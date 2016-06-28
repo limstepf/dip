@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>ch.unifr.diva.dip</groupId>
+		<artifactId>dip-pom-osgi</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../pom-osgi/pom.xml</relativePath>
+	</parent>
+	<artifactId>dip-pom-osgi-dependency</artifactId>
+	<name>DIVA DIP OSGi Dependency POM</name>
+	<description>
+		The DIVA DIP OSGi Dependency POM is a direct parent POM to copy
+		dependencies (e.g. external OSGi bundles) and make them available
+		to the OSGi framework (as system/core bundle).
+		Note that these bundles are only known/available to the OSGi framework,
+		but not to the host application.
+	</description>
+	<packaging>pom</packaging>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<outputDirectory>${app.core.bundledir}</outputDirectory>
+					<excludeTransitive>true</excludeTransitive>
+					<overWriteSnapshots>true</overWriteSnapshots>
+					<overWriteIfNewer>true</overWriteIfNewer>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

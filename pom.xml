@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>ch.unifr.diva.dip</groupId>
+	<artifactId>dip</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<name>DIVA DIP</name>
+	<description>DIVA Document Image Processor (DIP)</description>
+	<packaging>pom</packaging>
+
+	<prerequisites>
+		<maven>3.0</maven>
+	</prerequisites>
+
+	<modules>
+		<!-- parent POMs -->
+		<module>pom-super</module>
+		<module>pom-osgi</module>
+		<module>pom-osgi-component</module>
+		<module>pom-osgi-dependency</module>
+
+		<!-- API and host application -->
+		<module>api</module>
+		<module>app</module>
+
+		<!-- OSGi bundles (system/core) -->
+		<module>felix</module>
+		<module>felix-gogo</module>
+
+		<!-- OSGi bundles (plugins) -->
+		<module>awt-demo</module>
+		<module>awt-tools</module>
+		<module>fx-tools</module>
+
+	</modules>
+</project>

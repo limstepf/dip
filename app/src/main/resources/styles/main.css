@@ -1,0 +1,286 @@
+/*
+	Base: modena.css (default stylesheet)
+	File: jfxrt.jar, com/sun/javafx/scene/control/skin/modena/
+*/
+.root {
+	-dip-background: derive(-fx-base, -67%);
+	-dip-faint: derive(-fx-dark-text-color, 111%);
+	-dip-accent-faint: -fx-faint-focus-color;
+	-dip-accent-highlight: derive(-fx-accent, 67%);
+	-dip-alert: #FF0000;
+	-dip-alert-faint: #FF000022;
+	-dip-alert-highlight: derive(-dip-alert, 67%);
+
+	-dip-proc-unavailable: orangered;
+	-dip-proc-unavailable-highlight: derive(-dip-proc-unavailable, 67%);
+	-dip-proc-unconnected: orange;
+	-dip-proc-unconnected-highlight: derive(-dip-proc-unconnected, 67%);
+	-dip-proc-waiting: gold;
+	-dip-proc-waiting-highlight: derive(-dip-proc-waiting, 67%);
+	-dip-proc-processing: greenyellow;
+	-dip-proc-processing-highlight: derive(-dip-proc-processing, 67%);
+	-dip-proc-ready: forestgreen;
+	-dip-proc-ready-highlight: derive(-dip-proc-ready, 67%);
+}
+
+/*
+	 1px		0.083333em
+	 2px		0.166667em
+     3px		0.25em
+     4px		0.333333em
+	 5px		0.416em
+	 6px		0.5em
+     7px		0.583333em
+     8px		0.666667em
+     9px		0.75em
+	10px		0.833em
+    11px		0.916667em
+    12px		1em
+	15px		1.25em
+	30px		2.5em
+	45px		3.75em
+*/
+
+.dip-disabled {
+	-fx-opacity: 0.4;
+}
+
+.dip-title {
+	-fx-font-weight: 900;
+	-fx-padding: 0 0 2em 0;
+}
+
+.dip-small {
+	-fx-font-size: 0.75em;
+}
+.label.dip-small {
+	-fx-text-fill: -dip-faint;
+}
+.button.dip-small {
+    -fx-padding: 0.166667em 0.333333em 0.166667em 0.333333em;
+}
+
+.dip-text-input {}
+.dip-text-input:alert {
+    -fx-background-color: 
+        -dip-alert,
+        -fx-control-inner-background,
+        -dip-alert-faint,
+        linear-gradient(from 0px 0px to 0px 5px, derive(-fx-control-inner-background, -9%), -fx-control-inner-background);
+}
+
+.dip-list-cell {}
+.dip-list-cell:insert-above {
+	-fx-border-width: 0.166667em 0 0 0;
+	-fx-border-color: -fx-accent;
+}
+.dip-list-cell:insert-below {
+	-fx-border-width: 0 0 0.166667em 0;
+	-fx-border-color: -fx-accent;
+}
+
+.dip-separator {
+    -fx-border-color: transparent transparent -fx-box-border transparent;
+    -fx-border-insets: 0 0 1 0;
+}
+
+.dip-form-grid-pane {
+	-fx-hgap: 1.25em;
+	-fx-vgap: 0.416em;
+}
+
+.dip-button-bar {
+    -fx-spacing: 0.833em;
+	-fx-hgap: 1.25em;
+}
+
+.dip-dialog {
+	-fx-padding: 1.25em;
+}
+
+.dip-dialog > .dip-button-bar {
+	-fx-padding: 3.75em 0 0 0;
+	-fx-alignment: baseline-right;
+}
+
+.dip-lane {
+	-fx-spacing: 0.416em;
+}
+
+.dip-zoom-pane,
+.dip-zoom-pane > .viewport {
+	-fx-background-color: transparent;
+}
+
+.dip-side-bar {
+	-fx-background-color: -fx-base;
+}
+
+.dip-widget {
+    -fx-padding: 0.416em;
+	-fx-background-color: -fx-shadow-highlight-color, -fx-outer-border, -fx-inner-border, -fx-body-color;
+	-fx-background-insets: 0 0 -1 0, 0, 1, 2;
+    -fx-background-radius: 3px, 3px, 2px, 1px;
+}
+
+.dip-viewport {
+	-fx-stroke: -fx-accent;
+	-fx-fill: -dip-accent-faint;
+}
+
+.dip-editor,
+.dip-pipeline-editor {
+	-fx-background-color: -dip-background;
+}
+
+.dip-status-bar {
+    -fx-spacing: 0.166667em;
+	-fx-padding: 0.166667em 0.666667em 0.166667em 0.666667em;
+	-fx-background-color: -fx-outer-border, -fx-body-color;
+	-fx-background-insets: 0 0 0 0, 1 0 0 0;
+}
+
+.dip-status-bar Label {
+
+}
+
+.dip-status-bar ProgressBar {
+	-fx-padding: 0.166667em 0.0em 0.0em 0.0em;
+}
+
+.dip-resize-handle {
+
+}
+
+.dip-processor {
+	-fx-background-color: transparent;
+}
+
+.dip-processor-leftright,
+.dip-processor-topdown {
+	-fx-background-color: -fx-body-color;
+    -fx-padding: 0.416em;
+	-fx-border-color: -fx-outer-border;
+}
+
+.dip-processor-leftright {
+	-fx-border-width: 1px 0 1px 0;
+}
+
+.dip-processor-topdown {
+	-fx-border-width: 0 1px 0 1px;
+}
+
+.dip-processor-top,
+.dip-processor-right,
+.dip-processor-bottom,
+.dip-processor-left {
+    -fx-padding: 0.416em;
+    -fx-spacing: 0.416em;
+	-fx-background-color: -fx-body-color;
+	-fx-border-color: -fx-outer-border;
+}
+
+.dip-processor-top {
+	-fx-background-color: ladder(
+		-fx-color,
+		derive(-fx-color,8%) 75%,
+		derive(-fx-color,10%) 80%
+	);
+	-fx-background-radius: 0.833em 0.833em 0 0;
+	-fx-border-radius: 0.833em 0.833em 0 0;
+	-fx-border-width: 1px 1px 0 1px;
+}
+
+.dip-processor-right {
+	-fx-background-radius: 0 0.833em 0.833em 0;
+	-fx-border-radius: 0 0.833em 0.833em 0;
+	-fx-border-width: 1px 1px 1px 0;
+}
+
+.dip-processor-bottom {
+	-fx-background-color: derive(-fx-color,-8%);
+	-fx-background-radius: 0 0 0.833em 0.833em;
+	-fx-border-radius: 0 0 0.833em 0.833em;
+	-fx-border-width: 0 1px 1px 1px;
+}
+
+.dip-processor-left {
+	-fx-background-radius: 0.833em 0 0 0.833em;
+	-fx-border-radius: 0.833em 0 0 0.833em;
+	-fx-border-width: 1px 0 1px 1px;
+}
+
+.dip-processor:selected .dip-processor-top,
+.dip-processor:selected .dip-processor-right,
+.dip-processor:selected .dip-processor-bottom,
+.dip-processor:selected .dip-processor-left,
+.dip-processor:selected .dip-processor-leftright,
+.dip-processor:selected .dip-processor-topdown {
+	-fx-background-color: -dip-accent-highlight;
+	-fx-border-color: -fx-accent;
+}
+
+.dip-processor:unavailable .dip-processor-top,
+.dip-processor:unavailable .dip-processor-right,
+.dip-processor:unavailable .dip-processor-bottom,
+.dip-processor:unavailable .dip-processor-left,
+.dip-processor:unavailable .dip-processor-leftright,
+.dip-processor:unavailable .dip-processor-topdown {  
+	-fx-background-color: -dip-proc-unavailable-highlight;
+	-fx-border-color: -dip-proc-unavailable;
+}
+
+.dip-processor:unconnected .dip-processor-top,
+.dip-processor:unconnected .dip-processor-right,
+.dip-processor:unconnected .dip-processor-bottom,
+.dip-processor:unconnected .dip-processor-left,
+.dip-processor:unconnected .dip-processor-leftright,
+.dip-processor:unconnected .dip-processor-topdown {  
+	-fx-background-color: -dip-proc-unconnected-highlight;
+	-fx-border-color: -dip-proc-unconnected;
+}
+
+.dip-processor:waiting .dip-processor-top,
+.dip-processor:waiting .dip-processor-right,
+.dip-processor:waiting .dip-processor-bottom,
+.dip-processor:waiting .dip-processor-left,
+.dip-processor:waiting .dip-processor-leftright,
+.dip-processor:waiting .dip-processor-topdown {  
+	-fx-background-color: -dip-proc-waiting-highlight;
+	-fx-border-color: -dip-proc-waiting;
+}
+
+.dip-processor:processing .dip-processor-top,
+.dip-processor:processing .dip-processor-right,
+.dip-processor:processing .dip-processor-bottom,
+.dip-processor:processing .dip-processor-left,
+.dip-processor:processing .dip-processor-leftright,
+.dip-processor:processing .dip-processor-topdown {  
+	-fx-background-color: -dip-proc-processing-highlight;
+	-fx-border-color: -dip-proc-processing;
+}
+
+.dip-processor:ready .dip-processor-top,
+.dip-processor:ready .dip-processor-right,
+.dip-processor:ready .dip-processor-bottom,
+.dip-processor:ready .dip-processor-left,
+.dip-processor:ready .dip-processor-leftright,
+.dip-processor:ready .dip-processor-topdown {  
+	-fx-background-color: -dip-proc-ready-highlight;
+	-fx-border-color: -dip-proc-ready;
+}
+
+
+.dip-wire {
+	//-fx-effect: dropshadow( gaussian , black , 3, 0, 1, 1 );
+}
+
+.dip-rubberband {
+	-fx-stroke: -fx-accent;
+	//-fx-effect: dropshadow( gaussian , black , 3, 0, 1, 1 );
+}
+
+.dip-shadow {
+	-fx-effect: dropshadow( gaussian , black , 3, 0, 1, 1 );
+}

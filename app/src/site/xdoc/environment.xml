@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+		  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		  xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+
+	<properties>
+		<title>Development Environment</title>
+	</properties>
+
+	<head>
+	</head>
+
+	<body>
+		<div class="dip">
+			<section name="Development Environment">
+				<dl>
+					<dt>Programming Language</dt>
+					<dd>
+						<p>Java 8</p>
+						<ul>
+							<li>
+								<a href="https://docs.oracle.com/javase/8/docs/api/">
+									https://docs.oracle.com/javase/8/docs/api/
+								</a>
+							</li>
+						</ul>
+					</dd>
+
+					<dt>UI Toolkit</dt>
+					<dd>
+						<p>JavaFX 8</p>
+						<ul>
+							<li>
+								<a href="http://docs.oracle.com/javase/8/javafx/api/">
+									http://docs.oracle.com/javase/8/javafx/api/
+								</a>
+							</li>
+							<li>
+								<a href="https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html">
+									https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html
+								</a>
+							</li>
+							<li>
+								<a href="http://gluonhq.com/open-source/scene-builder/">
+									http://gluonhq.com/open-source/scene-builder/
+								</a>
+							</li>
+						</ul>
+					</dd>
+
+					<dt>Service/Plugin Framework</dt>
+					<dd>
+						<p>Apache Felix (OSGi Framework and Service platform)</p>
+						<ul>
+							<li>
+								<a href="http://felix.apache.org/">
+									http://felix.apache.org/
+								</a>
+							</li>
+							<li>
+								<a href="http://www.osgi.org/Specifications/">
+									http://www.osgi.org/Specifications/
+								</a>
+							</li>
+						</ul>
+					</dd>
+
+					<dt>Build Tool</dt>
+					<dd>
+						<p>Apache Maven 3</p>
+						<ul>
+							<li>
+								<a href="https://maven.apache.org/">
+									https://maven.apache.org/
+								</a>
+							</li>
+						</ul>
+					</dd>
+
+					<dt>Version Control System</dt>
+					<dd>
+						<p>Git</p>
+						<ul>
+							<li>
+								<a href="https://git-scm.com/">
+									https://git-scm.com/
+								</a>
+							</li>
+						</ul>
+					</dd>
+				</dl>
+			</section>
+
+			<!--
+			<section name="Another section">
+				<source>
+	code line 1
+	code line 2
+				</source>
+			</section>
+			-->
+		</div>
+	</body>
+</document>

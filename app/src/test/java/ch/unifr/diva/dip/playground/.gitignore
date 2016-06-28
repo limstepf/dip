@@ -1,0 +1,9 @@
+# the playground is intended for developers to screw around.
+# ignore everything, commit nothing...
+*
+
+# ...except these demo files/tests (and this .gitignore-file itself):
+!.gitignore
+!package-info.java
+!JavaTests.java
+!JavaFxApplicationTests.java

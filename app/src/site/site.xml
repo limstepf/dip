@@ -1,0 +1,31 @@
+<project>
+
+	<skin>
+		<groupId>org.apache.maven.skins</groupId>
+		<artifactId>maven-fluido-skin</artifactId>
+		<version>1.4</version>
+	</skin>
+
+	<custom>
+		<fluidoSkin>
+			<topBarEnabled>false</topBarEnabled>
+			<sideBarEnabled>true</sideBarEnabled>
+			<sourceLineNumbersEnabled>true</sourceLineNumbersEnabled>
+			<!-- spanX sum must be 12-->
+			<leftColumnClass>span3</leftColumnClass>
+			<bodyColumnClass>span9</bodyColumnClass>
+		</fluidoSkin>
+	</custom>
+
+	<body>
+		<menu ref="reports" />
+		<menu ref="parent" />
+		<menu ref="modules" />
+
+		<menu name="DIP Developer's Guide">
+			<item name="Development Environment" href="environment.html" />
+			<item name="Developer's Notes" href="notes.html" />
+			<item name="Code Conventions" href="code.html" />
+		</menu>
+	</body>
+</project>

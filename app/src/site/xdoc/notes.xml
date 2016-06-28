@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+		  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		  xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+
+	<properties>
+		<title>Developer's Notes</title>
+	</properties>
+
+	<head>
+	</head>
+
+	<body>
+		<div class="dip">
+			<section name="Developer's Notes">
+				<p>
+					Technical notes for developers. Have a look here before you change
+					the build, or update some dependencies to the latest version, or
+					what not.
+				</p>
+
+				<subsection name="Maven plugins, build, reporting">
+					<dl>
+						<dt>Test coverage (unit and integration tests)</dt>
+						<dd>
+							<p>
+								<em>Cobertura</em> didn't play nice with Java 8 (as of Oct.
+								2015, cobertura-maven-plugin, v. 2.7), hence <em>Jacoco</em>
+								is used to produce test coverage reports instead. <br />
+
+								<em>Jacoco</em> is nice too, and seems to recieve more love
+								from maintainers anyways nowadays. So there's that.</p>
+
+							<p>The execution phases had to be tweaked in order to not
+								produce the site folder too early, otherwise no other reports
+								would be generated (there might be some kind of aggregate/merge
+								button, alas I didn't find it...). <br />
+								Similarly do not try to change the <em>Jacoco</em> files
+								(i.e. the Maven properties <tt>testing.surefire.file</tt> and
+								<tt>testing.failsafe.file</tt>), or the reporting will fail.</p>
+						</dd>
+
+						<dt>Running single unit or integration tests</dt>
+						<dd>
+							<p>The latest version of the <em>Maven Surefire Plugin</em>
+								(maven-surefire-plugin, v. 2.19) has a bug s.t. single tests
+								can't be run from the IDE/NetBeans (still works fine from the
+								console though). That's not much fun, so version 2.18.1 is
+								used in the meantime.</p>
+
+							<p>See:</p>
+							<ul>
+								<li>
+									<a href="https://netbeans.org/bugzilla/show_bug.cgi?id=244404">
+										https://netbeans.org/bugzilla/show_bug.cgi?id=244404
+									</a>
+								</li>
+								<li>
+									<a href="https://issues.apache.org/jira/browse/SUREFIRE-1028">
+										https://issues.apache.org/jira/browse/SUREFIRE-1028
+									</a>
+								</li>
+							</ul>
+						</dd>
+					</dl>
+				</subsection>
+
+			</section>
+		</div>
+	</body>
+</document>
