@@ -41,11 +41,11 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
 
 /**
- * Rescaling filter. Scaling/gain and biasing (and clamping).
+ * Sample rescaling filter. Scaling/gain and biasing (and clamping).
  */
 @Component
 @Service
-public class Rescaler extends ProcessableBase implements Transmutable {
+public class SampleRescaler extends ProcessableBase implements Transmutable {
 
 	private final static String STORAGE_IMAGE = "rescaled.png";
 	private final static String STORAGE_IMAGE_FORMAT = "PNG";
@@ -106,14 +106,14 @@ public class Rescaler extends ProcessableBase implements Transmutable {
 
 	private static class RescaleConfig {
 
-		private final Rescaler rescaler;
+		private final SampleRescaler rescaler;
 		private ValueListSelection vs;
 		private final Map<String, OutputPort> ports = new HashMap<>();
 		private int numBands = -1;
 		private boolean isBufferedMatrix;
 		private RescaleOp.Precision precision;
 
-		public RescaleConfig(Rescaler rescaler) {
+		public RescaleConfig(SampleRescaler rescaler) {
 			this.rescaler = rescaler;
 		}
 
@@ -262,8 +262,8 @@ public class Rescaler extends ProcessableBase implements Transmutable {
 	/**
 	 * Default constructor.
 	 */
-	public Rescaler() {
-		super("Rescaler");
+	public SampleRescaler() {
+		super("Sample Rescaler");
 
 		final TextParameter rescaleText = new TextParameter(
 				"I'(x,y) = clamp(gain * I(x,y) + bias)"
@@ -366,7 +366,7 @@ public class Rescaler extends ProcessableBase implements Transmutable {
 
 	@Override
 	public Processor newInstance(ProcessorContext context) {
-		return new Rescaler();
+		return new SampleRescaler();
 	}
 
 	@Override
