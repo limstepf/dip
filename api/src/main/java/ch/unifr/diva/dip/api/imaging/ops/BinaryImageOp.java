@@ -1,5 +1,6 @@
 package ch.unifr.diva.dip.api.imaging.ops;
 
+import ch.unifr.diva.dip.api.imaging.BufferedMatrix;
 import ch.unifr.diva.dip.api.imaging.ImagingUtils;
 import ch.unifr.diva.dip.api.imaging.scanners.Location;
 import ch.unifr.diva.dip.api.imaging.scanners.RasterScanner;
@@ -21,17 +22,30 @@ public abstract class BinaryImageOp extends NullOp {
 	protected final BufferedImage left;
 	protected final boolean combinePixels;
 
+	/**
+	 * Creates a new binary image operation without combining pixels.
+	 *
+	 * @param left the first source image.
+	 */
 	public BinaryImageOp(BufferedImage left) {
 		this(left, false);
 	}
 
+	/**
+	 * Creates a new binary image operation.
+	 *
+	 * @param left the first source image.
+	 * @param combinePixels if set to True RGB pixels will be extracted and
+	 * combined, otherwise each sample is combined individually.
+	 */
 	public BinaryImageOp(BufferedImage left, boolean combinePixels) {
 		this.left = left;
 		this.combinePixels = combinePixels;
 	}
 
 	/**
-	 * Combines two source samples in a way known only by the implementing subclass.
+	 * Combines two source samples in a way known only by the implementing
+	 * subclass.
 	 *
 	 * @param s1 sample from the first (or left) source.
 	 * @param s2 sample from the second (or right) source.
@@ -39,6 +53,13 @@ public abstract class BinaryImageOp extends NullOp {
 	 */
 	public abstract int combine(int s1, int s2);
 
+	/**
+	 * Combines two RGB pixels.
+	 *
+	 * @param p1 pixel of the first source image.
+	 * @param p2 pixel of the second source image.
+	 * @return the combined pixel.
+	 */
 	public int combineRGB(int p1, int p2) {
 		final Color c1 = new Color(p1);
 		final Color c2 = new Color(p2);
@@ -56,11 +77,14 @@ public abstract class BinaryImageOp extends NullOp {
 		final Rectangle rightBounds = right.getRaster().getBounds();
 		final Rectangle intersectBounds = leftBounds.intersection(rightBounds);
 
-		if (dst == null) { //
-			final ColorModel cm = (ImagingUtils.numBands(this.left) < ImagingUtils.numBands(right))
-					? this.left.getColorModel()
-					: right.getColorModel();
-			dst = createCompatibleDestImage(intersectBounds, cm);
+		if (dst == null) {
+			if ((this.left instanceof BufferedMatrix) || (right instanceof BufferedMatrix)) {
+				final BufferedMatrix mat = (BufferedMatrix) getImageWithLeastBands(this.left, right);
+				dst = createCompatibleDestMatrix(intersectBounds, mat);
+			} else {
+				final ColorModel cm = getImageWithLeastBands(this.left, right).getColorModel();
+				dst = createCompatibleDestImage(intersectBounds, cm);
+			}
 		}
 
 		if (this.combinePixels) {
@@ -82,6 +106,19 @@ public abstract class BinaryImageOp extends NullOp {
 		}
 
 		return dst;
+	}
+
+	private BufferedImage getImageWithLeastBands(BufferedImage... images) {
+		BufferedImage image = images[0];
+		int numBands = ImagingUtils.numBands(image);
+		for (int i = 1; i < images.length; i++) {
+			final int n = ImagingUtils.numBands(images[i]);
+			if (n < numBands) {
+				image = images[i];
+				numBands = n;
+			}
+		}
+		return image;
 	}
 
 }

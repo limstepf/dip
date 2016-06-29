@@ -1,5 +1,6 @@
 package ch.unifr.diva.dip.api.imaging.ops;
 
+import ch.unifr.diva.dip.api.imaging.BufferedMatrix;
 import ch.unifr.diva.dip.api.imaging.scanners.Location;
 import ch.unifr.diva.dip.api.imaging.scanners.RasterScanner;
 import java.awt.Rectangle;
@@ -23,10 +24,24 @@ public class NullOp implements BufferedImageOp {
 
 	@Override
 	public BufferedImage createCompatibleDestImage(BufferedImage src, ColorModel dstCM) {
+		// buffered matrix?
+		if (src instanceof BufferedMatrix) {
+			final BufferedMatrix mat = (BufferedMatrix) src;
+			return new BufferedMatrix(
+					mat.getWidth(),
+					mat.getHeight(),
+					mat.getNumBands(),
+					mat.getSampleDataType(),
+					mat.getInterleave()
+			);
+		}
+
+		// common type?
 		if (src.getType() != 0) {
 			return new BufferedImage(src.getWidth(), src.getHeight(), src.getType());
 		}
 
+		// custom type
 		return new BufferedImage(
 				dstCM,
 				dstCM.createCompatibleWritableRaster(src.getWidth(), src.getHeight()),
@@ -35,12 +50,39 @@ public class NullOp implements BufferedImageOp {
 		);
 	}
 
+	/**
+	 * Creates a zeroed destination image with the correct size and number of
+	 * bands.
+	 *
+	 * @param bounds bounds/size of the destination image.
+	 * @param dstCM ColorModel of the destination.
+	 * @return the zeroed destination image.
+	 */
 	public BufferedImage createCompatibleDestImage(Rectangle bounds, ColorModel dstCM) {
 		return new BufferedImage(
 				dstCM,
 				dstCM.createCompatibleWritableRaster(bounds.width, bounds.height),
 				dstCM.isAlphaPremultiplied(),
 				null
+		);
+	}
+
+	/**
+	 * Creates a zeroed destination matrix with the correct size, precision and
+	 * number of bands.
+	 *
+	 * @param bounds bounds/size of the destination matrix.
+	 * @param src source matrix the destination matrix should be compatible to
+	 * (defines numBands, sampleDataType, and interleave).
+	 * @return the zeroed destination matrix.
+	 */
+	public BufferedMatrix createCompatibleDestMatrix(Rectangle bounds, BufferedMatrix src) {
+		return new BufferedMatrix(
+				bounds.width,
+				bounds.height,
+				src.getNumBands(),
+				src.getSampleDataType(),
+				src.getInterleave()
 		);
 	}
 
