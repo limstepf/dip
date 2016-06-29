@@ -85,6 +85,15 @@ public class BufferedMatrix extends BufferedImage {
 	protected final int bands;
 
 	/**
+	 * Returns the number of bands (or matrices).
+	 *
+	 * @return number of bands (or matrices).
+	 */
+	public int getNumBands() {
+		return bands;
+	}
+
+	/**
 	 * Returns the interleave method.
 	 *
 	 * @return the interleave method.
