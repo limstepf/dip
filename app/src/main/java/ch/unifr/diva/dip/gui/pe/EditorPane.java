@@ -225,15 +225,20 @@ public class EditorPane {
 
 	private void bindWire(InputPort input, ConnectionView wire, OutputPort output, boolean doConnect) {
 		final PortView<InputPort> ip = this.ports.get(input);
-//		final PortView<OutputPort> op = this.ports.get(input.connection());
 		final PortView<OutputPort> op = this.ports.get(output);
 
 		// unregister wire from previous ports
 		if (wire.inputPort() != null) {
-			this.ports.get(wire.inputPort()).removeWire(wire);
+			final PortView pv = this.ports.get(wire.inputPort());
+			if (pv != null) {
+				pv.removeWire(wire);
+			}
 		}
 		if (wire.outputPort() != null) {
-			this.ports.get(wire.outputPort()).removeWire(wire);
+			final PortView pv = this.ports.get(wire.outputPort());
+			if (pv != null) {
+				pv.removeWire(wire);
+			}
 		}
 
 		if (!doConnect && !input.isConnected()) {
@@ -362,7 +367,7 @@ public class EditorPane {
 	public void updateProcessor(ProcessorWrapper wrapper) {
 		final ProcessorView oldView = processorViews.get(wrapper);
 		if (oldView == null) {
-			log.warn("Couldn't update processor: processor view not found");
+			log.warn("Couldn't update processor: processor view not found: {}", wrapper);
 			return;
 		}
 
