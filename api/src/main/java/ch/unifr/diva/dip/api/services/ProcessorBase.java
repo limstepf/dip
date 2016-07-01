@@ -31,12 +31,33 @@ public abstract class ProcessorBase implements Processor {
 
 	protected static final org.slf4j.Logger log = LoggerFactory.getLogger(ProcessorBase.class);
 
+	/**
+	 * Name of the processor.
+	 */
 	protected final String name;
+
+	// we use LinkedHashMap's (as opposed to ordinary HashMap's) since we care
+	// about the order of ports and parameters
+	/**
+	 * Published input ports.
+	 */
 	protected final Map<String, InputPort> inputs = new LinkedHashMap();
+
+	/**
+	 * Published output ports.
+	 */
 	protected final Map<String, OutputPort> outputs = new LinkedHashMap();
-//	protected final Map<String, Parameter> parameters = new LinkedHashMap();
+
+	/**
+	 * Published parameters.
+	 */
 	protected final Map<String, Parameter> parameters = new LinkedHashMap();
 
+	/**
+	 * Creates a new processor base.
+	 *
+	 * @param name name of the processor.
+	 */
 	public ProcessorBase(String name) {
 		this.name = name;
 	}
@@ -62,9 +83,9 @@ public abstract class ProcessorBase implements Processor {
 	}
 
 	/**
-	 * Resets all (published) output ports. Make sure to override this method
-	 * if the processor is transmutable and offers a dynamic/changing set of
-	 * output ports.
+	 * Resets all (published) output ports. Make sure to override this method if
+	 * the processor is transmutable and offers a dynamic/changing set of output
+	 * ports.
 	 */
 	protected void resetOutputs() {
 		for (OutputPort output : outputs.values()) {
@@ -173,6 +194,13 @@ public abstract class ProcessorBase implements Processor {
 		return null;
 	}
 
+	/**
+	 * Writes a {@code BufferedMatrix} to the savefile.
+	 *
+	 * @param context the processor context.
+	 * @param filename the filename of the image/matrix.
+	 * @param mat the image/matrix.
+	 */
 	protected void writeBufferedMatrix(ProcessorContext context, String filename, BufferedMatrix mat) {
 		final Path file = context.directory.resolve(filename);
 
@@ -210,6 +238,13 @@ public abstract class ProcessorBase implements Processor {
 		}
 	}
 
+	/**
+	 * Reads a {@code BufferedMatrix} from the savefile.
+	 *
+	 * @param context the processor context.
+	 * @param filename the filename of the image/matrix.
+	 * @return the image/matrix, or null.
+	 */
 	protected BufferedMatrix readBufferedMatrix(ProcessorContext context, String filename) {
 		final Path file = context.directory.resolve(filename);
 
