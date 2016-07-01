@@ -46,6 +46,7 @@ public class RunnablePipeline extends Pipeline<RunnableProcessor> {
 		this.stageListener = (ListChangeListener.Change<? extends RunnableProcessor> c) -> {
 			updatePortMapsAndStages();
 		};
+		this.processors().addListener(stageListener);
 
 		this.modifiedPipelineProperty.addObservedProperty(this.processors);
 	}
