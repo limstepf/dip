@@ -213,6 +213,9 @@ public class Project implements Modifiable, Localizable {
 	private void saveInternal() throws Exception {
 		final ProjectData data = new ProjectData(this);
 
+		// save current pipeline (e.g. the object map)
+		this.getSelectedPage().getPipeline().save();
+
 		// write project root xml
 		Files.deleteIfExists(zip.getPath(ProjectData.PROJECT_ROOT_XML));
 
