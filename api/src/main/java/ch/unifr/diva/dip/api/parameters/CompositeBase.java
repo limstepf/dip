@@ -2,7 +2,6 @@ package ch.unifr.diva.dip.api.parameters;
 
 import java.util.Collection;
 import java.util.List;
-import javafx.beans.InvalidationListener;
 
 /**
  * Base class for composite parameters. Implementing classes should call
@@ -25,6 +24,8 @@ import javafx.beans.InvalidationListener;
  */
 public abstract class CompositeBase<T> extends PersistentParameterBase<T> {
 
+	protected boolean enableChildListeners;
+
 	/**
 	 * Composite base constructor.
 	 *
@@ -36,10 +37,6 @@ public abstract class CompositeBase<T> extends PersistentParameterBase<T> {
 		super(label, defaultValue, initialValue);
 	}
 
-	private final InvalidationListener invalidationListener = (c) -> {
-		this.valueProperty.invalidate();
-	};
-
 	/**
 	 * Listens to changes in persistent child parameters to invalidate the
 	 * composite value. This method should be called in the constructor of
@@ -48,21 +45,58 @@ public abstract class CompositeBase<T> extends PersistentParameterBase<T> {
 	 * @param children persistent child parameters.
 	 */
 	protected void addChildListeners(List<PersistentParameter> children) {
-		for (PersistentParameter p : children) {
-			p.property().addListener(invalidationListener);
+		for (final PersistentParameter p : children) {
+			p.property().addListener((c) -> {
+				if (enableChildListeners) {
+					invalidateChildParameter(p);
+				}
+			});
 		}
+
+		enableChildListeners(true);
 	}
 
 	/**
-	 * Removes invalidation listeners from persistent child parameters.
+	 * Disables/(re-)enables child parameter invalidation listeners.
 	 *
-	 * @param children persistent child parameters.
+	 * @param enable True to enable invalidation listeners, False to disable
+	 * them.
 	 */
-	protected void removeChildListeners(List<PersistentParameter> children) {
-		for (PersistentParameter p : children) {
-			p.property().removeListener(invalidationListener);
-		}
+	protected void enableChildListeners(boolean enable) {
+		this.enableChildListeners = enable;
 	}
+
+	/**
+	 * Invalidates a child parameter. This method gets called if a persistent
+	 * child parameter has been changed. The composite parameter has to update
+	 * its internal state/representation (often a list, or a map of child
+	 * values) in the implementation of this method.
+	 *
+	 * @param p the persistent child parameter that has been changed.
+	 */
+	protected abstract void invalidateChildParameter(PersistentParameter p);
+
+	/**
+	 * Sets the value of the parameter. Composite parameters need to propagate
+	 * changes to persistent child parameters, and therefore can't simply set
+	 * the new value and be done with it. It might be wise anyways to do some
+	 * validation instead of setting the composite value directly (children
+	 * might be outdated or missing...).
+	 *
+	 * <p>
+	 * It is highly recommended to disable the invalidation listeners on child
+	 * parameters first, update the children, and re-enable the listeners at the
+	 * end, s.t. the composite parameter (parent) fires/invalidates the
+	 * valueProperty just a single time.<br />
+	 *
+	 * In case the object of the valueProperty is still the same (i.e. has the
+	 * same hash code), the valueProperty should be invalidated manually (e.g.
+	 * in case of a list or map whose values changed).
+	 *
+	 * @param value the new value.
+	 */
+	@Override
+	public abstract void set(T value);
 
 	/**
 	 * Returns a list of all child parameters.
@@ -84,9 +118,4 @@ public abstract class CompositeBase<T> extends PersistentParameterBase<T> {
 		return hasPersistentChildren();
 	}
 
-	// For composite T it might be wise to override:
-	// # public void set(T value)
-	// ...and do some validation before setting a composite directly. Children
-	// might be outdated or missing (e.g. loading an old savefile) so it's
-	// probably best to set children individually.
 }

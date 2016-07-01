@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import javafx.beans.InvalidationListener;
 
 /**
  * Composite grid backed by a list of child parameters. Keep in mind that a list
@@ -59,6 +60,7 @@ public class CompositeGrid extends CompositeGridBase<ValueList> {
 
 		this.children = parameters;
 		this.persistentChildren = Parameter.filterPersistent(this.children);
+		
 		addChildListeners(this.persistentChildren);
 	}
 
@@ -105,7 +107,22 @@ public class CompositeGrid extends CompositeGridBase<ValueList> {
 	}
 
 	@Override
+	protected void invalidateChildParameter(PersistentParameter p) {
+		final ValueList vl = get();
+		for (int i = 0; i < this.persistentChildren.size(); i++) {
+			final PersistentParameter pi = this.persistentChildren.get(i);
+			if (p.equals(pi)) {
+				vl.list.set(i, p.get());
+				break;
+			}
+		}
+		this.valueProperty.invalidate();
+	}
+
+	@Override
 	public void set(ValueList value) {
+		enableChildListeners(false);
+
 		final ValueList v = get();
 		// read at most as many values as we have persistent children
 		final int max = Math.min(
@@ -117,11 +134,17 @@ public class CompositeGrid extends CompositeGridBase<ValueList> {
 			this.persistentChildren.get(i).set(value.get(i));
 		}
 
+		final boolean invalidate = this.valueProperty.get().equals(v);
 		this.valueProperty.set(v);
+		if (invalidate) {
+			this.valueProperty.invalidate();
+		}
 
 		if (view != null) {
 			view.set(v);
 		}
+
+		enableChildListeners(true);
 	}
 
 }

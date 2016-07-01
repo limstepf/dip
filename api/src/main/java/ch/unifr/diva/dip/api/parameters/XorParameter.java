@@ -1,7 +1,6 @@
 package ch.unifr.diva.dip.api.parameters;
 
 import ch.unifr.diva.dip.api.datastructures.ValueListSelection;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -23,9 +22,7 @@ import javafx.scene.layout.VBox;
  */
 public class XorParameter extends CompositeBase<ValueListSelection> {
 
-	// TODO: we might wanna offer an XorParameter backed by something like a
-	// ValueSelection*Map*. See CompositeGrid/CompositeGridMap.
-	private final List<Parameter> children;
+	protected final List<Parameter> children;
 
 	/**
 	 * Creates an XOR parameter. Default selection is 0 (the first option).
@@ -49,6 +46,7 @@ public class XorParameter extends CompositeBase<ValueListSelection> {
 		super(label, initValue(parameters, defaultSelection), initValue(parameters, defaultSelection));
 
 		this.children = parameters;
+
 		addChildListeners(Parameter.filterPersistent(this.children));
 	}
 
@@ -77,15 +75,41 @@ public class XorParameter extends CompositeBase<ValueListSelection> {
 	}
 
 	@Override
+	protected void invalidateChildParameter(PersistentParameter p) {
+		final ValueListSelection vs = get();
+		for (int i = 0; i < this.children.size(); i++) {
+			final Parameter pi = this.children.get(i);
+			if (p.equals(pi)) {
+				vs.list.set(i, p.get());
+				break;
+			}
+		}
+		this.valueProperty.invalidate();
+	}
+
+	@Override
 	public void set(ValueListSelection value) {
+		enableChildListeners(false);
+
+		for (int i = 0; i < this.children.size(); i++) {
+			final Parameter p = this.children.get(i);
+			if (p.isPersistent()) {
+				final PersistentParameter pp = (PersistentParameter) p;
+				pp.set(value.get(i));
+			}
+		}
+
 		final boolean invalidate = this.valueProperty.get().equals(value);
 		this.valueProperty.set(value);
 		if (invalidate) {
 			this.valueProperty.invalidate();
 		}
+
 		if (view != null) {
 			view.set(value);
 		}
+
+		enableChildListeners(true);
 	}
 
 	@Override
@@ -95,6 +119,7 @@ public class XorParameter extends CompositeBase<ValueListSelection> {
 
 	/**
 	 * XOR item/option view.
+	 *
 	 * @param <T>
 	 */
 	public static class XorViewItem<T extends Parameter.View> {

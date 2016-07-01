@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javafx.beans.InvalidationListener;
 
 /**
  * Composite grid backed by a map of child parameters. Use a
@@ -48,11 +49,12 @@ public class CompositeGridMap extends CompositeGridBase<ValueMap> {
 				this.persistentChildren.add((PersistentParameter) p.getValue());
 			}
 		}
+
 		addChildListeners(this.persistentChildren);
 	}
 
 	// yes, we do this twice to not override the default later on...
-	private static ValueMap initValue(Map<String, Parameter> parameters) {
+	protected static ValueMap initValue(Map<String, Parameter> parameters) {
 		final Map<String, Object> defaultValues = new HashMap<>();
 		for (Map.Entry<String, Parameter> p : parameters.entrySet()) {
 			if (p.getValue().isPersistent()) {
@@ -103,7 +105,23 @@ public class CompositeGridMap extends CompositeGridBase<ValueMap> {
 	}
 
 	@Override
+	protected void invalidateChildParameter(PersistentParameter p) {
+		final ValueMap vm = get();
+		for (int i = 0; i < this.persistentChildren.size(); i++) {
+			final PersistentParameter pi = this.persistentChildren.get(i);
+			if (p.equals(pi)) {
+				final String key = this.persistentKeys.get(i);
+				vm.set(key, p.get());
+				break;
+			}
+		}
+		this.valueProperty.invalidate();
+	}
+
+	@Override
 	public void set(ValueMap value) {
+		enableChildListeners(false);
+
 		// value can't be trusted (might have invalid/outdated, or worse: missing keys)
 		// so we copy the entries individually
 		final ValueMap v = get();
@@ -112,11 +130,18 @@ public class CompositeGridMap extends CompositeGridBase<ValueMap> {
 			final int index = getIndexFromKey(e.getKey());
 			this.persistentChildren.get(index).set(e.getValue());
 		}
+
+		final boolean invalidate = this.valueProperty.get().equals(v);
 		this.valueProperty.set(v);
+		if (invalidate) {
+			this.valueProperty.invalidate();
+		}
 
 		if (view != null) {
 			view.set(v);
 		}
+
+		enableChildListeners(true);
 	}
 
 }
