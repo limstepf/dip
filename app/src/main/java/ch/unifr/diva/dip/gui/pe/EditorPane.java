@@ -323,6 +323,7 @@ public class EditorPane {
 	public void addProcessor(ProcessorWrapper wrapper) {
 		final ProcessorView view = this.editor.selectedPipeline().getLayoutStrategy().newProcessorView(editor, wrapper);
 		processorViews.put(wrapper, view);
+		view.init();
 		pane().getChildren().add(view);
 	}
 
@@ -377,6 +378,7 @@ public class EditorPane {
 		// replace with new view (conn. already hooked up, just need wires)
 		final ProcessorView newView = this.editor.selectedPipeline().getLayoutStrategy().newProcessorView(editor, wrapper);
 		processorViews.put(wrapper, newView);
+		newView.init();
 
 		if (!replaceNode(oldView, newView)) {
 			log.warn(

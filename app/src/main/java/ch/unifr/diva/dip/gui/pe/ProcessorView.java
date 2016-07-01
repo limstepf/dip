@@ -48,14 +48,24 @@ public abstract class ProcessorView extends BorderPane {
 	protected Node minimalNodeX;
 	protected Node minimalNodeY;
 
-	// TO IMPL: (1) add info and input/output panes
-	//				add title to info pane
-	//			(2) setupDraggable(infoPane)
-	//			(3) add inputs/outputs to panes
-	//			(4) setupPortViewListener();
-	//				also attach portListener to main/infoPane
-	//			(5) call setupEditingListeners()
-	//
+	/**
+	 * Creates the base of a processor view.
+	 *
+	 * <p>
+	 * Implementing sub-classes need to:
+	 *
+	 * <ol>
+	 * <li>add info and input/output panes (add title to info pane)</li>
+	 * <li>setupDraggable(infoPane)</li>
+	 * <li>add inputs/outputs to panes</li>
+	 * <li>setupPortViewListener(); also attach portListener to
+	 * main/infoPane</li>
+	 * <li>call setupEditingListeners()</li>
+	 * </ol>
+	 *
+	 * @param editor the (parent) pipeline editor.
+	 * @param wrapper the processor wrapper to create the view for.
+	 */
 	public ProcessorView(PipelineEditor editor, ProcessorWrapper wrapper) {
 		this.editor = editor;
 		this.wrapper = wrapper;
@@ -64,11 +74,6 @@ public abstract class ProcessorView extends BorderPane {
 			this.pseudoClassStateChanged(UNAVAILABLE, true);
 		}
 		wrapper.availableProperty().addListener(availableListener);
-
-		if (wrapper.processor() instanceof Transmutable) {
-			final Transmutable t = (Transmutable) wrapper.processor();
-			t.transmuteProperty().addListener(transmutableListener);
-		}
 
 		this.inputPorts = new ArrayList<>();
 		for (Map.Entry<String, InputPort> e : wrapper.processor().inputs().entrySet()) {
@@ -96,9 +101,25 @@ public abstract class ProcessorView extends BorderPane {
 		this.title = new Label(wrapper.processor().name());
 	}
 
+	/**
+	 * Initializes the editing property. Should be called once panes and ports
+	 * are setup, so at the end of the constructor of a sub-class.
+	 */
 	protected void setupEditingListeners() {
 		this.editingProperty.addListener(editingListener);
 		this.editingProperty.set(wrapper.isEditing());
+	}
+
+	/**
+	 * Initializes the view and starts listening to transmutable invalidation
+	 * events. Needs to be called once the view has been registered to the
+	 * processorViews in the EditorPane.
+	 */
+	public void init() {
+		if (wrapper.processor() instanceof Transmutable) {
+			final Transmutable t = (Transmutable) wrapper.processor();
+			t.transmuteProperty().addListener(transmutableListener);
+		}
 	}
 
 	// listen to selected/deselected processors
