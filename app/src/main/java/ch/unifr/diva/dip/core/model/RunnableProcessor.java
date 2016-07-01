@@ -49,10 +49,16 @@ public class RunnableProcessor extends ProcessorWrapper {
 	private final ObjectMapData objectMap;
 	private final LayerGroup layer;
 
-	// needs to be updated manual after each interaction with the processor
+	// needs to be updated manually after each interaction with the processor
 	private final ObjectProperty<Processor.State> stateProperty;
 
-
+	/**
+	 * Creates a runnable processor. As opposed to {@code ProcessorWrapper}s,
+	 * {@code RunnableProcessor}'s can be executed.
+	 *
+	 * @param processor the processor specification.
+	 * @param pipeline the (parent) runnable pipeline.
+	 */
 	public RunnableProcessor(PipelineData.Processor processor, RunnablePipeline pipeline) {
 		super(
 				processor,
@@ -97,6 +103,19 @@ public class RunnableProcessor extends ProcessorWrapper {
 		this.updateState();
 	}
 
+	/**
+	 * Returns the layer group of the runnable processor.
+	 *
+	 * @return the layer group of the runnable processor.
+	 */
+	public LayerGroup layer() {
+		return this.layer;
+	}
+
+	/**
+	 * The processor layer extension. Integrates processor controls into a
+	 * processors layer group.
+	 */
 	public static class ProcessorLayerExtension implements LayerExtension, Localizable {
 
 		final RunnableProcessor runnable;
@@ -110,13 +129,9 @@ public class RunnableProcessor extends ProcessorWrapper {
 			this.runnable = runnable;
 
 			status.getStyleClass().add("dip-small");
-			status.setText(runnable.getState().label);
-			this.runnable.stateProperty().addListener((e) -> {
-				status.setText(runnable.getState().label);
+			stateCallback();
+			this.runnable.stateProperty().addListener((e) -> stateCallback());
 
-				processButton.setDisable(!runnable.getState().equals(Processor.State.PROCESSING));
-				resetButton.setDisable(runnable.getState().equals(Processor.State.UNAVAILABLE));
-			});
 			if (runnable.processor().canProcess()) {
 				processButton.setText(localize("process"));
 				processButton.getStyleClass().add("dip-small");
@@ -125,6 +140,7 @@ public class RunnableProcessor extends ProcessorWrapper {
 				});
 				lane.add(processButton);
 			}
+
 			if (runnable.processor().canReset()) {
 				resetButton.setText(localize("reset"));
 				resetButton.getStyleClass().add("dip-small");
@@ -133,19 +149,22 @@ public class RunnableProcessor extends ProcessorWrapper {
 				});
 				lane.add(resetButton);
 			}
+
 			lane.setAlignment(Pos.CENTER_LEFT);
 			lane.setPadding(new Insets(4, 4, 4, 4));
 			vbox.getChildren().addAll(status, lane);
+		}
+
+		private void stateCallback() {
+			status.setText(runnable.getState().label);
+			processButton.setDisable(!runnable.getState().equals(Processor.State.PROCESSING));
+			resetButton.setDisable(runnable.getState().equals(Processor.State.UNAVAILABLE));
 		}
 
 		@Override
 		public Node getComponent() {
 			return vbox;
 		}
-	}
-
-	public LayerGroup layer() {
-		return this.layer;
 	}
 
 	private ObjectMapData initObjectMap() {
@@ -243,7 +262,9 @@ public class RunnableProcessor extends ProcessorWrapper {
 	}
 
 	/**
-	 * Updates the state of the processor.
+	 * Updates the state of the processor. Updates only the state of this
+	 * processor, not however the states of depended processors (whose states
+	 * might change once the state of this one does...).
 	 */
 	protected void updateState() {
 		updateState(false);
@@ -291,6 +312,9 @@ public class RunnableProcessor extends ProcessorWrapper {
 		return new ProcessorContext(processorDataDirectory(), objectMap.objects, this.layer);
 	}
 
+	/**
+	 * Starts processing on a background task.
+	 */
 	public void processBackgroundTask() {
 		final RunnableProcessor runnable = this;
 		BackgroundTask<Void> task = new BackgroundTask<Void>(handler) {
@@ -325,7 +349,10 @@ public class RunnableProcessor extends ProcessorWrapper {
 	// you probably wanna run this on some background/worker thread or something...
 	private void process() {
 		if (!this.processor().canProcess()) {
-			log.warn("Can't process. Processor doesn't implement Processable: {}", this.processor());
+			log.warn(
+					"Can't process. Processor doesn't implement Processable: {}",
+					this.processor()
+			);
 			return;
 		}
 
@@ -339,6 +366,9 @@ public class RunnableProcessor extends ProcessorWrapper {
 		});
 	}
 
+	/**
+	 * Resets the processor on a background task.
+	 */
 	public void resetBackgroundTask() {
 		final RunnableProcessor runnable = this;
 		BackgroundTask<Void> task = new BackgroundTask<Void>(handler) {
@@ -383,13 +413,19 @@ public class RunnableProcessor extends ProcessorWrapper {
 			try {
 				FileFinder.deleteDirectory(processorDataPath());
 			} catch (IOException ex) {
-				log.error("failed to clear the processors's data directory: {}", this, ex);
+				log.error(
+						"failed to clear the processors's data directory: {}",
+						this, ex
+				);
 				handler.uiStrategy.showError(ex);
 			}
 		}
 
 		if (!this.processor().canReset()) {
-			log.warn("Can't process. Processor doesn't implement Processable or Editable: {}", this.processor());
+			log.warn(
+					"Can't process. Processor doesn't implement Processable or Editable: {}",
+					this.processor()
+			);
 			return;
 		}
 
@@ -397,9 +433,8 @@ public class RunnableProcessor extends ProcessorWrapper {
 		p.reset(newProcessorContext());
 
 		FxUtils.run(() -> {
-			// actually the method calling process (e.g. to run on background task) has
+			// the method calling process (e.g. to run on background task) has
 			// to update states once done.
-			//this.updateState(true);
 			this.setModified(true);
 		});
 	}
