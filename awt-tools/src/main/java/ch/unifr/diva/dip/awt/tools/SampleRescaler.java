@@ -175,6 +175,7 @@ public class SampleRescaler extends ProcessableBase implements Transmutable {
 					this.precision = this.isBufferedMatrix
 							? RescaleOp.Precision.FLOAT
 							: RescaleOp.Precision.BYTE;
+					this.ports.put(out.key, out.port);
 					break;
 			}
 		}
@@ -514,12 +515,8 @@ public class SampleRescaler extends ProcessableBase implements Transmutable {
 			} else {
 				writeBufferedImage(context, STORAGE_IMAGE, STORAGE_IMAGE_FORMAT, rescaledImage);
 			}
-			setOutputs(rescaledImage);
+			restoreOutputs(context, rescaledImage);
 		}
-	}
-
-	private void setOutputs(BufferedImage rescaledImage) {
-		restoreOutputs(null, rescaledImage);
 	}
 
 	private boolean restoreOutputs(ProcessorContext context) {
@@ -548,6 +545,10 @@ public class SampleRescaler extends ProcessableBase implements Transmutable {
 		this.output.setOutput(image);
 		this.rescaleConfig.setOutputs(image);
 
+		if (!this.rescaleConfig.isBufferedMatrix) {
+			provideImageLayer(context, image);
+		}
+
 		return true;
 	}
 
@@ -556,6 +557,7 @@ public class SampleRescaler extends ProcessableBase implements Transmutable {
 		deleteFile(context, STORAGE_IMAGE);
 		deleteFile(context, STORAGE_MAT);
 		resetOutputs();
+		resetLayer(context);
 	}
 
 	private final BooleanProperty transmuteProperty = new SimpleBooleanProperty();
