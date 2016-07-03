@@ -23,6 +23,10 @@ public class ApplicationRequest {
 		 */
 		OPEN_PIPELINE_EDITOR,
 		/**
+		 * Request to open the user settings window.
+		 */
+		OPEN_USER_SETTINGS,
+		/**
 		 * Request to exit the application.
 		 */
 		EXIT

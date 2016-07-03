@@ -14,6 +14,7 @@ import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.input.KeyCombination;
 import javafx.stage.Stage;
 
@@ -108,7 +109,13 @@ public class MenuBarPresenter implements Presenter, Localizable {
 		redo.setDisable(true); // TODO
 		redo.setAccelerator(KeyCombination.keyCombination("Ctrl+Y"));
 
-		menu.getItems().addAll(undo, redo);
+		final SeparatorMenuItem sep = new SeparatorMenuItem();
+		final MenuItem settings = new MenuItem(localize("settings"));
+		settings.setOnAction(e -> {
+			eventBus.post(new ApplicationRequest(ApplicationRequest.Type.OPEN_USER_SETTINGS));
+		});
+
+		menu.getItems().addAll(undo, redo, sep, settings);
 
 		return menu;
 	}

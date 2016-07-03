@@ -90,9 +90,6 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 			}
 
 			UserSettings.saveDividerPositions(view.getSplitPane(), handler.settings.primaryStage);
-//			if (!this.handler.shutdown()) {
-//				e.consume();
-//			}
 		});
 	}
 
@@ -147,6 +144,14 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 		this.handler.getProject().openPipelineEditor(stage, show);
 	}
 
+	/**
+	 * Opens the user settings window.
+	 */
+	public void openUserSettings() {
+		final UserSettingsWindow settings = new UserSettingsWindow(stage, this.handler);
+		settings.show();
+	}
+
 	@Subscribe
 	public void applicationRequest(ApplicationRequest event) {
 		switch (event.type) {
@@ -158,6 +163,9 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 				break;
 			case OPEN_PIPELINE_EDITOR:
 				openPipelineEditor(true);
+				break;
+			case OPEN_USER_SETTINGS:
+				openUserSettings();
 				break;
 			case EXIT:
 				exit();
