@@ -3,10 +3,13 @@ package ch.unifr.diva.dip.api.utils;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -152,6 +155,28 @@ public class L10n {
 	}
 
 	/**
+	 * Returns a list of all available locales.
+	 *
+	 * @return a list of available locales.
+	 */
+	public static List<Locale> availableLocales() {
+		return new ArrayList<>(availableLocales);
+	}
+
+	/**
+	 * Returns a set of all languages with available locale.
+	 *
+	 * @return a set of all languages with available locale.
+	 */
+	public static Collection<String> availableLanguages() {
+		final Set<String> languages = new HashSet<>();
+		for (Locale loc : availableLocales) {
+			languages.add(loc.getLanguage());
+		}
+		return languages;
+	}
+
+	/**
 	 * Returns the current {@code Locale}. The local is set at start-up of the
 	 * host application and is not really expected to be reset at runtime. That
 	 * is the host application needs to restart in order to effectively change
@@ -161,15 +186,6 @@ public class L10n {
 	 */
 	public Locale getLocale() {
 		return locale;
-	}
-
-	/**
-	 * Returns a list of all available locales.
-	 *
-	 * @return a list of available locales.
-	 */
-	public List<Locale> availableLocales() {
-		return new ArrayList<>(availableLocales);
 	}
 
 	/**
@@ -222,4 +238,5 @@ public class L10n {
 			this.loader = loader;
 		}
 	}
+
 }
