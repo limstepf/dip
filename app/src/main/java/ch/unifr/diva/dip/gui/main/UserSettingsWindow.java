@@ -78,7 +78,7 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 		final Category general = new Category(L10n.getInstance().getString("general"));
 
 		// locale/language
-		general.addItem(new Item<String>() {
+		general.addItem(new Item<EnumParameter>() {
 			@Override
 			public PersistentParameter parameter() {
 				if (this.parameter == null) {
@@ -103,7 +103,7 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 		final Category pe = new Category(L10n.getInstance().getString("pipeline.editor"));
 
 		// connection-view/wire type
-		pe.addItem(new Item<String>() {
+		pe.addItem(new Item<EnumParameter>() {
 			@Override
 			public PersistentParameter parameter() {
 				if (this.parameter == null) {
@@ -123,7 +123,7 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 		});
 
 		// pipeline layout strategy (or main direction)
-		pe.addItem(new Item<String>() {
+		pe.addItem(new Item<EnumParameter>() {
 			@Override
 			public PersistentParameter parameter() {
 				if (this.parameter == null) {
@@ -295,11 +295,11 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 	/**
 	 * Settings item interface.
 	 *
-	 * @param <T> value type of the persistent parameter.
+	 * @param <T> type of the persistent parameter.
 	 */
-	public static abstract class Item<T> {
+	public static abstract class Item<T extends PersistentParameter> {
 
-		protected PersistentParameter<T> parameter;
+		protected T parameter;
 
 		// only save an item if it actually has been initialized/used
 		public boolean hasBeenInitialized() {
