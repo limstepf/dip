@@ -11,6 +11,7 @@ import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.services.Transmutable;
 import ch.unifr.diva.dip.api.imaging.BufferedMatrix;
 import ch.unifr.diva.dip.api.imaging.SimpleColorModel;
+import ch.unifr.diva.dip.api.imaging.ops.BandExtractOp;
 import ch.unifr.diva.dip.api.imaging.ops.ColorBandVisualizationOp;
 import ch.unifr.diva.dip.api.imaging.scanners.Location;
 import ch.unifr.diva.dip.api.imaging.scanners.RasterScanner;
@@ -400,31 +401,23 @@ public class BandSplitter extends ProcessableBase implements Transmutable {
 
 		final boolean[] processBand = new boolean[numBands];
 		final BufferedImage[] images = new BufferedImage[numBands];
-		final WritableRaster[] raster = new WritableRaster[numBands];
 
 		// check which bands to extract...
 		for (int i = 0; i < numBands; i++) {
 			final OutputBand band = this.outputBands.get(i);
-
 			if (provideAll || band.isConnected()) {
 				processBand[i] = true;
-				images[i] = createCompatibleDestImage(src);
-				raster[i] = images[i].getRaster();
 			}
 		}
 
-		// extract marked bands
-		// TODO: parallelize!
-		for (Location pt : new RasterScanner(src, true)) {
-			if (processBand[pt.band]) {
-				final int sample = srcRaster.getSample(pt.col, pt.row, pt.band);
-				raster[pt.band].setSample(pt.col, pt.row, 0, sample);
-			}
-		}
+		// extract, save and set outputs
+		final BandExtractOp op = new BandExtractOp();
 
-		// save and set outputs
 		for (int i = 0; i < numBands; i++) {
 			if (processBand[i]) {
+				op.setBand(i);
+				images[i] = filter(context, op, src);
+
 				final OutputBand band = this.outputBands.get(i);
 
 				if (source.cm == null) {
@@ -459,15 +452,15 @@ public class BandSplitter extends ProcessableBase implements Transmutable {
 
 			case VISUALIZATION:
 				layerImages = new BufferedImage[numBands];
-				final ColorBandVisualizationOp op = new ColorBandVisualizationOp(source.cm);
+				final ColorBandVisualizationOp visop = new ColorBandVisualizationOp(source.cm);
 				for (int i = 0; i < numBands; i++) {
 					if (processBand[i]) {
-						op.setBand(i);
+						visop.setBand(i);
 						layerImages[i] = filter(
 								context,
-								op,
+								visop,
 								src,
-								op.createCompatibleDestImage(src, source.cm)
+								visop.createCompatibleDestImage(src, source.cm)
 						);
 
 						final OutputBand band = this.outputBands.get(i);
