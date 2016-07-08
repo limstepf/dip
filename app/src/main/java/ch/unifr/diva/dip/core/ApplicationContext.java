@@ -1,5 +1,6 @@
 package ch.unifr.diva.dip.core;
 
+import ch.unifr.diva.dip.api.utils.DipThreadPool;
 import ch.unifr.diva.dip.osgi.OSGiFramework;
 import ch.unifr.diva.dip.osgi.ExtraSystemPackages;
 import java.io.IOException;
@@ -27,6 +28,10 @@ public class ApplicationContext {
 	 * The data manager knows about the filesystem.
 	 */
 	public final ApplicationDataManager dataManager;
+	/**
+	 * The application wide thread pool/executor service.
+	 */
+	public final DipThreadPool threadPool;
 	/**
 	 * The plugin/service framework.
 	 */
@@ -75,6 +80,8 @@ public class ApplicationContext {
 		}
 		dataManager = tmpDataManager;
 
+		// init thread pool/executor service
+		threadPool = new DipThreadPool();
 
 		// init OSGi framework
 		OSGiFramework tmpOsgi = null;
@@ -132,6 +139,10 @@ public class ApplicationContext {
 	 * Close open application resources ({@literal e.g.} the OSGi framework).
 	 */
 	public void close() {
+		if (threadPool != null) {
+			threadPool.stop();
+		}
+
 		if (osgi != null) {
 			try {
 				osgi.stop();
@@ -146,6 +157,11 @@ public class ApplicationContext {
 	 * have been terminated.
 	 */
 	public void waitForStop() {
+		// gracefully shutdown the thread pool
+		if (threadPool != null) {
+			threadPool.waitForStop();
+		}
+
 		// gracefully shutdown OSGi framework (and all installed bundles...)
 		if (osgi != null) {
 			try {

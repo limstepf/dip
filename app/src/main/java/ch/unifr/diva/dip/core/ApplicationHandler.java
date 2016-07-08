@@ -1,5 +1,6 @@
 package ch.unifr.diva.dip.core;
 
+import ch.unifr.diva.dip.api.utils.DipThreadPool;
 import ch.unifr.diva.dip.core.ui.UIStrategy;
 import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.core.model.ProjectData;
@@ -32,10 +33,30 @@ public class ApplicationHandler implements Localizable {
 
 	private static final Logger log = LoggerFactory.getLogger(ApplicationHandler.class);
 	private final ApplicationContext context;
+
+	/**
+	 * The application data manager.
+	 */
 	public final ApplicationDataManager dataManager;
+	/**
+	 * Application wide thread pool/executor service.
+	 */
+	public final DipThreadPool threadPool;
+	/**
+	 * OSGi framework.
+	 */
 	public final OSGiFramework osgi;
+	/**
+	 * The user settings.
+	 */
 	public final UserSettings settings;
+	/**
+	 * The UI strategy.
+	 */
 	public final UIStrategy uiStrategy;
+	/**
+	 * The application's event bus.
+	 */
 	public final EventBus eventBus;
 
 	// open/current project
@@ -62,6 +83,7 @@ public class ApplicationHandler implements Localizable {
 	) {
 		this.context = context;
 		this.dataManager = context.dataManager;
+		this.threadPool = context.threadPool;
 		this.osgi = context.osgi;
 		this.settings = context.settings;
 		this.uiStrategy = uiStrategy;
@@ -182,7 +204,6 @@ public class ApplicationHandler implements Localizable {
 				);
 
 				// TODO: auto-repair for moved/modified-only files (-> user settings)
-
 				if (!validation.isValid()) {
 					log.warn("failed to open project: {}", getValue());
 					log.warn("invalid/corrupt project data: {}", validation);
