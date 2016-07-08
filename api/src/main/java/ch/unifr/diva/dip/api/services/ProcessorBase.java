@@ -10,6 +10,7 @@ import ch.unifr.diva.dip.api.imaging.BufferedIO;
 import ch.unifr.diva.dip.api.imaging.BufferedMatrix;
 import ch.unifr.diva.dip.api.imaging.ops.ConcurrentOp;
 import ch.unifr.diva.dip.api.imaging.ops.Parallelizable;
+import ch.unifr.diva.dip.api.utils.DipThreadPool;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
@@ -203,16 +204,42 @@ public abstract class ProcessorBase implements Processor {
 	 * @return the filtered image.
 	 */
 	protected BufferedImage filter(ProcessorContext context, BufferedImageOp op, BufferedImage src, BufferedImage dest) {
-		if (!(op instanceof Parallelizable)) {
+		return filter(context.threadPool, op, src, dest);
+	}
+
+	/**
+	 * Filters an image in parallel (if possible). Runs filters in parallel if
+	 * they implement the {@code Parallelizable} interface by wrapping them in a
+	 * {@code ConcurrentOp} first, otherwise runs them as is (and single
+	 * threaded).
+	 *
+	 * <p>
+	 * <em>Warning:</em> make absolutely sure to give an actually compatible
+	 * destination image in case the image filter doesn't rely on
+	 * {@code createCompatibleDestImage(BufferedImage bi, ColorModel cm)}
+	 * (overriding it is fine, since the method on the given image filter will
+	 * be called if wrapped by {@code ConcurrentOp}). So if the filter depends
+	 * on another method (with a different signature) to create a compatible
+	 * destination image, better don't pass null here.
+	 *
+	 * @param threadPool application wide thread pool/executor service
+	 * @param op the image filter (hopefully implementing the
+	 * {@code Parallelizable} interface).
+	 * @param src the source image.
+	 * @param dest the destination image, or null.
+	 * @return the filtered image.
+	 */
+	public static BufferedImage filter(DipThreadPool threadPool, BufferedImageOp op, BufferedImage src, BufferedImage dest) {
+		if (!(op instanceof Parallelizable) || threadPool.poolSize() < 2) {
 			return op.filter(src, dest);
 		}
 
-		final Rectangle tileSize = getOptimalTileSize(context, src);
+		final Rectangle tileSize = getOptimalTileSize(threadPool.poolSize(), src);
 		final ConcurrentOp cop = new ConcurrentOp(
 				op,
 				tileSize.width,
 				tileSize.height,
-				context.threadPool
+				threadPool
 		);
 		return cop.filter(src, dest);
 	}
@@ -225,6 +252,17 @@ public abstract class ProcessorBase implements Processor {
 	 * @return optimal tile size.
 	 */
 	protected Rectangle getOptimalTileSize(ProcessorContext context, BufferedImage src) {
+		return getOptimalTileSize(context.threadPool.poolSize(), src);
+	}
+
+	/**
+	 * Returns the optimal tile size to run a filter in parallel.
+	 *
+	 * @param numThreads number of threads.
+	 * @param src the source image to be filtered.
+	 * @return optimal tile size.
+	 */
+	public static Rectangle getOptimalTileSize(int numThreads, BufferedImage src) {
 		/*
 		 * Recall how ConcurrentOp uses it's workers/threads: we may just throw
 		 * as many at it, and each worker will just get a new tile, as long as
@@ -241,8 +279,8 @@ public abstract class ProcessorBase implements Processor {
 		 * dynamic tiles benchmark).
 		 */
 		return new Rectangle(
-				src.getWidth() / context.threadPool.poolSize(),
-				src.getHeight() / context.threadPool.poolSize()
+				src.getWidth() / numThreads,
+				src.getHeight() / numThreads
 		);
 	}
 
