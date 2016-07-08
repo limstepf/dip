@@ -76,7 +76,7 @@ public class ConcurrentOp extends NullOp {
 	@Override
 	public BufferedImage filter(BufferedImage src, BufferedImage dst) {
 		if (dst == null) {
-			dst = this.createCompatibleDestImage(src, src.getColorModel());
+			dst = this.op.createCompatibleDestImage(src, src.getColorModel());
 		}
 
 		if (this.threadPool == null) {
