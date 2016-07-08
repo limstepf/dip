@@ -7,12 +7,11 @@ import ch.unifr.diva.dip.api.imaging.scanners.Location;
 import ch.unifr.diva.dip.api.imaging.scanners.RasterScanner;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
-import java.util.Arrays;
 
 /**
  * Color conversion from and to known SimpleColorModels.
  */
-public class ColorConvertOp extends NullOp {
+public class ColorConvertOp extends NullOp implements Parallelizable {
 
 	private final SimpleColorModel srcCm;
 	private final SimpleColorModel dstCm;

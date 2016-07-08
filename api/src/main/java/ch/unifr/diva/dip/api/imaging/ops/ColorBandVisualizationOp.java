@@ -1,4 +1,3 @@
-
 package ch.unifr.diva.dip.api.imaging.ops;
 
 import ch.unifr.diva.dip.api.imaging.SimpleColorModel;
@@ -10,7 +9,7 @@ import java.awt.image.WritableRaster;
 /**
  * Color band visualization filter.
  */
-public class ColorBandVisualizationOp extends NullOp {
+public class ColorBandVisualizationOp extends NullOp implements Parallelizable {
 
 	private final SimpleColorModel cm;
 	private int band;

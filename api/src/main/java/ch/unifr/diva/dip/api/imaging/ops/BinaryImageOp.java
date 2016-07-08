@@ -17,7 +17,7 @@ import java.awt.image.WritableRaster;
  * "currying" (i.e. the transformation of a function with multiple arguments
  * into a function with only a single argument).
  */
-public abstract class BinaryImageOp extends NullOp {
+public abstract class BinaryImageOp extends NullOp implements Parallelizable {
 
 	protected final BufferedImage left;
 	protected final boolean combinePixels;

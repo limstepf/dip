@@ -2,7 +2,6 @@ package ch.unifr.diva.dip.api.imaging.ops;
 
 import ch.unifr.diva.dip.api.imaging.BufferedMatrix;
 import ch.unifr.diva.dip.api.imaging.ImagingUtils;
-import ch.unifr.diva.dip.api.imaging.SimpleColorModel;
 import ch.unifr.diva.dip.api.imaging.scanners.Location;
 import ch.unifr.diva.dip.api.imaging.scanners.RasterScanner;
 import java.awt.image.BufferedImage;
@@ -11,7 +10,7 @@ import java.awt.image.WritableRaster;
 /**
  * Linear scaling filter.
  */
-public class RescaleOp extends NullOp {
+public class RescaleOp extends NullOp implements Parallelizable {
 
 	/**
 	 * Output sample precision of the produced image.
@@ -67,7 +66,7 @@ public class RescaleOp extends NullOp {
 
 	/**
 	 * <pre>I(x,y) in [a,b] -> I'(x,y) in [a',b']</pre>
-	 * 
+	 *
 	 * @param srcRange
 	 * @param dstRange
 	 * @param precision

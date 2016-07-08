@@ -9,7 +9,7 @@ import java.awt.image.WritableRaster;
 /**
  * Global threshold filter.
  */
-public class GlobalThresholdOp extends NullOp {
+public class GlobalThresholdOp extends NullOp implements Parallelizable {
 
 	private int band;
 	private int threshold;

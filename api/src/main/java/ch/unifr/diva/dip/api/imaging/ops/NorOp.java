@@ -1,4 +1,3 @@
-
 package ch.unifr.diva.dip.api.imaging.ops;
 
 import java.awt.image.BufferedImage;
