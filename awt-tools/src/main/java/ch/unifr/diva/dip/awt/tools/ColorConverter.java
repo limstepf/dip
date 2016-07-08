@@ -286,7 +286,7 @@ public class ColorConverter extends ProcessableBase implements Transmutable {
 				image = src; // by-pass, still make a copy (to properly restore...)
 			} else {
 				final ColorConvertOp op = new ColorConvertOp(srcCm, out.cm);
-				image = op.filter(src, null);
+				image = filter(context, op, src, op.createCompatibleDestImage(src, out.cm));
 			}
 
 			if (out.cm.requiresBufferedMatrix()) {

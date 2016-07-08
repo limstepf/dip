@@ -37,24 +37,25 @@ public class GlobalThreshold extends ProcessableBase implements Transmutable {
 	private final static String STORAGE_FORMAT = "PNG";
 
 	enum AdaptiveMethod {
+
 		MEAN {
-			@Override
-			int computeThreshold(BufferedImage source, int band) {
-				return GlobalThresholdOp.computeMean(source, band, null);
-			}
-		},
+					@Override
+					int computeThreshold(BufferedImage source, int band) {
+						return GlobalThresholdOp.computeMean(source, band, null);
+					}
+				},
 		MOMENTS {
-			@Override
-			int computeThreshold(BufferedImage source, int band) {
-				return GlobalThresholdOp.computeMoments(source, band, null);
-			}
-		},
+					@Override
+					int computeThreshold(BufferedImage source, int band) {
+						return GlobalThresholdOp.computeMoments(source, band, null);
+					}
+				},
 		OTSU {
-			@Override
-			int computeThreshold(BufferedImage source, int band) {
-				return GlobalThresholdOp.computeOtsu(source, band, null);
-			}
-		};
+					@Override
+					int computeThreshold(BufferedImage source, int band) {
+						return GlobalThresholdOp.computeOtsu(source, band, null);
+					}
+				};
 
 		abstract int computeThreshold(BufferedImage source, int band);
 	}
@@ -205,14 +206,12 @@ public class GlobalThreshold extends ProcessableBase implements Transmutable {
 					break;
 			}
 
-			binaryImage = op.filter(source, null);
+			binaryImage = filter(context, op, source);
 			writeBufferedImage(context, STORAGE_FILE, STORAGE_FORMAT, binaryImage);
 		}
 
 		setOutputs(context, binaryImage);
 	}
-
-
 
 	@Override
 	public void reset(ProcessorContext context) {

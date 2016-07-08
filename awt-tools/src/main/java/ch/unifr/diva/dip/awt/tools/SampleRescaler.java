@@ -509,7 +509,12 @@ public class SampleRescaler extends ProcessableBase implements Transmutable {
 					this.rescaleConfig.getMax(),
 					this.rescaleConfig.getPrecision()
 			);
-			final BufferedImage rescaledImage = op.filter(source, null);
+			final BufferedImage rescaledImage = filter(
+					context,
+					op,
+					source,
+					op.createCompatibleDestImage(source, this.rescaleConfig.getPrecision())
+			);
 			if (this.rescaleConfig.isBufferedMatrix()) {
 				writeBufferedMatrix(context, STORAGE_MAT, (BufferedMatrix) rescaledImage);
 			} else {

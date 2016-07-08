@@ -388,7 +388,7 @@ public class SampleInverter extends ProcessableBase implements Transmutable {
 				op = new InvertOp();
 			}
 
-			final BufferedImage invertedImage = op.filter(source, null);
+			final BufferedImage invertedImage = filter(context, op, source);
 			if (this.config.isBufferedMatrix()) {
 				writeBufferedMatrix(context, STORAGE_MAT, (BufferedMatrix) invertedImage);
 			} else {

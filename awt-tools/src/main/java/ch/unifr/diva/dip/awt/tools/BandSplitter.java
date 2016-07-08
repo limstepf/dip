@@ -120,7 +120,7 @@ public class BandSplitter extends ProcessableBase implements Transmutable {
 			cf.addSeparator(0);
 			combo.setCellFactory(cf);
 		});
-		
+
 		this.parameters.put("source", cmSrc);
 
 		this.provideLayers = new EnumParameter("Provide layers", LayerOption.class, LayerOption.NONE.name());
@@ -414,6 +414,7 @@ public class BandSplitter extends ProcessableBase implements Transmutable {
 		}
 
 		// extract marked bands
+		// TODO: parallelize!
 		for (Location pt : new RasterScanner(src, true)) {
 			if (processBand[pt.band]) {
 				final int sample = srcRaster.getSample(pt.col, pt.row, pt.band);
@@ -462,7 +463,12 @@ public class BandSplitter extends ProcessableBase implements Transmutable {
 				for (int i = 0; i < numBands; i++) {
 					if (processBand[i]) {
 						op.setBand(i);
-						layerImages[i] = op.filter(src, null);
+						layerImages[i] = filter(
+								context,
+								op,
+								src,
+								op.createCompatibleDestImage(src, source.cm)
+						);
 
 						final OutputBand band = this.outputBands.get(i);
 						writeBufferedImage(context, band.VIS_FILE, STORAGE_FORMAT, layerImages[i]);
