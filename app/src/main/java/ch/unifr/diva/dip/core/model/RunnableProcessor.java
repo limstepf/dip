@@ -304,12 +304,21 @@ public class RunnableProcessor extends ProcessorWrapper {
 
 	@Override
 	protected HostProcessorContext newHostProcessorContext() {
-		return new HostProcessorContext(this.page, this.layer);
+		return new HostProcessorContext(
+				this.handler.threadPool,
+				this.page,
+				this.layer
+		);
 	}
 
 	@Override
 	protected ProcessorContext newProcessorContext() {
-		return new ProcessorContext(processorDataDirectory(), objectMap.objects, this.layer);
+		return new ProcessorContext(
+				this.handler.threadPool,
+				processorDataDirectory(),
+				objectMap.objects,
+				this.layer
+		);
 	}
 
 	/**

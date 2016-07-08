@@ -1,8 +1,7 @@
 package ch.unifr.diva.dip.api.components;
 
+import ch.unifr.diva.dip.api.utils.DipThreadPool;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -11,6 +10,11 @@ import java.util.Map;
  * save some data/state.
  */
 public class ProcessorContext {
+
+	/**
+	 * Application wide thread pool/executor service.
+	 */
+	public final DipThreadPool threadPool;
 
 	/**
 	 * Directory dedicated for persistent data of a processor. Note that this
@@ -37,7 +41,17 @@ public class ProcessorContext {
 	 */
 	public final EditorLayerGroup layer;
 
-	public ProcessorContext(Path directory, Map<String, Object> objects, EditorLayerGroup layer) {
+	/**
+	 * Creates a new processor context.
+	 *
+	 * @param threadPool the application wide thread pool/executor service.
+	 * @param directory the directory dedicated for persistent data of the
+	 * processor.
+	 * @param objects the persistent map of objects of the processor.
+	 * @param layer the processor's editor layer.
+	 */
+	public ProcessorContext(DipThreadPool threadPool, Path directory, Map<String, Object> objects, EditorLayerGroup layer) {
+		this.threadPool = threadPool;
 		this.directory = directory;
 		this.objects = objects;
 		this.layer = layer;
