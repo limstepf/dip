@@ -43,11 +43,28 @@ public class DipThreadPool {
 	}
 
 	/**
-	 * Shuts down the thread pool/executer service.
+	 * Shuts down the thread pool/executor service. This is equivalent to a call
+	 * to {@code stop()} followed by a {@code waitForStop()}.
 	 */
 	public void shutdown() {
+		stop();
+		waitForStop();
+	}
+
+	/**
+	 * Signals to shut down the thread pool/executor service.
+	 */
+	public void stop() {
+		this.executor.shutdown();
+	}
+
+	/**
+	 * Waits for the thread pool/executor service to shutdown. Waits for a
+	 * maximum of 5 seconds, then just kills threads that still haven't shut
+	 * down in time.
+	 */
+	public void waitForStop() {
 		try {
-			this.executor.shutdown();
 			this.executor.awaitTermination(5, TimeUnit.SECONDS);
 		} catch (InterruptedException ex) {
 			// interrupted
