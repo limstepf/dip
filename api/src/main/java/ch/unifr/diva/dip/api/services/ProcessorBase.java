@@ -8,7 +8,11 @@ import ch.unifr.diva.dip.api.components.ProcessorContext;
 import ch.unifr.diva.dip.api.parameters.Parameter;
 import ch.unifr.diva.dip.api.imaging.BufferedIO;
 import ch.unifr.diva.dip.api.imaging.BufferedMatrix;
+import ch.unifr.diva.dip.api.imaging.ops.ConcurrentOp;
+import ch.unifr.diva.dip.api.imaging.ops.Parallelizable;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -153,6 +157,93 @@ public abstract class ProcessorBase implements Processor {
 		final EditorLayerPane layer = context.layer.newLayerPane(name);
 		layer.add(new ImageView(image));
 		return layer;
+	}
+
+	/**
+	 * Filters an image in parallel (if possible). Runs filters in parallel if
+	 * they implement the {@code Parallelizable} interface by wrapping them in a
+	 * {@code ConcurrentOp} first, otherwise runs them as is (and single
+	 * threaded).
+	 *
+	 * <p>
+	 * <em>Warning:</em> Double-check if you shouldn't pass a compatible
+	 * destination image from the original image filter (which might be wrapped
+	 * if run in parallel).
+	 *
+	 * @param context the processor context.
+	 * @param op the image filter (hopefully implementing the
+	 * {@code Parallelizable} interface).
+	 * @param src the source image.
+	 * @return the filtered image.
+	 */
+	protected BufferedImage filter(ProcessorContext context, BufferedImageOp op, BufferedImage src) {
+		return filter(context, op, src, null);
+	}
+
+	/**
+	 * Filters an image in parallel (if possible). Runs filters in parallel if
+	 * they implement the {@code Parallelizable} interface by wrapping them in a
+	 * {@code ConcurrentOp} first, otherwise runs them as is (and single
+	 * threaded).
+	 *
+	 * <p>
+	 * <em>Warning:</em> make absolutely sure to give an actually compatible
+	 * destination image in case the image filter doesn't rely on
+	 * {@code createCompatibleDestImage(BufferedImage bi, ColorModel cm)}
+	 * (overriding it is fine, since the method on the given image filter will
+	 * be called if wrapped by {@code ConcurrentOp}). So if the filter depends
+	 * on another method (with a different signature) to create a compatible
+	 * destination image, better don't pass null here.
+	 *
+	 * @param context the processor context.
+	 * @param op the image filter (hopefully implementing the
+	 * {@code Parallelizable} interface).
+	 * @param src the source image.
+	 * @param dest the destination image, or null.
+	 * @return the filtered image.
+	 */
+	protected BufferedImage filter(ProcessorContext context, BufferedImageOp op, BufferedImage src, BufferedImage dest) {
+		if (!(op instanceof Parallelizable)) {
+			return op.filter(src, dest);
+		}
+
+		final Rectangle tileSize = getOptimalTileSize(context, src);
+		final ConcurrentOp cop = new ConcurrentOp(
+				op,
+				tileSize.width,
+				tileSize.height,
+				context.threadPool
+		);
+		return cop.filter(src, dest);
+	}
+
+	/**
+	 * Returns the optimal tile size to run a filter in parallel.
+	 *
+	 * @param context the processor context.
+	 * @param src the source image to be filtered.
+	 * @return optimal tile size.
+	 */
+	protected Rectangle getOptimalTileSize(ProcessorContext context, BufferedImage src) {
+		/*
+		 * Recall how ConcurrentOp uses it's workers/threads: we may just throw
+		 * as many at it, and each worker will just get a new tile, as long as
+		 * there are still tiles left to be processed. I.e. the tile size is not
+		 * _that_ crucial after all. Optimally we'd like to have a tile size s.t.
+		 * we end up with a number of tiles that can be evenly distributed to all
+		 * threads (easier/less error with smaller tile size), while at the same
+		 * time we'd like to have as few tiles as possible to reduce overhead -
+		 * although that overhead isn't that great and fades in comparison to the
+		 * usual workload, so...
+		 *
+		 * This might occasionally yield super small workloads/tiles at the
+		 * border of the image, but it really doesn't matter too much (see
+		 * dynamic tiles benchmark).
+		 */
+		return new Rectangle(
+				src.getWidth() / context.threadPool.poolSize(),
+				src.getHeight() / context.threadPool.poolSize()
+		);
 	}
 
 	/**
