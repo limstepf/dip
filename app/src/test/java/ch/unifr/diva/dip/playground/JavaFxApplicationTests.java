@@ -1,5 +1,6 @@
 package ch.unifr.diva.dip.playground;
 
+import ch.unifr.diva.dip.core.ApplicationSettings;
 import javafx.application.Application;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -50,6 +51,25 @@ public class JavaFxApplicationTests {
 			this.primaryStage = primaryStage;
 			this.primaryStage.setScene(this.scene);
 			this.primaryStage.show();
+		}
+	}
+
+	/**
+	 * Base class for simple Java FX application with the application wide style
+	 * sheet attached to the scene.
+	 *
+	 * @param <T> type of the root node in the scene.
+	 */
+	public static abstract class StyledSimpleApplication<T extends Parent> extends SimpleApplication<T> {
+
+		public StyledSimpleApplication(T root) {
+			super(root);
+		}
+
+		@Override
+		public void start(Stage primaryStage) throws Exception {
+			super.start(primaryStage);
+			this.scene.getStylesheets().add(ApplicationSettings.stylesheet);
 		}
 	}
 
