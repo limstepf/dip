@@ -29,23 +29,6 @@ public abstract class CompositeGridBase<T> extends CompositeBase<T> {
 	protected final double[] horizontalSpacing = new double[]{0, 0};
 	protected final double[] verticalSpacing = new double[]{0, 0};
 
-	public void setHorizontalSpacing(double cell) {
-		setHorizontalSpacing(cell, 0);
-	}
-	public void setHorizontalSpacing(double cell, double border) {
-		this.horizontalSpacing[0] = cell;
-		this.horizontalSpacing[1] = border;
-	}
-
-	public void setVerticalSpacing(double cell) {
-		setVerticalSpacing(cell, 0);
-	}
-
-	public void setVerticalSpacing(double cell, double border) {
-		this.verticalSpacing[0] = cell;
-		this.verticalSpacing[1] = border;
-	}
-
 	/**
 	 * Creates a composite grid.
 	 *
@@ -58,6 +41,46 @@ public abstract class CompositeGridBase<T> extends CompositeBase<T> {
 
 		this.columnConstraints = new ArrayList<>();
 		this.rowConstraints = new ArrayList<>();
+	}
+
+	/**
+	 * Sets the horizontal spacing between cells.
+	 *
+	 * @param cell horizontal spacing between cells.
+	 */
+	public void setHorizontalSpacing(double cell) {
+		setHorizontalSpacing(cell, 0);
+	}
+
+	/**
+	 * Sets the horizontal spacing.
+	 *
+	 * @param cell horizontal spacing between cells.
+	 * @param border horizontal spacing at the border.
+	 */
+	public void setHorizontalSpacing(double cell, double border) {
+		this.horizontalSpacing[0] = cell;
+		this.horizontalSpacing[1] = border;
+	}
+
+	/**
+	 * Sets the vertical spacing between cells.
+	 *
+	 * @param cell vertical spacing between cells.
+	 */
+	public void setVerticalSpacing(double cell) {
+		setVerticalSpacing(cell, 0);
+	}
+
+	/**
+	 * Sets the vertical spacing.
+	 *
+	 * @param cell vertical spacing between cells.
+	 * @param border vertical spacing at the border.
+	 */
+	public void setVerticalSpacing(double cell, double border) {
+		this.verticalSpacing[0] = cell;
+		this.verticalSpacing[1] = border;
 	}
 
 	/**
@@ -82,6 +105,20 @@ public abstract class CompositeGridBase<T> extends CompositeBase<T> {
 		}
 
 		return this.columnConstraints.size();
+	}
+
+	/**
+	 * Sets not further specified column constraints, therby defining the number
+	 * of columns in the grid. Once initialized this way, the constraints can be
+	 * retrieved to be further defined.
+	 *
+	 * @param numColumns the number of columns in the grid.
+	 */
+	public void setColumnConstraints(int numColumns) {
+		this.columnConstraints.clear();
+		for (int i = 0; i < numColumns; i++) {
+			this.columnConstraints.add(new ColumnConstraints());
+		}
 	}
 
 	/**
@@ -151,6 +188,19 @@ public abstract class CompositeGridBase<T> extends CompositeBase<T> {
 	 */
 	public List<RowConstraints> getRowConstraints() {
 		return this.rowConstraints;
+	}
+
+	/**
+	 * Initializes new, not further specified row constraints. Once initialized
+	 * this way, the constraints can be retrieved to be further defined.
+	 *
+	 * @param numRows number of row constraints to be set up.
+	 */
+	public void setRowConstraints(int numRows) {
+		this.rowConstraints.clear();
+		for (int i = 0; i < numRows; i++) {
+			this.rowConstraints.add(new RowConstraints());
+		}
 	}
 
 	/**
