@@ -284,3 +284,19 @@
 .dip-shadow {
 	-fx-effect: dropshadow( gaussian , black , 3, 0, 1, 1 );
 }
+
+.dip-matrix-left,
+.dip-matrix-right {
+	-fx-border-color: black;
+	-fx-pref-width: 5px;
+	-fx-max-width: 5px;
+}
+
+.dip-matrix-left {
+	-fx-border-width: 2px 0 2px 2px;
+}
+
+.dip-matrix-right {
+	-fx-border-width: 2px 2px 2px 0;
+}
+
