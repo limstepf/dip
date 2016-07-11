@@ -1,10 +1,9 @@
-
 package ch.unifr.diva.dip.api.datatypes;
 
 import javafx.scene.input.DataFormat;
 
 /**
- *
+ * A JavaFX color.
  */
 public class Color implements DataType {
 

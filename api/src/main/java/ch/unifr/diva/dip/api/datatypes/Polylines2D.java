@@ -1,11 +1,10 @@
-
 package ch.unifr.diva.dip.api.datatypes;
 
 import ch.unifr.diva.dip.api.datastructures.Polyline2D;
 import javafx.scene.input.DataFormat;
 
 /**
- *
+ * A list of {@code Polylines2D}.
  */
 public class Polylines2D implements DataType {
 

@@ -4,7 +4,7 @@ import ch.unifr.diva.dip.api.datastructures.Point2D;
 import javafx.scene.input.DataFormat;
 
 /**
- *
+ * A list of {@code Point2D}.
  */
 public class Points2D implements DataType {
 

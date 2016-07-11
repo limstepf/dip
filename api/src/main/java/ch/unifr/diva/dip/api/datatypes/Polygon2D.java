@@ -1,10 +1,9 @@
-
 package ch.unifr.diva.dip.api.datatypes;
 
 import javafx.scene.input.DataFormat;
 
 /**
- *
+ * A 2D polygon.
  */
 public class Polygon2D implements DataType {
 

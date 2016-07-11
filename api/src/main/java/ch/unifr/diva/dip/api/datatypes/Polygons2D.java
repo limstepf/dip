@@ -1,10 +1,9 @@
-
 package ch.unifr.diva.dip.api.datatypes;
 
 import javafx.scene.input.DataFormat;
 
 /**
- *
+ * A list of {@code Polygons2D}.
  */
 public class Polygons2D implements DataType {
 
@@ -20,7 +19,7 @@ public class Polygons2D implements DataType {
 	public DataFormat dataFormat() {
 		return dataFormat;
 	}
-	
+
 	@Override
 	public boolean isList() {
 		return true;

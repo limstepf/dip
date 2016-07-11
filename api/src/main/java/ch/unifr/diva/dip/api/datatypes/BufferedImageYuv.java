@@ -1,4 +1,3 @@
-
 package ch.unifr.diva.dip.api.datatypes;
 
 import javafx.scene.input.DataFormat;

@@ -1,11 +1,10 @@
-
 package ch.unifr.diva.dip.api.datatypes;
 
 import ch.unifr.diva.dip.api.datastructures.Line2D;
 import javafx.scene.input.DataFormat;
 
 /**
- *
+ * A list of {@code Line2D}.
  */
 public class Lines2D implements DataType {
 
