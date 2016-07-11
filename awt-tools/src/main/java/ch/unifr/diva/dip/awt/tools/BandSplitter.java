@@ -13,8 +13,6 @@ import ch.unifr.diva.dip.api.imaging.BufferedMatrix;
 import ch.unifr.diva.dip.api.imaging.SimpleColorModel;
 import ch.unifr.diva.dip.api.imaging.ops.BandExtractOp;
 import ch.unifr.diva.dip.api.imaging.ops.ColorBandVisualizationOp;
-import ch.unifr.diva.dip.api.imaging.scanners.Location;
-import ch.unifr.diva.dip.api.imaging.scanners.RasterScanner;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.util.ArrayList;
