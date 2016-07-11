@@ -38,7 +38,7 @@ public class PageGenerator implements HostProcessor {
 		this.output_awt = new OutputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImage());
 		this.outputs.put(OUT_AWT, this.output_awt);
 
-		this.output_fx = new OutputPort(new ch.unifr.diva.dip.api.datatypes.Image());
+		this.output_fx = new OutputPort(new ch.unifr.diva.dip.api.datatypes.FxImage());
 		this.outputs.put(OUT_FX, this.output_fx);
 	}
 

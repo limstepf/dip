@@ -5,10 +5,10 @@ import javafx.scene.input.DataFormat;
 /**
  * A JavaFX image.
  */
-public class Image implements DataType {
+public class FxImage implements DataType {
 
 	public final static Class type = javafx.scene.image.Image.class;
-	public final static DataFormat dataFormat = new DataFormat("dip-datatype/image");
+	public final static DataFormat dataFormat = new DataFormat("dip-datatype/fx-image");
 
 	@Override
 	public Class type() {

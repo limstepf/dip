@@ -5,10 +5,10 @@ import javafx.scene.input.DataFormat;
 /**
  * A JavaFX color.
  */
-public class Color implements DataType {
+public class FxColor implements DataType {
 
 	public final static Class type = javafx.scene.paint.Color.class;
-	public final static DataFormat dataFormat = new DataFormat("dip-datatype/color");
+	public final static DataFormat dataFormat = new DataFormat("dip-datatype/fx-color");
 
 	@Override
 	public Class type() {

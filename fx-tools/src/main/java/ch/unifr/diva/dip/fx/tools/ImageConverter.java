@@ -26,7 +26,7 @@ public class ImageConverter extends ProcessableBase {
 	public ImageConverter() {
 		super("Image Converter");
 
-		this.input = new InputPort(new ch.unifr.diva.dip.api.datatypes.Image(), true);
+		this.input = new InputPort(new ch.unifr.diva.dip.api.datatypes.FxImage(), true);
 		inputs.put("image", input);
 
 		this.output = new OutputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImage());
