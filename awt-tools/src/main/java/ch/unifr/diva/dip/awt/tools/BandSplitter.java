@@ -114,7 +114,7 @@ public class BandSplitter extends ProcessableBase implements Transmutable {
 
 		this.cmSrc = new EnumParameter("source", SimpleColorModel.class, ANY_OPTION);
 		this.cmSrc.addOption(ANY_OPTION, "Any/unknown");
-		this.cmSrc.addViewHook((combo) -> {
+		this.cmSrc.addComboBoxViewHook((combo) -> {
 			final SelectionListCellFactory cf = new SelectionListCellFactory();
 			cf.addSeparator(0);
 			combo.setCellFactory(cf);
@@ -124,7 +124,7 @@ public class BandSplitter extends ProcessableBase implements Transmutable {
 
 		this.provideLayers = new EnumParameter("Provide layers", LayerOption.class, LayerOption.NONE.name());
 		this.provideLayersCellFactory = new SelectionListCellFactory<>();
-		this.provideLayers.addViewHook((combo) -> {
+		this.provideLayers.addComboBoxViewHook((combo) -> {
 			combo.setCellFactory(this.provideLayersCellFactory);
 		});
 		this.parameters.put("provide-layers", this.provideLayers);

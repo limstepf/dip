@@ -192,7 +192,7 @@ public class SampleInverter extends ProcessableBase implements Transmutable {
 		this.singleBandOption.setPrefix(new TextParameter("single band"));
 		this.selectedBandProperty = new SimpleDoubleProperty(4);
 		this.selectBandEnableProperty = new SimpleBooleanProperty(true);
-		this.singleBandOption.addViewHook((s) -> {
+		this.singleBandOption.addSliderViewHook((s) -> {
 			s.maxProperty().bind(selectedBandProperty);
 			s.visibleProperty().bind(this.selectBandEnableProperty);
 		});

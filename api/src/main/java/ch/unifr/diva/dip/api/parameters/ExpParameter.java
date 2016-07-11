@@ -1,7 +1,5 @@
 package ch.unifr.diva.dip.api.parameters;
 
-import java.util.ArrayList;
-import java.util.List;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import net.objecthunter.exp4j.Expression;
@@ -66,7 +64,6 @@ public class ExpParameter extends StringParameter {
 	// r, g, b, or what not...  -> adjust tooltip (validation only), and
 	// processors would just retrieve the expression instead of a double.
 	// see: http://www.objecthunter.net/exp4j/#Evaluating_an_expression
-	
 	/**
 	 * Creates an expression parameter.
 	 *
@@ -112,27 +109,6 @@ public class ExpParameter extends StringParameter {
 			this.expressionValue = Double.NaN;
 			return false;
 		}
-	}
-
-	private final List<ViewHook<TextField>> viewHooks = new ArrayList<>();
-
-	/**
-	 * Adds a view hook to customize the textfield. This method is only called
-	 * if the view of the parameter is actually requested.
-	 *
-	 * @param hook hook method for a textfield.
-	 */
-	public void addViewHook(ViewHook<TextField> hook) {
-		this.viewHooks.add(hook);
-	}
-
-	/**
-	 * Removes a view hook.
-	 *
-	 * @param hook hook method to be removed.
-	 */
-	public void removeViewHook(ViewHook<TextField> hook) {
-		this.viewHooks.remove(hook);
 	}
 
 	/**

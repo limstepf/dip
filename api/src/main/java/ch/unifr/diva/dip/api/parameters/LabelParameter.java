@@ -31,7 +31,7 @@ public class LabelParameter implements Parameter {
 		return view;
 	}
 
-	private final List<PersistentParameter.ViewHook<Label>> viewHooks = new ArrayList<>();
+	protected final List<PersistentParameter.ViewHook<Label>> viewHooks = new ArrayList<>();
 
 	/**
 	 * Adds a view hook to customize the label. This method is only called if
@@ -39,7 +39,7 @@ public class LabelParameter implements Parameter {
 	 *
 	 * @param hook hook method for a label.
 	 */
-	public void addViewHook(PersistentParameter.ViewHook<Label> hook) {
+	public void addLabelViewHook(PersistentParameter.ViewHook<Label> hook) {
 		this.viewHooks.add(hook);
 	}
 
@@ -48,7 +48,7 @@ public class LabelParameter implements Parameter {
 	 *
 	 * @param hook hook method to be removed.
 	 */
-	public void removeViewHook(PersistentParameter.ViewHook<Label> hook) {
+	public void removeLabelViewHook(PersistentParameter.ViewHook<Label> hook) {
 		this.viewHooks.remove(hook);
 	}
 

@@ -66,7 +66,7 @@ public class IntegerSliderParameter extends IntegerParameter {
 		return new IntegerSliderView(this);
 	}
 
-	private final List<ViewHook<Slider>> viewHooks = new ArrayList<>();
+	protected final List<ViewHook<Slider>> sliderViewHooks = new ArrayList<>();
 
 	/**
 	 * Adds a view hook to customize the slider. This method is only called if
@@ -74,8 +74,8 @@ public class IntegerSliderParameter extends IntegerParameter {
 	 *
 	 * @param hook hook method for a slider.
 	 */
-	public void addViewHook(ViewHook<Slider> hook) {
-		this.viewHooks.add(hook);
+	public void addSliderViewHook(ViewHook<Slider> hook) {
+		this.sliderViewHooks.add(hook);
 	}
 
 	/**
@@ -83,8 +83,8 @@ public class IntegerSliderParameter extends IntegerParameter {
 	 *
 	 * @param hook hook method to be removed.
 	 */
-	public void removeViewHook(ViewHook<Slider> hook) {
-		this.viewHooks.remove(hook);
+	public void removeSliderViewHook(ViewHook<Slider> hook) {
+		this.sliderViewHooks.remove(hook);
 	}
 
 	/**
@@ -122,7 +122,7 @@ public class IntegerSliderParameter extends IntegerParameter {
 				root.setRight(node);
 			}
 
-			PersistentParameter.applyViewHooks(slider, parameter.viewHooks);
+			PersistentParameter.applyViewHooks(slider, parameter.sliderViewHooks);
 
 			slider.valueProperty().addListener((obs) -> {
 				final int v = get();

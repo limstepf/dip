@@ -139,7 +139,7 @@ public class EnumParameter extends StringParameter {
 		return new EnumView(this);
 	}
 
-	private final List<ViewHook<ComboBox>> viewHooks = new ArrayList<>();
+	protected final List<ViewHook<ComboBox>> comboBoxViewHooks = new ArrayList<>();
 
 	/**
 	 * Adds a view hook to customize the combo box. This method is only called
@@ -147,8 +147,8 @@ public class EnumParameter extends StringParameter {
 	 *
 	 * @param hook hook method for a combo box.
 	 */
-	public void addViewHook(ViewHook<ComboBox> hook) {
-		this.viewHooks.add(hook);
+	public void addComboBoxViewHook(ViewHook<ComboBox> hook) {
+		this.comboBoxViewHooks.add(hook);
 	}
 
 	/**
@@ -156,8 +156,8 @@ public class EnumParameter extends StringParameter {
 	 *
 	 * @param hook hook method to be removed.
 	 */
-	public void removeViewHook(ViewHook<ComboBox> hook) {
-		this.viewHooks.remove(hook);
+	public void removeComboBoxViewHook(ViewHook<ComboBox> hook) {
+		this.comboBoxViewHooks.remove(hook);
 	}
 
 	/**
@@ -171,7 +171,7 @@ public class EnumParameter extends StringParameter {
 			root.setMaxWidth(Double.MAX_VALUE);
 			root.getItems().addAll(parameter.labels);
 			set(parameter.get());
-			PersistentParameter.applyViewHooks(root, parameter.viewHooks);
+			PersistentParameter.applyViewHooks(root, parameter.comboBoxViewHooks);
 			root.valueProperty().addListener((obs) -> {
 				parameter.valueProperty.set(get());
 			});

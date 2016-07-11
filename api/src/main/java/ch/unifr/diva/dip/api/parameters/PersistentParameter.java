@@ -62,6 +62,7 @@ public interface PersistentParameter<T> extends Parameter<T> {
 
 		/**
 		 * Updates the parameter and its view with a new value.
+		 *
 		 * @param value the new value.
 		 */
 		public void set(T value);
@@ -163,22 +164,24 @@ public interface PersistentParameter<T> extends Parameter<T> {
 	/**
 	 * Applies a view hook to the given fx node.
 	 *
-	 * @param <T> class of the node
+	 * @param <T> class of the node.
+	 * @param <S> class of the view hook.
 	 * @param node the node.
 	 * @param hook the view hook to be applied to the node.
 	 */
-	public static <T> void applyViewHook(T node, ViewHook<T> hook) {
+	public static <T, S extends ViewHook<T>> void applyViewHook(T node, S hook) {
 		hook.apply(node);
 	}
 
 	/**
 	 * Applies a list of view hooks to the given fx node.
 	 *
-	 * @param <T> class of the node
+	 * @param <T> class of the node.
+	 * @param <S> class of the view hook.
 	 * @param node the node.
 	 * @param hooks the view hooks to be applied to the node.
 	 */
-	public static <T> void applyViewHooks(T node, List<ViewHook<T>> hooks) {
+	public static <T, S extends ViewHook<T>> void applyViewHooks(T node, List<S> hooks) {
 		for (ViewHook<T> hook : hooks) {
 			applyViewHook(node, hook);
 		}

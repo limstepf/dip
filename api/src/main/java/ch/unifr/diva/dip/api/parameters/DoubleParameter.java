@@ -1,6 +1,8 @@
 package ch.unifr.diva.dip.api.parameters;
 
 import ch.unifr.diva.dip.api.utils.ui.NumberValidationTooltip;
+import java.util.ArrayList;
+import java.util.List;
 import javafx.scene.control.TextField;
 
 /**
@@ -60,6 +62,27 @@ public class DoubleParameter extends PersistentParameterBase<Double> {
 		return new DoubleView(this);
 	}
 
+	protected final List<ViewHook> viewHooks = new ArrayList<>();
+
+	/**
+	 * Adds a view hook to customize the textfield. This method is only called
+	 * if the view of the parameter is actually requested.
+	 *
+	 * @param hook hook method for a label.
+	 */
+	public void addTextFieldViewHook(ViewHook<TextField> hook) {
+		this.viewHooks.add(hook);
+	}
+
+	/**
+	 * Removes a view hook.
+	 *
+	 * @param hook hook method to be removed.
+	 */
+	public void removeTextFieldViewHook(ViewHook<TextField> hook) {
+		this.viewHooks.remove(hook);
+	}
+
 	/**
 	 * Simple Double view with a TextField.
 	 */
@@ -73,6 +96,7 @@ public class DoubleParameter extends PersistentParameterBase<Double> {
 
 			root.getStyleClass().add("dip-text-input");
 			root.setTooltip(validator);
+			PersistentParameter.applyViewHooks(root, parameter.viewHooks);
 			root.textProperty().addListener((obs) -> {
 				final Double number = get();
 				validator.setOutOfRange(number, parameter.minValue, parameter.maxValue);

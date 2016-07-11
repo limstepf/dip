@@ -1,5 +1,7 @@
 package ch.unifr.diva.dip.api.parameters;
 
+import java.util.ArrayList;
+import java.util.List;
 import javafx.scene.control.TextField;
 
 /**
@@ -16,6 +18,27 @@ public class StringParameter extends PersistentParameterBase<String> {
 		return new StringView(this);
 	}
 
+	protected final List<ViewHook> viewHooks = new ArrayList<>();
+
+	/**
+	 * Adds a view hook to customize the textfield. This method is only called
+	 * if the view of the parameter is actually requested.
+	 *
+	 * @param hook hook method for a label.
+	 */
+	public void addTextFieldViewHook(ViewHook<TextField> hook) {
+		this.viewHooks.add(hook);
+	}
+
+	/**
+	 * Removes a view hook.
+	 *
+	 * @param hook hook method to be removed.
+	 */
+	public void removeTextFieldViewHook(ViewHook<TextField> hook) {
+		this.viewHooks.remove(hook);
+	}
+
 	/**
 	 * Simple String view with a TextField.
 	 */
@@ -25,6 +48,7 @@ public class StringParameter extends PersistentParameterBase<String> {
 			super(parameter, new TextField());
 			set(parameter.get());
 
+			PersistentParameter.applyViewHooks(root, parameter.viewHooks);
 			root.textProperty().addListener((obs) -> {
 				parameter.valueProperty.set(get());
 			});

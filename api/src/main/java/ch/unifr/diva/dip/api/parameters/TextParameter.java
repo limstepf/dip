@@ -56,7 +56,7 @@ public class TextParameter implements Parameter {
 		return view;
 	}
 
-	private final List<PersistentParameter.ViewHook<Text>> viewHooks = new ArrayList<>();
+	protected final List<PersistentParameter.ViewHook<Text>> viewHooks = new ArrayList<>();
 
 	/**
 	 * Adds a view hook to customize the label. This method is only called if
@@ -64,7 +64,7 @@ public class TextParameter implements Parameter {
 	 *
 	 * @param hook hook method for a label.
 	 */
-	public void addViewHook(PersistentParameter.ViewHook<Text> hook) {
+	public void addTextViewHook(PersistentParameter.ViewHook<Text> hook) {
 		this.viewHooks.add(hook);
 	}
 
@@ -73,7 +73,7 @@ public class TextParameter implements Parameter {
 	 *
 	 * @param hook hook method to be removed.
 	 */
-	public void removeViewHook(PersistentParameter.ViewHook<Text> hook) {
+	public void removeTextViewHook(PersistentParameter.ViewHook<Text> hook) {
 		this.viewHooks.remove(hook);
 	}
 

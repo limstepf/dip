@@ -76,7 +76,7 @@ public class GlobalThreshold extends ProcessableBase implements Transmutable {
 				127, 0, 255
 		);
 
-		manualInput.addViewHook((s) -> {
+		manualInput.addSliderViewHook((s) -> {
 			s.setMajorTickUnit(64);
 			s.setMinorTickCount(15);
 		});

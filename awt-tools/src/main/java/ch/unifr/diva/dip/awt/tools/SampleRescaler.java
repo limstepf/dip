@@ -92,7 +92,7 @@ public class SampleRescaler extends ProcessableBase implements Transmutable {
 			// 4 textfields on a row... better shorten their widths a bit
 			final ExpParameter[] params = {gain, bias, min, max};
 			for (ExpParameter p : params) {
-				p.addViewHook((tf) -> initTextField(tf));
+				p.addTextFieldViewHook((tf) -> initTextField(tf));
 			}
 		}
 
@@ -269,17 +269,17 @@ public class SampleRescaler extends ProcessableBase implements Transmutable {
 		final TextParameter rescaleText = new TextParameter(
 				"I'(x,y) = clamp(gain * I(x,y) + bias)"
 		);
-		rescaleText.addViewHook((n) -> {
+		rescaleText.addTextViewHook((n) -> {
 			GridPane.setValignment(n, VPos.BASELINE);
 			n.getStyleClass().add("dip-disabled");
 		});
 		final TextParameter bitOption = new TextParameter("BIT");
 		final IntegerSliderParameter byteSlider = new IntegerSliderParameter(1, 1, 4);
 		byteSlider.setPrefix(new TextParameter("BYTE"));
-		byteSlider.addViewHook((s) -> initBandSlider(s));
+		byteSlider.addSliderViewHook((s) -> initBandSlider(s));
 		final IntegerSliderParameter floatSlider = new IntegerSliderParameter(1, 1, 4);
 		floatSlider.setPrefix(new TextParameter("FLOAT"));
-		floatSlider.addViewHook((s) -> initBandSlider(s));
+		floatSlider.addSliderViewHook((s) -> initBandSlider(s));
 		final EnumParameter cmOption = new EnumParameter(
 				"", SimpleColorModel.class, SimpleColorModel.RGB.name()
 		);
@@ -304,10 +304,10 @@ public class SampleRescaler extends ProcessableBase implements Transmutable {
 		final Insets insets = new Insets(10, 0, 0, 0);
 		final LabelParameter scalingLP = new LabelParameter("Scaling");
 		final LabelParameter clampLP = new LabelParameter("Clamp");
-		scalingLP.addViewHook((label) -> {
+		scalingLP.addLabelViewHook((label) -> {
 			label.setPadding(insets);
 		});
-		clampLP.addViewHook((label) -> {
+		clampLP.addLabelViewHook((label) -> {
 			label.setPadding(insets);
 		});
 
