@@ -3,7 +3,7 @@ package ch.unifr.diva.dip.api.datatypes;
 import javafx.scene.input.DataFormat;
 
 /**
- * A JavaFX color.
+ * A JavaFX color. Used to encapsulate colors in the default sRGB color space.
  */
 public class FxColor implements DataType {
 
