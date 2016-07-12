@@ -139,6 +139,24 @@ public class DoubleMatrix extends MatrixBase {
 		return a;
 	}
 
+	/**
+	 * Returns the matrix as a kernel with floating point coefficients.
+	 *
+	 * @return a kernel with floating point coefficients.
+	 */
+	public java.awt.image.Kernel getKernel() {
+		if (!this.layout.equals(Layout.ROW_MAJOR_ORDER)) {
+			return this.toRowMajor().getKernel();
+		}
+
+		final float[] floats = new float[this.data.length];
+		for (int i = 0; i < this.data.length; i++) {
+			floats[i] = (float) this.data[i];
+		}
+
+		return new java.awt.image.Kernel(this.columns, this.rows, floats);
+	}
+
 	@Override
 	public String get(int row, int column, String format) {
 		return String.format(format, get(row, column));
