@@ -226,4 +226,24 @@ public class FloatMatrix extends MatrixBase {
 		return tp;
 	}
 
+	@Override
+	public FloatMatrix toColumnMajor() {
+		if (this.layout.equals(Layout.COLUMN_MAJOR_ORDER)) {
+			return this;
+		}
+
+		final FloatMatrix tp = this.transpose();
+		return new FloatMatrix(this.rows, this.columns, Layout.COLUMN_MAJOR_ORDER, tp.data);
+	}
+
+	@Override
+	public FloatMatrix toRowMajor() {
+		if (this.layout.equals(Layout.ROW_MAJOR_ORDER)) {
+			return this;
+		}
+
+		final FloatMatrix tp = this.transpose();
+		return new FloatMatrix(this.rows, this.columns, Layout.ROW_MAJOR_ORDER, tp.data);
+	}
+
 }

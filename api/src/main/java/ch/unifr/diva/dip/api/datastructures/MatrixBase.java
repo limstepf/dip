@@ -196,6 +196,22 @@ public abstract class MatrixBase {
 	public abstract <T extends MatrixBase> T transpose();
 
 	/**
+	 * Returns the matrix in column major order.
+	 *
+	 * @param <T> subclass of {@code MatrixBase}.
+	 * @return the matrix in column major order.
+	 */
+	public abstract <T extends MatrixBase> T toColumnMajor();
+
+	/**
+	 * Returns the matrix in row major order.
+	 *
+	 * @param <T> subclass of {@code MatrixBase}.
+	 * @return the matrix in row major order.
+	 */
+	public abstract <T extends MatrixBase> T toRowMajor();
+
+	/**
 	 * Returns a pretty printed string representation of the matrix.
 	 *
 	 * @param numChar total number of characters of the string representation of

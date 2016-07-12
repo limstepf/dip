@@ -346,4 +346,24 @@ public class StringMatrix extends MatrixBase {
 		return tp;
 	}
 
+	@Override
+	public StringMatrix toColumnMajor() {
+		if (this.layout.equals(Layout.COLUMN_MAJOR_ORDER)) {
+			return this;
+		}
+
+		final StringMatrix tp = this.transpose();
+		return new StringMatrix(this.rows, this.columns, Layout.COLUMN_MAJOR_ORDER, tp.data);
+	}
+
+	@Override
+	public StringMatrix toRowMajor() {
+		if (this.layout.equals(Layout.ROW_MAJOR_ORDER)) {
+			return this;
+		}
+
+		final StringMatrix tp = this.transpose();
+		return new StringMatrix(this.rows, this.columns, Layout.ROW_MAJOR_ORDER, tp.data);
+	}
+
 }
