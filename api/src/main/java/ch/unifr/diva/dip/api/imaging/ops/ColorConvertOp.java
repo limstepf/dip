@@ -45,19 +45,7 @@ public class ColorConvertOp extends NullOp implements Parallelizable {
 		if (cm.dataType().type().equals(BufferedMatrix.class)) {
 			return new BufferedMatrix(src.getWidth(), src.getHeight(), cm.numBands());
 		}
-		return new BufferedImage(src.getWidth(), src.getHeight(), getCompatibleType(cm));
+		return new BufferedImage(src.getWidth(), src.getHeight(), getCompatibleBufferdImageType(cm));
 	}
 
-	private int getCompatibleType(SimpleColorModel cm) {
-		switch (cm.numBands()) {
-			case 1:
-				return BufferedImage.TYPE_BYTE_GRAY;
-
-			case 4:
-				return BufferedImage.TYPE_INT_ARGB;
-
-			default:
-				return BufferedImage.TYPE_INT_RGB;
-		}
-	}
 }

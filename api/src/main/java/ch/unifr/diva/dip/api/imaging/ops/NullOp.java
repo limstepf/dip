@@ -1,6 +1,7 @@
 package ch.unifr.diva.dip.api.imaging.ops;
 
 import ch.unifr.diva.dip.api.imaging.BufferedMatrix;
+import ch.unifr.diva.dip.api.imaging.SimpleColorModel;
 import ch.unifr.diva.dip.api.imaging.scanners.Location;
 import ch.unifr.diva.dip.api.imaging.scanners.RasterScanner;
 import java.awt.Rectangle;
@@ -84,6 +85,27 @@ public class NullOp implements BufferedImageOp {
 				src.getSampleDataType(),
 				src.getInterleave()
 		);
+	}
+
+	/**
+	 * Returns a BufferedImage type compatible for the given SimpleColorModel.
+	 * Handles images with byte precision and 1, 3, or 4 bands.
+	 *
+	 * @param cm the SimpleColorModel to get a compatible BufferedImage type
+	 * for.
+	 * @return the BufferdImage type.
+	 */
+	public int getCompatibleBufferdImageType(SimpleColorModel cm) {
+		switch (cm.numBands()) {
+			case 1:
+				return BufferedImage.TYPE_BYTE_GRAY;
+
+			case 4:
+				return BufferedImage.TYPE_INT_ARGB;
+
+			default:
+				return BufferedImage.TYPE_INT_RGB;
+		}
 	}
 
 	@Override
