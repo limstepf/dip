@@ -8,6 +8,59 @@ import java.awt.image.BufferedImage;
 public interface ImagePadder {
 
 	/**
+	 * Available image padder types.
+	 */
+	enum Type {
+
+		/**
+		 * Zero padding.
+		 */
+		ZERO() {
+					@Override
+					public ImagePadder getInstance() {
+						if (this.padder == null) {
+							this.padder = new ZeroPadder();
+						}
+						return this.padder;
+					}
+				},
+		/**
+		 * Tiled padding (circular indexing).
+		 */
+		TILED() {
+					@Override
+					public ImagePadder getInstance() {
+						if (this.padder == null) {
+							this.padder = new TiledPadder();
+						}
+						return this.padder;
+					}
+				},
+		/**
+		 * Reflective or mirrored padding (reflective indexing).
+		 */
+		REFLECTIVE() {
+					@Override
+					public ImagePadder getInstance() {
+						if (this.padder == null) {
+							this.padder = new ReflectivePadder();
+						}
+						return this.padder;
+					}
+				};
+
+		// image padders are thread-safe, so...
+		protected ImagePadder padder;
+
+		/**
+		 * Returns an image padder of a particular type.
+		 *
+		 * @return an image padder.
+		 */
+		public abstract ImagePadder getInstance();
+	}
+
+	/**
 	 * Returns the samples in an array of int for the specified pixel.
 	 *
 	 * @param src the padded image.
