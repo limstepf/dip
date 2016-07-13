@@ -160,6 +160,7 @@ public class ExpMatrixParameter extends PersistentParameterBase<StringMatrix> {
 		protected StringMatrix.Layout currentLayout;
 		protected int currentRows = -1;
 		protected int currentColumns = -1;
+		protected boolean enabledListeners = true;
 
 		public StringMatrixView(ExpMatrixParameter parameter) {
 			super(parameter, new BorderPane());
@@ -233,7 +234,7 @@ public class ExpMatrixParameter extends PersistentParameterBase<StringMatrix> {
 					textfields[index].pseudoClassStateChanged(PersistentParameter.ALERT, !isValid);
 					parameter.get().set(index, expression);
 					updateTooltip(index);
-					parameter.valueProperty.invalidate();
+					invalidateMatrix();
 				};
 				textfields[i].textProperty().addListener(listeners[i]);
 				updateTooltip(index);
@@ -258,6 +259,12 @@ public class ExpMatrixParameter extends PersistentParameterBase<StringMatrix> {
 			}
 		}
 
+		protected void invalidateMatrix() {
+			if (enabledListeners) {
+				parameter.valueProperty.invalidate();
+			}
+		}
+
 		public void updateCellWidth(double minCellWidth, double prefCellWidth, double maxCellWidth) {
 			for (ColumnConstraints cc : this.grid.getColumnConstraints()) {
 				cc.setMinWidth(minCellWidth);
@@ -275,9 +282,12 @@ public class ExpMatrixParameter extends PersistentParameterBase<StringMatrix> {
 		}
 
 		protected void setValues(StringMatrix value) {
+			this.enabledListeners = false;
 			for (int i = 0; i < value.data.length; i++) {
 				textfields[i].setText(format(value.data[i]));
 			}
+			this.enabledListeners = true;
+			invalidateMatrix();
 		}
 
 		protected boolean needsNewGrid(StringMatrix value) {
