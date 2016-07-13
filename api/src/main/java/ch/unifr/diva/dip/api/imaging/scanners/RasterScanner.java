@@ -14,10 +14,24 @@ public class RasterScanner extends ImageScanner {
 	protected int index;
 	protected final int maxIndex;
 
+	/**
+	 * Creates a new, banded raster scanner for the given image. Iterates over
+	 * all pixels and all bands in the image.
+	 *
+	 * @param image the image to scan.
+	 */
 	public RasterScanner(BufferedImage image) {
 		this(image, true);
 	}
 
+	/**
+	 * Creates a new raster scanner for the given image. Iterates over all
+	 * pixels, and if desired all bands in the image.
+	 *
+	 * @param image the image to scan.
+	 * @param isBanded iterates over all pixels and bands if True, over all
+	 * pixels only if False.
+	 */
 	public RasterScanner(BufferedImage image, boolean isBanded) {
 		this(
 				image.getRaster(),
@@ -25,10 +39,23 @@ public class RasterScanner extends ImageScanner {
 		);
 	}
 
+	/**
+	 * Creates a new, banded raster scanner for the given raster. Iterates over
+	 * all pixels and all bands in the raster.
+	 *
+	 * @param raster the raster to scan.
+	 */
 	public RasterScanner(WritableRaster raster) {
 		this(raster, raster.getNumBands());
 	}
 
+	/**
+	 * Creates a new raster scanner for the given raster. Iterates over all
+	 * pixels, and given number of bands in the raster.
+	 *
+	 * @param raster the raster to scan.
+	 * @param numBands the number of bands in the raster.
+	 */
 	public RasterScanner(WritableRaster raster, int numBands) {
 		this(
 				new Rectangle(raster.getWidth(), raster.getHeight()),
@@ -36,6 +63,23 @@ public class RasterScanner extends ImageScanner {
 		);
 	}
 
+	/**
+	 * Creates a new raster scanner for the given region. Iterates over all
+	 * discrete positions in the region.
+	 *
+	 * @param region the region to scan.
+	 */
+	public RasterScanner(Rectangle region) {
+		this(region, 1);
+	}
+
+	/**
+	 * Creates a new raster scanner for the given region. Iterates over all
+	 * discrete positions and given number of bands in the region.
+	 *
+	 * @param region the region to scan.
+	 * @param numBands the number of bands in the region.
+	 */
 	public RasterScanner(Rectangle region, int numBands) {
 		super(region, numBands);
 
