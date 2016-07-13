@@ -87,14 +87,29 @@ public class RasterScanner extends ImageScanner {
 		this.maxIndex = region.width * region.height * numBands;
 	}
 
+	/**
+	 * Returns the current row.
+	 *
+	 * @return the current row.
+	 */
 	protected int getRow() {
-		return index / (numBands * region.width);
+		return index / (numBands * region.width) + region.x;
 	}
 
+	/**
+	 * Returns the current column.
+	 *
+	 * @return the current column.
+	 */
 	protected int getCol() {
-		return (index / numBands) % region.width;
+		return (index / numBands) % region.width + region.y;
 	}
 
+	/**
+	 * Returns the current band.
+	 *
+	 * @return the current band.
+	 */
 	protected int getBand() {
 		return index % numBands;
 	}

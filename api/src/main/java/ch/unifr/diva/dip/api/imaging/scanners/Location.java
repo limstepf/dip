@@ -25,13 +25,35 @@ public class Location {
 	 */
 	public int band;
 
+	/**
+	 * Creates a new location with index, coordinates and band all set to zero.
+	 */
 	public Location() {
 		this(0, 0, 0, 0);
 	}
 
-	public Location(int index, int col, int row, int band) {
+	/**
+	 * Creates a new location with index set to zero.
+	 *
+	 * @param column the X coordinate of the location.
+	 * @param row the Y coordinate of the location.
+	 * @param band the band of the location (first band starts at 0).
+	 */
+	public Location(int column, int row, int band) {
+		this(0, column, row, band);
+	}
+
+	/**
+	 * Creates a new location.
+	 *
+	 * @param index the index of the location.
+	 * @param column the X coordinate of the location.
+	 * @param row the Y coordinate of the location.
+	 * @param band the band of the location (first band starts at 0).
+	 */
+	public Location(int index, int column, int row, int band) {
 		this.index = index;
-		this.col = col;
+		this.col = column;
 		this.row = row;
 		this.band = band;
 	}

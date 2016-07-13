@@ -1,4 +1,3 @@
-
 package ch.unifr.diva.dip.api.imaging.scanners;
 
 import ch.unifr.diva.dip.api.imaging.ImagingUtils;
@@ -18,6 +17,13 @@ abstract public class ImageScanner implements Iterable<Location>, Iterator<Locat
 	protected final Rectangle region;
 	protected final int numBands;
 
+	/**
+	 * Creates a new image scanner for the given image.
+	 *
+	 * @param image the image to scan.
+	 * @param useBands iterate over all samples in all bands in True, just over
+	 * all pixels/locations otherwise.
+	 */
 	public ImageScanner(BufferedImage image, boolean useBands) {
 		this(
 				image.getRaster().getBounds(),
@@ -25,14 +31,27 @@ abstract public class ImageScanner implements Iterable<Location>, Iterator<Locat
 		);
 	}
 
+	/**
+	 * Creates a new, unbanded image scanner for the given region. Iterates over
+	 * all pixels/locations in the region.
+	 *
+	 * @param region the region to scan.
+	 */
+	public ImageScanner(Rectangle region) {
+		this(region, 1);
+	}
+
+	/**
+	 * Creates a new image scanner for the given region. Iterates over all
+	 * samples in the given number of bands in the region.
+	 *
+	 * @param region the region to scan.
+	 * @param numBands the number of bands in the region.
+	 */
 	public ImageScanner(Rectangle region, int numBands) {
 		this.region = region;
 		this.numBands = numBands;
-		this.current = new Location();
-	}
-
-	public ImageScanner(Rectangle region) {
-		this(region, 1);
+		this.current = new Location(region.x, region.y, 0);
 	}
 
 	@Override
