@@ -93,7 +93,7 @@ public class RasterScanner extends ImageScanner {
 	 * @return the current row.
 	 */
 	protected int getRow() {
-		return index / (numBands * region.width) + region.x;
+		return index / (numBands * region.width) + region.y;
 	}
 
 	/**
@@ -102,7 +102,7 @@ public class RasterScanner extends ImageScanner {
 	 * @return the current column.
 	 */
 	protected int getCol() {
-		return (index / numBands) % region.width + region.y;
+		return (index / numBands) % region.width + region.x;
 	}
 
 	/**
