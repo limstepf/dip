@@ -13,9 +13,9 @@ import javafx.scene.control.ComboBox;
  *
  * @see EnumParameter
  */
-public class OptionParameter extends IntegerParameter {
+public class OptionParameter extends PersistentParameterBase<Integer, OptionParameter.OptionView> {
 
-	public final List<String> options;
+	protected final List<String> options;
 
 	/**
 	 * Default constructor.
@@ -26,11 +26,12 @@ public class OptionParameter extends IntegerParameter {
 	 */
 	public OptionParameter(String label, List<String> options, int defaultValue) {
 		super(label, defaultValue);
+
 		this.options = options;
 	}
 
 	@Override
-	protected PersistentParameter.View newViewInstance() {
+	protected OptionView newViewInstance() {
 		return new OptionView(this);
 	}
 
@@ -58,7 +59,7 @@ public class OptionParameter extends IntegerParameter {
 	/**
 	 * Option view with a ComboBox.
 	 */
-	public static class OptionView extends ParameterViewBase<OptionParameter, Integer, ComboBox> {
+	public static class OptionView extends PersistentParameterBase.ParameterViewBase<OptionParameter, Integer, ComboBox> {
 
 		public OptionView(OptionParameter parameter) {
 			super(parameter, new ComboBox());

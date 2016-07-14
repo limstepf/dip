@@ -27,6 +27,14 @@ public interface Parameter<T> {
 	public <U extends View<T>> U view();
 
 	/**
+	 * Un-/hides the parameter (and it's view).
+	 *
+	 * @param hide True to hide the parameter, False to unhide/show the
+	 * parameter.
+	 */
+	public void setHide(boolean hide);
+
+	/**
 	 * A view of a transient parameter.
 	 *
 	 * @param <T>
@@ -39,6 +47,18 @@ public interface Parameter<T> {
 		 * @return the root node of the view.
 		 */
 		public Node node();
+
+		/**
+		 * Un-/hides the parameter's view. Marks the parameter as invisible and
+		 * also as unmanaged by its parent, thereby removing it from the
+		 * flow/size calculations.
+		 *
+		 * @param hide True to hide the view, False to unhide/show the view.
+		 */
+		default void setHide(boolean hide) {
+			node().setVisible(!hide);
+			node().setManaged(!hide);
+		}
 	}
 
 	/**

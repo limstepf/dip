@@ -11,10 +11,12 @@ import javafx.scene.layout.BorderPane;
 /**
  * Integer slider parameter.
  */
-public class IntegerSliderParameter extends IntegerParameter {
+public class IntegerSliderParameter extends PersistentParameterBase<Integer, IntegerSliderParameter.IntegerSliderView> {
 
-	private Parameter prefixParameter;
-	private Parameter postfixParameter;
+	protected final int minValue;
+	protected final int maxValue;
+	protected Parameter prefixParameter;
+	protected Parameter postfixParameter;
 
 	/**
 	 * Creates an integer slider parameter (without label). Use a view hook to
@@ -38,7 +40,10 @@ public class IntegerSliderParameter extends IntegerParameter {
 	 * @param maxValue maximum value (inclusive).
 	 */
 	public IntegerSliderParameter(String label, int defaultValue, int minValue, int maxValue) {
-		super(label, defaultValue, minValue, maxValue);
+		super(label, defaultValue);
+
+		this.minValue = minValue;
+		this.maxValue = maxValue;
 	}
 
 	/**
@@ -62,7 +67,7 @@ public class IntegerSliderParameter extends IntegerParameter {
 	}
 
 	@Override
-	protected PersistentParameter.View newViewInstance() {
+	protected IntegerSliderView newViewInstance() {
 		return new IntegerSliderView(this);
 	}
 
@@ -90,7 +95,7 @@ public class IntegerSliderParameter extends IntegerParameter {
 	/**
 	 * Integer view with a Slider.
 	 */
-	public static class IntegerSliderView extends ParameterViewBase<IntegerSliderParameter, Integer, BorderPane> {
+	public static class IntegerSliderView extends PersistentParameterBase.ParameterViewBase<IntegerSliderParameter, Integer, BorderPane> {
 
 		private final Slider slider = new Slider();
 		private final Tooltip tooltip = new Tooltip();

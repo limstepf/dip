@@ -11,11 +11,10 @@ import javafx.scene.control.Button;
  * A button as parameter. This is a transient parameter (for display purposes
  * only). Nothing gets saved.
  */
-public class ButtonParameter implements Parameter {
+public class ButtonParameter extends TransientParameterBase<ButtonParameter.ButtonView> {
 
 	private final String label;
 	private EventHandler<ActionEvent> onAction;
-	private ButtonView view;
 
 	/**
 	 * Creates a new button parameter without onAction event handler. Use
@@ -53,11 +52,8 @@ public class ButtonParameter implements Parameter {
 	}
 
 	@Override
-	public View view() {
-		if (view == null) {
-			this.view = new ButtonView(this);
-		}
-		return view;
+	protected ButtonView newViewInstance() {
+		return new ButtonView(this);
 	}
 
 	protected final List<PersistentParameter.ViewHook<Button>> viewHooks = new ArrayList<>();

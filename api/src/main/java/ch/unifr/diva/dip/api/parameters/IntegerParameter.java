@@ -8,7 +8,7 @@ import javafx.scene.control.TextField;
 /**
  * Integer parameter.
  */
-public class IntegerParameter extends PersistentParameterBase<Integer> {
+public class IntegerParameter extends PersistentParameterBase<Integer, IntegerParameter.IntegerView> {
 
 	protected final int minValue;
 	protected final int maxValue;
@@ -58,7 +58,7 @@ public class IntegerParameter extends PersistentParameterBase<Integer> {
 	}
 
 	@Override
-	protected PersistentParameter.View newViewInstance() {
+	protected IntegerView newViewInstance() {
 		return new IntegerView(this);
 	}
 
@@ -86,7 +86,7 @@ public class IntegerParameter extends PersistentParameterBase<Integer> {
 	/**
 	 * Simple Integer view with a TextField.
 	 */
-	public static class IntegerView extends ParameterViewBase<IntegerParameter, Integer, TextField> {
+	public static class IntegerView extends PersistentParameterBase.ParameterViewBase<IntegerParameter, Integer, TextField> {
 
 		protected final NumberValidationTooltip<Integer> validator = new NumberValidationTooltip<>();
 

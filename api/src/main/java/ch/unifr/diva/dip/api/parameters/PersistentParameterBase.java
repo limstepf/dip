@@ -8,11 +8,19 @@ import javafx.scene.Node;
  * Persistent parameter base class. Implements most boilerplate code of a
  * parameter leaving only/mostly the view to be implemented.
  *
+ * <p>
+ * While the view, extending from {@code PersistentParameter.View<T>} is
+ * generic, keep in mind that once typed, subclasses have to share that view. So
+ * it's often easier to not extend some basic integer parameter (with a simple
+ * view), but rather extend directly from here again.
+ *
  * @param <T> class of the parameter's value.
+ * @param <V> class of the parameter's view.
  */
-public abstract class PersistentParameterBase<T> implements PersistentParameter<T> {
+public abstract class PersistentParameterBase<T, V extends PersistentParameter.View<T>> implements PersistentParameter<T> {
 
-	protected PersistentParameter.View view = null;
+	protected V view;
+	protected boolean isHidden;
 	protected final String label;
 	protected final T defaultValue;
 	protected final ParentObjectProperty<T> valueProperty;
@@ -55,12 +63,21 @@ public abstract class PersistentParameterBase<T> implements PersistentParameter<
 		return this.valueProperty;
 	}
 
-	protected abstract PersistentParameter.View newViewInstance();
+	@Override
+	public void setHide(boolean hide) {
+		isHidden = hide;
+		if (view != null) {
+			view.setHide(this.isHidden);
+		}
+	}
+
+	protected abstract V newViewInstance();
 
 	@Override
-	public Parameter.View<T> view() {
+	public V view() {
 		if (view == null) {
 			view = newViewInstance();
+			view.setHide(isHidden);
 		}
 		return view;
 	}

@@ -7,7 +7,7 @@ import javafx.scene.layout.HBox;
 /**
  * A Boolean parameter.
  */
-public class BooleanParameter extends PersistentParameterBase<Boolean> {
+public class BooleanParameter extends PersistentParameterBase<Boolean, BooleanParameter.BooleanView> {
 
 	protected String trueLabel;
 	protected String falseLabel;
@@ -56,14 +56,14 @@ public class BooleanParameter extends PersistentParameterBase<Boolean> {
 	}
 
 	@Override
-	protected PersistentParameter.View newViewInstance() {
+	protected BooleanView newViewInstance() {
 		return new BooleanView(this);
 	}
 
 	/**
 	 * Boolean view with a ToggleGroup of two ToggleButtons.
 	 */
-	public static class BooleanView extends ParameterViewBase<BooleanParameter, Boolean, HBox> {
+	public static class BooleanView extends PersistentParameterBase.ParameterViewBase<BooleanParameter, Boolean, HBox> {
 
 		private final ToggleGroup group = new ToggleGroup();
 		private final ToggleButton on;

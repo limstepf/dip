@@ -8,7 +8,7 @@ import javafx.scene.control.TextField;
 /**
  * A Double parameter.
  */
-public class DoubleParameter extends PersistentParameterBase<Double> {
+public class DoubleParameter extends PersistentParameterBase<Double, DoubleParameter.DoubleView> {
 
 	protected final double minValue;
 	protected final double maxValue;
@@ -58,7 +58,7 @@ public class DoubleParameter extends PersistentParameterBase<Double> {
 	}
 
 	@Override
-	protected PersistentParameter.View newViewInstance() {
+	protected DoubleView newViewInstance() {
 		return new DoubleView(this);
 	}
 
@@ -86,7 +86,7 @@ public class DoubleParameter extends PersistentParameterBase<Double> {
 	/**
 	 * Simple Double view with a TextField.
 	 */
-	public static class DoubleView extends ParameterViewBase<DoubleParameter, Double, TextField> {
+	public static class DoubleView extends PersistentParameterBase.ParameterViewBase<DoubleParameter, Double, TextField> {
 
 		protected final NumberValidationTooltip<Double> validator = new NumberValidationTooltip<>();
 

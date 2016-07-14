@@ -20,7 +20,7 @@ import javafx.scene.layout.VBox;
  * All (sub-)parameters are (re-)stored too, even if not selected, and referred
  * to by index (w.r.t. the given list of parameters).
  */
-public class XorParameter extends CompositeBase<ValueListSelection> {
+public class XorParameter extends CompositeBase<ValueListSelection, XorParameter.XorView> {
 
 	protected final List<Parameter> children;
 
@@ -113,7 +113,7 @@ public class XorParameter extends CompositeBase<ValueListSelection> {
 	}
 
 	@Override
-	protected PersistentParameter.View newViewInstance() {
+	protected XorView newViewInstance() {
 		return new XorView(this);
 	}
 
@@ -140,7 +140,7 @@ public class XorParameter extends CompositeBase<ValueListSelection> {
 	/**
 	 * The XOR view.
 	 */
-	public static class XorView extends ParameterViewBase<XorParameter, ValueListSelection, VBox> {
+	public static class XorView extends PersistentParameterBase.ParameterViewBase<XorParameter, ValueListSelection, VBox> {
 
 		// TODO: implement XorGridView?
 		private final ToggleGroup toggleGroup = new ToggleGroup();

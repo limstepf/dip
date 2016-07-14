@@ -19,10 +19,11 @@ import java.util.List;
  *
  * @param <T> class of the parameter's value. For composite parameters something
  * like a {@code ValueList} or a {@code ValueMap} will do.
+ * @param <V> class of the parameter's view.
  * @see ValueList
  * @see ValueMap
  */
-public abstract class CompositeBase<T> extends PersistentParameterBase<T> {
+public abstract class CompositeBase<T, V extends PersistentParameter.View<T>> extends PersistentParameterBase<T, V> {
 
 	protected boolean enableChildListeners;
 

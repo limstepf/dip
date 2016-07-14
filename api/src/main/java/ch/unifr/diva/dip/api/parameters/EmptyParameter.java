@@ -1,4 +1,3 @@
-
 package ch.unifr.diva.dip.api.parameters;
 
 import javafx.scene.Node;
@@ -11,6 +10,7 @@ import javafx.scene.layout.Region;
 public class EmptyParameter implements Parameter {
 
 	private Parameter.View view;
+	protected boolean isHidden;
 
 	/**
 	 * Creates an empty parameter.
@@ -20,9 +20,18 @@ public class EmptyParameter implements Parameter {
 	}
 
 	@Override
+	public void setHide(boolean hide) {
+		this.isHidden = hide;
+		if (view != null) {
+			this.view.setHide(this.isHidden);
+		}
+	}
+
+	@Override
 	public View view() {
 		if (view == null) {
 			this.view = new EmptyView();
+			this.view.setHide(this.isHidden);
 		}
 		return view;
 	}
@@ -38,6 +47,6 @@ public class EmptyParameter implements Parameter {
 		public Node node() {
 			return region;
 		}
-
 	}
+
 }

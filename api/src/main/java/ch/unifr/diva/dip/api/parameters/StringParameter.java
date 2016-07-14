@@ -7,14 +7,29 @@ import javafx.scene.control.TextField;
 /**
  * String parameter.
  */
-public class StringParameter extends PersistentParameterBase<String> {
+public class StringParameter extends PersistentParameterBase<String, StringParameter.StringView> {
 
+	/**
+	 * Creates a new, empty string parameter.
+	 *
+	 * @param label label of the parameter.
+	 */
+	public StringParameter(String label) {
+		this(label, "");
+	}
+
+	/**
+	 * Creates a new string parameter.
+	 *
+	 * @param label label of the parameter.
+	 * @param defaultValue default value/string.
+	 */
 	public StringParameter(String label, String defaultValue) {
 		super(label, defaultValue);
 	}
 
 	@Override
-	protected PersistentParameter.View newViewInstance() {
+	protected StringView newViewInstance() {
 		return new StringView(this);
 	}
 
@@ -42,7 +57,7 @@ public class StringParameter extends PersistentParameterBase<String> {
 	/**
 	 * Simple String view with a TextField.
 	 */
-	public static class StringView extends ParameterViewBase<StringParameter, String, TextField> {
+	public static class StringView extends PersistentParameterBase.ParameterViewBase<StringParameter, String, TextField> {
 
 		public StringView(StringParameter parameter) {
 			super(parameter, new TextField());

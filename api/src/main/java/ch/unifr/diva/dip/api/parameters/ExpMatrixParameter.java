@@ -25,7 +25,7 @@ import net.objecthunter.exp4j.ExpressionBuilder;
  *
  * @see ExpParameter
  */
-public class ExpMatrixParameter extends PersistentParameterBase<StringMatrix> {
+public class ExpMatrixParameter extends PersistentParameterBase<StringMatrix, ExpMatrixParameter.StringMatrixView> {
 
 	protected double cellSpacing = 3.0;
 	protected double minCellWidth = 15.0;
@@ -139,14 +139,14 @@ public class ExpMatrixParameter extends PersistentParameterBase<StringMatrix> {
 	}
 
 	@Override
-	protected View newViewInstance() {
+	protected StringMatrixView newViewInstance() {
 		return new StringMatrixView(this);
 	}
 
 	/**
 	 * StringMatrix view.
 	 */
-	public static class StringMatrixView extends ParameterViewBase<ExpMatrixParameter, StringMatrix, BorderPane> {
+	public static class StringMatrixView extends PersistentParameterBase.ParameterViewBase<ExpMatrixParameter, StringMatrix, BorderPane> {
 
 		protected final GridPane grid;
 		protected final Region leftBorder;

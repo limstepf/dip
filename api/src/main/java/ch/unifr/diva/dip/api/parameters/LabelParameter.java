@@ -9,10 +9,9 @@ import javafx.scene.control.Label;
  * A label as parameter. This is a transient parameter (for display purposes
  * only). Nothing gets saved.
  */
-public class LabelParameter implements Parameter {
+public class LabelParameter extends TransientParameterBase {
 
-	private final String label;
-	private Parameter.View view;
+	protected final String label;
 
 	/**
 	 * Creates a label parameter.
@@ -24,11 +23,8 @@ public class LabelParameter implements Parameter {
 	}
 
 	@Override
-	public View view() {
-		if (view == null) {
-			this.view = new LabelView(this);
-		}
-		return view;
+	protected Parameter.View newViewInstance() {
+		return new LabelView(this);
 	}
 
 	protected final List<PersistentParameter.ViewHook<Label>> viewHooks = new ArrayList<>();

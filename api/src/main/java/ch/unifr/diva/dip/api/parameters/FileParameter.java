@@ -11,7 +11,7 @@ import javafx.stage.Stage;
 /**
  * A File parameter.
  */
-public class FileParameter extends PersistentParameterBase<FileReference> {
+public class FileParameter extends PersistentParameterBase<FileReference, FileParameter.FileView> {
 
 	protected final String action;
 	protected final Mode mode;
@@ -46,14 +46,15 @@ public class FileParameter extends PersistentParameterBase<FileReference> {
 	}
 
 	@Override
-	protected PersistentParameter.View newViewInstance() {
+	protected FileView newViewInstance() {
 		return new FileView(this);
 	}
 
 	/**
 	 * File view.
 	 */
-	public static class FileView extends ParameterViewBase<FileParameter, FileReference, HBox> {
+	public static class FileView extends PersistentParameterBase.ParameterViewBase<FileParameter, FileReference, HBox> {
+
 		protected final TextField text = new TextField();
 		protected final Button button = new Button();
 		protected FileReference file;
@@ -121,4 +122,3 @@ public class FileParameter extends PersistentParameterBase<FileReference> {
 	}
 
 }
-

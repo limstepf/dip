@@ -8,7 +8,7 @@ import javafx.scene.control.TextField;
 /**
  * Float parameter.
  */
-public class FloatParameter extends PersistentParameterBase<Float> {
+public class FloatParameter extends PersistentParameterBase<Float, FloatParameter.FloatView> {
 
 	protected final float minValue;
 	protected final float maxValue;
@@ -58,7 +58,7 @@ public class FloatParameter extends PersistentParameterBase<Float> {
 	}
 
 	@Override
-	protected PersistentParameter.View newViewInstance() {
+	protected FloatView newViewInstance() {
 		return new FloatView(this);
 	}
 
@@ -86,7 +86,7 @@ public class FloatParameter extends PersistentParameterBase<Float> {
 	/**
 	 * Simple Float view with a TextField.
 	 */
-	public static class FloatView extends ParameterViewBase<FloatParameter, Float, TextField> {
+	public static class FloatView extends PersistentParameterBase.ParameterViewBase<FloatParameter, Float, TextField> {
 
 		protected final NumberValidationTooltip<Float> validator = new NumberValidationTooltip<>();
 

@@ -11,7 +11,7 @@ import javafx.scene.control.ComboBox;
  *
  * @see OptionParameter
  */
-public class EnumParameter extends StringParameter {
+public class EnumParameter extends PersistentParameterBase<String, EnumParameter.EnumView> {
 
 	final List<String> options;
 	final List<String> labels;
@@ -135,7 +135,7 @@ public class EnumParameter extends StringParameter {
 	}
 
 	@Override
-	protected PersistentParameter.View newViewInstance() {
+	protected EnumView newViewInstance() {
 		return new EnumView(this);
 	}
 
@@ -163,7 +163,7 @@ public class EnumParameter extends StringParameter {
 	/**
 	 * Enum view with a ComboBox.
 	 */
-	public static class EnumView extends ParameterViewBase<EnumParameter, String, ComboBox> {
+	public static class EnumView extends PersistentParameterBase.ParameterViewBase<EnumParameter, String, ComboBox> {
 
 		public EnumView(EnumParameter parameter) {
 			super(parameter, new ComboBox());

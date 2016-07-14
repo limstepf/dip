@@ -16,10 +16,16 @@ import javafx.scene.text.Text;
  * field, once initialized), so the text/message can be easily changed at
  * runtime, nevertheless.
  */
-public class TextParameter implements Parameter {
+public class TextParameter extends TransientParameterBase {
 
-	private final StringProperty textProperty;
-	private Parameter.View view;
+	protected final StringProperty textProperty;
+
+	/**
+	 * Creates an empty text parameter.
+	 */
+	public TextParameter() {
+		this("");
+	}
 
 	/**
 	 * Creates a text parameter.
@@ -49,11 +55,8 @@ public class TextParameter implements Parameter {
 	}
 
 	@Override
-	public View view() {
-		if (view == null) {
-			this.view = new TextView(this);
-		}
-		return view;
+	protected Parameter.View newViewInstance() {
+		return new TextView(this);
 	}
 
 	protected final List<PersistentParameter.ViewHook<Text>> viewHooks = new ArrayList<>();

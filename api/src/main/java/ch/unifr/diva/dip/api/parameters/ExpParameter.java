@@ -1,5 +1,7 @@
 package ch.unifr.diva.dip.api.parameters;
 
+import java.util.ArrayList;
+import java.util.List;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import net.objecthunter.exp4j.Expression;
@@ -57,7 +59,7 @@ import net.objecthunter.exp4j.ExpressionBuilder;
  *
  * @see net.objecthunter.exp4j
  */
-public class ExpParameter extends StringParameter {
+public class ExpParameter extends PersistentParameterBase<String, ExpParameter.ExpView> {
 
 	// TODO: this could be extended to support expressions with variables, e.g.
 	// a function that gets x and y pixel coordinates, or another that takes
@@ -75,7 +77,7 @@ public class ExpParameter extends StringParameter {
 	}
 
 	@Override
-	protected PersistentParameter.View newViewInstance() {
+	protected ExpView newViewInstance() {
 		return new ExpView(this);
 	}
 
@@ -111,10 +113,31 @@ public class ExpParameter extends StringParameter {
 		}
 	}
 
+	protected final List<ViewHook> viewHooks = new ArrayList<>();
+
+	/**
+	 * Adds a view hook to customize the textfield. This method is only called
+	 * if the view of the parameter is actually requested.
+	 *
+	 * @param hook hook method for a label.
+	 */
+	public void addTextFieldViewHook(ViewHook<TextField> hook) {
+		this.viewHooks.add(hook);
+	}
+
+	/**
+	 * Removes a view hook.
+	 *
+	 * @param hook hook method to be removed.
+	 */
+	public void removeTextFieldViewHook(ViewHook<TextField> hook) {
+		this.viewHooks.remove(hook);
+	}
+
 	/**
 	 * Expression view.
 	 */
-	public static class ExpView extends ParameterViewBase<ExpParameter, String, TextField> {
+	public static class ExpView extends PersistentParameterBase.ParameterViewBase<ExpParameter, String, TextField> {
 
 		protected final Tooltip tooltip = new Tooltip();
 
@@ -153,7 +176,6 @@ public class ExpParameter extends StringParameter {
 		public final void set(String value) {
 			root.setText(value);
 		}
-
 	}
 
 }

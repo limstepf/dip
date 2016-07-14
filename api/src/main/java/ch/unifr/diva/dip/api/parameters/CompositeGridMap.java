@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javafx.beans.InvalidationListener;
 
 /**
  * Composite grid backed by a map of child parameters. Use a

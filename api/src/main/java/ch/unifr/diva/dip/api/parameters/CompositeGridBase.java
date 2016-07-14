@@ -2,7 +2,6 @@ package ch.unifr.diva.dip.api.parameters;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import static java.util.stream.Collectors.toList;
 import javafx.geometry.HPos;
@@ -21,7 +20,7 @@ import javafx.scene.layout.RowConstraints;
  *
  * @param <T> class of the parameter's value.
  */
-public abstract class CompositeGridBase<T> extends CompositeBase<T> {
+public abstract class CompositeGridBase<T> extends CompositeBase<T, CompositeGridBase.GridView<? extends CompositeGridBase<T>, T>> {
 
 	protected final List<ColumnConstraints> columnConstraints;
 	protected final List<RowConstraints> rowConstraints;
@@ -241,7 +240,7 @@ public abstract class CompositeGridBase<T> extends CompositeBase<T> {
 	protected abstract void updateChildValues(T value);
 
 	@Override
-	protected View newViewInstance() {
+	protected GridView newViewInstance() {
 		return new GridView(this);
 	}
 
@@ -251,7 +250,7 @@ public abstract class CompositeGridBase<T> extends CompositeBase<T> {
 	 * @param <P> class of the parameter, subclass of CompositeBase.
 	 * @param <T> class of the parameter's value.
 	 */
-	public static class GridView<P extends CompositeGridBase<T>, T> extends ParameterViewBase<P, T, GridPane> {
+	public static class GridView<P extends CompositeGridBase<T>, T> extends PersistentParameterBase.ParameterViewBase<P, T, GridPane> {
 
 		public GridView(P parameter) {
 			super(parameter, new GridPane());
