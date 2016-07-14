@@ -61,13 +61,13 @@ public class MatrixEditor extends ProcessorBase {
 		this.multiplier = new ExpParameter("multiplier", "1");
 		this.multiplier.addTextFieldViewHook((tf) -> tf.setPrefWidth(singleWidth));
 
-		final CompositeGrid dimensions = new CompositeGrid(
-				"Dimensions",
+		final CompositeGrid shape = new CompositeGrid(
+				"Shape",
 				this.rows,
 				new TextParameter(" x "),
 				this.columns
 		);
-		this.parameters.put("dimensions", dimensions);
+		this.parameters.put("shape", shape);
 
 		final ExpParameter matModifier = new ExpParameter("matmod", "1");
 		matModifier.addTextFieldViewHook((tf) -> tf.setPrefWidth(singleWidth));
