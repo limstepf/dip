@@ -4,6 +4,7 @@ import ch.unifr.diva.dip.api.datatypes.DataType;
 import ch.unifr.diva.dip.api.imaging.scanners.Location;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
+import java.util.Arrays;
 
 /**
  * Simple Color Models supported by DIP.
@@ -742,6 +743,13 @@ public enum SimpleColorModel {
 	private final float[] minValues;
 	private final float[] maxValues;
 
+	/**
+	 * Defines a new simple color model with sample range from 0 to 255.
+	 *
+	 * @param dataType the data type of the color model.
+	 * @param bandLabels the band labels (or acronyms).
+	 * @param bandDescriptions the band descriptions.
+	 */
 	private SimpleColorModel(
 			Class<? extends DataType> dataType,
 			String[] bandLabels,
@@ -754,6 +762,15 @@ public enum SimpleColorModel {
 		);
 	}
 
+	/**
+	 * Defines a new simple color model.
+	 *
+	 * @param dataType the data type of the color model.
+	 * @param bandLabels the band labels (or acronyms).
+	 * @param bandDescriptions the band descriptions.
+	 * @param minValues array of minimum sample ranges for all bands.
+	 * @param maxValues array of maximum sample ranges for all bands.
+	 */
 	private SimpleColorModel(
 			Class<? extends DataType> dataType,
 			String[] bandLabels,
@@ -776,6 +793,7 @@ public enum SimpleColorModel {
 		this.maxValues = maxValues;
 	}
 
+	// used to define min/max sample ranges for all bands
 	private static float[] getExtrema(int numBands, float value) {
 		final float[] minima = new float[numBands];
 		for (int i = 0; i < numBands; i++) {
@@ -784,48 +802,141 @@ public enum SimpleColorModel {
 		return minima;
 	}
 
+	/**
+	 * Returns the number of bands of the color model.
+	 *
+	 * @return the number of bands.
+	 */
 	public int numBands() {
 		return this.numBands;
 	}
 
+	/**
+	 * Returns a short band label (or acronym).
+	 *
+	 * @param band the index of the band.
+	 * @return the band label (or acronym).
+	 */
 	public String bandLabel(int band) {
 		return this.bandLabels[band];
 	}
 
+	/**
+	 * Returns the band description.
+	 *
+	 * @param band the index of the band.
+	 * @return the band description.
+	 */
 	public String bandDescription(int band) {
 		return this.bandDescriptions[band];
 	}
 
+	/**
+	 * Returns the data type of the color model.
+	 *
+	 * @return the data type of the color model.
+	 */
 	public DataType dataType() {
 		return this.dataType;
 	}
 
+	/**
+	 * Checks whether images with this color model require a
+	 * {@code BufferedMatrix} instead of a {@code BufferedImage}.
+	 *
+	 * @return True if images with this color model require a
+	 * {@code BufferedMatrix}, False otherwise.
+	 */
 	public boolean requiresBufferedMatrix() {
 		return dataType().type().equals(BufferedMatrix.class);
 	}
 
+	/**
+	 * Returns the minimum value of the defined band range.
+	 *
+	 * @param band the band index.
+	 * @return the minimum value of the band range.
+	 */
 	public float minValue(int band) {
 		return this.minValues[band];
 	}
 
+	/**
+	 * Returns the maximum value of the defined band range.
+	 *
+	 * @param band the band index.
+	 * @return the maximum value of the band range.
+	 */
 	public float maxValue(int band) {
 		return this.maxValues[band];
 	}
 
+	/**
+	 * Returns the minumum values of the defined band ranges for all bands.
+	 *
+	 * @return an array of all minimum values of band ranges.
+	 */
+	public float[] minValues() {
+		return Arrays.copyOf(this.minValues, this.minValues.length);
+	}
+
+	/**
+	 * Returns the maximum values of the defined band ranges for all bands.
+	 *
+	 * @return an array of all maximum values of band ranges.
+	 */
+	public float[] maxValues() {
+		return Arrays.copyOf(this.maxValues, this.maxValues.length);
+	}
+
+	/**
+	 * Returns the type of the {@code BufferedImage} required to visualize the
+	 * bands of images with this color model. Individual bands are typically
+	 * visualize in grayscale, but also RGB can be used (e.g. to show hue or
+	 * color difference bands).
+	 *
+	 * @return the type of the {@code BufferedImage} to be used to visualize
+	 * individual bands of images with this color model.
+	 */
 	public int getBandVisualizationImageType() {
 		return BufferedImage.TYPE_BYTE_GRAY;
 	}
 
+	/**
+	 * Computes individual band visualization on a single pixel/location and
+	 * band.
+	 *
+	 * @param src the source raster to read from.
+	 * @param dst the destination raster to write the visualization to.
+	 * @param pt the pixel/location.
+	 * @param band the index of the band.
+	 */
 	public void doBandVisualization(WritableRaster src, WritableRaster dst, Location pt, int band) {
 		final float sample = src.getSampleFloat(pt.col, pt.row, band);
 		dst.setSample(pt.col, pt.row, pt.band, sample);
 	}
 
+	/**
+	 * Converts a pixel from this to another color model.
+	 *
+	 * @param cm target/destination color model.
+	 * @param from source pixel data.
+	 * @return the converted pixel data.
+	 */
 	public float[] convertTo(SimpleColorModel cm, float[] from) {
 		final float[] to = new float[cm.numBands];
 		return convertTo(cm, from, to);
 	}
 
+	/**
+	 * Converts a pixel from this to another color model.
+	 *
+	 * @param cm target/destination color model.
+	 * @param from source pixel data.
+	 * @param to pre-allocated destination array for the converted pixel data.
+	 * Can not be null, and needs to be of the size of {@code cm.numBands}.
+	 * @return the converted pixel data (the {@code to} array).
+	 */
 	public float[] convertTo(SimpleColorModel cm, float[] from, float[] to) {
 		switch (cm) {
 			case CMY:
@@ -860,80 +971,212 @@ public enum SimpleColorModel {
 		return new float[cm.numBands];
 	}
 
+	/**
+	 * Converts a pixel from this color model to CMY.
+	 *
+	 * @param from source pixel data.
+	 * @return the converted pixel data.
+	 */
 	public float[] toCmy(float[] from) {
 		return toCmy(from, newFloat(CMY));
 	}
 
+	/**
+	 * Converts a pixel from this color model to CMY.
+	 *
+	 * @param from source pixel data.
+	 * @param to pre-allocated destination array for the converted pixel data.
+	 * @return the converted pixel data.
+	 */
 	public float[] toCmy(float[] from, float[] to) {
 		return RGB.toCmy(SimpleColorModel.this.toRgb(from), to);
 	}
 
+	/**
+	 * Converts a pixel from this color model to grayscale.
+	 *
+	 * @param from source pixel data.
+	 * @return the converted pixel data.
+	 */
 	public float[] toGray(float[] from) {
 		return toGray(from, newFloat(GRAY));
 	}
 
+	/**
+	 * Converts a pixel from this color model to grayscale.
+	 *
+	 * @param from source pixel data.
+	 * @param to pre-allocated destination array for the converted pixel data.
+	 * @return the converted pixel data.
+	 */
 	public float[] toGray(float[] from, float[] to) {
 		return RGB.toGray(SimpleColorModel.this.toRgb(from), to);
 	}
 
+	/**
+	 * Converts a pixel from this color model to HSV.
+	 *
+	 * @param from source pixel data.
+	 * @return the converted pixel data.
+	 */
 	public float[] toHsv(float[] from) {
 		return toHsv(from, newFloat(HSV));
 	}
 
+	/**
+	 * Converts a pixel from this color model to HSV.
+	 *
+	 * @param from source pixel data.
+	 * @param to pre-allocated destination array for the converted pixel data.
+	 * @return the converted pixel data.
+	 */
 	public float[] toHsv(float[] from, float[] to) {
 		return RGB.toHsv(SimpleColorModel.this.toRgb(from), to);
 	}
 
+	/**
+	 * Converts a pixel from this color model to RGB.
+	 *
+	 * @param from source pixel data.
+	 * @return the converted pixel data.
+	 */
 	public float[] toRgb(float[] from) {
 		return toRgb(from, newFloat(RGB));
 	}
 
+	/**
+	 * Converts a pixel from this color model to RGB.
+	 *
+	 * @param from source pixel data.
+	 * @param to pre-allocated destination array for the converted pixel data.
+	 * @return the converted pixel data.
+	 */
 	public abstract float[] toRgb(float[] from, float[] to);
 
+	/**
+	 * Converts a pixel from this color model to RGBA.
+	 *
+	 * @param from source pixel data.
+	 * @return the converted pixel data.
+	 */
 	public float[] toRgba(float[] from) {
 		return toRgba(from, newFloat(RGBA));
 	}
 
+	/**
+	 * Converts a pixel from this color model to RGBA.
+	 *
+	 * @param from source pixel data.
+	 * @param to pre-allocated destination array for the converted pixel data.
+	 * @return the converted pixel data.
+	 */
 	public float[] toRgba(float[] from, float[] to) {
 		return RGB.toRgba(SimpleColorModel.this.toRgb(from), to);
 	}
 
+	/**
+	 * Converts a pixel from this color model to YUV.
+	 *
+	 * @param from source pixel data.
+	 * @return the converted pixel data.
+	 */
 	public float[] toYuv(float[] from) {
 		return toYuv(from, newFloat(YUV));
 	}
 
+	/**
+	 * Converts a pixel from this color model to YUV.
+	 *
+	 * @param from source pixel data.
+	 * @param to pre-allocated destination array for the converted pixel data.
+	 * @return the converted pixel data.
+	 */
 	public float[] toYuv(float[] from, float[] to) {
 		return RGB.toYuv(SimpleColorModel.this.toRgb(from), to);
 	}
 
+	/**
+	 * Converts a pixel from this color model to YCbCr.
+	 *
+	 * @param from source pixel data.
+	 * @return the converted pixel data.
+	 */
 	public float[] toYCbCr(float[] from) {
 		return toYCbCr(from, newFloat(YCbCr));
 	}
 
+	/**
+	 * Converts a pixel from this color model to YCbCr.
+	 *
+	 * @param from source pixel data.
+	 * @param to pre-allocated destination array for the converted pixel data.
+	 * @return the converted pixel data.
+	 */
 	public float[] toYCbCr(float[] from, float[] to) {
 		return RGB.toYCbCr(SimpleColorModel.this.toRgb(from), to);
 	}
 
+	/**
+	 * Converts a pixel from this color model to linear RGB. Not to be confused
+	 * with the standard RGB color space sRGB.
+	 *
+	 * @param from source pixel data.
+	 * @return the converted pixel data.
+	 */
 	public float[] toLinearRgb(float[] from) {
 		return toLinearRgb(from, new float[3]);
 	}
 
+	/**
+	 * Converts a pixel from this color model to linear RGB. Not to be confused
+	 * with the standard RGB color space sRGB.
+	 *
+	 * @param from source pixel data.
+	 * @param to pre-allocated destination array for the converted pixel data.
+	 * @return the converted pixel data.
+	 */
 	public float[] toLinearRgb(float[] from, float[] to) {
 		return RGB.toLinearRgb(SimpleColorModel.this.toRgb(from), to);
 	}
 
+	/**
+	 * Converts a pixel from this color model to XYZ.
+	 *
+	 * @param from source pixel data.
+	 * @return the converted pixel data.
+	 */
 	public float[] toXyz(float[] from) {
 		return toXyz(from, newFloat(XYZ));
 	}
 
+	/**
+	 * Converts a pixel from this color model to XYZ.
+	 *
+	 * @param from source pixel data.
+	 * @param to pre-allocated destination array for the converted pixel data.
+	 * @return the converted pixel data.
+	 */
 	public float[] toXyz(float[] from, float[] to) {
 		return RGB.toXyz(SimpleColorModel.this.toRgb(from), to);
 	}
 
+	/**
+	 * Converts a pixel from this color model to Lab.
+	 *
+	 * @param from source pixel data.
+	 * @return the converted pixel data.
+	 */
 	public float[] toLab(float[] from) {
 		return toLab(from, newFloat(Lab));
 	}
 
+	/**
+	 * Converts a pixel from this color model to Lab.
+	 *
+	 * @param from source pixel data.
+	 * @param to pre-allocated destination array for the converted pixel data.
+	 * @return the converted pixel data.
+	 */
 	public float[] toLab(float[] from, float[] to) {
 		return RGB.toLab(SimpleColorModel.this.toRgb(from), to);
 	}
