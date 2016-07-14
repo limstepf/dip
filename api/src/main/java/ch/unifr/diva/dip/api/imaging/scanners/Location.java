@@ -37,7 +37,7 @@ public class Location {
 	 *
 	 * @param column the X coordinate of the location.
 	 * @param row the Y coordinate of the location.
-	 * @param band the band of the location (first band starts at 0).
+	 * @param band the index of the band of the location.
 	 */
 	public Location(int column, int row, int band) {
 		this(0, column, row, band);
@@ -49,7 +49,7 @@ public class Location {
 	 * @param index the index of the location.
 	 * @param column the X coordinate of the location.
 	 * @param row the Y coordinate of the location.
-	 * @param band the band of the location (first band starts at 0).
+	 * @param band the index of the band of the location.
 	 */
 	public Location(int index, int column, int row, int band) {
 		this.index = index;
