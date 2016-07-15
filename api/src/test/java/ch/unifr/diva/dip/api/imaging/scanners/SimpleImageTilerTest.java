@@ -2,30 +2,13 @@ package ch.unifr.diva.dip.api.imaging.scanners;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.util.Arrays;
-import java.util.List;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
  * SimpleImageTiler unit tests.
  */
-public class SimpleImageTilerTest {
-
-	public final List<Rectangle> regions = Arrays.asList(
-			new Rectangle(128, 256),
-			new Rectangle(512, 512),
-			new Rectangle(2048, 1033),
-			new Rectangle(3841, 4921),
-			new Rectangle(6878, 5547)
-	);
-
-	public final List<Rectangle> tiles = Arrays.asList(
-			new Rectangle(32, 32),
-			new Rectangle(64, 32),
-			new Rectangle(131, 211),
-			new Rectangle(1024, 1024)
-	);
+public class SimpleImageTilerTest extends ImageTilerTestBase {
 
 	@Test
 	public void iteratorTest() {
