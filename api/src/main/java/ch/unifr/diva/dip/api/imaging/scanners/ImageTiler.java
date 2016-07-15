@@ -5,17 +5,19 @@ import java.awt.image.BufferedImage;
 import java.util.Iterator;
 
 /**
- * Thread-safe image tiler for parallel image processing.
+ * Image tiler base class.
+ *
+ * @param <T> type of the tile.
  */
-public class ImageTiler implements Iterator<Rectangle>, Iterable<Rectangle> {
+public abstract class ImageTiler<T extends Rectangle> implements Iterator<T>, Iterable<T> {
 
-	private final int imageWidth;
-	private final int imageHeight;
-	private final int width;
-	private final int height;
-	private final int rows;
-	private final int cols;
-	private int index;
+	protected final int imageWidth;
+	protected final int imageHeight;
+	protected final int width;
+	protected final int height;
+	protected final int rows;
+	protected final int cols;
+	protected int index;
 
 	/**
 	 * Creates a new image tiler with quadratic/square tiles. Returned tiles at
@@ -56,7 +58,7 @@ public class ImageTiler implements Iterator<Rectangle>, Iterable<Rectangle> {
 	}
 
 	@Override
-	public synchronized Rectangle next() {
+	public synchronized T next() {
 		if (!hasNext()) {
 			return null;
 		}
@@ -64,29 +66,31 @@ public class ImageTiler implements Iterator<Rectangle>, Iterable<Rectangle> {
 		this.index++;
 		final int x = getX();
 		final int y = getY();
-		return new Rectangle(x, y, getWidth(x), getHeight(y));
+		return getTile(x, y, getWidth(x), getHeight(y));
 	}
 
-	private int getX() {
+	protected abstract T getTile(int x, int y, int width, int height);
+
+	protected int getX() {
 		return this.index % this.cols * this.width;
 	}
 
-	private int getY() {
+	protected int getY() {
 		return this.index / this.cols * this.height;
 	}
 
-	private int getWidth(int x) {
+	protected int getWidth(int x) {
 		final int w = x + this.width;
 		return (w > this.imageWidth) ? (this.width - (w - this.imageWidth)) : this.width;
 	}
 
-	private int getHeight(int y) {
+	protected int getHeight(int y) {
 		final int h = y + this.height;
 		return (h > this.imageHeight) ? (this.height - (h - this.imageHeight)) : this.height;
 	}
 
 	@Override
-	public synchronized Iterator<Rectangle> iterator() {
+	public synchronized Iterator<T> iterator() {
 		return this;
 	}
 

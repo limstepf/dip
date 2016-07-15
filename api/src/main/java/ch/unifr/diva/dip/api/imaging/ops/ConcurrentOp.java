@@ -1,6 +1,6 @@
 package ch.unifr.diva.dip.api.imaging.ops;
 
-import ch.unifr.diva.dip.api.imaging.scanners.ImageTiler;
+import ch.unifr.diva.dip.api.imaging.scanners.SimpleImageTiler;
 import ch.unifr.diva.dip.api.utils.DipThreadPool;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
@@ -89,7 +89,7 @@ public class ConcurrentOp extends NullOp {
 	}
 
 	private void runOnThreads(BufferedImage src, BufferedImage dst) {
-		final ImageTiler tiler = new ImageTiler(src, this.tileWidth, this.tileHeight);
+		final SimpleImageTiler tiler = new SimpleImageTiler(src, this.tileWidth, this.tileHeight);
 		final Thread[] threads = new Thread[this.threadCount];
 
 		for (int i = 0; i < this.threadCount; i++) {
@@ -107,7 +107,7 @@ public class ConcurrentOp extends NullOp {
 	}
 
 	private void runOnThreadPool(BufferedImage src, BufferedImage dst) {
-		final ImageTiler tiler = new ImageTiler(src, this.tileWidth, this.tileHeight);
+		final SimpleImageTiler tiler = new SimpleImageTiler(src, this.tileWidth, this.tileHeight);
 		final List<Callable<Void>> callables = new ArrayList<>();
 
 		for (int i = 0; i < this.threadCount; i++) {
