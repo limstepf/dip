@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import javafx.beans.InvalidationListener;
 
 /**
  * Composite grid backed by a list of child parameters. Keep in mind that a list
@@ -60,7 +59,7 @@ public class CompositeGrid extends CompositeGridBase<ValueList> {
 
 		this.children = parameters;
 		this.persistentChildren = Parameter.filterPersistent(this.children);
-		
+
 		addChildListeners(this.persistentChildren);
 	}
 

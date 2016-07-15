@@ -244,6 +244,27 @@ public abstract class CompositeGridBase<T> extends CompositeBase<T, CompositeGri
 		return new GridView(this);
 	}
 
+	protected final List<ViewHook> viewHooks = new ArrayList<>();
+
+	/**
+	 * Adds a view hook to customize the grid pane. This method is only called
+	 * if the view of the parameter is actually requested.
+	 *
+	 * @param hook hook method for a label.
+	 */
+	public void addGridPaneViewHook(ViewHook<GridPane> hook) {
+		this.viewHooks.add(hook);
+	}
+
+	/**
+	 * Removes a view hook.
+	 *
+	 * @param hook hook method to be removed.
+	 */
+	public void removeGridPaneViewHook(ViewHook<GridPane> hook) {
+		this.viewHooks.remove(hook);
+	}
+
 	/**
 	 * Grid view for composite parameters.
 	 *
@@ -257,9 +278,11 @@ public abstract class CompositeGridBase<T> extends CompositeBase<T, CompositeGri
 
 			set(parameter.get());
 			initGrid();
+			PersistentParameter.applyViewHooks(root, parameter.viewHooks);
 		}
 
 		protected final void initGrid() {
+			root.setMaxWidth(Double.MAX_VALUE);
 			root.getColumnConstraints().addAll(parameter.columnConstraints);
 			root.getRowConstraints().addAll(parameter.rowConstraints);
 
