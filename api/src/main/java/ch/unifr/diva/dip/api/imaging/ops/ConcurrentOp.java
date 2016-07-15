@@ -1,5 +1,6 @@
 package ch.unifr.diva.dip.api.imaging.ops;
 
+import ch.unifr.diva.dip.api.imaging.scanners.ImageTiler;
 import ch.unifr.diva.dip.api.imaging.scanners.SimpleImageTiler;
 import ch.unifr.diva.dip.api.utils.DipThreadPool;
 import java.awt.image.BufferedImage;
@@ -88,8 +89,19 @@ public class ConcurrentOp extends NullOp {
 		return dst;
 	}
 
+	private ImageTiler getImageTiler(BufferedImage src) {
+		if (this.op instanceof Parallelizable) {
+			return ((Parallelizable) this.op).getImageTiler(src, this.tileWidth, this.tileHeight);
+		}
+		if (this.op instanceof PaddedParallelizable) {
+			return ((PaddedParallelizable) this.op).getImageTiler(src, this.tileWidth, this.tileHeight);
+		}
+
+		throw new IllegalArgumentException("don't know how to tile. BufferedImageOp isn't parallelizable");
+	}
+
 	private void runOnThreads(BufferedImage src, BufferedImage dst) {
-		final SimpleImageTiler tiler = new SimpleImageTiler(src, this.tileWidth, this.tileHeight);
+		final ImageTiler tiler = getImageTiler(src);
 		final Thread[] threads = new Thread[this.threadCount];
 
 		for (int i = 0; i < this.threadCount; i++) {
@@ -107,7 +119,7 @@ public class ConcurrentOp extends NullOp {
 	}
 
 	private void runOnThreadPool(BufferedImage src, BufferedImage dst) {
-		final SimpleImageTiler tiler = new SimpleImageTiler(src, this.tileWidth, this.tileHeight);
+		final ImageTiler tiler = getImageTiler(src);
 		final List<Callable<Void>> callables = new ArrayList<>();
 
 		for (int i = 0; i < this.threadCount; i++) {
