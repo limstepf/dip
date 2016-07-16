@@ -5,6 +5,7 @@ import ch.unifr.diva.dip.api.datastructures.Kernel;
 import ch.unifr.diva.dip.api.datastructures.Matrix;
 import ch.unifr.diva.dip.api.imaging.ImagingUtils;
 import ch.unifr.diva.dip.api.imaging.padders.ImagePadder;
+import ch.unifr.diva.dip.api.imaging.scanners.ImageTiler;
 import ch.unifr.diva.dip.api.imaging.scanners.Location;
 import ch.unifr.diva.dip.api.imaging.scanners.PaddedImageTiler;
 import ch.unifr.diva.dip.api.imaging.scanners.RasterScanner;
@@ -151,7 +152,7 @@ public class ConvolutionOp<T extends Matrix> extends NullOp implements PaddedTil
 	}
 
 	@Override
-	public PaddedImageTiler getImageTiler(BufferedImage src, int width, int height) {
+	public ImageTiler getImageTiler(BufferedImage src, int width, int height) {
 		return new PaddedImageTiler(
 				src,
 				width,

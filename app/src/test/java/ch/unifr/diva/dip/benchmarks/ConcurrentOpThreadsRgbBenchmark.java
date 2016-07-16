@@ -2,7 +2,7 @@ package ch.unifr.diva.dip.benchmarks;
 
 import ch.unifr.diva.dip.api.imaging.SimpleColorModel;
 import ch.unifr.diva.dip.api.imaging.ops.ColorConvertOp;
-import ch.unifr.diva.dip.api.imaging.ops.ConcurrentOp;
+import ch.unifr.diva.dip.api.imaging.ops.ConcurrentTileOp;
 import ch.unifr.diva.dip.api.imaging.ops.InvertOp;
 import ch.unifr.diva.dip.api.imaging.ops.NullOp;
 import ch.unifr.diva.dip.api.utils.DipThreadPool;
@@ -60,7 +60,7 @@ public class ConcurrentOpThreadsRgbBenchmark {
 	@BenchmarkMode({Mode.AverageTime})
 	@OutputTimeUnit(TimeUnit.MILLISECONDS)
 	public BufferedImage nullOp(Resources r) {
-		ConcurrentOp op = new ConcurrentOp(
+		ConcurrentTileOp op = new ConcurrentTileOp(
 				new NullOp(),
 				r.tileSize,
 				r.tileSize,
@@ -74,7 +74,7 @@ public class ConcurrentOpThreadsRgbBenchmark {
 	@BenchmarkMode({Mode.AverageTime})
 	@OutputTimeUnit(TimeUnit.MILLISECONDS)
 	public BufferedImage invertOp(Resources r) {
-		ConcurrentOp op = new ConcurrentOp(
+		ConcurrentTileOp op = new ConcurrentTileOp(
 				new InvertOp(),
 				r.tileSize,
 				r.tileSize,
@@ -88,7 +88,7 @@ public class ConcurrentOpThreadsRgbBenchmark {
 	@BenchmarkMode({Mode.AverageTime})
 	@OutputTimeUnit(TimeUnit.MILLISECONDS)
 	public BufferedImage colorConvertOp(Resources r) {
-		ConcurrentOp op = new ConcurrentOp(
+		ConcurrentTileOp op = new ConcurrentTileOp(
 				new ColorConvertOp(SimpleColorModel.RGB, SimpleColorModel.Lab),
 				r.tileSize,
 				r.tileSize,

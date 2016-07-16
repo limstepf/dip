@@ -1,4 +1,3 @@
-
 package ch.unifr.diva.dip.api.imaging.ops;
 
 import ch.unifr.diva.dip.api.imaging.features.Histogram;
@@ -34,7 +33,8 @@ public class ConcurrentOpIT {
 	}
 
 	/**
-	 * Tests that each pixel is written to exactly once, no matter by what thread.
+	 * Tests that each pixel is written to exactly once, no matter by what
+	 * thread.
 	 */
 	@Test
 	public void testEachPixelOnce() {
@@ -47,7 +47,7 @@ public class ConcurrentOpIT {
 			for (Integer width : widths) {
 				for (Integer height : heights) {
 					BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
-					ConcurrentOp cop = new ConcurrentOp(op, tile, tile, threadPool);
+					ConcurrentTileOp cop = new ConcurrentTileOp(op, tile, tile, threadPool);
 					BufferedImage out = cop.filter(image, null);
 					Histogram histogram = new Histogram(out, 0);
 					// image starts out all black, TestOp is supposed to increment all
@@ -68,6 +68,7 @@ public class ConcurrentOpIT {
 	 * Simple test op that increments each sample by one.
 	 */
 	public static class TestOp extends NullOp {
+
 		@Override
 		public BufferedImage filter(BufferedImage src, BufferedImage dst) {
 			if (dst == null) {

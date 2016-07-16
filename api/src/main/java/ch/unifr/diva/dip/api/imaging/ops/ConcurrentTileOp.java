@@ -1,7 +1,6 @@
 package ch.unifr.diva.dip.api.imaging.ops;
 
 import ch.unifr.diva.dip.api.imaging.scanners.ImageTiler;
-import ch.unifr.diva.dip.api.imaging.scanners.SimpleImageTiler;
 import ch.unifr.diva.dip.api.utils.DipThreadPool;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
@@ -10,11 +9,14 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 /**
- * Wrapper to run image processing filters in parallel.
+ * Wrapper to run {@code TileParallelizable} image processing filters in
+ * parallel.
+ *
+ * @param <T> subclass of BufferedImageOp and TileParallelizable.
  */
-public class ConcurrentOp extends NullOp {
+public class ConcurrentTileOp<T extends BufferedImageOp & TileParallelizable> extends NullOp {
 
-	private final BufferedImageOp op;
+	private final T op;
 	private final int tileWidth;
 	private final int tileHeight;
 	private final int threadCount;
@@ -28,7 +30,7 @@ public class ConcurrentOp extends NullOp {
 	 * @param tileWidth tile width.
 	 * @param tileHeight tile height.
 	 */
-	public ConcurrentOp(BufferedImageOp op, int tileWidth, int tileHeight) {
+	public ConcurrentTileOp(T op, int tileWidth, int tileHeight) {
 		this(op, tileWidth, tileHeight, Runtime.getRuntime().availableProcessors());
 	}
 
@@ -40,7 +42,7 @@ public class ConcurrentOp extends NullOp {
 	 * @param tileHeight tile height.
 	 * @param threadCount number of threads to be used.
 	 */
-	public ConcurrentOp(BufferedImageOp op, int tileWidth, int tileHeight, int threadCount) {
+	public ConcurrentTileOp(T op, int tileWidth, int tileHeight, int threadCount) {
 		this(op, tileWidth, tileHeight, null, threadCount);
 	}
 
@@ -52,7 +54,7 @@ public class ConcurrentOp extends NullOp {
 	 * @param tileHeight tile height.
 	 * @param threadPool a DIP thread pool.
 	 */
-	public ConcurrentOp(BufferedImageOp op, int tileWidth, int tileHeight, DipThreadPool threadPool) {
+	public ConcurrentTileOp(T op, int tileWidth, int tileHeight, DipThreadPool threadPool) {
 		this(op, tileWidth, tileHeight, threadPool, threadPool.poolSize());
 	}
 
@@ -66,7 +68,7 @@ public class ConcurrentOp extends NullOp {
 	 * thread will be created manually.
 	 * @param threadCount number of threads to be used.
 	 */
-	public ConcurrentOp(BufferedImageOp op, int tileWidth, int tileHeight, DipThreadPool threadPool, int threadCount) {
+	public ConcurrentTileOp(T op, int tileWidth, int tileHeight, DipThreadPool threadPool, int threadCount) {
 		this.op = op;
 		this.tileWidth = tileWidth;
 		this.tileHeight = tileHeight;
@@ -89,19 +91,8 @@ public class ConcurrentOp extends NullOp {
 		return dst;
 	}
 
-	private ImageTiler getImageTiler(BufferedImage src) {
-		if (this.op instanceof TileParallelizable) {
-			return ((TileParallelizable) this.op).getImageTiler(src, this.tileWidth, this.tileHeight);
-		}
-		if (this.op instanceof PaddedTileParallelizable) {
-			return ((PaddedTileParallelizable) this.op).getImageTiler(src, this.tileWidth, this.tileHeight);
-		}
-
-		throw new IllegalArgumentException("don't know how to tile. BufferedImageOp isn't parallelizable");
-	}
-
 	private void runOnThreads(BufferedImage src, BufferedImage dst) {
-		final ImageTiler tiler = getImageTiler(src);
+		final ImageTiler tiler = this.op.getImageTiler(src, this.tileWidth, this.tileHeight);
 		final Thread[] threads = new Thread[this.threadCount];
 
 		for (int i = 0; i < this.threadCount; i++) {
@@ -119,7 +110,7 @@ public class ConcurrentOp extends NullOp {
 	}
 
 	private void runOnThreadPool(BufferedImage src, BufferedImage dst) {
-		final ImageTiler tiler = getImageTiler(src);
+		final ImageTiler tiler = this.op.getImageTiler(src, this.tileWidth, this.tileHeight);
 		final List<Callable<Void>> callables = new ArrayList<>();
 
 		for (int i = 0; i < this.threadCount; i++) {

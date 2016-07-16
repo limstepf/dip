@@ -8,7 +8,7 @@ import ch.unifr.diva.dip.api.components.ProcessorContext;
 import ch.unifr.diva.dip.api.parameters.Parameter;
 import ch.unifr.diva.dip.api.imaging.BufferedIO;
 import ch.unifr.diva.dip.api.imaging.BufferedMatrix;
-import ch.unifr.diva.dip.api.imaging.ops.ConcurrentOp;
+import ch.unifr.diva.dip.api.imaging.ops.ConcurrentTileOp;
 import ch.unifr.diva.dip.api.imaging.ops.TileParallelizable;
 import ch.unifr.diva.dip.api.utils.DipThreadPool;
 import java.awt.Rectangle;
@@ -235,7 +235,7 @@ public abstract class ProcessorBase implements Processor {
 		}
 
 		final Rectangle tileSize = getOptimalTileSize(threadPool.poolSize(), src);
-		final ConcurrentOp cop = new ConcurrentOp(
+		final ConcurrentTileOp cop = new ConcurrentTileOp(
 				op,
 				tileSize.width,
 				tileSize.height,

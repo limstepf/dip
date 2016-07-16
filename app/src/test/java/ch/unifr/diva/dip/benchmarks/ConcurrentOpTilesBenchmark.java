@@ -2,7 +2,7 @@ package ch.unifr.diva.dip.benchmarks;
 
 import ch.unifr.diva.dip.api.imaging.SimpleColorModel;
 import ch.unifr.diva.dip.api.imaging.ops.ColorConvertOp;
-import ch.unifr.diva.dip.api.imaging.ops.ConcurrentOp;
+import ch.unifr.diva.dip.api.imaging.ops.ConcurrentTileOp;
 import ch.unifr.diva.dip.api.imaging.ops.NullOp;
 import ch.unifr.diva.dip.api.utils.DipThreadPool;
 import java.awt.image.BufferedImage;
@@ -59,7 +59,7 @@ public class ConcurrentOpTilesBenchmark {
 	@BenchmarkMode({Mode.AverageTime})
 	@OutputTimeUnit(TimeUnit.MILLISECONDS)
 	public BufferedImage nullOp(Resources r) {
-		ConcurrentOp op = new ConcurrentOp(
+		ConcurrentTileOp op = new ConcurrentTileOp(
 				new NullOp(),
 				r.tileSize,
 				r.tileSize,
@@ -73,7 +73,7 @@ public class ConcurrentOpTilesBenchmark {
 	@BenchmarkMode({Mode.AverageTime})
 	@OutputTimeUnit(TimeUnit.MILLISECONDS)
 	public BufferedImage colorConvertOp(Resources r) {
-		ConcurrentOp op = new ConcurrentOp(
+		ConcurrentTileOp op = new ConcurrentTileOp(
 				new ColorConvertOp(SimpleColorModel.RGB, SimpleColorModel.YCbCr),
 				r.tileSize,
 				r.tileSize,

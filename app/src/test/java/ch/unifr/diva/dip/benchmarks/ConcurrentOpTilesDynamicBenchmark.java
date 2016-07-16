@@ -3,7 +3,7 @@ package ch.unifr.diva.dip.benchmarks;
 
 import ch.unifr.diva.dip.api.imaging.SimpleColorModel;
 import ch.unifr.diva.dip.api.imaging.ops.ColorConvertOp;
-import ch.unifr.diva.dip.api.imaging.ops.ConcurrentOp;
+import ch.unifr.diva.dip.api.imaging.ops.ConcurrentTileOp;
 import ch.unifr.diva.dip.api.utils.DipThreadPool;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -59,7 +59,7 @@ public class ConcurrentOpTilesDynamicBenchmark {
 	@BenchmarkMode({Mode.AverageTime})
 	@OutputTimeUnit(TimeUnit.MILLISECONDS)
 	public BufferedImage staticTileSizeOp(Resources r) {
-		ConcurrentOp op = new ConcurrentOp(
+		ConcurrentTileOp op = new ConcurrentTileOp(
 				new ColorConvertOp(SimpleColorModel.RGB, SimpleColorModel.Lab),
 				r.tileSize, // use static tile size, no matter what
 				r.tileSize,
@@ -74,7 +74,7 @@ public class ConcurrentOpTilesDynamicBenchmark {
 	@OutputTimeUnit(TimeUnit.MILLISECONDS)
 	public BufferedImage dynamicTileSizeOp(Resources r) {
 		Rectangle tileSize = getOptimalTileSize(r.numThreads, r.image);
-		ConcurrentOp op = new ConcurrentOp(
+		ConcurrentTileOp op = new ConcurrentTileOp(
 				new ColorConvertOp(SimpleColorModel.RGB, SimpleColorModel.Lab),
 				tileSize.width, // use dynamic/optimal(?) tile size
 				tileSize.height,
