@@ -1,6 +1,6 @@
 package ch.unifr.diva.dip.api.imaging.ops;
 
-import ch.unifr.diva.dip.api.imaging.scanners.PaddedImageTiler;
+import ch.unifr.diva.dip.api.imaging.scanners.ImageTiler;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
@@ -20,9 +20,9 @@ import java.awt.image.BufferedImage;
  * not in it (at the edges of tiles), as would happen with a
  * {@code SimpleImageTiler}.
  *
- * @see Parallelizable
+ * @see TileParallelizable
  */
-public interface PaddedParallelizable {
+public interface PaddedTileParallelizable extends TileParallelizable {
 
 	/**
 	 * Performs a single-input/output operation on a BufferedImage within a
@@ -44,6 +44,7 @@ public interface PaddedParallelizable {
 	 * @param height the height of the tile (writable/unpadded region).
 	 * @return a padded image tiler.
 	 */
-	public PaddedImageTiler getImageTiler(BufferedImage src, int width, int height);
+	@Override
+	public ImageTiler getImageTiler(BufferedImage src, int width, int height);
 
 }

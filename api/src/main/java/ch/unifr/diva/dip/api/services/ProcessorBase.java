@@ -9,7 +9,7 @@ import ch.unifr.diva.dip.api.parameters.Parameter;
 import ch.unifr.diva.dip.api.imaging.BufferedIO;
 import ch.unifr.diva.dip.api.imaging.BufferedMatrix;
 import ch.unifr.diva.dip.api.imaging.ops.ConcurrentOp;
-import ch.unifr.diva.dip.api.imaging.ops.Parallelizable;
+import ch.unifr.diva.dip.api.imaging.ops.TileParallelizable;
 import ch.unifr.diva.dip.api.utils.DipThreadPool;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -230,7 +230,7 @@ public abstract class ProcessorBase implements Processor {
 	 * @return the filtered image.
 	 */
 	public static BufferedImage filter(DipThreadPool threadPool, BufferedImageOp op, BufferedImage src, BufferedImage dest) {
-		if (!(op instanceof Parallelizable) || threadPool.poolSize() < 2) {
+		if (!(op instanceof TileParallelizable) || threadPool.poolSize() < 2) {
 			return op.filter(src, dest);
 		}
 

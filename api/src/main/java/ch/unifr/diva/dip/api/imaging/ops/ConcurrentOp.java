@@ -90,11 +90,11 @@ public class ConcurrentOp extends NullOp {
 	}
 
 	private ImageTiler getImageTiler(BufferedImage src) {
-		if (this.op instanceof Parallelizable) {
-			return ((Parallelizable) this.op).getImageTiler(src, this.tileWidth, this.tileHeight);
+		if (this.op instanceof TileParallelizable) {
+			return ((TileParallelizable) this.op).getImageTiler(src, this.tileWidth, this.tileHeight);
 		}
-		if (this.op instanceof PaddedParallelizable) {
-			return ((PaddedParallelizable) this.op).getImageTiler(src, this.tileWidth, this.tileHeight);
+		if (this.op instanceof PaddedTileParallelizable) {
+			return ((PaddedTileParallelizable) this.op).getImageTiler(src, this.tileWidth, this.tileHeight);
 		}
 
 		throw new IllegalArgumentException("don't know how to tile. BufferedImageOp isn't parallelizable");

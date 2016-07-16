@@ -17,7 +17,7 @@ import java.awt.image.WritableRaster;
  *
  * @param <T> class of the matrix backing the used kernel.
  */
-public class ConvolutionOp<T extends MatrixBase> extends NullOp implements PaddedParallelizable {
+public class ConvolutionOp<T extends MatrixBase> extends NullOp implements PaddedTileParallelizable {
 
 	private final ImagePadder padder;
 	private final KernelBase<T> kernel; // *the* kernel, or just the row vector if separable
