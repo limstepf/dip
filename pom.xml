@@ -33,6 +33,7 @@
 
 		<!-- OSGi bundles (plugins) -->
 		<module>awt-demo</module>
+		<module>ejml-demo</module>
 		<module>awt-tools</module>
 		<module>fx-tools</module>
 
