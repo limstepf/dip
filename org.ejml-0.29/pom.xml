@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>ch.unifr.diva.dip</groupId>
+		<artifactId>dip-pom-osgi-package</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../pom-osgi-package/pom.xml</relativePath>
+	</parent>
+
+	<artifactId>org-ejml</artifactId>
+	<version>0.29</version>
+
+	<name>Efficient Java Matrix Library (EJML) v0.29</name>
+	<description>
+		A fast and easy to use dense matrix linear algebra library written in Java.
+	</description>
+	<packaging>bundle</packaging>
+
+	<properties>
+		<ejml.version>0.29</ejml.version>
+	</properties>
+
+	<dependencies>
+		<!--
+		if we just have 'all' as dependency, we're going to end up with twice
+		the bundle size, since all individual jars (core, dense64, ...) will
+		be included, as well as the all.jar file.. So we're just listing all
+		dependencies individually.
+		-->
+		<!--
+		<dependency>
+			<groupId>org.ejml</groupId>
+			<artifactId>all</artifactId>
+			<version>0.29</version>
+		</dependency>
+		-->
+
+		<dependency>
+			<groupId>org.ejml</groupId>
+			<artifactId>core</artifactId>
+			<version>${ejml.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.ejml</groupId>
+			<artifactId>dense64</artifactId>
+			<version>${ejml.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.ejml</groupId>
+			<artifactId>denseC64</artifactId>
+			<version>${ejml.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.ejml</groupId>
+			<artifactId>equation</artifactId>
+			<version>${ejml.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.ejml</groupId>
+			<artifactId>simple</artifactId>
+			<version>${ejml.version}</version>
+		</dependency>
+	</dependencies>
+
+</project>

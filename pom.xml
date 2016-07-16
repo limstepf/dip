@@ -28,6 +28,9 @@
 		<module>felix</module>
 		<module>felix-gogo</module>
 
+		<!-- OSGi packages (wrapped/repackaged dependencies) -->
+		<module>org.ejml-0.29</module>
+
 		<!-- OSGi bundles (plugins) -->
 		<module>awt-demo</module>
 		<module>awt-tools</module>
