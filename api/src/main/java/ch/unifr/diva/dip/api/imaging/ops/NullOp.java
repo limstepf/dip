@@ -1,6 +1,7 @@
 package ch.unifr.diva.dip.api.imaging.ops;
 
 import ch.unifr.diva.dip.api.imaging.BufferedMatrix;
+import ch.unifr.diva.dip.api.imaging.ImagingUtils;
 import ch.unifr.diva.dip.api.imaging.SimpleColorModel;
 import ch.unifr.diva.dip.api.imaging.scanners.Location;
 import ch.unifr.diva.dip.api.imaging.scanners.RasterScanner;
@@ -23,6 +24,30 @@ import java.awt.image.WritableRaster;
  * method.
  */
 public class NullOp implements BufferedImageOp {
+
+	/**
+	 * Available sample precisions. This enumeration is mostly used to give a
+	 * list of options to produce an output image (e.g. SampleRescaler).
+	 */
+	public enum SamplePrecision {
+
+		/**
+		 * Bit sample precision. Single-band BufferedImage of type
+		 * TYPE_BYTE_BINARY.
+		 */
+		BIT,
+		/**
+		 * Byte sample precision. Depending on the number of bands this will be
+		 * a BufferedImage of type TYPE_BYTE_GRAY (single-band), TYPE_INT_RGB (3
+		 * bands), or TYPE_INT_ARGB (4 bands).
+		 */
+		BYTE,
+		/**
+		 * Float sample precision. BufferedMatrix of floats with the same number
+		 * of bands as the input image.
+		 */
+		FLOAT
+	}
 
 	@Override
 	public BufferedImage createCompatibleDestImage(BufferedImage src, ColorModel dstCM) {
@@ -70,6 +95,38 @@ public class NullOp implements BufferedImageOp {
 	}
 
 	/**
+	 * Creates a zeroed destination image with desired sample precision and the
+	 * number of bands of the source image.
+	 *
+	 * @param src the source image, used to determine the number of bands in the
+	 * returned image.
+	 * @param precision the desired sample precision.
+	 * @return the zeroed destination image.
+	 */
+	public BufferedImage createCompatibleDestImage(BufferedImage src, SamplePrecision precision) {
+		final int n = ImagingUtils.numBands(src);
+		switch (precision) {
+			case FLOAT:
+				return new BufferedMatrix(src.getWidth(), src.getHeight(), n);
+
+			case BIT:
+				return new BufferedImage(
+						src.getWidth(),
+						src.getHeight(),
+						BufferedImage.TYPE_BYTE_BINARY
+				);
+
+			case BYTE:
+			default:
+				return new BufferedImage(
+						src.getWidth(),
+						src.getHeight(),
+						getCompatibleBufferdImageType(n)
+				);
+		}
+	}
+
+	/**
 	 * Creates a zeroed destination matrix with the correct size, precision and
 	 * number of bands.
 	 *
@@ -97,13 +154,25 @@ public class NullOp implements BufferedImageOp {
 	 * @return the BufferdImage type.
 	 */
 	public int getCompatibleBufferdImageType(SimpleColorModel cm) {
-		switch (cm.numBands()) {
+		return getCompatibleBufferdImageType(cm.numBands());
+	}
+
+	/**
+	 * Returns a suitable BufferedImage type for the given number of bands,
+	 * assuming a sample precision of BYTE.
+	 *
+	 * @param numBands the number of bands (1, 3, or 4).
+	 * @return a BufferedImage Type supporting the desired number of bands.
+	 */
+	public int getCompatibleBufferdImageType(int numBands) {
+		switch (numBands) {
 			case 1:
 				return BufferedImage.TYPE_BYTE_GRAY;
 
 			case 4:
 				return BufferedImage.TYPE_INT_ARGB;
 
+			case 3:
 			default:
 				return BufferedImage.TYPE_INT_RGB;
 		}
