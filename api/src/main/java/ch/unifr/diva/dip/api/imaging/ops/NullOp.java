@@ -11,6 +11,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.awt.image.ColorModel;
+import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 
 /**
@@ -144,6 +145,19 @@ public class NullOp implements BufferedImageOp {
 	@Override
 	public RenderingHints getRenderingHints() {
 		return null;
+	}
+
+	/**
+	 * Returns the raster with the least number of bands.
+	 *
+	 * @param <T> subclass of {@code Raster}.
+	 * @param a the first raster.
+	 * @param b the second raster.
+	 * @return the raster with the least number of bands, or the first raster if
+	 * both bands have the same number of bands.
+	 */
+	protected <T extends Raster> T getRasterWithLeastBands(T a, T b) {
+		return (b.getNumBands() < a.getNumBands()) ? b : a;
 	}
 
 }
