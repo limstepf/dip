@@ -18,6 +18,7 @@
 		<module>pom-osgi</module>
 		<module>pom-osgi-component</module>
 		<module>pom-osgi-dependency</module>
+		<module>pom-osgi-package</module>
 
 		<!-- API and host application -->
 		<module>api</module>
