@@ -20,7 +20,7 @@ import net.objecthunter.exp4j.ExpressionBuilder;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
-public class StringMatrix extends MatrixBase {
+public class StringMatrix extends Matrix {
 
 	/**
 	 * Continous Strings of the matrix.

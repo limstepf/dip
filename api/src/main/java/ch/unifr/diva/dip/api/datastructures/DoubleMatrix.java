@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
-public class DoubleMatrix extends MatrixBase {
+public class DoubleMatrix extends Matrix {
 
 	/**
 	 * Continous doubles of the matrix.

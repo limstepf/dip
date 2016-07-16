@@ -1,8 +1,8 @@
 package ch.unifr.diva.dip.api.imaging.ops;
 
 import ch.unifr.diva.dip.api.datastructures.DoubleMatrix;
-import ch.unifr.diva.dip.api.datastructures.KernelBase;
-import ch.unifr.diva.dip.api.datastructures.MatrixBase;
+import ch.unifr.diva.dip.api.datastructures.Kernel;
+import ch.unifr.diva.dip.api.datastructures.Matrix;
 import ch.unifr.diva.dip.api.imaging.ImagingUtils;
 import ch.unifr.diva.dip.api.imaging.padders.ImagePadder;
 import ch.unifr.diva.dip.api.imaging.scanners.Location;
@@ -17,11 +17,11 @@ import java.awt.image.WritableRaster;
  *
  * @param <T> class of the matrix backing the used kernel.
  */
-public class ConvolutionOp<T extends MatrixBase> extends NullOp implements PaddedTileParallelizable {
+public class ConvolutionOp<T extends Matrix> extends NullOp implements PaddedTileParallelizable {
 
 	private final ImagePadder padder;
-	private final KernelBase<T> kernel; // *the* kernel, or just the row vector if separable
-	private final KernelBase<T> columnVector; // ...or, null if not separable
+	private final Kernel<T> kernel; // *the* kernel, or just the row vector if separable
+	private final Kernel<T> columnVector; // ...or, null if not separable
 	private final ConvolutionOp[] convolutionPasses; // 1st and 2nd pass, null if not separable
 	private final boolean isDoublePrecision;
 	private final boolean[] abs;
@@ -38,7 +38,7 @@ public class ConvolutionOp<T extends MatrixBase> extends NullOp implements Padde
 	 * @param kernel the row or column vector.
 	 * @param op the parent double-pass convolution filter.
 	 */
-	private ConvolutionOp(KernelBase<T> kernel, ConvolutionOp op) {
+	private ConvolutionOp(Kernel<T> kernel, ConvolutionOp op) {
 		this.padder = op.padder;
 		this.kernel = kernel;
 		this.isDoublePrecision = this.kernel.matrix() instanceof DoubleMatrix;
@@ -69,7 +69,7 @@ public class ConvolutionOp<T extends MatrixBase> extends NullOp implements Padde
 	 * @param max maximum value per band used for clamping.
 	 * @param precision desired output sample precision.
 	 */
-	public ConvolutionOp(KernelBase<T> rowVector, KernelBase<T> columnVector, ImagePadder padder,
+	public ConvolutionOp(Kernel<T> rowVector, Kernel<T> columnVector, ImagePadder padder,
 			boolean[] abs, double[] gain, double[] bias, double[] min, double[] max, SamplePrecision precision) {
 		this.padder = padder;
 		this.kernel = rowVector;

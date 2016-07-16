@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
-public class FloatMatrix extends MatrixBase {
+public class FloatMatrix extends Matrix {
 
 	/**
 	 * Continous floats of the matrix.

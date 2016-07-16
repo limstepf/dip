@@ -3,7 +3,7 @@ package ch.unifr.diva.dip.api.datastructures;
 /**
  * A kernel with coefficients in double-precision floating points.
  */
-public class DoubleKernel extends KernelBase<DoubleMatrix> {
+public class DoubleKernel extends Kernel<DoubleMatrix> {
 
 	/**
 	 * Creates a new kernel with float coefficients in the shape of the given

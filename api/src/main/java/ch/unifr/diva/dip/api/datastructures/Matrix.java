@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlAttribute;
  * encoded by XML.</li>
  * </ul>
  */
-public abstract class MatrixBase {
+public abstract class Matrix {
 
 	/**
 	 * The layout defines how the matrix is stored in the continuous/linear
@@ -94,7 +94,7 @@ public abstract class MatrixBase {
 	 * @param columns number of columns (n).
 	 * @param layout layout used by the continuous/linear array.
 	 */
-	public MatrixBase(int rows, int columns, Layout layout) {
+	public Matrix(int rows, int columns, Layout layout) {
 		this.rows = rows;
 		this.columns = columns;
 		this.layout = layout;
@@ -164,7 +164,7 @@ public abstract class MatrixBase {
 	 * @param mat another matrix.
 	 * @return True if both matrices have the same dimensions, False otherwise.
 	 */
-	public boolean equalSize(MatrixBase mat) {
+	public boolean equalSize(Matrix mat) {
 		return equalSize(this, mat);
 	}
 
@@ -175,7 +175,7 @@ public abstract class MatrixBase {
 	 * @param b the second matrix.
 	 * @return True if both matrices have the same dimensions, False otherwise.
 	 */
-	public static boolean equalSize(MatrixBase a, MatrixBase b) {
+	public static boolean equalSize(Matrix a, Matrix b) {
 		return (a.rows == b.rows) && (a.columns == b.columns);
 	}
 
@@ -185,7 +185,7 @@ public abstract class MatrixBase {
 	 * @param <T> subclass of {@code MatrixBase}.
 	 * @return a copy of this matrix.
 	 */
-	public abstract <T extends MatrixBase> T copy();
+	public abstract <T extends Matrix> T copy();
 
 	/**
 	 * Returns a transposed copy of this matrix.
@@ -193,7 +193,7 @@ public abstract class MatrixBase {
 	 * @param <T> subclass of {@code MatrixBase}.
 	 * @return a transposed copy of this matrix.
 	 */
-	public abstract <T extends MatrixBase> T transpose();
+	public abstract <T extends Matrix> T transpose();
 
 	/**
 	 * Returns the matrix in column major order.
@@ -201,7 +201,7 @@ public abstract class MatrixBase {
 	 * @param <T> subclass of {@code MatrixBase}.
 	 * @return the matrix in column major order.
 	 */
-	public abstract <T extends MatrixBase> T toColumnMajor();
+	public abstract <T extends Matrix> T toColumnMajor();
 
 	/**
 	 * Returns the matrix in row major order.
@@ -209,7 +209,7 @@ public abstract class MatrixBase {
 	 * @param <T> subclass of {@code MatrixBase}.
 	 * @return the matrix in row major order.
 	 */
-	public abstract <T extends MatrixBase> T toRowMajor();
+	public abstract <T extends Matrix> T toRowMajor();
 
 	/**
 	 * Returns a pretty printed string representation of the matrix.

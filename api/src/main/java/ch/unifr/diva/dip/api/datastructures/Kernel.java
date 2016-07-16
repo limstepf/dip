@@ -23,7 +23,7 @@ import java.awt.Rectangle;
  *
  * @param <T> class of the wrapped matrix.
  */
-public abstract class KernelBase<T extends MatrixBase> {
+public abstract class Kernel<T extends Matrix> {
 
 	protected final T matrix;
 	protected final Rectangle bounds;
@@ -33,7 +33,7 @@ public abstract class KernelBase<T extends MatrixBase> {
 	 *
 	 * @param matrix the matrix containing the kernel coefficients.
 	 */
-	public KernelBase(T matrix) {
+	public Kernel(T matrix) {
 		this.matrix = matrix.toRowMajor();
 		this.bounds = new Rectangle(
 				this.matrix.columns / -2,

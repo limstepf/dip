@@ -8,8 +8,8 @@ import ch.unifr.diva.dip.api.datastructures.DoubleKernel;
 import ch.unifr.diva.dip.api.datastructures.DoubleMatrix;
 import ch.unifr.diva.dip.api.datastructures.FloatKernel;
 import ch.unifr.diva.dip.api.datastructures.FloatMatrix;
-import ch.unifr.diva.dip.api.datastructures.KernelBase;
-import ch.unifr.diva.dip.api.datastructures.MatrixBase;
+import ch.unifr.diva.dip.api.datastructures.Kernel;
+import ch.unifr.diva.dip.api.datastructures.Matrix;
 import ch.unifr.diva.dip.api.imaging.BufferedMatrix;
 import ch.unifr.diva.dip.api.imaging.ops.ConvolutionOp;
 import ch.unifr.diva.dip.api.imaging.padders.ImagePadder;
@@ -72,7 +72,7 @@ public class ConvolutionFilter extends ProcessableBase implements Transmutable {
 	 *
 	 * @param <T>
 	 */
-	private static class KernelInput<T extends MatrixBase> {
+	private static class KernelInput<T extends Matrix> {
 
 		private final String postfix;
 		public final InputPort<T> kernel;
@@ -324,8 +324,8 @@ public class ConvolutionFilter extends ProcessableBase implements Transmutable {
 			final InputPort<BufferedImage> source = getConnectedInput();
 			final BufferedImage src = source.getValue();
 
-			final KernelBase kernel;
-			final KernelBase columnVector;
+			final Kernel kernel;
+			final Kernel columnVector;
 			final KernelPrecision p = KernelPrecision.get(this.kernelPrecision.get());
 			if (p.equals(KernelPrecision.DOUBLE)) {
 				if (this.kernelDouble.isSeparable()) {
