@@ -100,28 +100,46 @@ public class NullOp implements BufferedImageOp {
 	 *
 	 * @param src the source image, used to determine the number of bands in the
 	 * returned image.
-	 * @param precision the desired sample precision.
+	 * @param precision sample precision of the destination image.
 	 * @return the zeroed destination image.
 	 */
 	public BufferedImage createCompatibleDestImage(BufferedImage src, SamplePrecision precision) {
-		final int n = ImagingUtils.numBands(src);
+		return createCompatibleDestImage(
+				src.getWidth(),
+				src.getHeight(),
+				precision,
+				ImagingUtils.numBands(src)
+		);
+	}
+
+	/**
+	 * Creates a zeroed destination image with desired dimensions, sample
+	 * precision, and number of bands.
+	 *
+	 * @param width width of the destination image.
+	 * @param height height of the destination image.
+	 * @param precision sample precision of the destination image.
+	 * @param numBands number of bands of the destination image.
+	 * @return the zeroed destination image.
+	 */
+	public BufferedImage createCompatibleDestImage(int width, int height, SamplePrecision precision, int numBands) {
 		switch (precision) {
 			case FLOAT:
-				return new BufferedMatrix(src.getWidth(), src.getHeight(), n);
+				return new BufferedMatrix(width, height, numBands);
 
 			case BIT:
 				return new BufferedImage(
-						src.getWidth(),
-						src.getHeight(),
+						width,
+						height,
 						BufferedImage.TYPE_BYTE_BINARY
 				);
 
 			case BYTE:
 			default:
 				return new BufferedImage(
-						src.getWidth(),
-						src.getHeight(),
-						getCompatibleBufferdImageType(n)
+						width,
+						height,
+						getCompatibleBufferdImageType(numBands)
 				);
 		}
 	}
