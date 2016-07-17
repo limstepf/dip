@@ -2,6 +2,7 @@ package ch.unifr.diva.dip.awt.tools;
 
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.components.ProcessorContext;
+import ch.unifr.diva.dip.api.datastructures.BooleanMatrix;
 import ch.unifr.diva.dip.api.datastructures.DoubleMatrix;
 import ch.unifr.diva.dip.api.datastructures.FloatMatrix;
 import ch.unifr.diva.dip.api.datastructures.StringMatrix;
@@ -32,15 +33,46 @@ public class MatrixEditor extends ProcessorBase {
 	public static final int MAX_ROWS = 64;
 	public static final int MAX_COLUMNS = MAX_ROWS;
 
+	private final OutputPort<BooleanMatrix> output_boolean;
 	private final OutputPort<FloatMatrix> output_float;
 	private final OutputPort<DoubleMatrix> output_double;
 
-	private final IntegerParameter columns;
-	private final IntegerParameter rows;
+	private final MatrixShapeParameter shape;
 	private final ExpMatrixParameter matrix;
 	private final ExpParameter multiplier;
 
 	private final InvalidationListener dimensionListener;
+
+	/**
+	 * A composite parameter to define the shape of a matrix.
+	 */
+	public static class MatrixShapeParameter {
+
+		public final IntegerParameter columns;
+		public final IntegerParameter rows;
+		public final CompositeGrid composite;
+
+		public MatrixShapeParameter() {
+			this(3, 3);
+		}
+
+		public MatrixShapeParameter(int defaultRows, int defaultColumns) {
+			final double dimWidth = 35;
+
+			this.rows = new IntegerParameter("rows", defaultRows, 1, MAX_ROWS);
+			this.rows.addTextFieldViewHook((tf) -> tf.setPrefWidth(dimWidth));
+
+			this.columns = new IntegerParameter("columns", defaultColumns, 1, MAX_COLUMNS);
+			this.columns.addTextFieldViewHook((tf) -> tf.setPrefWidth(dimWidth));
+
+			this.composite = new CompositeGrid(
+					"Shape",
+					this.rows,
+					new TextParameter(" x "),
+					this.columns
+			);
+		}
+	}
 
 	public MatrixEditor() {
 		super("Matrix Editor");
@@ -49,25 +81,14 @@ public class MatrixEditor extends ProcessorBase {
 		final double singleWidth = dimWidth * 2 + 15;
 		final int defaultSize = 3;
 
-		this.columns = new IntegerParameter("columns", defaultSize, 1, MAX_COLUMNS);
-		this.columns.addTextFieldViewHook((tf) -> tf.setPrefWidth(dimWidth));
-
-		this.rows = new IntegerParameter("rows", defaultSize, 1, MAX_ROWS);
-		this.rows.addTextFieldViewHook((tf) -> tf.setPrefWidth(dimWidth));
-
 		this.matrix = new ExpMatrixParameter("matrix", new StringMatrix(defaultSize, defaultSize));
 		this.matrix.setCellWidth(singleWidth + this.matrix.getCellSpacing() * 2);
 
 		this.multiplier = new ExpParameter("multiplier", "1");
 		this.multiplier.addTextFieldViewHook((tf) -> tf.setPrefWidth(singleWidth));
 
-		final CompositeGrid shape = new CompositeGrid(
-				"Shape",
-				this.rows,
-				new TextParameter(" x "),
-				this.columns
-		);
-		this.parameters.put("shape", shape);
+		this.shape = new MatrixShapeParameter();
+		this.parameters.put("shape", this.shape.composite);
 
 		final ExpParameter matModifier = new ExpParameter("matmod", "1");
 		matModifier.addTextFieldViewHook((tf) -> tf.setPrefWidth(singleWidth));
@@ -95,17 +116,19 @@ public class MatrixEditor extends ProcessorBase {
 		this.parameters.put("matrix", mat);
 
 		this.dimensionListener = (obs) -> {
-			final int m = this.rows.get();
-			final int n = this.columns.get();
+			final int m = this.shape.rows.get();
+			final int n = this.shape.columns.get();
 			final StringMatrix a = this.matrix.get();
 			if (a.rows != m || a.columns != n) {
 				this.matrix.set(new StringMatrix(m, n));
 			}
 		};
 
+		this.output_boolean = new OutputPort(new ch.unifr.diva.dip.api.datatypes.BooleanMatrix());
 		this.output_float = new OutputPort(new ch.unifr.diva.dip.api.datatypes.FloatMatrix());
 		this.output_double = new OutputPort(new ch.unifr.diva.dip.api.datatypes.DoubleMatrix());
 
+		this.outputs.put("boolean-matrix", output_boolean);
 		this.outputs.put("float-matrix", output_float);
 		this.outputs.put("double-matrix", output_double);
 	}
@@ -117,8 +140,8 @@ public class MatrixEditor extends ProcessorBase {
 
 	@Override
 	public void init(ProcessorContext context) {
-		this.rows.property().addListener(dimensionListener);
-		this.columns.property().addListener(dimensionListener);
+		this.shape.rows.property().addListener(dimensionListener);
+		this.shape.columns.property().addListener(dimensionListener);
 
 		// only set/update outputs if this is for a runnable processor!
 		if (context != null) {
@@ -147,6 +170,10 @@ public class MatrixEditor extends ProcessorBase {
 					? this.matrix.get().getDoubleMatrix().multiply(mul)
 					: this.matrix.get().getDoubleMatrix();
 			this.output_double.setOutput(dmat);
+		}
+		if (this.output_boolean.isConnected()) {
+			final BooleanMatrix bmat = this.matrix.get().getBooleanMatrix();
+			this.output_boolean.setOutput(bmat);
 		}
 	}
 
