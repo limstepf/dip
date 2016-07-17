@@ -37,6 +37,10 @@ public class InputPort<T> extends AbstractPort<T> {
 	}
 
 	public T getValue() {
+		if (this.connection() == null) {
+			return null;
+		}
+		
 		return (T) this.connection().getOutput();
 	}
 
