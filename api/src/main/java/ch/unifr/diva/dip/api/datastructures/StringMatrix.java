@@ -179,6 +179,28 @@ public class StringMatrix extends Matrix {
 		return (float) evalDouble(expression);
 	}
 
+	protected boolean evalBoolean(String expression) {
+		if (expression == null) {
+			return false;
+		}
+
+		if (!expression.isEmpty()) {
+			final char c = Character.toLowerCase(expression.charAt(0));
+			switch (c) {
+				case 't':
+					return true;
+				case 'f':
+					return false;
+				case '1':
+					return true;
+				case '0':
+					return false;
+			}
+		}
+		
+		return evalDouble(expression) > 0;
+	}
+
 	/**
 	 * Evaluates and returns the single element at the specified row/column.
 	 *
@@ -228,6 +250,31 @@ public class StringMatrix extends Matrix {
 	}
 
 	/**
+	 * Evaluates and returns the single element at the specified row/column.
+	 *
+	 * @param row the row of the element.
+	 * @param column the column of the element.
+	 * @return the boolean value represented by the element. Anything larger
+	 * than
+	 *
+	 */
+	public boolean getBoolean(int row, int column) {
+		return evalBoolean(get(row, column));
+	}
+
+	/**
+	 * Evaluates and returns the single element at the specified index (linear
+	 * indexing).
+	 *
+	 * @param index the index of the element.
+	 * @return the float value represented by the element, or Float.NaN if the
+	 * expression is invalid.
+	 */
+	public boolean getBoolean(int index) {
+		return evalBoolean(get(index));
+	}
+
+	/**
 	 * Converts the matrix to a {@code DoubleMatrix} by evaluating the string
 	 * elements as mathematical expressions.
 	 *
@@ -258,6 +305,26 @@ public class StringMatrix extends Matrix {
 
 		for (int i = 0; i < this.data.length; i++) {
 			mat.data[i] = getFloat(i);
+		}
+
+		return mat;
+	}
+
+	/**
+	 * Converts the matrix to a {@code BooleanMatrix}. This is done by either
+	 * evaluating the string elements as mathematical expressions ({@code x > 0}
+	 * is considered true), or by checking the first char which can be either
+	 * {@code 't'} or {@code 'f'} (not case sensitive).
+	 *
+	 * @return a matrix of booleans.
+	 */
+	public BooleanMatrix getBooleanMatrix() {
+		final BooleanMatrix mat = new BooleanMatrix(
+				this.rows, this.columns, this.layout
+		);
+
+		for (int i = 0; i < this.data.length; i++) {
+			mat.data[i] = getBoolean(i);
 		}
 
 		return mat;
