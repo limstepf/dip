@@ -4,14 +4,14 @@ import ch.unifr.diva.dip.api.imaging.scanners.ImageTiler;
 import ch.unifr.diva.dip.api.imaging.scanners.PaddedImageTiler;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
-import java.util.concurrent.Callable;
 
 /**
- * Image processing worker. Indended to be used by an ExecutorService.
+ * Image processing worker thread for {@code TileParallelizable}
+ * {@code BufferedImageOp}s.
  *
  * @param <T> subclass of BufferedImageOp and Parallelizable.
  */
-public class OpCallable<T extends BufferedImageOp & TileParallelizable> implements Callable<Void> {
+public class TileOpThread<T extends BufferedImageOp & TileParallelizable> extends Thread {
 
 	private final T op;
 	private final ImageTiler tiler;
@@ -19,14 +19,14 @@ public class OpCallable<T extends BufferedImageOp & TileParallelizable> implemen
 	private final BufferedImage dst;
 
 	/**
-	 * Creates a new image processing worker.
+	 * Creates a new image processing worker thread.
 	 *
 	 * @param op the image filter.
 	 * @param tiler the image tiler.
 	 * @param src the source image.
 	 * @param dst the destination image.
 	 */
-	public OpCallable(T op, ImageTiler tiler, BufferedImage src, BufferedImage dst) {
+	public TileOpThread(T op, ImageTiler tiler, BufferedImage src, BufferedImage dst) {
 		this.op = op;
 		this.tiler = tiler;
 		this.src = src;
@@ -34,7 +34,7 @@ public class OpCallable<T extends BufferedImageOp & TileParallelizable> implemen
 	}
 
 	@Override
-	public Void call() throws Exception {
+	public void run() {
 		if (this.op instanceof PaddedTileParallelizable) {
 			ConcurrentTileOp.processPaddedTiles(
 					(PaddedTileParallelizable) this.op,
@@ -50,8 +50,6 @@ public class OpCallable<T extends BufferedImageOp & TileParallelizable> implemen
 					this.dst
 			);
 		}
-
-		return null;
 	}
 
 }

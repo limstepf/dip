@@ -98,7 +98,7 @@ public class ConcurrentTileOp<T extends BufferedImageOp & TileParallelizable> ex
 		final Thread[] threads = new Thread[this.threadCount];
 
 		for (int i = 0; i < this.threadCount; i++) {
-			threads[i] = new OpThread(this.op, tiler, src, dst);
+			threads[i] = new TileOpThread(this.op, tiler, src, dst);
 			threads[i].start();
 		}
 
@@ -116,7 +116,7 @@ public class ConcurrentTileOp<T extends BufferedImageOp & TileParallelizable> ex
 		final List<Callable<Void>> callables = new ArrayList<>();
 
 		for (int i = 0; i < this.threadCount; i++) {
-			callables.add(new OpCallable(this.op, tiler, src, dst));
+			callables.add(new TileOpCallable(this.op, tiler, src, dst));
 		}
 
 		try {
