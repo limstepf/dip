@@ -52,22 +52,6 @@ public class ConvolutionFilter extends ProcessableBase implements Transmutable {
 	private final EnumParameter padderOption;
 
 	/**
-	 * Kernel precision.
-	 */
-	private enum KernelPrecision {
-
-		FLOAT,
-		DOUBLE;
-
-		public static KernelPrecision get(String name) {
-			if (DOUBLE.name().equals(name)) {
-				return DOUBLE;
-			}
-			return FLOAT;
-		}
-	}
-
-	/**
 	 * Kernel input set.
 	 *
 	 * @param <T>
@@ -115,7 +99,7 @@ public class ConvolutionFilter extends ProcessableBase implements Transmutable {
 
 		// parameters/config
 		this.kernelPrecision = new EnumParameter(
-				"precision", KernelPrecision.class, KernelPrecision.FLOAT.name()
+				"precision", Kernel.Precision.class, Kernel.Precision.FLOAT.name()
 		);
 		this.padderOption = new EnumParameter(
 				"edge handling", ImagePadder.Type.class, ImagePadder.Type.REFLECTIVE.name()
@@ -204,7 +188,7 @@ public class ConvolutionFilter extends ProcessableBase implements Transmutable {
 
 		enableSourceInputs(input);
 
-		final KernelPrecision p = KernelPrecision.get(this.kernelPrecision.get());
+		final Kernel.Precision p = getKernelPrecision();
 		switch (p) {
 			case FLOAT:
 				this.kernelFloat.registerPorts(this.inputs);
@@ -238,6 +222,14 @@ public class ConvolutionFilter extends ProcessableBase implements Transmutable {
 			return this.input_float;
 		}
 		return this.input;
+	}
+
+	private Kernel.Precision getKernelPrecision() {
+		return EnumParameter.valueOf(
+				this.kernelPrecision.get(),
+				Kernel.Precision.class,
+				Kernel.Precision.FLOAT
+		);
 	}
 
 	private void enableOutputs() {
@@ -296,7 +288,7 @@ public class ConvolutionFilter extends ProcessableBase implements Transmutable {
 		}
 
 		// check kernel (non-sep. kernel, or column and row vectors
-		final KernelPrecision p = KernelPrecision.get(this.kernelPrecision.get());
+		final Kernel.Precision p = getKernelPrecision();
 		switch (p) {
 			case FLOAT:
 				if (!(this.kernelFloat.kernel.isConnected()
@@ -326,8 +318,8 @@ public class ConvolutionFilter extends ProcessableBase implements Transmutable {
 
 			final Kernel kernel;
 			final Kernel columnVector;
-			final KernelPrecision p = KernelPrecision.get(this.kernelPrecision.get());
-			if (p.equals(KernelPrecision.DOUBLE)) {
+			final Kernel.Precision p = getKernelPrecision();
+			if (p.equals(Kernel.Precision.DOUBLE)) {
 				if (this.kernelDouble.isSeparable()) {
 					kernel = new DoubleKernel(this.kernelDouble.rowVector.getValue());
 					columnVector = new DoubleKernel(this.kernelDouble.columnVector.getValue());

@@ -29,6 +29,21 @@ public abstract class Kernel<T extends Matrix> {
 	protected final Rectangle bounds;
 
 	/**
+	 * Available kernel precisions.
+	 */
+	public enum Precision {
+
+		/**
+		 * Single floating-point precision.
+		 */
+		FLOAT,
+		/**
+		 * Double floating-point precision.
+		 */
+		DOUBLE;
+	}
+
+	/**
 	 * Creates a new kernel in the shape (and precision) of the given matrix.
 	 *
 	 * @param matrix the matrix containing the kernel coefficients.
