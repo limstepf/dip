@@ -40,13 +40,13 @@ public class InputPort<T> extends AbstractPort<T> {
 		if (this.connection() == null) {
 			return null;
 		}
-		
+
 		return (T) this.connection().getOutput();
 	}
 
-	// output-port signals once value/payload is ready
-	protected void setReady() {
-		setPortState(State.READY);
+	// output-port signals once value/payload is ready, or reset
+	protected void setReady(boolean ready) {
+		setPortState(ready ? State.READY : State.WAITING);
 	}
 
 	@Override

@@ -23,9 +23,10 @@ public class OutputPort<T> extends AbstractPort<T> {
 
 		if (hasValue()) {
 			setPortState(State.READY);
-			signalInputs();
+			signalInputs(true);
 		} else {
 			setPortState(getIdleState());
+			signalInputs(false);
 		}
 	}
 
@@ -33,9 +34,9 @@ public class OutputPort<T> extends AbstractPort<T> {
 		return (this.value != null);
 	}
 
-	private void signalInputs() {
+	private void signalInputs(boolean ready) {
 		for (InputPort input : inputs) {
-			input.setReady();
+			input.setReady(ready);
 		}
 	}
 
@@ -68,7 +69,7 @@ public class OutputPort<T> extends AbstractPort<T> {
 			inputs.add(input);
 			setPortState(hasValue() ? State.READY : State.WAITING);
 			if (getPortState().equals(State.READY)) {
-				signalInputs();
+				signalInputs(true);
 			}
 		}
 	}
