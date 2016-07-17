@@ -49,6 +49,17 @@ public class NullOp implements BufferedImageOp {
 		FLOAT
 	}
 
+	/**
+	 * Creates a zeroed destination image of the same size and type as the given
+	 * source image.
+	 *
+	 * @param src the source image.
+	 * @return the zeroed destination image.
+	 */
+	public BufferedImage createCompatibleDestImage(BufferedImage src) {
+		return createCompatibleDestImage(src, src.getColorModel());
+	}
+
 	@Override
 	public BufferedImage createCompatibleDestImage(BufferedImage src, ColorModel dstCM) {
 		// buffered matrix?
