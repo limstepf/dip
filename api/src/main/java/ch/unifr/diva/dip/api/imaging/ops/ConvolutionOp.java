@@ -163,11 +163,6 @@ public class ConvolutionOp<T extends Matrix> extends NullOp implements PaddedTil
 	}
 
 	@Override
-	public BufferedImage filter(BufferedImage src, BufferedImage dst) {
-		return filter(src, dst, null);
-	}
-
-	@Override
 	public BufferedImage filter(BufferedImage src, BufferedImage dst, Rectangle writableRegion) {
 		if (dst == null) {
 			dst = this.createCompatibleDestImage(src, this.precision);
@@ -184,7 +179,7 @@ public class ConvolutionOp<T extends Matrix> extends NullOp implements PaddedTil
 
 		// non-separable/single-pass convolution
 		final WritableRaster dstRaster = dst.getRaster();
-		final WritableRaster raster = getRasterWithLeastBands(src.getRaster(), dstRaster);
+		final int numBands = Math.min(src.getRaster().getNumBands(), dstRaster.getNumBands());
 
 		// things get a bit messy here to not have a thousand conditionals
 		// withing the main loop, so:
@@ -196,14 +191,14 @@ public class ConvolutionOp<T extends Matrix> extends NullOp implements PaddedTil
 			if (!doRescale()) {
 				if (takeAbsValue()) {
 					// double | abs
-					for (Location pt : new RasterScanner(raster)) {
+					for (Location pt : new RasterScanner(writableRegion, numBands)) {
 						dstRaster.setSample(pt.col, pt.row, pt.band,
 								abs(pt.band, convolveAtDouble(src, pt))
 						);
 					}
 				} else {
 					// double
-					for (Location pt : new RasterScanner(raster)) {
+					for (Location pt : new RasterScanner(writableRegion, numBands)) {
 						dstRaster.setSample(pt.col, pt.row, pt.band,
 								convolveAtDouble(src, pt)
 						);
@@ -211,7 +206,7 @@ public class ConvolutionOp<T extends Matrix> extends NullOp implements PaddedTil
 				}
 			} else if (takeAbsValue()) {
 				// double | abs | rescaling
-				for (Location pt : new RasterScanner(raster)) {
+				for (Location pt : new RasterScanner(writableRegion, numBands)) {
 					dstRaster.setSample(pt.col, pt.row, pt.band,
 							ImagingUtils.clamp(
 									gain[pt.band] * abs(pt.band, convolveAtDouble(src, pt)) + bias[pt.band],
@@ -222,7 +217,7 @@ public class ConvolutionOp<T extends Matrix> extends NullOp implements PaddedTil
 				}
 			} else {
 				// double | rescaling
-				for (Location pt : new RasterScanner(raster)) {
+				for (Location pt : new RasterScanner(writableRegion, numBands)) {
 					dstRaster.setSample(pt.col, pt.row, pt.band,
 							ImagingUtils.clamp(
 									gain[pt.band] * convolveAtDouble(src, pt) + bias[pt.band],
@@ -238,14 +233,14 @@ public class ConvolutionOp<T extends Matrix> extends NullOp implements PaddedTil
 			if (!doRescale()) {
 				// float | abs
 				if (takeAbsValue()) {
-					for (Location pt : new RasterScanner(raster)) {
+					for (Location pt : new RasterScanner(writableRegion, numBands)) {
 						dstRaster.setSample(pt.col, pt.row, pt.band,
 								abs(pt.band, convolveAtFloat(src, pt))
 						);
 					}
 				} else {
 					// float
-					for (Location pt : new RasterScanner(raster)) {
+					for (Location pt : new RasterScanner(writableRegion, numBands)) {
 						dstRaster.setSample(pt.col, pt.row, pt.band,
 								convolveAtFloat(src, pt)
 						);
@@ -253,7 +248,7 @@ public class ConvolutionOp<T extends Matrix> extends NullOp implements PaddedTil
 				}
 			} else if (takeAbsValue()) {
 				// float | abs | rescaling
-				for (Location pt : new RasterScanner(raster)) {
+				for (Location pt : new RasterScanner(writableRegion, numBands)) {
 					dstRaster.setSample(pt.col, pt.row, pt.band,
 							ImagingUtils.clamp(
 									gain[pt.band] * abs(pt.band, convolveAtFloat(src, pt)) + bias[pt.band],
@@ -264,7 +259,7 @@ public class ConvolutionOp<T extends Matrix> extends NullOp implements PaddedTil
 				}
 			} else {
 				// float | rescaling
-				for (Location pt : new RasterScanner(raster)) {
+				for (Location pt : new RasterScanner(writableRegion, numBands)) {
 					dstRaster.setSample(pt.col, pt.row, pt.band,
 							ImagingUtils.clamp(
 									gain[pt.band] * convolveAtFloat(src, pt) + bias[pt.band],

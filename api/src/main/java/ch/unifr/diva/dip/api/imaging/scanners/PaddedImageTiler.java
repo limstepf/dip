@@ -47,28 +47,38 @@ public class PaddedImageTiler extends ImageTiler<PaddedImageTiler.PaddedTile> {
 
 	@Override
 	protected PaddedTile getTile(int x, int y, int width, int height) {
-		int padX = x - this.xPadding;
-		if (padX < 0) {
-			padX = 0;
+		int paddedX = x - this.xPadding;
+		if (paddedX < 0) {
+			paddedX = 0;
+		}
+		final int leftPadding = x - paddedX;
+
+		int paddedWidth = leftPadding + width + this.xPadding;
+		final int paddedEndX = paddedX + paddedWidth;
+		if (paddedEndX > this.imageWidth) {
+			paddedWidth -= paddedEndX - this.imageWidth;
 		}
 
-		int padY = y - this.yPadding;
-		if (padY < 0) {
-			padY = 0;
+		int paddedY = y - this.yPadding;
+		if (paddedY < 0) {
+			paddedY = 0;
+		}
+		final int topPadding = y - paddedY;
+
+		int paddedHeight = topPadding + height + this.yPadding;
+		final int paddedEndY = paddedY + paddedHeight;
+		if (paddedEndY > this.imageHeight) {
+			paddedHeight -= paddedEndY - this.imageHeight;
 		}
 
-		int padWidth = width + (x - padX) + this.xPadding;
-		if ((padX + padWidth) > this.imageWidth) {
-			padWidth = this.imageWidth - padX;
-		}
+		final Rectangle writable = new Rectangle(
+				leftPadding,
+				topPadding,
+				width,
+				height
+		);
 
-		int padHeight = height + (y - padY) + this.yPadding;
-		if ((padY + padHeight) > this.imageHeight) {
-			padHeight = this.imageHeight - padY;
-		}
-
-		final Rectangle writable = new Rectangle(x, y, width, height);
-		return new PaddedTile(padX, padY, padWidth, padHeight, writable);
+		return new PaddedTile(paddedX, paddedY, paddedWidth, paddedHeight, writable);
 	}
 
 	/**
@@ -83,7 +93,14 @@ public class PaddedImageTiler extends ImageTiler<PaddedImageTiler.PaddedTile> {
 		private static final long serialVersionUID = 1L;
 
 		/**
-		 * Writable region within the padded tile.
+		 * Writable region within the padded tile. Note that this region is
+		 * defined w.r.t. the coordinate system of the tile (or the
+		 * {@code BufferedImage} returned by a call to {@code getSubImage()}) -
+		 * not the coordinate system of the (entire) image itself! <br />
+		 *
+		 * So {@code x} and {@code y} coordinates of this region are somewhere
+		 * between the desired padding and zero (in case there's no image left
+		 * for padding at the borders).
 		 */
 		public final Rectangle writableRegion;
 

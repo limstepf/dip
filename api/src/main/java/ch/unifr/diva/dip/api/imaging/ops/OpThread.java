@@ -1,16 +1,18 @@
 package ch.unifr.diva.dip.api.imaging.ops;
 
 import ch.unifr.diva.dip.api.imaging.scanners.ImageTiler;
-import java.awt.Rectangle;
+import ch.unifr.diva.dip.api.imaging.scanners.PaddedImageTiler;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 
 /**
  * Image processing worker thread.
+ *
+ * @param <T> subclass of BufferedImageOp and Parallelizable.
  */
-public class OpThread extends Thread {
+public class OpThread<T extends BufferedImageOp & TileParallelizable> extends Thread {
 
-	private final BufferedImageOp op;
+	private final T op;
 	private final ImageTiler tiler;
 	private final BufferedImage src;
 	private final BufferedImage dst;
@@ -23,7 +25,7 @@ public class OpThread extends Thread {
 	 * @param src the source image.
 	 * @param dst the destination image.
 	 */
-	public OpThread(BufferedImageOp op, ImageTiler tiler, BufferedImage src, BufferedImage dst) {
+	public OpThread(T op, ImageTiler tiler, BufferedImage src, BufferedImage dst) {
 		this.op = op;
 		this.tiler = tiler;
 		this.src = src;
@@ -32,11 +34,20 @@ public class OpThread extends Thread {
 
 	@Override
 	public void run() {
-		Rectangle tile;
-		while ((tile = tiler.next()) != null) {
-			final BufferedImage srcTile = this.src.getSubimage(tile.x, tile.y, tile.width, tile.height);
-			final BufferedImage dstTile = this.dst.getSubimage(tile.x, tile.y, tile.width, tile.height);
-			this.op.filter(srcTile, dstTile);
+		if (this.op instanceof PaddedTileParallelizable) {
+			ConcurrentTileOp.processPaddedTiles(
+					(PaddedTileParallelizable) this.op,
+					(PaddedImageTiler) this.tiler,
+					this.src,
+					this.dst
+			);
+		} else {
+			ConcurrentTileOp.processTiles(
+					this.op,
+					this.tiler,
+					this.src,
+					this.dst
+			);
 		}
 	}
 

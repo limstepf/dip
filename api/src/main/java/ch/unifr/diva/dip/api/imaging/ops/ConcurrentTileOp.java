@@ -1,7 +1,9 @@
 package ch.unifr.diva.dip.api.imaging.ops;
 
 import ch.unifr.diva.dip.api.imaging.scanners.ImageTiler;
+import ch.unifr.diva.dip.api.imaging.scanners.PaddedImageTiler;
 import ch.unifr.diva.dip.api.utils.DipThreadPool;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.util.ArrayList;
@@ -121,6 +123,45 @@ public class ConcurrentTileOp<T extends BufferedImageOp & TileParallelizable> ex
 			this.threadPool.getExecutorService().invokeAll(callables);
 		} catch (InterruptedException ex) {
 			// interrupted
+		}
+	}
+
+	/**
+	 * Processes tiles for as long as there are tiles left to be processed.
+	 *
+	 * @param <T> subclass of {@code TileParallelizable}.
+	 * @param op the {@code BufferedImageOp} implementing
+	 * {@code TileParallelizable}.
+	 * @param tiler the image tiler to ask for the next tile(s).
+	 * @param src the source image.
+	 * @param dst the destination image.
+	 */
+	public static <T extends TileParallelizable> void processTiles(T op, ImageTiler tiler, BufferedImage src, BufferedImage dst) {
+		Rectangle tile;
+		while ((tile = tiler.next()) != null) {
+			final BufferedImage srcTile = src.getSubimage(tile.x, tile.y, tile.width, tile.height);
+			final BufferedImage dstTile = dst.getSubimage(tile.x, tile.y, tile.width, tile.height);
+			op.filter(srcTile, dstTile);
+		}
+	}
+
+	/**
+	 * Processes padded tiles for as long as there are tiles left to be
+	 * processed.
+	 *
+	 * @param <T> subclass of {@code PaddedTileParallelizable}.
+	 * @param op the {@code BufferedImageOp} implementing
+	 * {@code PaddedTileParallelizable}.
+	 * @param tiler the image tiler to ask for the next tile(s).
+	 * @param src the source image.
+	 * @param dst the destination image.
+	 */
+	public static <T extends PaddedTileParallelizable> void processPaddedTiles(T op, PaddedImageTiler tiler, BufferedImage src, BufferedImage dst) {
+		PaddedImageTiler.PaddedTile tile;
+		while ((tile = tiler.next()) != null) {
+			final BufferedImage srcTile = src.getSubimage(tile.x, tile.y, tile.width, tile.height);
+			final BufferedImage dstTile = dst.getSubimage(tile.x, tile.y, tile.width, tile.height);
+			op.filter(srcTile, dstTile, tile.writableRegion);
 		}
 	}
 

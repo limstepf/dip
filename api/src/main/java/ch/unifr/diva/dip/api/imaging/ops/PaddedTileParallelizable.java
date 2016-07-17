@@ -24,6 +24,11 @@ import java.awt.image.BufferedImage;
  */
 public interface PaddedTileParallelizable extends TileParallelizable {
 
+	@Override
+	default BufferedImage filter(BufferedImage src, BufferedImage dst) {
+		return filter(src, dst, dst.getRaster().getBounds());
+	}
+
 	/**
 	 * Performs a single-input/output operation on a BufferedImage within a
 	 * writable region only.
