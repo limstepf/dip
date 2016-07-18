@@ -1,4 +1,3 @@
-
 package ch.unifr.diva.dip.core.model;
 
 import ch.unifr.diva.dip.api.components.InputPort;
@@ -19,7 +18,13 @@ public class RunnablePipeline extends Pipeline<RunnableProcessor> {
 	private volatile Map<OutputPort, ProcessorWrapper.PortMapEntry> outputPortMap;
 	private volatile Map<InputPort, ProcessorWrapper.PortMapEntry> inputPortMap;
 
-
+	/**
+	 * Creates a new runnable pipeline from pipeline data.
+	 *
+	 * @param handler the application handler.
+	 * @param page the project page.
+	 * @param pipeline the pipeline data/specification.
+	 */
 	public RunnablePipeline(ApplicationHandler handler, ProjectPage page, PipelineData.Pipeline pipeline) {
 		super(handler, pipeline.id, pipeline.name);
 		this.page = page;
@@ -37,9 +42,11 @@ public class RunnablePipeline extends Pipeline<RunnableProcessor> {
 		initConnections(pipeline, processors);
 
 		// init and update processor states now that they're connected
-		for (RunnableProcessor p : processors) {
-			p.initProcessor();
-			p.updateState();
+		for (Stage<RunnableProcessor> stage : stages()) {
+			for (RunnableProcessor p : stage.processors) {
+				p.initProcessor();
+				p.updateState();
+			}
 		}
 
 		// rebuild portmaps and stages in case the processors should have changed
@@ -70,6 +77,7 @@ public class RunnablePipeline extends Pipeline<RunnableProcessor> {
 
 	/**
 	 * Returns the input port map.
+	 *
 	 * @return the input port map.
 	 */
 	public Map<InputPort, ProcessorWrapper.PortMapEntry> inputPortMap() {
@@ -81,6 +89,7 @@ public class RunnablePipeline extends Pipeline<RunnableProcessor> {
 
 	/**
 	 * Returns the output port map.
+	 *
 	 * @return the output port map.
 	 */
 	public Map<OutputPort, ProcessorWrapper.PortMapEntry> outputPortMap() {
@@ -92,18 +101,20 @@ public class RunnablePipeline extends Pipeline<RunnableProcessor> {
 
 	/**
 	 * Returns the stages of the pipeline.
+	 *
 	 * @return the stages of the pipeline.
 	 */
-	public PipelineStages<RunnableProcessor> stages() {
+	public final PipelineStages<RunnableProcessor> stages() {
 		if (this.stages == null) {
-			this.stages = new Pipeline.PipelineStages<>(this, this.outputPortMap);
+			this.stages = new Pipeline.PipelineStages<>(this, outputPortMap());
 		}
 
 		return this.stages;
 	}
 
 	/**
-	 * Saves the state of the pipeline including all its {@code RunnableProcessor}s.
+	 * Saves the state of the pipeline including all its
+	 * {@code RunnableProcessor}s.
 	 */
 	public void save() {
 		for (RunnableProcessor p : processors) {
