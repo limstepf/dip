@@ -5,14 +5,30 @@ The Document Image Processor (DIP) is an image processing application for _docum
 * to __bring__ promising image processing __prototypes to fruition__.
 
 ## Key technology
-* Java 8 and JavaFX
+* Java 8, and JavaFX
+    * [https://docs.oracle.com/javase/8/docs/api/](https://docs.oracle.com/javase/8/docs/api/)
+	* [http://docs.oracle.com/javase/8/javafx/api/](http://docs.oracle.com/javase/8/javafx/api/)
+
 * Java Architecture for XML Binding (JAXB)
-* Open Service Gateway Initiative (OSGi) and Declarative Services (DS)
+	* [https://jaxb.java.net/](https://jaxb.java.net/)
+	* [https://docs.oracle.com/javase/tutorial/jaxb/intro/](https://docs.oracle.com/javase/tutorial/jaxb/intro/)
+
+* Open Service Gateway Initiative (OSGi), and Declarative Services (DS)
+    * [http://www.osgi.org/Specifications/](http://www.osgi.org/Specifications/)
+	* [http://felix.apache.org/](http://felix.apache.org/)
+
 
 ## Architecture
-* Multi-module Maven project
+* Version control with Git
+	* [https://git-scm.com/](https://git-scm.com/)
+
+* Multi-module Maven 3 project
+	* [https://maven.apache.org/](https://maven.apache.org/)
+
 * Host application embeds an OSGi framework (Apache Felix)
+
 * DIP API defines a _Processor_ service (besides other classes that need to be shared by the host application and OSGi bundles)
+
 * OSGi bundles, kept in their own Maven module, provide services that implement the _Processor_ interface
 
 ### Key concepts
