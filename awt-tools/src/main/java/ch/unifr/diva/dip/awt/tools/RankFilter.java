@@ -38,23 +38,23 @@ public class RankFilter extends ProcessableBase implements Transmutable {
 	private final InputPort<BooleanMatrix> mask;
 	private final OutputPort<BufferedImage> output;
 
-	private final EnumParameter rankOption;
 	private final EnumParameter padderOption;
+	private final EnumParameter rankOption;
 	private final XorParameter maskOption;
 	private final MatrixShapeParameter shape;
 
 	public RankFilter() {
 		super("Rank Filter");
 
-		this.rankOption = new EnumParameter(
-				"ranking method", RankOp.Rank.class, RankOp.Rank.MEDIAN.name()
-		);
 		this.padderOption = new EnumParameter(
-				"edge handling", ImagePadder.Type.class, ImagePadder.Type.REFLECTIVE.name()
+				"Edge handling", ImagePadder.Type.class, ImagePadder.Type.REFLECTIVE.name()
 		);
-		this.shape = new MatrixShapeParameter();
+		this.rankOption = new EnumParameter(
+				"Ranking method", RankOp.Rank.class, RankOp.Rank.MEDIAN.name()
+		);
+		this.shape = new MatrixShapeParameter(3, 3, "");
 		this.maskOption = new XorParameter(
-				"mask",
+				"Mask",
 				Arrays.asList(
 						this.shape.composite,
 						new TextParameter("Use BooleanMatrix")

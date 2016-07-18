@@ -52,11 +52,21 @@ public class MatrixEditor extends ProcessorBase {
 		public final IntegerParameter rows;
 		public final CompositeGrid composite;
 
+		/**
+		 * Creates a new matrix shape parameter with default 3x3 shape.
+		 */
 		public MatrixShapeParameter() {
-			this(3, 3);
+			this(3, 3, "Shape");
 		}
 
-		public MatrixShapeParameter(int defaultRows, int defaultColumns) {
+		/**
+		 * Creates a new matrix shape parameter.
+		 *
+		 * @param defaultRows default number of rows.
+		 * @param defaultColumns default number of columns.
+		 * @param label label of the parameter.
+		 */
+		public MatrixShapeParameter(int defaultRows, int defaultColumns, String label) {
 			final double dimWidth = 35;
 
 			this.rows = new IntegerParameter("rows", defaultRows, 1, MAX_ROWS);
@@ -66,7 +76,7 @@ public class MatrixEditor extends ProcessorBase {
 			this.columns.addTextFieldViewHook((tf) -> tf.setPrefWidth(dimWidth));
 
 			this.composite = new CompositeGrid(
-					"Shape",
+					label,
 					this.rows,
 					new TextParameter(" x "),
 					this.columns
