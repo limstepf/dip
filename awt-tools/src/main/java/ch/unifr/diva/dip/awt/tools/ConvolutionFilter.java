@@ -385,71 +385,26 @@ public class ConvolutionFilter extends ProcessableBase implements Transmutable {
 			// errors will be produced (see ConvolutionOp)
 			if (columnVector != null) {
 				// 2-pass convolution
-				ConvolutionOp op = new ConvolutionOp(
-						columnVector,
-						null,
-						padderType.getInstance(),
-						this.rescaleUnit.getAbs(),
-						this.rescaleUnit.getGain(),
-						this.rescaleUnit.getBias(),
-						this.rescaleUnit.getMin(),
-						this.rescaleUnit.getMax(),
-						this.rescaleUnit.getPrecision()
-				);
+				ConvolutionOp op = getConvolutionOp(columnVector, padderType);
 				final BufferedImage tmp = filter(
 						context, op, src,
-						op.createCompatibleDestImage(
-								src.getWidth(),
-								src.getHeight(),
-								this.rescaleUnit.getPrecision(),
-								this.rescaleUnit.numBands()
-						)
+						getCompatibleDestImage(op, src)
 				);
-				op = new ConvolutionOp(
-						kernel,
-						null,
-						padderType.getInstance(),
-						this.rescaleUnit.getAbs(),
-						this.rescaleUnit.getGain(),
-						this.rescaleUnit.getBias(),
-						this.rescaleUnit.getMin(),
-						this.rescaleUnit.getMax(),
-						this.rescaleUnit.getPrecision()
-				);
+
+				op = getConvolutionOp(kernel, padderType);
 				image = filter(
 						context, op, tmp,
-						op.createCompatibleDestImage(
-								src.getWidth(),
-								src.getHeight(),
-								this.rescaleUnit.getPrecision(),
-								this.rescaleUnit.numBands()
-						)
+						getCompatibleDestImage(op, src)
 				);
 			} else {
 				// 1-pass convolution
-				final ConvolutionOp op = new ConvolutionOp(
-						kernel,
-						columnVector,
-						padderType.getInstance(),
-						this.rescaleUnit.getAbs(),
-						this.rescaleUnit.getGain(),
-						this.rescaleUnit.getBias(),
-						this.rescaleUnit.getMin(),
-						this.rescaleUnit.getMax(),
-						this.rescaleUnit.getPrecision()
-				);
+				final ConvolutionOp op = getConvolutionOp(kernel, padderType);
 
 				image = filter(
 						context, op, src,
-						op.createCompatibleDestImage(
-								src.getWidth(),
-								src.getHeight(),
-								this.rescaleUnit.getPrecision(),
-								this.rescaleUnit.numBands()
-						)
+						getCompatibleDestImage(op, src)
 				);
 			}
-
 
 			if (this.rescaleUnit.isBufferedMatrix()) {
 				writeBufferedMatrix(context, MATRIX_FILE, (BufferedMatrix) image);
@@ -459,6 +414,29 @@ public class ConvolutionFilter extends ProcessableBase implements Transmutable {
 
 			restoreOutputs(context, image);
 		}
+	}
+
+	private ConvolutionOp getConvolutionOp(Kernel kernel, ImagePadder.Type padderType) {
+		return new ConvolutionOp(
+				kernel,
+				null,
+				padderType.getInstance(),
+				this.rescaleUnit.getAbs(),
+				this.rescaleUnit.getGain(),
+				this.rescaleUnit.getBias(),
+				this.rescaleUnit.getMin(),
+				this.rescaleUnit.getMax(),
+				this.rescaleUnit.getPrecision()
+		);
+	}
+
+	private BufferedImage getCompatibleDestImage(ConvolutionOp op, BufferedImage src) {
+		return op.createCompatibleDestImage(
+				src.getWidth(),
+				src.getHeight(),
+				this.rescaleUnit.getPrecision(),
+				this.rescaleUnit.numBands()
+		);
 	}
 
 	@Override
