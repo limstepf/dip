@@ -57,6 +57,15 @@ public class ConvolutionOp<T extends Matrix> extends NullOp implements PaddedTil
 	/**
 	 * Creates a new convolution filter.
 	 *
+	 * <p>
+	 * <em>Warning:</em> while this {@code BufferedImageOp} implements the
+	 * {@code PaddedTileParallelizable} interface, errors will be produced if
+	 * using a separable kernel (i.e. a row and a column vector) that is run
+	 * concurrently with a tile approach. <br />
+	 *
+	 * To work around this limitation just do the two passes (in parallel)
+	 * manually one after the other.
+	 *
 	 * @param rowVector the kernel (single-pass convolution), or the row vector
 	 * for double-pass convolution with a separable kernel.
 	 * @param columnVector null (single-pass convolution), or the column vector
@@ -165,13 +174,18 @@ public class ConvolutionOp<T extends Matrix> extends NullOp implements PaddedTil
 	@Override
 	public BufferedImage filter(BufferedImage src, BufferedImage dst, Rectangle writableRegion) {
 		if (dst == null) {
-			dst = this.createCompatibleDestImage(src, this.precision);
+			dst = createCompatibleDestImage(src, this.precision);
 		}
 
 		// separable double-pass convolution?
+		// BUG/FEAUTRE: this produces errors if run in parallel (with padded-tiles)
 		if (this.columnVector != null) {
 			return this.convolutionPasses[1].filter(
-					this.convolutionPasses[0].filter(src, null, writableRegion),
+					this.convolutionPasses[0].filter(
+							src,
+							null,
+							writableRegion
+					),
 					dst,
 					writableRegion
 			);
