@@ -66,6 +66,9 @@ public class ExpParameter extends PersistentParameterBase<String, ExpParameter.E
 	// r, g, b, or what not...  -> adjust tooltip (validation only), and
 	// processors would just retrieve the expression instead of a double.
 	// see: http://www.objecthunter.net/exp4j/#Evaluating_an_expression
+	private Double expressionValue;
+	private String tooltipFormat;
+
 	/**
 	 * Creates an expression parameter.
 	 *
@@ -80,8 +83,6 @@ public class ExpParameter extends PersistentParameterBase<String, ExpParameter.E
 	protected ExpView newViewInstance() {
 		return new ExpView(this);
 	}
-
-	private Double expressionValue = null;
 
 	/**
 	 * Evaluates the value of the expression.
@@ -110,6 +111,20 @@ public class ExpParameter extends PersistentParameterBase<String, ExpParameter.E
 			// UnknownFunctionOrVariableException is a IllegalArgumentException
 			this.expressionValue = Double.NaN;
 			return false;
+		}
+	}
+
+	/**
+	 * Sets a custom {@code Tooltip} format.
+	 *
+	 * @param format a {@code String} format that gets passed one double; the
+	 * value of the current expression.
+	 */
+	public void setTooltipFormat(String format) {
+		this.tooltipFormat = format;
+
+		if (this.view != null) {
+			this.view.updateTooltip();
 		}
 	}
 
@@ -164,8 +179,14 @@ public class ExpParameter extends PersistentParameterBase<String, ExpParameter.E
 			updateTooltip();
 		}
 
-		protected final void updateTooltip() {
-			tooltip.setText(Double.toString(parameter.getDouble()));
+		public final void updateTooltip() {
+			final String msg;
+			if (parameter.tooltipFormat != null) {
+				msg = String.format(parameter.tooltipFormat, parameter.getDouble());
+			} else {
+				msg = Double.toString(parameter.getDouble());
+			}
+			tooltip.setText(msg);
 		}
 
 		protected final String get() {
