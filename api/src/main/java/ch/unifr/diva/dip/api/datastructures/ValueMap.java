@@ -24,14 +24,31 @@ public class ValueMap {
 		this(new HashMap<>());
 	}
 
+	/**
+	 * Creates a new value map containing the given objects.
+	 *
+	 * @param map the objects of the value map.
+	 */
 	public ValueMap(Map<String, Object> map) {
 		this.map = map;
 	}
 
+	/**
+	 * Returns an object of the value map.
+	 *
+	 * @param key the key of the object.
+	 * @return the object, or null if not found.
+	 */
 	public Object get(String key) {
 		return map.get(key);
 	}
 
+	/**
+	 * Sets/updates an object of the value map.
+	 *
+	 * @param key the key of the object.
+	 * @param obj the new object.
+	 */
 	public void set(String key, Object obj) {
 		this.map.put(key, obj);
 	}

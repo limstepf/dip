@@ -23,14 +23,31 @@ public class ValueList {
 		this(new ArrayList<>());
 	}
 
+	/**
+	 * Creates a new value list containing the given objects.
+	 *
+	 * @param values the objects of the value list.
+	 */
 	public ValueList(List<Object> values) {
 		this.list = values;
 	}
 
+	/**
+	 * Returns an object of the value list.
+	 *
+	 * @param index the index of the object in the value list.
+	 * @return the object at the given index.
+	 */
 	public Object get(int index) {
 		return this.list.get(index);
 	}
 
+	/**
+	 * Sets/updates an object of the value list.
+	 *
+	 * @param index the index of the object in the value list.
+	 * @param obj the new object.
+	 */
 	public void set(int index, Object obj) {
 		this.list.set(index, obj);
 	}

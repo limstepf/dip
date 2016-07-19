@@ -1,4 +1,3 @@
-
 package ch.unifr.diva.dip.api.datastructures;
 
 import java.util.List;
@@ -18,6 +17,11 @@ public class Polygon2D extends Polyline2D {
 		this(null);
 	}
 
+	/**
+	 * Creates a new 2D polygon.
+	 *
+	 * @param points the points defining the 2D polygon.
+	 */
 	public Polygon2D(List<Point2D> points) {
 		super(points);
 	}

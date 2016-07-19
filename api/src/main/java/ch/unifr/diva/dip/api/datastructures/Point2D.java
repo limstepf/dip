@@ -22,6 +22,12 @@ public class Point2D implements Cloneable {
 		this(0.0, 0.0);
 	}
 
+	/**
+	 * Creates a new 2D point.
+	 *
+	 * @param x the X coordinate of the point.
+	 * @param y the Y coordinate of the point.
+	 */
 	public Point2D(double x, double y) {
 		this.x = x;
 		this.y = y;

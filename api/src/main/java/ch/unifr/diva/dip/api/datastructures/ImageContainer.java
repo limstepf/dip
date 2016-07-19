@@ -1,4 +1,3 @@
-
 package ch.unifr.diva.dip.api.datastructures;
 
 import javafx.scene.image.Image;
@@ -23,7 +22,13 @@ public class ImageContainer {
 		this.image = null;
 	}
 
+	/**
+	 * Creates a new image container.
+	 *
+	 * @param image the image to be wrapped.
+	 */
 	public ImageContainer(Image image) {
 		this.image = image;
 	}
+
 }

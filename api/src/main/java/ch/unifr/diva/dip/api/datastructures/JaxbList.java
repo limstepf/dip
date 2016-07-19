@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * Generic, marshalable/unmarshable list.
+ * Generic, marshallable/unmarshable list.
  *
  * @param <T> type of the list items.
  */
@@ -23,11 +23,22 @@ public class JaxbList<T> {
 		this.list = null;
 	}
 
+	/**
+	 * Creates a new marshallable/unmarshable list wrapping the given list.
+	 *
+	 * @param list the list to be wrapped.
+	 */
 	public JaxbList(List<T> list) {
 		this.list = list;
 	}
 
+	/**
+	 * Returns the wrapped list.
+	 *
+	 * @return the wrapped list.
+	 */
 	public List<T> getList() {
 		return this.list;
 	}
+
 }

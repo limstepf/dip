@@ -1,4 +1,3 @@
-
 package ch.unifr.diva.dip.api.datastructures;
 
 import java.util.HashMap;
@@ -9,8 +8,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * Holds a map of values and a key pointing to/selecting one. Values, just
- * typed as Objects, must be un-/marshallable with JAXB.
+ * Holds a map of values and a key pointing to/selecting one. Values, just typed
+ * as Objects, must be un-/marshallable with JAXB.
  */
 @XmlRootElement(name = "value-map-selection")
 @XmlAccessorType(XmlAccessType.NONE)
@@ -24,11 +23,22 @@ public class ValueMapSelection extends ValueMap {
 		this(new HashMap<>(), "");
 	}
 
+	/**
+	 * Creates a new value map selection containing the given objects.
+	 *
+	 * @param map the objects of the value map.
+	 * @param selection the key of the selected object.
+	 */
 	public ValueMapSelection(Map<String, Object> map, String selection) {
 		super(map);
 		this.selection = selection;
 	}
 
+	/**
+	 * Returns the currently selected object.
+	 *
+	 * @return the currently selected object.
+	 */
 	public Object getSelectedValue() {
 		return this.map.get(this.selection);
 	}

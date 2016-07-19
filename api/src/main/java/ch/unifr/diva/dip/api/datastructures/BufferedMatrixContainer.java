@@ -25,14 +25,27 @@ public class BufferedMatrixContainer {
 		this.bytes = null;
 	}
 
+	/**
+	 * Creates a new buffered matrix container.
+	 *
+	 * @param mat the buffered matrix to wrap.
+	 * @throws IOException
+	 */
 	public BufferedMatrixContainer(BufferedMatrix mat) throws IOException {
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		BufferedIO.writeMat(mat, baos);
 		this.bytes = baos.toByteArray();
 	}
-	
+
+	/**
+	 * Returns the wrapped buffered matrix.
+	 *
+	 * @return the wrapped buffered matrix.
+	 * @throws IOException
+	 */
 	public BufferedMatrix getBufferedMatrix() throws IOException {
 		final ByteArrayInputStream bais = new ByteArrayInputStream(this.bytes);
 		return BufferedIO.readMat(bais);
 	}
+
 }

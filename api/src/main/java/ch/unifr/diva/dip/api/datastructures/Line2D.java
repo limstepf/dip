@@ -1,4 +1,3 @@
-
 package ch.unifr.diva.dip.api.datastructures;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -23,10 +22,24 @@ public class Line2D {
 		this(null, null);
 	}
 
+	/**
+	 * Creates a new 2D line.
+	 *
+	 * @param startX the X coordinate of the start point.
+	 * @param startY the Y coordinate of the start point.
+	 * @param endX the X coordinate of the end point.
+	 * @param endY the Y coordinate of the end point.
+	 */
 	public Line2D(double startX, double startY, double endX, double endY) {
 		this(new Point2D(startX, startY), new Point2D(endX, endY));
 	}
 
+	/**
+	 * Creates a new 2D line.
+	 *
+	 * @param start the start point.
+	 * @param end the end point.
+	 */
 	public Line2D(Point2D start, Point2D end) {
 		this.end = end;
 		this.start = start;
@@ -45,4 +58,5 @@ public class Line2D {
 	public Object clone() throws CloneNotSupportedException {
 		return super.clone();
 	}
+
 }

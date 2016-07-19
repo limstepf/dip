@@ -1,4 +1,3 @@
-
 package ch.unifr.diva.dip.api.datastructures;
 
 import java.util.List;
@@ -14,7 +13,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.NONE)
 public class Polyline2D {
 
-	@XmlElement(name="point")
+	@XmlElement(name = "point")
 	public final List<Point2D> points;
 
 	@SuppressWarnings("unused")
@@ -22,6 +21,11 @@ public class Polyline2D {
 		this(null);
 	}
 
+	/**
+	 * Creates a new 2D polyline.
+	 *
+	 * @param points the 2D points defining the polyline.
+	 */
 	public Polyline2D(List<Point2D> points) {
 		this.points = points;
 	}

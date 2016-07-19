@@ -24,14 +24,29 @@ public class FileReference {
 		this.path = null;
 	}
 
+	/**
+	 * Creates a new file reference of the given path.
+	 *
+	 * @param path a path to a file.
+	 */
 	public FileReference(String path) {
 		this.path = path;
 	}
 
+	/**
+	 * Creates a new file reference of the given file.
+	 *
+	 * @param file the file.
+	 */
 	public FileReference(java.io.File file) {
 		this.path = file.toString();
 	}
 
+	/**
+	 * Creates a new file reference of the given path.
+	 *
+	 * @param path a path to a file.
+	 */
 	public FileReference(java.nio.file.Path path) {
 		this.path = path.toString();
 	}
@@ -53,4 +68,5 @@ public class FileReference {
 	public java.nio.file.Path toPath() {
 		return Paths.get(this.path);
 	}
+
 }

@@ -22,7 +22,13 @@ public class BufferedImageContainer {
 		this.image = null;
 	}
 
+	/**
+	 * Creates a new buffered image container.
+	 *
+	 * @param image the image to wrap.
+	 */
 	public BufferedImageContainer(BufferedImage image) {
 		this.image = image;
 	}
+
 }

@@ -23,11 +23,22 @@ public class ValueListSelection extends ValueList {
 		this(new ArrayList<>(), -1);
 	}
 
+	/**
+	 * Creates a new value list selection containing the given objects.
+	 *
+	 * @param values the objects of the value list selection.
+	 * @param selection the index pointing to the currently selected object.
+	 */
 	public ValueListSelection(List<Object> values, int selection) {
 		super(values);
 		this.selection = selection;
 	}
 
+	/**
+	 * Returns the currently selected object.
+	 *
+	 * @return the currently selected object.
+	 */
 	public Object getSelectedValue() {
 		if (this.selection > this.list.size()) {
 			return null;
