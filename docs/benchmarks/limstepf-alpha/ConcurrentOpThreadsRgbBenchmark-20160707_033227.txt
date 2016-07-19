@@ -1,0 +1,415 @@
+cd D:\unifr\MScMA\dip\app; "JAVA_HOME=C:\\Program Files\\Java\\jdk1.8.0_45" cmd /c "\"\"C:\\Program Files\\NetBeans 8.0.2\\java\\maven\\bin\\mvn.bat\" -Dexec.args=\"-classpath %classpath ch.unifr.diva.dip.benchmarks.ConcurrentOpThreadsRgbBenchmark\" -Dexec.executable=\"C:\\Program Files\\Java\\jdk1.8.0_45\\bin\\java.exe\" -Dexec.classpathScope=test -Dmaven.ext.class.path=\"C:\\Program Files\\NetBeans 8.0.2\\java\\maven-nblib\\netbeans-eventspy.jar;C:\\Program Files\\NetBeans 8.0.2\\java\\maven-nblib\\netbeans-cos.jar\" org.codehaus.mojo:exec-maven-plugin:1.2.1:exec\""
+Running NetBeans Compile On Save execution. Phase execution is skipped and output directories of dependency projects (with Compile on Save turned on) will be used instead of their jar artifacts.
+Scanning for projects...
+                                                                        
+------------------------------------------------------------------------
+Building DIVA DIP Application 1.0.0-SNAPSHOT
+------------------------------------------------------------------------
+
+--- exec-maven-plugin:1.2.1:exec (default-cli) @ dip-app ---
+# JMH 1.12 (released 97 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConcurrentOpThreadsRgbBenchmark.colorConvertOp
+# Parameters: (numThreads = 1, size = 4096, tileSize = 256)
+
+# Run progress: 0.00% complete, ETA 00:02:00
+# Fork: 1 of 1
+# Warmup Iteration   1: 7371.556 ms/op
+# Warmup Iteration   2: 7325.905 ms/op
+# Warmup Iteration   3: 7324.301 ms/op
+# Warmup Iteration   4: 7325.441 ms/op
+# Warmup Iteration   5: 7334.287 ms/op
+Iteration   1: 7333.257 ms/op
+Iteration   2: 7346.945 ms/op
+Iteration   3: 7346.225 ms/op
+Iteration   4: 7338.004 ms/op
+Iteration   5: 7342.640 ms/op
+
+
+Result "colorConvertOp":
+  7341.414 ?(99.9%) 22.237 ms/op [Average]
+  (min, avg, max) = (7333.257, 7341.414, 7346.945), stdev = 5.775
+  CI (99.9%): [7319.177, 7363.651] (assumes normal distribution)
+
+
+# JMH 1.12 (released 97 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConcurrentOpThreadsRgbBenchmark.colorConvertOp
+# Parameters: (numThreads = 2, size = 4096, tileSize = 256)
+
+# Run progress: 8.33% complete, ETA 00:13:43
+# Fork: 1 of 1
+# Warmup Iteration   1: 3723.805 ms/op
+# Warmup Iteration   2: 3684.176 ms/op
+# Warmup Iteration   3: 3705.162 ms/op
+# Warmup Iteration   4: 3705.144 ms/op
+# Warmup Iteration   5: 3691.181 ms/op
+Iteration   1: 3699.166 ms/op
+Iteration   2: 3709.882 ms/op
+Iteration   3: 3700.747 ms/op
+Iteration   4: 3727.204 ms/op
+Iteration   5: 3747.970 ms/op
+
+
+Result "colorConvertOp":
+  3716.994 ?(99.9%) 79.293 ms/op [Average]
+  (min, avg, max) = (3699.166, 3716.994, 3747.970), stdev = 20.592
+  CI (99.9%): [3637.701, 3796.286] (assumes normal distribution)
+
+
+# JMH 1.12 (released 97 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConcurrentOpThreadsRgbBenchmark.colorConvertOp
+# Parameters: (numThreads = 4, size = 4096, tileSize = 256)
+
+# Run progress: 16.67% complete, ETA 00:09:28
+# Fork: 1 of 1
+# Warmup Iteration   1: 2059.899 ms/op
+# Warmup Iteration   2: 1998.493 ms/op
+# Warmup Iteration   3: 1984.764 ms/op
+# Warmup Iteration   4: 1987.072 ms/op
+# Warmup Iteration   5: 2010.715 ms/op
+Iteration   1: 1991.908 ms/op
+Iteration   2: 1989.871 ms/op
+Iteration   3: 1985.933 ms/op
+Iteration   4: 1991.399 ms/op
+Iteration   5: 1974.712 ms/op
+
+
+Result "colorConvertOp":
+  1986.765 ?(99.9%) 27.467 ms/op [Average]
+  (min, avg, max) = (1974.712, 1986.765, 1991.908), stdev = 7.133
+  CI (99.9%): [1959.297, 2014.232] (assumes normal distribution)
+
+
+# JMH 1.12 (released 97 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConcurrentOpThreadsRgbBenchmark.colorConvertOp
+# Parameters: (numThreads = 8, size = 4096, tileSize = 256)
+
+# Run progress: 25.00% complete, ETA 00:06:45
+# Fork: 1 of 1
+# Warmup Iteration   1: 1219.607 ms/op
+# Warmup Iteration   2: 1178.870 ms/op
+# Warmup Iteration   3: 1129.927 ms/op
+# Warmup Iteration   4: 1172.648 ms/op
+# Warmup Iteration   5: 1096.460 ms/op
+Iteration   1: 1236.168 ms/op
+Iteration   2: 1185.227 ms/op
+Iteration   3: 1179.969 ms/op
+Iteration   4: 1121.485 ms/op
+Iteration   5: 1138.064 ms/op
+
+
+Result "colorConvertOp":
+  1172.182 ?(99.9%) 172.842 ms/op [Average]
+  (min, avg, max) = (1121.485, 1172.182, 1236.168), stdev = 44.886
+  CI (99.9%): [999.341, 1345.024] (assumes normal distribution)
+
+
+# JMH 1.12 (released 97 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConcurrentOpThreadsRgbBenchmark.invertOp
+# Parameters: (numThreads = 1, size = 4096, tileSize = 256)
+
+# Run progress: 33.33% complete, ETA 00:04:56
+# Fork: 1 of 1
+# Warmup Iteration   1: 700.086 ms/op
+# Warmup Iteration   2: 696.073 ms/op
+# Warmup Iteration   3: 679.071 ms/op
+# Warmup Iteration   4: 686.126 ms/op
+# Warmup Iteration   5: 678.180 ms/op
+Iteration   1: 681.648 ms/op
+Iteration   2: 680.796 ms/op
+Iteration   3: 679.666 ms/op
+Iteration   4: 680.067 ms/op
+Iteration   5: 686.003 ms/op
+
+
+Result "invertOp":
+  681.636 ?(99.9%) 9.840 ms/op [Average]
+  (min, avg, max) = (679.666, 681.636, 686.003), stdev = 2.555
+  CI (99.9%): [671.796, 691.475] (assumes normal distribution)
+
+
+# JMH 1.12 (released 97 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConcurrentOpThreadsRgbBenchmark.invertOp
+# Parameters: (numThreads = 2, size = 4096, tileSize = 256)
+
+# Run progress: 41.67% complete, ETA 00:03:49
+# Fork: 1 of 1
+# Warmup Iteration   1: 415.034 ms/op
+# Warmup Iteration   2: 404.451 ms/op
+# Warmup Iteration   3: 425.186 ms/op
+# Warmup Iteration   4: 402.502 ms/op
+# Warmup Iteration   5: 415.496 ms/op
+Iteration   1: 410.464 ms/op
+Iteration   2: 422.239 ms/op
+Iteration   3: 412.519 ms/op
+Iteration   4: 405.272 ms/op
+Iteration   5: 410.751 ms/op
+
+
+Result "invertOp":
+  412.249 ?(99.9%) 23.892 ms/op [Average]
+  (min, avg, max) = (405.272, 412.249, 422.239), stdev = 6.205
+  CI (99.9%): [388.357, 436.141] (assumes normal distribution)
+
+
+# JMH 1.12 (released 97 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConcurrentOpThreadsRgbBenchmark.invertOp
+# Parameters: (numThreads = 4, size = 4096, tileSize = 256)
+
+# Run progress: 50.00% complete, ETA 00:02:57
+# Fork: 1 of 1
+# Warmup Iteration   1: 390.021 ms/op
+# Warmup Iteration   2: 372.952 ms/op
+# Warmup Iteration   3: 377.582 ms/op
+# Warmup Iteration   4: 382.664 ms/op
+# Warmup Iteration   5: 385.038 ms/op
+Iteration   1: 382.690 ms/op
+Iteration   2: 388.677 ms/op
+Iteration   3: 383.361 ms/op
+Iteration   4: 384.367 ms/op
+Iteration   5: 382.216 ms/op
+
+
+Result "invertOp":
+  384.262 ?(99.9%) 10.000 ms/op [Average]
+  (min, avg, max) = (382.216, 384.262, 388.677), stdev = 2.597
+  CI (99.9%): [374.262, 394.262] (assumes normal distribution)
+
+
+# JMH 1.12 (released 97 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConcurrentOpThreadsRgbBenchmark.invertOp
+# Parameters: (numThreads = 8, size = 4096, tileSize = 256)
+
+# Run progress: 58.33% complete, ETA 00:02:16
+# Fork: 1 of 1
+# Warmup Iteration   1: 344.344 ms/op
+# Warmup Iteration   2: 329.482 ms/op
+# Warmup Iteration   3: 321.797 ms/op
+# Warmup Iteration   4: 322.915 ms/op
+# Warmup Iteration   5: 340.141 ms/op
+Iteration   1: 322.400 ms/op
+Iteration   2: 326.037 ms/op
+Iteration   3: 336.377 ms/op
+Iteration   4: 321.079 ms/op
+Iteration   5: 318.726 ms/op
+
+
+Result "invertOp":
+  324.924 ?(99.9%) 26.678 ms/op [Average]
+  (min, avg, max) = (318.726, 324.924, 336.377), stdev = 6.928
+  CI (99.9%): [298.246, 351.602] (assumes normal distribution)
+
+
+# JMH 1.12 (released 97 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConcurrentOpThreadsRgbBenchmark.nullOp
+# Parameters: (numThreads = 1, size = 4096, tileSize = 256)
+
+# Run progress: 66.67% complete, ETA 00:01:42
+# Fork: 1 of 1
+# Warmup Iteration   1: 682.236 ms/op
+# Warmup Iteration   2: 661.886 ms/op
+# Warmup Iteration   3: 670.214 ms/op
+# Warmup Iteration   4: 665.723 ms/op
+# Warmup Iteration   5: 666.857 ms/op
+Iteration   1: 671.964 ms/op
+Iteration   2: 667.012 ms/op
+Iteration   3: 663.368 ms/op
+Iteration   4: 666.362 ms/op
+Iteration   5: 668.703 ms/op
+
+
+Result "nullOp":
+  667.482 ?(99.9%) 12.174 ms/op [Average]
+  (min, avg, max) = (663.368, 667.482, 671.964), stdev = 3.161
+  CI (99.9%): [655.308, 679.655] (assumes normal distribution)
+
+
+# JMH 1.12 (released 97 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConcurrentOpThreadsRgbBenchmark.nullOp
+# Parameters: (numThreads = 2, size = 4096, tileSize = 256)
+
+# Run progress: 75.00% complete, ETA 00:01:13
+# Fork: 1 of 1
+# Warmup Iteration   1: 380.767 ms/op
+# Warmup Iteration   2: 359.054 ms/op
+# Warmup Iteration   3: 369.517 ms/op
+# Warmup Iteration   4: 370.252 ms/op
+# Warmup Iteration   5: 370.442 ms/op
+Iteration   1: 372.716 ms/op
+Iteration   2: 376.344 ms/op
+Iteration   3: 370.454 ms/op
+Iteration   4: 363.699 ms/op
+Iteration   5: 364.308 ms/op
+
+
+Result "nullOp":
+  369.504 ?(99.9%) 20.977 ms/op [Average]
+  (min, avg, max) = (363.699, 369.504, 376.344), stdev = 5.448
+  CI (99.9%): [348.527, 390.481] (assumes normal distribution)
+
+
+# JMH 1.12 (released 97 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConcurrentOpThreadsRgbBenchmark.nullOp
+# Parameters: (numThreads = 4, size = 4096, tileSize = 256)
+
+# Run progress: 83.33% complete, ETA 00:00:46
+# Fork: 1 of 1
+# Warmup Iteration   1: 336.737 ms/op
+# Warmup Iteration   2: 345.069 ms/op
+# Warmup Iteration   3: 340.867 ms/op
+# Warmup Iteration   4: 335.731 ms/op
+# Warmup Iteration   5: 328.475 ms/op
+Iteration   1: 329.447 ms/op
+Iteration   2: 337.597 ms/op
+Iteration   3: 340.151 ms/op
+Iteration   4: 343.287 ms/op
+Iteration   5: 334.787 ms/op
+
+
+Result "nullOp":
+  337.054 ?(99.9%) 20.351 ms/op [Average]
+  (min, avg, max) = (329.447, 337.054, 343.287), stdev = 5.285
+  CI (99.9%): [316.703, 357.405] (assumes normal distribution)
+
+
+# JMH 1.12 (released 97 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConcurrentOpThreadsRgbBenchmark.nullOp
+# Parameters: (numThreads = 8, size = 4096, tileSize = 256)
+
+# Run progress: 91.67% complete, ETA 00:00:22
+# Fork: 1 of 1
+# Warmup Iteration   1: 312.672 ms/op
+# Warmup Iteration   2: 307.587 ms/op
+# Warmup Iteration   3: 310.963 ms/op
+# Warmup Iteration   4: 305.112 ms/op
+# Warmup Iteration   5: 283.725 ms/op
+Iteration   1: 307.848 ms/op
+Iteration   2: 285.316 ms/op
+Iteration   3: 294.718 ms/op
+Iteration   4: 305.575 ms/op
+Iteration   5: 284.322 ms/op
+
+
+Result "nullOp":
+  295.556 ?(99.9%) 42.324 ms/op [Average]
+  (min, avg, max) = (284.322, 295.556, 307.848), stdev = 10.991
+  CI (99.9%): [253.232, 337.880] (assumes normal distribution)
+
+
+# Run complete. Total time: 00:04:19
+
+Benchmark                                       (numThreads)  (size)  (tileSize)  Mode  Cnt     Score     Error  Units
+ConcurrentOpThreadsRgbBenchmark.colorConvertOp             1    4096         256  avgt    5  7341.414 ?  22.237  ms/op
+ConcurrentOpThreadsRgbBenchmark.colorConvertOp             2    4096         256  avgt    5  3716.994 ?  79.293  ms/op
+ConcurrentOpThreadsRgbBenchmark.colorConvertOp             4    4096         256  avgt    5  1986.765 ?  27.467  ms/op
+ConcurrentOpThreadsRgbBenchmark.colorConvertOp             8    4096         256  avgt    5  1172.182 ? 172.842  ms/op
+ConcurrentOpThreadsRgbBenchmark.invertOp                   1    4096         256  avgt    5   681.636 ?   9.840  ms/op
+ConcurrentOpThreadsRgbBenchmark.invertOp                   2    4096         256  avgt    5   412.249 ?  23.892  ms/op
+ConcurrentOpThreadsRgbBenchmark.invertOp                   4    4096         256  avgt    5   384.262 ?  10.000  ms/op
+ConcurrentOpThreadsRgbBenchmark.invertOp                   8    4096         256  avgt    5   324.924 ?  26.678  ms/op
+ConcurrentOpThreadsRgbBenchmark.nullOp                     1    4096         256  avgt    5   667.482 ?  12.174  ms/op
+ConcurrentOpThreadsRgbBenchmark.nullOp                     2    4096         256  avgt    5   369.504 ?  20.977  ms/op
+ConcurrentOpThreadsRgbBenchmark.nullOp                     4    4096         256  avgt    5   337.054 ?  20.351  ms/op
+ConcurrentOpThreadsRgbBenchmark.nullOp                     8    4096         256  avgt    5   295.556 ?  42.324  ms/op
+------------------------------------------------------------------------
+BUILD SUCCESS
+------------------------------------------------------------------------
+Total time: 4:20.098s
+Finished at: Thu Jul 07 03:32:27 CEST 2016
+Final Memory: 7M/309M
+------------------------------------------------------------------------

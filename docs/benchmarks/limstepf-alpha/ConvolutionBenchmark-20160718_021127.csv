@@ -1,0 +1,19 @@
+"Benchmark","Mode","Threads","Samples","Score","Score Error (99.9%)","Unit","Param: numThreads","Param: size"
+"ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.onePassConvolution","avgt",1,5,29.112298,0.375720,"ms/op",8,512
+"ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.onePassConvolution","avgt",1,5,55.911572,0.604059,"ms/op",8,701
+"ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.onePassConvolution","avgt",1,5,121.145504,3.750535,"ms/op",8,1024
+"ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.onePassConvolution","avgt",1,5,279.504330,6.935317,"ms/op",8,1511
+"ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.onePassConvolution","avgt",1,5,477.699505,46.713173,"ms/op",8,2048
+"ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.onePassConvolution","avgt",1,5,1354.820950,140.374654,"ms/op",8,3313
+"ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.onePassConvolution","avgt",1,5,1987.430698,251.583142,"ms/op",8,4096
+"ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.onePassConvolution","avgt",1,5,5243.677344,889.129624,"ms/op",8,6667
+"ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.onePassConvolution","avgt",1,5,7586.031683,190.576110,"ms/op",8,8192
+"ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.twoPassConvolution","avgt",1,5,34.916385,0.957847,"ms/op",8,512
+"ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.twoPassConvolution","avgt",1,5,64.842072,1.967045,"ms/op",8,701
+"ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.twoPassConvolution","avgt",1,5,140.023137,7.210723,"ms/op",8,1024
+"ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.twoPassConvolution","avgt",1,5,296.925156,20.745030,"ms/op",8,1511
+"ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.twoPassConvolution","avgt",1,5,552.999610,51.449716,"ms/op",8,2048
+"ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.twoPassConvolution","avgt",1,5,1564.667883,307.590864,"ms/op",8,3313
+"ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.twoPassConvolution","avgt",1,5,2210.728156,589.801565,"ms/op",8,4096
+"ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.twoPassConvolution","avgt",1,5,5840.089667,980.903142,"ms/op",8,6667
+"ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.twoPassConvolution","avgt",1,5,8957.898149,1600.806452,"ms/op",8,8192

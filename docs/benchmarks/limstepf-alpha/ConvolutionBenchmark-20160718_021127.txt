@@ -1,0 +1,613 @@
+cd D:\unifr\MScMA\dip\app; "JAVA_HOME=C:\\Program Files\\Java\\jdk1.8.0_45" cmd /c "\"\"C:\\Program Files\\NetBeans 8.0.2\\java\\maven\\bin\\mvn.bat\" -Dexec.args=\"-classpath %classpath ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark\" -Dexec.executable=\"C:\\Program Files\\Java\\jdk1.8.0_45\\bin\\java.exe\" -Dexec.classpathScope=test -Dmaven.ext.class.path=\"C:\\Program Files\\NetBeans 8.0.2\\java\\maven-nblib\\netbeans-eventspy.jar;C:\\Program Files\\NetBeans 8.0.2\\java\\maven-nblib\\netbeans-cos.jar\" org.codehaus.mojo:exec-maven-plugin:1.2.1:exec\""
+Running NetBeans Compile On Save execution. Phase execution is skipped and output directories of dependency projects (with Compile on Save turned on) will be used instead of their jar artifacts.
+Scanning for projects...
+                                                                        
+------------------------------------------------------------------------
+Building DIVA DIP Application 1.0.0-SNAPSHOT
+------------------------------------------------------------------------
+
+--- exec-maven-plugin:1.2.1:exec (default-cli) @ dip-app ---
+# JMH 1.12 (released 108 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.onePassConvolution
+# Parameters: (numThreads = 8, size = 512)
+
+# Run progress: 0.00% complete, ETA 00:03:00
+# Fork: 1 of 1
+# Warmup Iteration   1: 35.145 ms/op
+# Warmup Iteration   2: 29.805 ms/op
+# Warmup Iteration   3: 28.952 ms/op
+# Warmup Iteration   4: 29.157 ms/op
+# Warmup Iteration   5: 29.439 ms/op
+Iteration   1: 29.100 ms/op
+Iteration   2: 29.038 ms/op
+Iteration   3: 29.020 ms/op
+Iteration   4: 29.264 ms/op
+Iteration   5: 29.140 ms/op
+
+
+Result "onePassConvolution":
+  29.112 ?(99.9%) 0.376 ms/op [Average]
+  (min, avg, max) = (29.020, 29.112, 29.264), stdev = 0.098
+  CI (99.9%): [28.737, 29.488] (assumes normal distribution)
+
+
+# JMH 1.12 (released 108 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.onePassConvolution
+# Parameters: (numThreads = 8, size = 701)
+
+# Run progress: 5.56% complete, ETA 00:02:57
+# Fork: 1 of 1
+# Warmup Iteration   1: 69.587 ms/op
+# Warmup Iteration   2: 56.829 ms/op
+# Warmup Iteration   3: 56.720 ms/op
+# Warmup Iteration   4: 56.760 ms/op
+# Warmup Iteration   5: 55.635 ms/op
+Iteration   1: 56.046 ms/op
+Iteration   2: 55.652 ms/op
+Iteration   3: 55.988 ms/op
+Iteration   4: 55.880 ms/op
+Iteration   5: 55.992 ms/op
+
+
+Result "onePassConvolution":
+  55.912 ?(99.9%) 0.604 ms/op [Average]
+  (min, avg, max) = (55.652, 55.912, 56.046), stdev = 0.157
+  CI (99.9%): [55.308, 56.516] (assumes normal distribution)
+
+
+# JMH 1.12 (released 108 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.onePassConvolution
+# Parameters: (numThreads = 8, size = 1024)
+
+# Run progress: 11.11% complete, ETA 00:02:48
+# Fork: 1 of 1
+# Warmup Iteration   1: 153.440 ms/op
+# Warmup Iteration   2: 122.483 ms/op
+# Warmup Iteration   3: 123.717 ms/op
+# Warmup Iteration   4: 120.955 ms/op
+# Warmup Iteration   5: 121.729 ms/op
+Iteration   1: 122.107 ms/op
+Iteration   2: 121.874 ms/op
+Iteration   3: 121.299 ms/op
+Iteration   4: 120.778 ms/op
+Iteration   5: 119.669 ms/op
+
+
+Result "onePassConvolution":
+  121.146 ?(99.9%) 3.751 ms/op [Average]
+  (min, avg, max) = (119.669, 121.146, 122.107), stdev = 0.974
+  CI (99.9%): [117.395, 124.896] (assumes normal distribution)
+
+
+# JMH 1.12 (released 108 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.onePassConvolution
+# Parameters: (numThreads = 8, size = 1511)
+
+# Run progress: 16.67% complete, ETA 00:02:42
+# Fork: 1 of 1
+# Warmup Iteration   1: 375.143 ms/op
+# Warmup Iteration   2: 287.051 ms/op
+# Warmup Iteration   3: 278.634 ms/op
+# Warmup Iteration   4: 278.977 ms/op
+# Warmup Iteration   5: 279.383 ms/op
+Iteration   1: 281.205 ms/op
+Iteration   2: 279.306 ms/op
+Iteration   3: 280.291 ms/op
+Iteration   4: 280.204 ms/op
+Iteration   5: 276.515 ms/op
+
+
+Result "onePassConvolution":
+  279.504 ?(99.9%) 6.935 ms/op [Average]
+  (min, avg, max) = (276.515, 279.504, 281.205), stdev = 1.801
+  CI (99.9%): [272.569, 286.440] (assumes normal distribution)
+
+
+# JMH 1.12 (released 108 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.onePassConvolution
+# Parameters: (numThreads = 8, size = 2048)
+
+# Run progress: 22.22% complete, ETA 00:02:34
+# Fork: 1 of 1
+# Warmup Iteration   1: 630.803 ms/op
+# Warmup Iteration   2: 475.852 ms/op
+# Warmup Iteration   3: 469.591 ms/op
+# Warmup Iteration   4: 472.963 ms/op
+# Warmup Iteration   5: 479.888 ms/op
+Iteration   1: 480.028 ms/op
+Iteration   2: 472.624 ms/op
+Iteration   3: 478.883 ms/op
+Iteration   4: 495.138 ms/op
+Iteration   5: 461.825 ms/op
+
+
+Result "onePassConvolution":
+  477.700 ?(99.9%) 46.713 ms/op [Average]
+  (min, avg, max) = (461.825, 477.700, 495.138), stdev = 12.131
+  CI (99.9%): [430.986, 524.413] (assumes normal distribution)
+
+
+# JMH 1.12 (released 108 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.onePassConvolution
+# Parameters: (numThreads = 8, size = 3313)
+
+# Run progress: 27.78% complete, ETA 00:02:33
+# Fork: 1 of 1
+# Warmup Iteration   1: 1684.668 ms/op
+# Warmup Iteration   2: 1342.921 ms/op
+# Warmup Iteration   3: 1285.132 ms/op
+# Warmup Iteration   4: 1374.052 ms/op
+# Warmup Iteration   5: 1286.009 ms/op
+Iteration   1: 1307.855 ms/op
+Iteration   2: 1360.801 ms/op
+Iteration   3: 1378.584 ms/op
+Iteration   4: 1397.793 ms/op
+Iteration   5: 1329.071 ms/op
+
+
+Result "onePassConvolution":
+  1354.821 ?(99.9%) 140.375 ms/op [Average]
+  (min, avg, max) = (1307.855, 1354.821, 1397.793), stdev = 36.455
+  CI (99.9%): [1214.446, 1495.196] (assumes normal distribution)
+
+
+# JMH 1.12 (released 108 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.onePassConvolution
+# Parameters: (numThreads = 8, size = 4096)
+
+# Run progress: 33.33% complete, ETA 00:02:28
+# Fork: 1 of 1
+# Warmup Iteration   1: 2290.591 ms/op
+# Warmup Iteration   2: 1994.313 ms/op
+# Warmup Iteration   3: 2103.643 ms/op
+# Warmup Iteration   4: 1959.858 ms/op
+# Warmup Iteration   5: 2048.567 ms/op
+Iteration   1: 1944.660 ms/op
+Iteration   2: 1962.651 ms/op
+Iteration   3: 1943.003 ms/op
+Iteration   4: 2099.936 ms/op
+Iteration   5: 1986.902 ms/op
+
+
+Result "onePassConvolution":
+  1987.431 ?(99.9%) 251.583 ms/op [Average]
+  (min, avg, max) = (1943.003, 1987.431, 2099.936), stdev = 65.335
+  CI (99.9%): [1735.848, 2239.014] (assumes normal distribution)
+
+
+# JMH 1.12 (released 108 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.onePassConvolution
+# Parameters: (numThreads = 8, size = 6667)
+
+# Run progress: 38.89% complete, ETA 00:02:31
+# Fork: 1 of 1
+# Warmup Iteration   1: 6198.054 ms/op
+# Warmup Iteration   2: 4858.524 ms/op
+# Warmup Iteration   3: 5280.466 ms/op
+# Warmup Iteration   4: 4866.062 ms/op
+# Warmup Iteration   5: 4882.835 ms/op
+Iteration   1: 5114.492 ms/op
+Iteration   2: 5603.128 ms/op
+Iteration   3: 5214.873 ms/op
+Iteration   4: 5295.017 ms/op
+Iteration   5: 4990.877 ms/op
+
+
+Result "onePassConvolution":
+  5243.677 ?(99.9%) 889.130 ms/op [Average]
+  (min, avg, max) = (4990.877, 5243.677, 5603.128), stdev = 230.904
+  CI (99.9%): [4354.548, 6132.807] (assumes normal distribution)
+
+
+# JMH 1.12 (released 108 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.onePassConvolution
+# Parameters: (numThreads = 8, size = 8192)
+
+# Run progress: 44.44% complete, ETA 00:03:10
+# Fork: 1 of 1
+# Warmup Iteration   1: 8558.286 ms/op
+# Warmup Iteration   2: 7566.363 ms/op
+# Warmup Iteration   3: 7746.423 ms/op
+# Warmup Iteration   4: 7639.888 ms/op
+# Warmup Iteration   5: 7577.985 ms/op
+Iteration   1: 7611.822 ms/op
+Iteration   2: 7500.727 ms/op
+Iteration   3: 7585.077 ms/op
+Iteration   4: 7612.621 ms/op
+Iteration   5: 7619.912 ms/op
+
+
+Result "onePassConvolution":
+  7586.032 ?(99.9%) 190.576 ms/op [Average]
+  (min, avg, max) = (7500.727, 7586.032, 7619.912), stdev = 49.492
+  CI (99.9%): [7395.456, 7776.608] (assumes normal distribution)
+
+
+# JMH 1.12 (released 108 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.twoPassConvolution
+# Parameters: (numThreads = 8, size = 512)
+
+# Run progress: 50.00% complete, ETA 00:03:55
+# Fork: 1 of 1
+# Warmup Iteration   1: 43.857 ms/op
+# Warmup Iteration   2: 35.366 ms/op
+# Warmup Iteration   3: 36.114 ms/op
+# Warmup Iteration   4: 35.618 ms/op
+# Warmup Iteration   5: 34.267 ms/op
+Iteration   1: 35.100 ms/op
+Iteration   2: 35.033 ms/op
+Iteration   3: 34.500 ms/op
+Iteration   4: 34.875 ms/op
+Iteration   5: 35.074 ms/op
+
+
+Result "twoPassConvolution":
+  34.916 ?(99.9%) 0.958 ms/op [Average]
+  (min, avg, max) = (34.500, 34.916, 35.100), stdev = 0.249
+  CI (99.9%): [33.959, 35.874] (assumes normal distribution)
+
+
+# JMH 1.12 (released 108 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.twoPassConvolution
+# Parameters: (numThreads = 8, size = 701)
+
+# Run progress: 55.56% complete, ETA 00:03:16
+# Fork: 1 of 1
+# Warmup Iteration   1: 82.085 ms/op
+# Warmup Iteration   2: 66.776 ms/op
+# Warmup Iteration   3: 65.888 ms/op
+# Warmup Iteration   4: 65.376 ms/op
+# Warmup Iteration   5: 64.326 ms/op
+Iteration   1: 64.475 ms/op
+Iteration   2: 64.576 ms/op
+Iteration   3: 65.263 ms/op
+Iteration   4: 65.513 ms/op
+Iteration   5: 64.383 ms/op
+
+
+Result "twoPassConvolution":
+  64.842 ?(99.9%) 1.967 ms/op [Average]
+  (min, avg, max) = (64.383, 64.842, 65.513), stdev = 0.511
+  CI (99.9%): [62.875, 66.809] (assumes normal distribution)
+
+
+# JMH 1.12 (released 108 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.twoPassConvolution
+# Parameters: (numThreads = 8, size = 1024)
+
+# Run progress: 61.11% complete, ETA 00:02:43
+# Fork: 1 of 1
+# Warmup Iteration   1: 180.584 ms/op
+# Warmup Iteration   2: 142.253 ms/op
+# Warmup Iteration   3: 137.859 ms/op
+# Warmup Iteration   4: 138.729 ms/op
+# Warmup Iteration   5: 139.464 ms/op
+Iteration   1: 142.585 ms/op
+Iteration   2: 138.687 ms/op
+Iteration   3: 137.855 ms/op
+Iteration   4: 139.978 ms/op
+Iteration   5: 141.010 ms/op
+
+
+Result "twoPassConvolution":
+  140.023 ?(99.9%) 7.211 ms/op [Average]
+  (min, avg, max) = (137.855, 140.023, 142.585), stdev = 1.873
+  CI (99.9%): [132.812, 147.234] (assumes normal distribution)
+
+
+# JMH 1.12 (released 108 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.twoPassConvolution
+# Parameters: (numThreads = 8, size = 1511)
+
+# Run progress: 66.67% complete, ETA 00:02:14
+# Fork: 1 of 1
+# Warmup Iteration   1: 376.044 ms/op
+# Warmup Iteration   2: 304.477 ms/op
+# Warmup Iteration   3: 307.681 ms/op
+# Warmup Iteration   4: 298.274 ms/op
+# Warmup Iteration   5: 301.403 ms/op
+Iteration   1: 291.025 ms/op
+Iteration   2: 298.753 ms/op
+Iteration   3: 305.195 ms/op
+Iteration   4: 294.214 ms/op
+Iteration   5: 295.440 ms/op
+
+
+Result "twoPassConvolution":
+  296.925 ?(99.9%) 20.745 ms/op [Average]
+  (min, avg, max) = (291.025, 296.925, 305.195), stdev = 5.387
+  CI (99.9%): [276.180, 317.670] (assumes normal distribution)
+
+
+# JMH 1.12 (released 108 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.twoPassConvolution
+# Parameters: (numThreads = 8, size = 2048)
+
+# Run progress: 72.22% complete, ETA 00:01:48
+# Fork: 1 of 1
+# Warmup Iteration   1: 653.794 ms/op
+# Warmup Iteration   2: 536.878 ms/op
+# Warmup Iteration   3: 543.693 ms/op
+# Warmup Iteration   4: 547.202 ms/op
+# Warmup Iteration   5: 553.437 ms/op
+Iteration   1: 530.565 ms/op
+Iteration   2: 554.231 ms/op
+Iteration   3: 554.195 ms/op
+Iteration   4: 561.040 ms/op
+Iteration   5: 564.966 ms/op
+
+
+Result "twoPassConvolution":
+  553.000 ?(99.9%) 51.450 ms/op [Average]
+  (min, avg, max) = (530.565, 553.000, 564.966), stdev = 13.361
+  CI (99.9%): [501.550, 604.449] (assumes normal distribution)
+
+
+# JMH 1.12 (released 108 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.twoPassConvolution
+# Parameters: (numThreads = 8, size = 3313)
+
+# Run progress: 77.78% complete, ETA 00:01:23
+# Fork: 1 of 1
+# Warmup Iteration   1: 1760.568 ms/op
+# Warmup Iteration   2: 1393.480 ms/op
+# Warmup Iteration   3: 1374.638 ms/op
+# Warmup Iteration   4: 1476.442 ms/op
+# Warmup Iteration   5: 1404.796 ms/op
+Iteration   1: 1606.325 ms/op
+Iteration   2: 1544.504 ms/op
+Iteration   3: 1539.013 ms/op
+Iteration   4: 1460.177 ms/op
+Iteration   5: 1673.319 ms/op
+
+
+Result "twoPassConvolution":
+  1564.668 ?(99.9%) 307.591 ms/op [Average]
+  (min, avg, max) = (1460.177, 1564.668, 1673.319), stdev = 79.880
+  CI (99.9%): [1257.077, 1872.259] (assumes normal distribution)
+
+
+# JMH 1.12 (released 108 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.twoPassConvolution
+# Parameters: (numThreads = 8, size = 4096)
+
+# Run progress: 83.33% complete, ETA 00:01:01
+# Fork: 1 of 1
+# Warmup Iteration   1: 2487.449 ms/op
+# Warmup Iteration   2: 2266.031 ms/op
+# Warmup Iteration   3: 2269.117 ms/op
+# Warmup Iteration   4: 2294.498 ms/op
+# Warmup Iteration   5: 2237.049 ms/op
+Iteration   1: 2282.875 ms/op
+Iteration   2: 1982.213 ms/op
+Iteration   3: 2398.296 ms/op
+Iteration   4: 2214.505 ms/op
+Iteration   5: 2175.751 ms/op
+
+
+Result "twoPassConvolution":
+  2210.728 ?(99.9%) 589.802 ms/op [Average]
+  (min, avg, max) = (1982.213, 2210.728, 2398.296), stdev = 153.170
+  CI (99.9%): [1620.927, 2800.530] (assumes normal distribution)
+
+
+# JMH 1.12 (released 108 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.twoPassConvolution
+# Parameters: (numThreads = 8, size = 6667)
+
+# Run progress: 88.89% complete, ETA 00:00:41
+# Fork: 1 of 1
+# Warmup Iteration   1: 5857.272 ms/op
+# Warmup Iteration   2: 6116.928 ms/op
+# Warmup Iteration   3: 6241.466 ms/op
+# Warmup Iteration   4: 5815.612 ms/op
+# Warmup Iteration   5: 6010.082 ms/op
+Iteration   1: 5596.352 ms/op
+Iteration   2: 5815.107 ms/op
+Iteration   3: 6216.379 ms/op
+Iteration   4: 5624.822 ms/op
+Iteration   5: 5947.788 ms/op
+
+
+Result "twoPassConvolution":
+  5840.090 ?(99.9%) 980.903 ms/op [Average]
+  (min, avg, max) = (5596.352, 5840.090, 6216.379), stdev = 254.737
+  CI (99.9%): [4859.187, 6820.993] (assumes normal distribution)
+
+
+# JMH 1.12 (released 108 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConvolutionBenchmark.twoPassConvolution
+# Parameters: (numThreads = 8, size = 8192)
+
+# Run progress: 94.44% complete, ETA 00:00:23
+# Fork: 1 of 1
+# Warmup Iteration   1: 9114.608 ms/op
+# Warmup Iteration   2: 9499.797 ms/op
+# Warmup Iteration   3: 9175.694 ms/op
+# Warmup Iteration   4: 8236.375 ms/op
+# Warmup Iteration   5: 8245.012 ms/op
+Iteration   1: 8936.192 ms/op
+Iteration   2: 8868.681 ms/op
+Iteration   3: 9370.207 ms/op
+Iteration   4: 8323.748 ms/op
+Iteration   5: 9290.662 ms/op
+
+
+Result "twoPassConvolution":
+  8957.898 ?(99.9%) 1600.806 ms/op [Average]
+  (min, avg, max) = (8323.748, 8957.898, 9370.207), stdev = 415.724
+  CI (99.9%): [7357.092, 10558.705] (assumes normal distribution)
+
+
+# Run complete. Total time: 00:08:12
+
+Benchmark                                (numThreads)  (size)  Mode  Cnt     Score      Error  Units
+ConvolutionBenchmark.onePassConvolution             8     512  avgt    5    29.112 ?    0.376  ms/op
+ConvolutionBenchmark.onePassConvolution             8     701  avgt    5    55.912 ?    0.604  ms/op
+ConvolutionBenchmark.onePassConvolution             8    1024  avgt    5   121.146 ?    3.751  ms/op
+ConvolutionBenchmark.onePassConvolution             8    1511  avgt    5   279.504 ?    6.935  ms/op
+ConvolutionBenchmark.onePassConvolution             8    2048  avgt    5   477.700 ?   46.713  ms/op
+ConvolutionBenchmark.onePassConvolution             8    3313  avgt    5  1354.821 ?  140.375  ms/op
+ConvolutionBenchmark.onePassConvolution             8    4096  avgt    5  1987.431 ?  251.583  ms/op
+ConvolutionBenchmark.onePassConvolution             8    6667  avgt    5  5243.677 ?  889.130  ms/op
+ConvolutionBenchmark.onePassConvolution             8    8192  avgt    5  7586.032 ?  190.576  ms/op
+ConvolutionBenchmark.twoPassConvolution             8     512  avgt    5    34.916 ?    0.958  ms/op
+ConvolutionBenchmark.twoPassConvolution             8     701  avgt    5    64.842 ?    1.967  ms/op
+ConvolutionBenchmark.twoPassConvolution             8    1024  avgt    5   140.023 ?    7.211  ms/op
+ConvolutionBenchmark.twoPassConvolution             8    1511  avgt    5   296.925 ?   20.745  ms/op
+ConvolutionBenchmark.twoPassConvolution             8    2048  avgt    5   553.000 ?   51.450  ms/op
+ConvolutionBenchmark.twoPassConvolution             8    3313  avgt    5  1564.668 ?  307.591  ms/op
+ConvolutionBenchmark.twoPassConvolution             8    4096  avgt    5  2210.728 ?  589.802  ms/op
+ConvolutionBenchmark.twoPassConvolution             8    6667  avgt    5  5840.090 ?  980.903  ms/op
+ConvolutionBenchmark.twoPassConvolution             8    8192  avgt    5  8957.898 ? 1600.806  ms/op
+------------------------------------------------------------------------
+BUILD SUCCESS
+------------------------------------------------------------------------
+Total time: 8:13.334s
+Finished at: Mon Jul 18 02:11:27 CEST 2016
+Final Memory: 7M/309M
+------------------------------------------------------------------------

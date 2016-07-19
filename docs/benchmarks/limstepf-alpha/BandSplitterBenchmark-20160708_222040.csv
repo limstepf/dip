@@ -1,0 +1,15 @@
+"Benchmark","Mode","Threads","Samples","Score","Score Error (99.9%)","Unit","Param: numThreads","Param: size"
+"ch.unifr.diva.dip.benchmarks.BandSplitterBenchmark.concurrent3xLoopOp","avgt",1,5,3.949845,0.052590,"ms/op",8,512
+"ch.unifr.diva.dip.benchmarks.BandSplitterBenchmark.concurrent3xLoopOp","avgt",1,5,7.269230,0.020569,"ms/op",8,701
+"ch.unifr.diva.dip.benchmarks.BandSplitterBenchmark.concurrent3xLoopOp","avgt",1,5,15.418233,0.297855,"ms/op",8,1024
+"ch.unifr.diva.dip.benchmarks.BandSplitterBenchmark.concurrent3xLoopOp","avgt",1,5,33.444488,0.189700,"ms/op",8,1511
+"ch.unifr.diva.dip.benchmarks.BandSplitterBenchmark.concurrent3xLoopOp","avgt",1,5,61.114902,2.704629,"ms/op",8,2048
+"ch.unifr.diva.dip.benchmarks.BandSplitterBenchmark.concurrent3xLoopOp","avgt",1,5,159.667534,2.396442,"ms/op",8,3313
+"ch.unifr.diva.dip.benchmarks.BandSplitterBenchmark.concurrent3xLoopOp","avgt",1,5,288.195965,7.587674,"ms/op",8,4096
+"ch.unifr.diva.dip.benchmarks.BandSplitterBenchmark.singleLoopOp","avgt",1,5,11.165296,0.106422,"ms/op",8,512
+"ch.unifr.diva.dip.benchmarks.BandSplitterBenchmark.singleLoopOp","avgt",1,5,21.100621,0.204697,"ms/op",8,701
+"ch.unifr.diva.dip.benchmarks.BandSplitterBenchmark.singleLoopOp","avgt",1,5,45.401374,0.396806,"ms/op",8,1024
+"ch.unifr.diva.dip.benchmarks.BandSplitterBenchmark.singleLoopOp","avgt",1,5,98.562743,0.654800,"ms/op",8,1511
+"ch.unifr.diva.dip.benchmarks.BandSplitterBenchmark.singleLoopOp","avgt",1,5,182.702650,4.463776,"ms/op",8,2048
+"ch.unifr.diva.dip.benchmarks.BandSplitterBenchmark.singleLoopOp","avgt",1,5,479.783350,6.742064,"ms/op",8,3313
+"ch.unifr.diva.dip.benchmarks.BandSplitterBenchmark.singleLoopOp","avgt",1,5,735.154512,9.191114,"ms/op",8,4096

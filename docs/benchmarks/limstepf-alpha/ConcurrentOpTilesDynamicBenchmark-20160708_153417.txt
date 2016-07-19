@@ -1,0 +1,481 @@
+cd D:\unifr\MScMA\dip\app; "JAVA_HOME=C:\\Program Files\\Java\\jdk1.8.0_45" cmd /c "\"\"C:\\Program Files\\NetBeans 8.0.2\\java\\maven\\bin\\mvn.bat\" -Dexec.args=\"-classpath %classpath ch.unifr.diva.dip.benchmarks.ConcurrentOpTilesDynamicBenchmark\" -Dexec.executable=\"C:\\Program Files\\Java\\jdk1.8.0_45\\bin\\java.exe\" -Dexec.classpathScope=test -Dmaven.ext.class.path=\"C:\\Program Files\\NetBeans 8.0.2\\java\\maven-nblib\\netbeans-eventspy.jar;C:\\Program Files\\NetBeans 8.0.2\\java\\maven-nblib\\netbeans-cos.jar\" org.codehaus.mojo:exec-maven-plugin:1.2.1:exec\""
+Running NetBeans Compile On Save execution. Phase execution is skipped and output directories of dependency projects (with Compile on Save turned on) will be used instead of their jar artifacts.
+Scanning for projects...
+                                                                        
+------------------------------------------------------------------------
+Building DIVA DIP Application 1.0.0-SNAPSHOT
+------------------------------------------------------------------------
+
+--- exec-maven-plugin:1.2.1:exec (default-cli) @ dip-app ---
+# JMH 1.12 (released 98 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConcurrentOpTilesDynamicBenchmark.dynamicTileSizeOp
+# Parameters: (numThreads = 8, size = 512, tileSize = 256)
+
+# Run progress: 0.00% complete, ETA 00:02:20
+# Fork: 1 of 1
+# Warmup Iteration   1: 19.289 ms/op
+# Warmup Iteration   2: 17.751 ms/op
+# Warmup Iteration   3: 17.572 ms/op
+# Warmup Iteration   4: 17.496 ms/op
+# Warmup Iteration   5: 17.628 ms/op
+Iteration   1: 17.589 ms/op
+Iteration   2: 17.532 ms/op
+Iteration   3: 17.600 ms/op
+Iteration   4: 19.684 ms/op
+Iteration   5: 19.665 ms/op
+
+
+Result "dynamicTileSizeOp":
+  18.414 ?(99.9%) 4.433 ms/op [Average]
+  (min, avg, max) = (17.532, 18.414, 19.684), stdev = 1.151
+  CI (99.9%): [13.981, 22.847] (assumes normal distribution)
+
+
+# JMH 1.12 (released 98 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConcurrentOpTilesDynamicBenchmark.dynamicTileSizeOp
+# Parameters: (numThreads = 8, size = 701, tileSize = 256)
+
+# Run progress: 7.14% complete, ETA 00:02:14
+# Fork: 1 of 1
+# Warmup Iteration   1: 37.166 ms/op
+# Warmup Iteration   2: 33.052 ms/op
+# Warmup Iteration   3: 32.798 ms/op
+# Warmup Iteration   4: 32.552 ms/op
+# Warmup Iteration   5: 32.488 ms/op
+Iteration   1: 32.616 ms/op
+Iteration   2: 32.462 ms/op
+Iteration   3: 32.745 ms/op
+Iteration   4: 32.456 ms/op
+Iteration   5: 32.718 ms/op
+
+
+Result "dynamicTileSizeOp":
+  32.599 ?(99.9%) 0.529 ms/op [Average]
+  (min, avg, max) = (32.456, 32.599, 32.745), stdev = 0.137
+  CI (99.9%): [32.071, 33.128] (assumes normal distribution)
+
+
+# JMH 1.12 (released 98 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConcurrentOpTilesDynamicBenchmark.dynamicTileSizeOp
+# Parameters: (numThreads = 8, size = 1024, tileSize = 256)
+
+# Run progress: 14.29% complete, ETA 00:02:05
+# Fork: 1 of 1
+# Warmup Iteration   1: 79.348 ms/op
+# Warmup Iteration   2: 73.041 ms/op
+# Warmup Iteration   3: 71.356 ms/op
+# Warmup Iteration   4: 71.185 ms/op
+# Warmup Iteration   5: 70.854 ms/op
+Iteration   1: 70.156 ms/op
+Iteration   2: 70.149 ms/op
+Iteration   3: 69.613 ms/op
+Iteration   4: 70.976 ms/op
+Iteration   5: 70.206 ms/op
+
+
+Result "dynamicTileSizeOp":
+  70.220 ?(99.9%) 1.876 ms/op [Average]
+  (min, avg, max) = (69.613, 70.220, 70.976), stdev = 0.487
+  CI (99.9%): [68.344, 72.096] (assumes normal distribution)
+
+
+# JMH 1.12 (released 98 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConcurrentOpTilesDynamicBenchmark.dynamicTileSizeOp
+# Parameters: (numThreads = 8, size = 1511, tileSize = 256)
+
+# Run progress: 21.43% complete, ETA 00:01:56
+# Fork: 1 of 1
+# Warmup Iteration   1: 170.137 ms/op
+# Warmup Iteration   2: 167.564 ms/op
+# Warmup Iteration   3: 156.488 ms/op
+# Warmup Iteration   4: 159.934 ms/op
+# Warmup Iteration   5: 167.523 ms/op
+Iteration   1: 156.044 ms/op
+Iteration   2: 154.243 ms/op
+Iteration   3: 154.259 ms/op
+Iteration   4: 156.060 ms/op
+Iteration   5: 158.263 ms/op
+
+
+Result "dynamicTileSizeOp":
+  155.774 ?(99.9%) 6.382 ms/op [Average]
+  (min, avg, max) = (154.243, 155.774, 158.263), stdev = 1.657
+  CI (99.9%): [149.391, 162.156] (assumes normal distribution)
+
+
+# JMH 1.12 (released 98 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConcurrentOpTilesDynamicBenchmark.dynamicTileSizeOp
+# Parameters: (numThreads = 8, size = 2048, tileSize = 256)
+
+# Run progress: 28.57% complete, ETA 00:01:47
+# Fork: 1 of 1
+# Warmup Iteration   1: 329.967 ms/op
+# Warmup Iteration   2: 284.506 ms/op
+# Warmup Iteration   3: 322.904 ms/op
+# Warmup Iteration   4: 316.423 ms/op
+# Warmup Iteration   5: 334.346 ms/op
+Iteration   1: 315.802 ms/op
+Iteration   2: 292.561 ms/op
+Iteration   3: 314.414 ms/op
+Iteration   4: 311.839 ms/op
+Iteration   5: 295.490 ms/op
+
+
+Result "dynamicTileSizeOp":
+  306.021 ?(99.9%) 42.707 ms/op [Average]
+  (min, avg, max) = (292.561, 306.021, 315.802), stdev = 11.091
+  CI (99.9%): [263.314, 348.729] (assumes normal distribution)
+
+
+# JMH 1.12 (released 98 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConcurrentOpTilesDynamicBenchmark.dynamicTileSizeOp
+# Parameters: (numThreads = 8, size = 3313, tileSize = 256)
+
+# Run progress: 35.71% complete, ETA 00:01:41
+# Fork: 1 of 1
+# Warmup Iteration   1: 857.724 ms/op
+# Warmup Iteration   2: 834.769 ms/op
+# Warmup Iteration   3: 790.283 ms/op
+# Warmup Iteration   4: 773.029 ms/op
+# Warmup Iteration   5: 788.622 ms/op
+Iteration   1: 784.031 ms/op
+Iteration   2: 850.706 ms/op
+Iteration   3: 774.373 ms/op
+Iteration   4: 810.563 ms/op
+Iteration   5: 781.131 ms/op
+
+
+Result "dynamicTileSizeOp":
+  800.161 ?(99.9%) 121.010 ms/op [Average]
+  (min, avg, max) = (774.373, 800.161, 850.706), stdev = 31.426
+  CI (99.9%): [679.151, 921.171] (assumes normal distribution)
+
+
+# JMH 1.12 (released 98 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConcurrentOpTilesDynamicBenchmark.dynamicTileSizeOp
+# Parameters: (numThreads = 8, size = 4096, tileSize = 256)
+
+# Run progress: 42.86% complete, ETA 00:01:38
+# Fork: 1 of 1
+# Warmup Iteration   1: 1247.946 ms/op
+# Warmup Iteration   2: 1217.619 ms/op
+# Warmup Iteration   3: 1119.598 ms/op
+# Warmup Iteration   4: 1163.819 ms/op
+# Warmup Iteration   5: 1149.111 ms/op
+Iteration   1: 1178.555 ms/op
+Iteration   2: 1135.972 ms/op
+Iteration   3: 1192.274 ms/op
+Iteration   4: 1201.990 ms/op
+Iteration   5: 1127.374 ms/op
+
+
+Result "dynamicTileSizeOp":
+  1167.233 ?(99.9%) 129.574 ms/op [Average]
+  (min, avg, max) = (1127.374, 1167.233, 1201.990), stdev = 33.650
+  CI (99.9%): [1037.660, 1296.807] (assumes normal distribution)
+
+
+# JMH 1.12 (released 98 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConcurrentOpTilesDynamicBenchmark.staticTileSizeOp
+# Parameters: (numThreads = 8, size = 512, tileSize = 256)
+
+# Run progress: 50.00% complete, ETA 00:01:26
+# Fork: 1 of 1
+# Warmup Iteration   1: 34.510 ms/op
+# Warmup Iteration   2: 33.342 ms/op
+# Warmup Iteration   3: 33.258 ms/op
+# Warmup Iteration   4: 32.900 ms/op
+# Warmup Iteration   5: 32.645 ms/op
+Iteration   1: 33.136 ms/op
+Iteration   2: 33.142 ms/op
+Iteration   3: 33.207 ms/op
+Iteration   4: 33.200 ms/op
+Iteration   5: 33.144 ms/op
+
+
+Result "staticTileSizeOp":
+  33.166 ?(99.9%) 0.133 ms/op [Average]
+  (min, avg, max) = (33.136, 33.166, 33.207), stdev = 0.035
+  CI (99.9%): [33.033, 33.299] (assumes normal distribution)
+
+
+# JMH 1.12 (released 98 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConcurrentOpTilesDynamicBenchmark.staticTileSizeOp
+# Parameters: (numThreads = 8, size = 701, tileSize = 256)
+
+# Run progress: 57.14% complete, ETA 00:01:13
+# Fork: 1 of 1
+# Warmup Iteration   1: 47.763 ms/op
+# Warmup Iteration   2: 43.273 ms/op
+# Warmup Iteration   3: 42.633 ms/op
+# Warmup Iteration   4: 43.690 ms/op
+# Warmup Iteration   5: 44.108 ms/op
+Iteration   1: 42.847 ms/op
+Iteration   2: 42.754 ms/op
+Iteration   3: 42.728 ms/op
+Iteration   4: 43.822 ms/op
+Iteration   5: 42.895 ms/op
+
+
+Result "staticTileSizeOp":
+  43.009 ?(99.9%) 1.769 ms/op [Average]
+  (min, avg, max) = (42.728, 43.009, 43.822), stdev = 0.459
+  CI (99.9%): [41.240, 44.778] (assumes normal distribution)
+
+
+# JMH 1.12 (released 98 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConcurrentOpTilesDynamicBenchmark.staticTileSizeOp
+# Parameters: (numThreads = 8, size = 1024, tileSize = 256)
+
+# Run progress: 64.29% complete, ETA 00:01:00
+# Fork: 1 of 1
+# Warmup Iteration   1: 84.183 ms/op
+# Warmup Iteration   2: 71.027 ms/op
+# Warmup Iteration   3: 71.872 ms/op
+# Warmup Iteration   4: 70.097 ms/op
+# Warmup Iteration   5: 70.763 ms/op
+Iteration   1: 69.863 ms/op
+Iteration   2: 70.097 ms/op
+Iteration   3: 70.385 ms/op
+Iteration   4: 70.337 ms/op
+Iteration   5: 70.076 ms/op
+
+
+Result "staticTileSizeOp":
+  70.151 ?(99.9%) 0.818 ms/op [Average]
+  (min, avg, max) = (69.863, 70.151, 70.385), stdev = 0.212
+  CI (99.9%): [69.333, 70.970] (assumes normal distribution)
+
+
+# JMH 1.12 (released 98 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConcurrentOpTilesDynamicBenchmark.staticTileSizeOp
+# Parameters: (numThreads = 8, size = 1511, tileSize = 256)
+
+# Run progress: 71.43% complete, ETA 00:00:47
+# Fork: 1 of 1
+# Warmup Iteration   1: 179.349 ms/op
+# Warmup Iteration   2: 168.163 ms/op
+# Warmup Iteration   3: 164.453 ms/op
+# Warmup Iteration   4: 163.925 ms/op
+# Warmup Iteration   5: 162.043 ms/op
+Iteration   1: 162.523 ms/op
+Iteration   2: 165.014 ms/op
+Iteration   3: 169.300 ms/op
+Iteration   4: 164.129 ms/op
+Iteration   5: 161.747 ms/op
+
+
+Result "staticTileSizeOp":
+  164.543 ?(99.9%) 11.378 ms/op [Average]
+  (min, avg, max) = (161.747, 164.543, 169.300), stdev = 2.955
+  CI (99.9%): [153.165, 175.920] (assumes normal distribution)
+
+
+# JMH 1.12 (released 98 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConcurrentOpTilesDynamicBenchmark.staticTileSizeOp
+# Parameters: (numThreads = 8, size = 2048, tileSize = 256)
+
+# Run progress: 78.57% complete, ETA 00:00:35
+# Fork: 1 of 1
+# Warmup Iteration   1: 323.759 ms/op
+# Warmup Iteration   2: 296.576 ms/op
+# Warmup Iteration   3: 303.758 ms/op
+# Warmup Iteration   4: 306.188 ms/op
+# Warmup Iteration   5: 328.722 ms/op
+Iteration   1: 301.260 ms/op
+Iteration   2: 289.177 ms/op
+Iteration   3: 292.949 ms/op
+Iteration   4: 315.239 ms/op
+Iteration   5: 324.688 ms/op
+
+
+Result "staticTileSizeOp":
+  304.663 ?(99.9%) 57.807 ms/op [Average]
+  (min, avg, max) = (289.177, 304.663, 324.688), stdev = 15.012
+  CI (99.9%): [246.856, 362.469] (assumes normal distribution)
+
+
+# JMH 1.12 (released 98 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConcurrentOpTilesDynamicBenchmark.staticTileSizeOp
+# Parameters: (numThreads = 8, size = 3313, tileSize = 256)
+
+# Run progress: 85.71% complete, ETA 00:00:23
+# Fork: 1 of 1
+# Warmup Iteration   1: 837.578 ms/op
+# Warmup Iteration   2: 758.300 ms/op
+# Warmup Iteration   3: 767.856 ms/op
+# Warmup Iteration   4: 844.593 ms/op
+# Warmup Iteration   5: 750.145 ms/op
+Iteration   1: 747.521 ms/op
+Iteration   2: 742.421 ms/op
+Iteration   3: 784.548 ms/op
+Iteration   4: 759.829 ms/op
+Iteration   5: 743.095 ms/op
+
+
+Result "staticTileSizeOp":
+  755.483 ?(99.9%) 68.100 ms/op [Average]
+  (min, avg, max) = (742.421, 755.483, 784.548), stdev = 17.685
+  CI (99.9%): [687.383, 823.583] (assumes normal distribution)
+
+
+# JMH 1.12 (released 98 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ConcurrentOpTilesDynamicBenchmark.staticTileSizeOp
+# Parameters: (numThreads = 8, size = 4096, tileSize = 256)
+
+# Run progress: 92.86% complete, ETA 00:00:12
+# Fork: 1 of 1
+# Warmup Iteration   1: 1206.660 ms/op
+# Warmup Iteration   2: 1142.886 ms/op
+# Warmup Iteration   3: 1112.548 ms/op
+# Warmup Iteration   4: 1189.996 ms/op
+# Warmup Iteration   5: 1208.012 ms/op
+Iteration   1: 1217.495 ms/op
+Iteration   2: 1252.036 ms/op
+Iteration   3: 1181.930 ms/op
+Iteration   4: 1231.698 ms/op
+Iteration   5: 1189.370 ms/op
+
+
+Result "staticTileSizeOp":
+  1214.506 ?(99.9%) 112.365 ms/op [Average]
+  (min, avg, max) = (1181.930, 1214.506, 1252.036), stdev = 29.181
+  CI (99.9%): [1102.141, 1326.871] (assumes normal distribution)
+
+
+# Run complete. Total time: 00:02:53
+
+Benchmark                                            (numThreads)  (size)  (tileSize)  Mode  Cnt     Score     Error  Units
+ConcurrentOpTilesDynamicBenchmark.dynamicTileSizeOp             8     512         256  avgt    5    18.414 ?   4.433  ms/op
+ConcurrentOpTilesDynamicBenchmark.dynamicTileSizeOp             8     701         256  avgt    5    32.599 ?   0.529  ms/op
+ConcurrentOpTilesDynamicBenchmark.dynamicTileSizeOp             8    1024         256  avgt    5    70.220 ?   1.876  ms/op
+ConcurrentOpTilesDynamicBenchmark.dynamicTileSizeOp             8    1511         256  avgt    5   155.774 ?   6.382  ms/op
+ConcurrentOpTilesDynamicBenchmark.dynamicTileSizeOp             8    2048         256  avgt    5   306.021 ?  42.707  ms/op
+ConcurrentOpTilesDynamicBenchmark.dynamicTileSizeOp             8    3313         256  avgt    5   800.161 ? 121.010  ms/op
+ConcurrentOpTilesDynamicBenchmark.dynamicTileSizeOp             8    4096         256  avgt    5  1167.233 ? 129.574  ms/op
+ConcurrentOpTilesDynamicBenchmark.staticTileSizeOp              8     512         256  avgt    5    33.166 ?   0.133  ms/op
+ConcurrentOpTilesDynamicBenchmark.staticTileSizeOp              8     701         256  avgt    5    43.009 ?   1.769  ms/op
+ConcurrentOpTilesDynamicBenchmark.staticTileSizeOp              8    1024         256  avgt    5    70.151 ?   0.818  ms/op
+ConcurrentOpTilesDynamicBenchmark.staticTileSizeOp              8    1511         256  avgt    5   164.543 ?  11.378  ms/op
+ConcurrentOpTilesDynamicBenchmark.staticTileSizeOp              8    2048         256  avgt    5   304.663 ?  57.807  ms/op
+ConcurrentOpTilesDynamicBenchmark.staticTileSizeOp              8    3313         256  avgt    5   755.483 ?  68.100  ms/op
+ConcurrentOpTilesDynamicBenchmark.staticTileSizeOp              8    4096         256  avgt    5  1214.506 ? 112.365  ms/op
+------------------------------------------------------------------------
+BUILD SUCCESS
+------------------------------------------------------------------------
+Total time: 2:54.677s
+Finished at: Fri Jul 08 15:34:17 CEST 2016
+Final Memory: 6M/245M
+------------------------------------------------------------------------

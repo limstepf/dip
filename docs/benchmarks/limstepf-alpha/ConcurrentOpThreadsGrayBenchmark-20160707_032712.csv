@@ -1,0 +1,9 @@
+"Benchmark","Mode","Threads","Samples","Score","Score Error (99.9%)","Unit","Param: numThreads","Param: size","Param: tileSize"
+"ch.unifr.diva.dip.benchmarks.ConcurrentOpThreadsGrayBenchmark.invertOp","avgt",1,5,216.213316,5.452542,"ms/op",1,4096,256
+"ch.unifr.diva.dip.benchmarks.ConcurrentOpThreadsGrayBenchmark.invertOp","avgt",1,5,116.826014,22.519145,"ms/op",2,4096,256
+"ch.unifr.diva.dip.benchmarks.ConcurrentOpThreadsGrayBenchmark.invertOp","avgt",1,5,95.404774,4.822184,"ms/op",4,4096,256
+"ch.unifr.diva.dip.benchmarks.ConcurrentOpThreadsGrayBenchmark.invertOp","avgt",1,5,81.868626,2.857467,"ms/op",8,4096,256
+"ch.unifr.diva.dip.benchmarks.ConcurrentOpThreadsGrayBenchmark.nullOp","avgt",1,5,192.018027,5.682683,"ms/op",1,4096,256
+"ch.unifr.diva.dip.benchmarks.ConcurrentOpThreadsGrayBenchmark.nullOp","avgt",1,5,110.668361,19.707083,"ms/op",2,4096,256
+"ch.unifr.diva.dip.benchmarks.ConcurrentOpThreadsGrayBenchmark.nullOp","avgt",1,5,94.793406,5.471543,"ms/op",4,4096,256
+"ch.unifr.diva.dip.benchmarks.ConcurrentOpThreadsGrayBenchmark.nullOp","avgt",1,5,81.161361,1.868484,"ms/op",8,4096,256
