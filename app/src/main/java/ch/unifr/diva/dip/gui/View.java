@@ -1,6 +1,6 @@
 package ch.unifr.diva.dip.gui;
 
-import javafx.scene.layout.Region;
+import javafx.scene.Parent;
 
 /**
  * View interface.
@@ -12,5 +12,5 @@ public interface View {
 	 *
 	 * @return The root node of the view.
 	 */
-	public Region getComponent();
+	public Parent getComponent();
 }

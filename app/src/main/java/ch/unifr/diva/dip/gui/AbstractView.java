@@ -1,7 +1,7 @@
 package ch.unifr.diva.dip.gui;
 
 import ch.unifr.diva.dip.core.ui.Localizable;
-import javafx.scene.layout.Region;
+import javafx.scene.Parent;
 
 /**
  * The AbstractView already implements the required interface and some
@@ -9,7 +9,7 @@ import javafx.scene.layout.Region;
  *
  * @param <P> The parent (or root) component of this view.
  */
-public class AbstractView<P extends Region> implements View, Localizable {
+public class AbstractView<P extends Parent> implements View, Localizable {
 
 	protected final P root;
 
@@ -24,7 +24,7 @@ public class AbstractView<P extends Region> implements View, Localizable {
 	}
 
 	@Override
-	public Region getComponent() {
+	public Parent getComponent() {
 		return root;
 	}
 
