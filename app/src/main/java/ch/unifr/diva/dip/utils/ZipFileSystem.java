@@ -41,8 +41,11 @@ public class ZipFileSystem implements AutoCloseable {
 	 *
 	 * @param uri an URI pointing to a zip file.
 	 * @throws IOException
-	 * @see create()
-	 * @see open()
+	 * @see #create(java.io.File)
+	 * @see #create(java.nio.file.Path)
+	 * @see #create(java.net.URI)
+	 * @see #open(java.io.File)
+	 * @see #open(java.nio.file.Path)
 	 */
 	public ZipFileSystem(URI uri) throws IOException {
 		this(uri, new HashMap<>());
@@ -55,8 +58,11 @@ public class ZipFileSystem implements AutoCloseable {
 	 * @param uri URI pointing to an existing zip file.
 	 * @param env a map of properties configuring the file system.
 	 * @throws IOException
-	 * @See create()
-	 * @See open()
+	 * @see #create(java.io.File)
+	 * @see #create(java.nio.file.Path)
+	 * @see #create(java.net.URI)
+	 * @see #open(java.io.File)
+	 * @see #open(java.nio.file.Path) 
 	 */
 	public ZipFileSystem(URI uri, HashMap<String, String> env) throws IOException {
 		fs = FileSystems.newFileSystem(uri, env);
