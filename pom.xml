@@ -34,7 +34,7 @@
 		<!-- OSGi bundles (demo plugins) -->
 		<!--<module>awt-demo</module>-->
 		<!--<module>ejml-demo</module>-->
-		
+
 		<!-- OSGi bundles (plugins) -->
 		<module>awt-tools</module>
 		<module>fx-tools</module>
