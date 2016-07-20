@@ -33,11 +33,9 @@ public class IOUtilsTest {
 	@Test
 	public void testGetRealDirectory() throws IOException {
 		Path p = root.resolve("some-new-directory");
-		System.out.println("p> " + p);
 		assertFalse("directory does not exist yet", Files.exists(p));
 
 		Path dir = getRealDirectory(p);
-		System.out.println("dir> " + dir);
 		assertTrue("directory exists", Files.exists(dir));
 		assertTrue("directory (still) exists", Files.exists(getRealDirectory(p)));
 	}
@@ -45,11 +43,9 @@ public class IOUtilsTest {
 	@Test
 	public void testGetRealDirectories() throws IOException {
 		Path p = root.resolve("d1/d2/d3/");
-		System.out.println("p> " + p);
 		assertFalse("directory does not exist yet", Files.exists(p));
 
 		Path dir = getRealDirectories(p);
-		System.out.println("dir> " + dir);
 		assertTrue("directory exists", Files.exists(dir));
 		assertTrue("directory (still) exists", Files.exists(getRealDirectories(p)));
 	}

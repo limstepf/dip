@@ -16,7 +16,6 @@ public class DoubleKernelTest extends KernelTestBase {
 	@Test
 	public void eyeTest() {
 		for (TestUtils.Shape s : eyes) {
-			System.out.println("shape> " + s);
 			final DoubleMatrix mat = new DoubleMatrix(s.rows, s.columns).fill(1);
 			final DoubleKernel kernel = new DoubleKernel(mat);
 			final int length = mat.data.length;

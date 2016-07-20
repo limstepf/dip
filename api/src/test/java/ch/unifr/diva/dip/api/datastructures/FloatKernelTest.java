@@ -15,7 +15,6 @@ public class FloatKernelTest extends KernelTestBase {
 	@Test
 	public void eyeTest() {
 		for (Shape s : eyes) {
-			System.out.println("shape> " + s);
 			final FloatMatrix mat = new FloatMatrix(s.rows, s.columns).fill(1);
 			final FloatKernel kernel = new FloatKernel(mat);
 			final int length = mat.data.length;
