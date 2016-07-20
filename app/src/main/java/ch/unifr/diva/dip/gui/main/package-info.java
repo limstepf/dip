@@ -1,4 +1,4 @@
 /**
- * Main GUI components of the dip application.
+ * Main GUI components.
  */
 package ch.unifr.diva.dip.gui.main;

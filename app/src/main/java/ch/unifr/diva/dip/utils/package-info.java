@@ -1,4 +1,4 @@
 /**
- * Utility classes used by the dip application.
+ * Utility classes.
  */
 package ch.unifr.diva.dip.utils;

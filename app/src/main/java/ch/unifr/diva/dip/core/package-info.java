@@ -1,4 +1,4 @@
 /**
- * Core components of the dip application.
+ * Core components.
  */
 package ch.unifr.diva.dip.core;

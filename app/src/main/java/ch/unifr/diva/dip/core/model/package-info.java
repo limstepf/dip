@@ -1,3 +1,6 @@
+/**
+ * Data models.
+ */
 @javax.xml.bind.annotation.XmlSchema(
 		xmlns = {
 			@javax.xml.bind.annotation.XmlNs(

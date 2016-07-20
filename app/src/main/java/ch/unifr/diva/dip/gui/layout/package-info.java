@@ -1,4 +1,4 @@
 /**
- * Basic layout components used by the dip application.
+ * Basic layout components.
  */
 package ch.unifr.diva.dip.gui.layout;
