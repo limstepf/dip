@@ -1,18 +1,3 @@
-@XmlSchema(
-		namespace = "http://www.unifr.ch/diva/dip",
-		elementFormDefault = XmlNsForm.QUALIFIED
-)
-@XmlJavaTypeAdapters({
-	@XmlJavaTypeAdapter(value = BooleanPropertyAdapter.class, type = BooleanProperty.class),
-	@XmlJavaTypeAdapter(value = BufferedImageAdapter.class, type = java.awt.image.BufferedImage.class),
-	@XmlJavaTypeAdapter(value = BufferedMatrixAdapter.class, type = ch.unifr.diva.dip.api.imaging.BufferedMatrix.class),
-	@XmlJavaTypeAdapter(value = DoublePropertyAdapter.class, type = DoubleProperty.class),
-	@XmlJavaTypeAdapter(value = ImageAdapter.class, type = javafx.scene.image.Image.class),
-	@XmlJavaTypeAdapter(value = IntegerPropertyAdapter.class, type = IntegerProperty.class),
-	@XmlJavaTypeAdapter(value = PathAdapter.class, type = java.nio.file.Path.class),
-	@XmlJavaTypeAdapter(value = StringPropertyAdapter.class, type = StringProperty.class)
-})
-
 /**
  * DIP data structures. Data structures defined here are primarily used to
  * communicate between processors (once mapped to a DIP datatype). Internally
@@ -31,6 +16,20 @@
  *
  * @see ch.unifr.diva.dip.api.datatypes
  */
+@XmlSchema(
+		namespace = "http://www.unifr.ch/diva/dip",
+		elementFormDefault = XmlNsForm.QUALIFIED
+)
+@XmlJavaTypeAdapters({
+	@XmlJavaTypeAdapter(value = BooleanPropertyAdapter.class, type = BooleanProperty.class),
+	@XmlJavaTypeAdapter(value = BufferedImageAdapter.class, type = java.awt.image.BufferedImage.class),
+	@XmlJavaTypeAdapter(value = BufferedMatrixAdapter.class, type = ch.unifr.diva.dip.api.imaging.BufferedMatrix.class),
+	@XmlJavaTypeAdapter(value = DoublePropertyAdapter.class, type = DoubleProperty.class),
+	@XmlJavaTypeAdapter(value = ImageAdapter.class, type = javafx.scene.image.Image.class),
+	@XmlJavaTypeAdapter(value = IntegerPropertyAdapter.class, type = IntegerProperty.class),
+	@XmlJavaTypeAdapter(value = PathAdapter.class, type = java.nio.file.Path.class),
+	@XmlJavaTypeAdapter(value = StringPropertyAdapter.class, type = StringProperty.class)
+})
 package ch.unifr.diva.dip.api.datastructures;
 
 import ch.unifr.diva.dip.api.utils.jaxb.BooleanPropertyAdapter;
