@@ -1,4 +1,4 @@
-package ch.unifr.diva.dip.api.utils.ui;
+package ch.unifr.diva.dip.api.ui;
 
 import java.util.BitSet;
 import javafx.application.Platform;

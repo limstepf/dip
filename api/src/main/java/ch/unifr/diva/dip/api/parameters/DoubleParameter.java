@@ -1,6 +1,6 @@
 package ch.unifr.diva.dip.api.parameters;
 
-import ch.unifr.diva.dip.api.utils.ui.NumberValidationTooltip;
+import ch.unifr.diva.dip.api.ui.NumberValidationTooltip;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.scene.control.TextField;

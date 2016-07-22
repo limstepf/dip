@@ -1,4 +1,4 @@
-package ch.unifr.diva.dip.api.utils.ui;
+package ch.unifr.diva.dip.api.ui;
 
 import ch.unifr.diva.dip.api.utils.L10n;
 import javafx.beans.property.BooleanProperty;
