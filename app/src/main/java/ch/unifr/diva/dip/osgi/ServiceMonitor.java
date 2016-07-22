@@ -85,6 +85,16 @@ public interface ServiceMonitor<T> {
 			final Service other = (Service) obj;
 			return this.pid.equals(other.pid);
 		}
+
+		@Override
+		public String toString() {
+			return this.getClass().getSimpleName()
+					+ "@" + Integer.toHexString(this.hashCode())
+					+ "{"
+					+ "pid=" + this.pid
+					+ ", service=" + this.service
+					+ "}";
+		}
 	}
 
 }
