@@ -39,8 +39,18 @@ public class OSGiFramework {
 	private final Path bundleCacheDir;
 	private final OSGiBundleTracker bundleTracker;
 	private final OSGiServiceTracker<Processor> processorServiceTracker;
-	public final OSGiServiceMonitor<Processor> services;
-	public final HostServiceMonitor hostServices;
+
+	/**
+	 * {@code Processor} service monitor. Safe to be accessed from the JavaFX
+	 * application thread.
+	 */
+	public final OSGiServiceMonitor<Processor> processors;
+
+	/**
+	 * {@code HostProcessor} service monitor. Safe to be accessed from the
+	 * JavaFX application thread.
+	 */
+	public final HostServiceMonitor hostProcessors;
 
 	/**
 	 * OSGiFramework constructor.
@@ -71,8 +81,8 @@ public class OSGiFramework {
 
 		this.bundleTracker = new OSGiBundleTracker(this.context);
 		this.processorServiceTracker = new OSGiServiceTracker(this.context, Processor.class);
-		this.services = new OSGiServiceMonitor(processorServiceTracker);
-		this.hostServices = new HostServiceMonitor();
+		this.processors = new OSGiServiceMonitor(processorServiceTracker);
+		this.hostProcessors = new HostServiceMonitor();
 		this.bundleTracker.open();
 		this.processorServiceTracker.open();
 
@@ -111,6 +121,12 @@ public class OSGiFramework {
 		return context;
 	}
 
+	/**
+	 * Returns a {@code Processor} service.
+	 *
+	 * @param pid PID of the processor.
+	 * @return the {@code Processor} service.
+	 */
 	public Processor getProcessor(String pid) {
 		return processorServiceTracker.getService(pid);
 	}
@@ -272,7 +288,7 @@ public class OSGiFramework {
 	 */
 	public List<ServiceMonitor.Service<Processor>> getCompatibleProcessors(Collection<String> inputTypes, Collection<String> outputTypes) {
 		final List list = new ArrayList<>();
-		for (ServiceMonitor.Service<Processor> p : this.services.services()) {
+		for (ServiceMonitor.Service<Processor> p : this.processors.services()) {
 			final List<String> inputs = p.service.portTypes(p.service.inputs());
 			final List<String> outputs = p.service.portTypes(p.service.outputs());
 

@@ -80,7 +80,6 @@ public class ProjectData {
 	@XmlElement(name = "pages")
 	public PageList pages = new PageList();
 
-
 	/**
 	 * Empty constructor (needed for JAXB).
 	 */
@@ -262,10 +261,10 @@ public class ProjectData {
 		if (pipelines() != null) {
 			for (PipelineData.Pipeline<ProcessorWrapper> pipeline : pipelines()) {
 				for (PipelineData.Processor processor : pipeline.processors()) {
-					if (handler.osgi.services.isAvailable(processor.pid)) {
+					if (handler.osgi.processors.isAvailable(processor.pid)) {
 						continue;
 					}
-					if (handler.osgi.hostServices.isAvailable(processor.pid)) {
+					if (handler.osgi.hostProcessors.isAvailable(processor.pid)) {
 						continue;
 					}
 					v.missingServices.add(processor.pid);

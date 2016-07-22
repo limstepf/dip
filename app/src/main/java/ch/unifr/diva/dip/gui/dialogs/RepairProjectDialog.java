@@ -600,7 +600,7 @@ public class RepairProjectDialog extends AbstractDialog {
 			this.processorCombo = new ComboBox();
 			processorCombo.setOnAction((e) -> {
 				final int index = processorCombo.getSelectionModel().getSelectedIndex();
-				final Service<Processor> p = handler.osgi.services.getService(compatibleProcessors.get(index));
+				final Service<Processor> p = handler.osgi.processors.getService(compatibleProcessors.get(index));
 				if (p != null) {
 
 					int i = 0;

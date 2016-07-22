@@ -87,21 +87,21 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 			while (c.next()) {
 				if (c.wasReplaced()) {
 					for (ProcessorWrapper w : c.getRemoved()) {
-							editorPane().updateProcessor(w);
+						editorPane().updateProcessor(w);
 					}
 				} else if (c.wasRemoved()) {
 					for (ProcessorWrapper w : c.getRemoved()) {
-							if (!selectedPipeline().processors().contains(w)) {
-								// processor got explicitly/manually deleted
-								editorPane().removeProcessor(w);
-							} else {
-								// only deprecated since service disappeared
-								editorPane().deprecateProcessor(w);
-							}
+						if (!selectedPipeline().processors().contains(w)) {
+							// processor got explicitly/manually deleted
+							editorPane().removeProcessor(w);
+						} else {
+							// only deprecated since service disappeared
+							editorPane().deprecateProcessor(w);
+						}
 					}
 				} else if (c.wasAdded()) {
 					for (ProcessorWrapper w : c.getAddedSubList()) {
-							editorPane().addProcessor(w);
+						editorPane().addProcessor(w);
 					}
 				}
 			}
@@ -118,14 +118,14 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 
 		final ProcessorsWidget hostProcessors = new ProcessorsWidget(
 				localize("pipeline.services.host"),
-				handler.osgi.hostServices
+				handler.osgi.hostProcessors
 		);
 		processorWidgets.add(hostProcessors);
 		sideBar.addMainWidget(hostProcessors);
 
 		final ProcessorsWidget processors = new ProcessorsWidget(
 				localize("pipeline.services"),
-				handler.osgi.services
+				handler.osgi.processors
 		);
 		processorWidgets.add(processors);
 		sideBar.addMainWidget(processors);
@@ -178,7 +178,6 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 
 			//TODO: update affected project pages according to changed pipelines
 			//      what if we only change some parameters?
-
 //			for (Pipeline p : pipelineManager().pipelines()) {
 //				System.out.println(p.getName()
 //						+ ", modified: "
@@ -231,7 +230,7 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 
 		if (manager.pipelines().contains(pipeline)) {
 			selectedPipelineProperty.set(pipeline);
-			
+
 			// add processors first, s.t. all ports will be initialized
 			for (ProcessorWrapper p : pipeline.processors()) {
 				editorPane().addProcessor(p);
