@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 public class OSGiServiceMonitor<T> implements ServiceMonitor<T> {
 
 	private static final Logger log = LoggerFactory.getLogger(HostServiceMonitor.class);
-	private final ServiceTracker processorTracker;
+	private final ServiceTrackerListener trackerListener;
 	private final ObservableList<Service<T>> services;
 
 	/**
@@ -25,8 +25,8 @@ public class OSGiServiceMonitor<T> implements ServiceMonitor<T> {
 	 */
 	public OSGiServiceMonitor(OSGiServiceTracker<T> serviceTracker) {
 		services = FXCollections.observableArrayList();
-		processorTracker = new ServiceTracker();
-		serviceTracker.addListener(processorTracker);
+		trackerListener = new ServiceTrackerListener();
+		serviceTracker.addListener(trackerListener);
 	}
 
 	@Override
@@ -39,7 +39,7 @@ public class OSGiServiceMonitor<T> implements ServiceMonitor<T> {
 	 *
 	 * @param <T> interface of the declarative service.
 	 */
-	private class ServiceTracker<T> implements TrackerListener<T> {
+	private class ServiceTrackerListener<T> implements TrackerListener<T> {
 
 		@Override
 		public void onAdded(String pid, T service) {

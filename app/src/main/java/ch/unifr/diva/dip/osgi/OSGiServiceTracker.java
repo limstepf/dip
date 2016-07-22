@@ -72,6 +72,19 @@ public class OSGiServiceTracker<T> {
 	}
 
 	/**
+	 * Wait for at least one service to be tracked by this ServiceTracker. This
+	 * method will also return when this ServiceTracker is closed
+	 *
+	 * @param timeout The time interval in milliseconds to wait. If zero, the
+	 * method will wait indefinitely.
+	 * @throws InterruptedException If another thread has interrupted the
+	 * current thread.
+	 */
+	public void waitForService(long timeout) throws InterruptedException {
+		this.tracker.waitForService(timeout);
+	}
+
+	/**
 	 * Adds a tracker listener to the service tracker.
 	 *
 	 * @param listener the tracker listener.
