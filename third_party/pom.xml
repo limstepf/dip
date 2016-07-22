@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>ch.unifr.diva.dip</groupId>
+	<artifactId>dip-third-party</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<name>DIVA DIP Third Party</name>
+	<description>
+		DIVA DIP Third Party is a multi-module (or aggregate) for third party
+		libraries to be directly copied, or repackaged as OSGi bundles.
+	</description>
+	<packaging>pom</packaging>
+
+	<modules>
+		<!-- parent POMs to copy or repackage dependencies -->
+		<module>pom-osgi-copy</module>
+		<module>pom-osgi-repackage</module>
+
+		<!-- copy OSGi bundles. These dependencies are already OSGi bundles and
+		just can be copied to a bundle directory (`app.core.bundledir` by
+		default). -->
+		<module>felix</module>
+		<module>felix-gogo</module>
+
+		<!-- repackage as OSGi bundles. These dependencies are not OSGi bundles
+		yet, so we have to create and add the OSGi bundle manifest file and
+		repackage the dependency as a new jar file, before copying them over to
+		a bundle directory (`app.plugin.bundledir` by default). -->
+		<module>org.ejml-0.29</module>
+	</modules>
+</project>

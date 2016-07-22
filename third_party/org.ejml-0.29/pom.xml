@@ -3,9 +3,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>ch.unifr.diva.dip</groupId>
-		<artifactId>dip-pom-osgi-package</artifactId>
+		<artifactId>dip-pom-osgi-repackage</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
-		<relativePath>../pom-osgi-package/pom.xml</relativePath>
+		<relativePath>../pom-osgi-repackage/pom.xml</relativePath>
 	</parent>
 
 	<artifactId>org-ejml</artifactId>
@@ -19,6 +19,7 @@
 
 	<properties>
 		<ejml.version>0.29</ejml.version>
+		<osgi.repackage.skip>false</osgi.repackage.skip>
 	</properties>
 
 	<dependencies>
@@ -32,7 +33,7 @@
 		<dependency>
 			<groupId>org.ejml</groupId>
 			<artifactId>all</artifactId>
-			<version>0.29</version>
+			<version>${ejml.version}</version>
 		</dependency>
 		-->
 

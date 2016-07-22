@@ -5,18 +5,26 @@
 		<groupId>ch.unifr.diva.dip</groupId>
 		<artifactId>dip-pom-osgi</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
-		<relativePath>../pom-osgi/pom.xml</relativePath>
+		<relativePath>../../pom-osgi/pom.xml</relativePath>
 	</parent>
-	<artifactId>dip-pom-osgi-dependency</artifactId>
-	<name>DIVA DIP OSGi Dependency POM</name>
+	<artifactId>dip-pom-osgi-copy</artifactId>
+	<name>DIVA DIP OSGi Copy POM</name>
 	<description>
-		The DIVA DIP OSGi Dependency POM is a direct parent POM to copy
+		The DIVA DIP OSGi Copy POM is a direct parent POM to copy
 		dependencies (e.g. external OSGi bundles) and make them available
 		to the OSGi framework (as system/core bundle).
 		Note that these bundles are only known/available to the OSGi framework,
 		but not to the host application.
 	</description>
 	<packaging>pom</packaging>
+
+	<properties>
+		<!-- correct paths of bundle directories -->
+		<app.core.bundledir>../../app/target/bundles-core</app.core.bundledir>
+		<app.plugin.bundledir>../../app/target/bundles</app.plugin.bundledir>
+
+		<osgi.copy.excludeTransitive>true</osgi.copy.excludeTransitive>
+	</properties>
 
 	<build>
 		<plugins>
@@ -32,7 +40,7 @@
 				</executions>
 				<configuration>
 					<outputDirectory>${app.core.bundledir}</outputDirectory>
-					<excludeTransitive>true</excludeTransitive>
+					<excludeTransitive>${osgi.copy.excludeTransitive}</excludeTransitive>
 					<overWriteSnapshots>true</overWriteSnapshots>
 					<overWriteIfNewer>true</overWriteIfNewer>
 				</configuration>

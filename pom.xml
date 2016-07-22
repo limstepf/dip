@@ -16,20 +16,14 @@
 		<!-- parent POMs -->
 		<module>pom-super</module>
 		<module>pom-osgi</module>
-		<module>pom-osgi-component</module>
-		<module>pom-osgi-dependency</module>
-		<module>pom-osgi-package</module>
+		<module>pom-osgi-bundle</module>
 
 		<!-- API and host application -->
 		<module>api</module>
 		<module>app</module>
 
-		<!-- OSGi bundles (system/core) -->
-		<module>felix</module>
-		<module>felix-gogo</module>
-
-		<!-- OSGi packages (wrapped/repackaged dependencies) -->
-		<module>org.ejml-0.29</module>
+		<!-- OSGi packages (copied/repackaged dependencies) -->
+		<module>third_party</module>
 
 		<!-- OSGi bundles (demo plugins) -->
 		<!--<module>awt-demo</module>-->

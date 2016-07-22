@@ -3,9 +3,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>ch.unifr.diva.dip</groupId>
-		<artifactId>dip-pom-osgi-component</artifactId>
+		<artifactId>dip-pom-osgi-bundle</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
-		<relativePath>../pom-osgi-component/pom.xml</relativePath>
+		<relativePath>../pom-osgi-bundle/pom.xml</relativePath>
 	</parent>
 
 	<groupId>ch.unifr.diva.dip</groupId>

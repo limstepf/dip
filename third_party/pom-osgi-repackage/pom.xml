@@ -5,17 +5,28 @@
 		<groupId>ch.unifr.diva.dip</groupId>
 		<artifactId>dip-pom-osgi</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
-		<relativePath>../pom-osgi/pom.xml</relativePath>
+		<relativePath>../../pom-osgi/pom.xml</relativePath>
 	</parent>
-	<artifactId>dip-pom-osgi-package</artifactId>
-	<name>DIVA DIP OSGi Package POM</name>
+	<artifactId>dip-pom-osgi-repackage</artifactId>
+	<name>DIVA DIP OSGi Repackage POM</name>
 	<description>
 		The DIVA DIP OSGi Package POM is a direct parent POM to create OSGi
 		bundles out of third party dependencies - that unfortunately aren't
-		packaged as OSGi bundles (yet) - by simply wrapping (or repackage)
-		them into a new jar.
+		packaged as OSGi bundles (yet) - by simply repackaging them into a
+		new jar.
 	</description>
 	<packaging>pom</packaging>
+
+	<properties>
+		<!-- correct paths of bundle directories -->
+		<app.core.bundledir>../../app/target/bundles-core</app.core.bundledir>
+		<app.plugin.bundledir>../../app/target/bundles</app.plugin.bundledir>
+
+		<!-- needs to be set to false in child POMs. This is set to true in here
+		s.t. this POM doesn't end up in the bundle directory itself. -->
+		<osgi.repackage.skip>true</osgi.repackage.skip>
+		<osgi.repackage.excludeTransitive>true</osgi.repackage.excludeTransitive>
+	</properties>
 
 	<build>
 		<plugins>
@@ -57,13 +68,13 @@
 							<type>${project.packaging}</type>
 						</artifactItem>
 					</artifactItems>
+					<skip>${osgi.repackage.skip}</skip>
 					<outputDirectory>${app.plugin.bundledir}</outputDirectory>
-					<excludeTransitive>true</excludeTransitive>
+					<excludeTransitive>${osgi.repackage.excludeTransitive}</excludeTransitive>
 					<overWriteSnapshots>true</overWriteSnapshots>
 					<overWriteIfNewer>true</overWriteIfNewer>
 				</configuration>
 			</plugin>
-
 		</plugins>
 	</build>
 
