@@ -1,7 +1,5 @@
-
 package ch.unifr.diva.dip.osgi;
 
-import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.osgi.OSGiServiceTracker.TrackerListener;
 import ch.unifr.diva.dip.utils.FxUtils;
 import javafx.collections.FXCollections;
@@ -11,49 +9,61 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Services monitor safe to be accessed from the JavaFX application thread.
+ *
+ * @param <T> interface of the declarative service.
  */
-public class OSGiServiceMonitor implements ServiceMonitor {
+public class OSGiServiceMonitor<T> implements ServiceMonitor<T> {
 
 	private static final Logger log = LoggerFactory.getLogger(HostServiceMonitor.class);
-	private final ProcessorTracker processorTracker;
-	private final ObservableList<Service<Processor>> processors;
+	private final ServiceTracker processorTracker;
+	private final ObservableList<Service<T>> services;
 
-	public OSGiServiceMonitor(OSGiServiceTracker<Processor> serviceTracker) {
-		processors = FXCollections.observableArrayList();
-		processorTracker = new ProcessorTracker();
+	/**
+	 * Creates a new OSGi service monitor.
+	 *
+	 * @param serviceTracker the OSGi service tracker of the service to monitor.
+	 */
+	public OSGiServiceMonitor(OSGiServiceTracker<T> serviceTracker) {
+		services = FXCollections.observableArrayList();
+		processorTracker = new ServiceTracker();
 		serviceTracker.addListener(processorTracker);
 	}
 
 	@Override
-	public ObservableList<Service<Processor>> processors() {
-		return processors;
+	public ObservableList<Service<T>> services() {
+		return services;
 	}
 
-	private class ProcessorTracker implements TrackerListener<Processor> {
+	/**
+	 * A service tracker.
+	 *
+	 * @param <T> interface of the declarative service.
+	 */
+	private class ServiceTracker<T> implements TrackerListener<T> {
 
 		@Override
-		public void onAdded(String pid, Processor service) {
+		public void onAdded(String pid, T service) {
 			FxUtils.run(() -> {
-				processors.add(new Service(pid, service));
+				services.add(new Service(pid, service));
 			});
 		}
 
 		@Override
-		public void onModified(String pid, Processor service) {
+		public void onModified(String pid, T service) {
 			FxUtils.run(() -> {
-				int index = processors.indexOf(pid);
+				int index = services.indexOf(pid);
 				if (index < 0) {
 					log.warn("failed to update service {}: invalid index.", pid);
 					return;
 				}
-				processors.set(index, new Service(pid, service));
+				services.set(index, new Service(pid, service));
 			});
 		}
 
 		@Override
-		public void onRemoved(String pid, Processor service) {
+		public void onRemoved(String pid, T service) {
 			FxUtils.run(() -> {
-				processors.remove(new Service(pid, service));
+				services.remove(new Service(pid, service));
 			});
 		}
 	}

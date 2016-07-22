@@ -21,8 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The ProcessorsWidget offers processors to be dragged into the Pipeline Editor.
- * TODO: a TreeView (level 1: bundle/category, level 2: processor) might work better here, eh?
+ * The ProcessorsWidget offers processors to be dragged into the Pipeline
+ * Editor. TODO: a TreeView (level 1: bundle/category, level 2: processor) might
+ * work better here, eh?
  */
 public class ProcessorsWidget extends AbstractWidget {
 
@@ -97,7 +98,7 @@ public class ProcessorsWidget extends AbstractWidget {
 		private void onDragOver(DragEvent e) {
 			final Dragboard db = e.getDragboard();
 
-		// accept drop here simply to indicate dragging, even if it results in
+			// accept drop here simply to indicate dragging, even if it results in
 			// a no-op (i.e. the dragging is aborted)
 			if (db.hasContent(OSGI_SERVICE_PROCESSOR)) {
 				e.acceptTransferModes(TransferMode.COPY);
@@ -137,7 +138,6 @@ public class ProcessorsWidget extends AbstractWidget {
 		}
 	}
 
-
 	public static class View extends VBox {
 
 		private final ListView<ServiceMonitor.Service<Processor>> listView = new ListView<>();
@@ -152,7 +152,7 @@ public class ProcessorsWidget extends AbstractWidget {
 			listView.setMaxHeight(Double.MAX_VALUE);
 			listView.setCellFactory((ListView<ServiceMonitor.Service<Processor>> param) -> new ProcessorListCell());
 
-			listView.setItems(services.processors());
+			listView.setItems(services.services());
 			this.getChildren().addAll(listView);
 		}
 	}

@@ -39,7 +39,7 @@ public class OSGiFramework {
 	private final Path bundleCacheDir;
 	private final OSGiBundleTracker bundleTracker;
 	private final OSGiServiceTracker<Processor> processorServiceTracker;
-	public final OSGiServiceMonitor services;
+	public final OSGiServiceMonitor<Processor> services;
 	public final HostServiceMonitor hostServices;
 
 	/**
@@ -272,7 +272,7 @@ public class OSGiFramework {
 	 */
 	public List<ServiceMonitor.Service<Processor>> getCompatibleProcessors(Collection<String> inputTypes, Collection<String> outputTypes) {
 		final List list = new ArrayList<>();
-		for (ServiceMonitor.Service<Processor> p : this.services.processors()) {
+		for (ServiceMonitor.Service<Processor> p : this.services.services()) {
 			final List<String> inputs = p.service.portTypes(p.service.inputs());
 			final List<String> outputs = p.service.portTypes(p.service.outputs());
 

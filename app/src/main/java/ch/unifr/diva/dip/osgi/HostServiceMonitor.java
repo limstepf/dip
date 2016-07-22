@@ -1,4 +1,3 @@
-
 package ch.unifr.diva.dip.osgi;
 
 import ch.unifr.diva.dip.api.services.Processor;
@@ -11,7 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Host Services monitor safe to be accessed from the JavaFX application thread.
+ * Host processor services monitor safe to be accessed from the JavaFX
+ * application thread.
  */
 public class HostServiceMonitor implements ServiceMonitor {
 
@@ -19,6 +19,9 @@ public class HostServiceMonitor implements ServiceMonitor {
 	private static final String DIP_HOST_SERVICES_PACKAGE = "ch.unifr.diva.dip.core.services";
 	private final ObservableList<Service<Processor>> processors;
 
+	/**
+	 * Creates a new host processor service monitor.
+	 */
 	public HostServiceMonitor() {
 		this.processors = FXCollections.observableArrayList();
 		String pid = "-1";
@@ -38,7 +41,7 @@ public class HostServiceMonitor implements ServiceMonitor {
 	}
 
 	@Override
-	public ObservableList<Service<Processor>> processors() {
+	public ObservableList<Service<Processor>> services() {
 		return this.processors;
 	}
 

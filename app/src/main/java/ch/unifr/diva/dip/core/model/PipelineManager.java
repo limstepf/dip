@@ -73,7 +73,7 @@ public class PipelineManager implements Modifiable, Localizable {
 	}
 
 	private void registerServiceListener() {
-		this.handler.osgi.services.processors().addListener(processorListener);
+		this.handler.osgi.services.services().addListener(processorListener);
 	}
 
 	private final ListChangeListener<? super Service<? extends Processor>> processorListener = (ListChangeListener.Change<? extends Service<? extends Processor>> c) -> {

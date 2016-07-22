@@ -1,17 +1,29 @@
 package ch.unifr.diva.dip.osgi;
 
-import ch.unifr.diva.dip.api.services.Processor;
 import javafx.collections.ObservableList;
 
 /**
  * Services monitor safe to be accessed from the JavaFX application thread.
+ *
+ * @param <T> interface of the declarative service.
  */
-public interface ServiceMonitor {
+public interface ServiceMonitor<T> {
 
-	public ObservableList<Service<Processor>> processors();
+	/**
+	 * Observable list of registered services.
+	 *
+	 * @return observable list of registered services.
+	 */
+	public ObservableList<Service<T>> services();
 
-	default Service<Processor> getService(String pid) {
-		for (Service<Processor> s : processors()) {
+	/**
+	 * Returns the requested service.
+	 *
+	 * @param pid PID of the service.
+	 * @return the requested service, or null if not available.
+	 */
+	default Service<T> getService(String pid) {
+		for (Service<T> s : services()) {
 			if (s.pid.equals(pid)) {
 				return s;
 			}
@@ -19,6 +31,12 @@ public interface ServiceMonitor {
 		return null;
 	}
 
+	/**
+	 * Checks whether a service is available, or not.
+	 *
+	 * @param pid PID of the service.
+	 * @return True if the service is available, False otherwise.
+	 */
 	default boolean isAvailable(String pid) {
 		return (getService(pid) != null);
 	}
@@ -30,9 +48,22 @@ public interface ServiceMonitor {
 	 */
 	public static class Service<T> {
 
+		/**
+		 * PID of the service.
+		 */
 		public final String pid;
+
+		/**
+		 * The service.
+		 */
 		public final T service;
 
+		/**
+		 * Creates a new service wrapper.
+		 *
+		 * @param pid PID of the service.
+		 * @param service the service.
+		 */
 		public Service(String pid, T service) {
 			this.pid = pid;
 			this.service = service;
@@ -55,4 +86,5 @@ public interface ServiceMonitor {
 			return this.pid.equals(other.pid);
 		}
 	}
+
 }

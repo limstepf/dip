@@ -4,7 +4,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- *
+ * OSGi service monitor tests.
  */
 public class ServiceMonitorTest {
 
@@ -21,7 +21,7 @@ public class ServiceMonitorTest {
 		HostServiceMonitor monitor = new HostServiceMonitor();
 		assertNotEquals(
 				"At least one host service must have been registered",
-				monitor.processors().size(),
+				monitor.services().size(),
 				0
 		);
 	}
