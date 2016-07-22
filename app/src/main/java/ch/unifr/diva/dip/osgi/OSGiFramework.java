@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,7 +82,6 @@ public class OSGiFramework {
 		startBundles(bundles);
 	}
 
-
 	/**
 	 * Stops this OSGi Framework.
 	 *
@@ -110,7 +110,6 @@ public class OSGiFramework {
 	public BundleContext getBundleContext() {
 		return context;
 	}
-
 
 	public Processor getProcessor(String pid) {
 		return processorServiceTracker.getService(pid);
@@ -259,6 +258,47 @@ public class OSGiFramework {
 				}
 				return j.toString();
 		}
+	}
+
+	/**
+	 * Compiles a list of compatible processors. A processor is considered
+	 * compatible if all input port and output port types occur at least once.
+	 * Anything more specific (like having a some port type multiple times)
+	 * isn't supported as of now.
+	 *
+	 * @param inputTypes required input port types.
+	 * @param outputTypes required output port types.
+	 * @return a list of compatible processors.
+	 */
+	public List<ServiceMonitor.Service<Processor>> getCompatibleProcessors(Collection<String> inputTypes, Collection<String> outputTypes) {
+		final List list = new ArrayList<>();
+		for (ServiceMonitor.Service<Processor> p : this.services.processors()) {
+			final List<String> inputs = p.service.portTypes(p.service.inputs());
+			final List<String> outputs = p.service.portTypes(p.service.outputs());
+
+			boolean compatible = true;
+			for (String in : inputTypes) {
+				if (!inputs.contains(in)) {
+					compatible = false;
+					break;
+				}
+				inputs.remove(in);
+			}
+			if (!compatible) {
+				continue;
+			}
+			for (String out : outputTypes) {
+				if (!outputs.contains(out)) {
+					compatible = false;
+					break;
+				}
+				outputs.remove(out);
+			}
+			if (compatible) {
+				list.add(p);
+			}
+		}
+		return list;
 	}
 
 }

@@ -61,7 +61,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * Repair project dialog.
  */
 public class RepairProjectDialog extends AbstractDialog {
 
@@ -588,7 +588,7 @@ public class RepairProjectDialog extends AbstractDialog {
 				}
 			}
 
-			final List<Service<Processor>> compatibleServices = handler.osgi.services.getCompatibleProcessors(
+			final List<Service<Processor>> compatibleServices = handler.osgi.getCompatibleProcessors(
 					inputs.values(),
 					outputs.values()
 			);
