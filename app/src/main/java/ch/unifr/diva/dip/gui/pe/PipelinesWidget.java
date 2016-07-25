@@ -5,6 +5,7 @@ import ch.unifr.diva.dip.core.ApplicationSettings;
 import ch.unifr.diva.dip.core.model.Pipeline;
 import ch.unifr.diva.dip.core.model.PipelineManager;
 import ch.unifr.diva.dip.core.ui.Localizable;
+import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import ch.unifr.diva.dip.gui.AbstractWidget;
 import ch.unifr.diva.dip.gui.dialogs.ErrorDialog;
 import ch.unifr.diva.dip.gui.layout.DraggableListCell;
@@ -226,8 +227,6 @@ public class PipelinesWidget extends AbstractWidget {
 		};
 		private Pipeline currentPipeline;
 
-
-
 		public PipelineCell(PipelineEditor editor, ToggleGroup group) {
 			this.editor = editor;
 			this.group = group;
@@ -236,7 +235,7 @@ public class PipelinesWidget extends AbstractWidget {
 			label.setMaxWidth(Double.MAX_VALUE);
 			textField.setOnKeyPressed(onEnterHandler);
 
-			final int d = ApplicationSettings.Stage.insets;
+			final int d = UIStrategyGUI.Stage.insets;
 			radioButton.setPadding(new Insets(0, d, 0, 0));
 			statusLabel.setPadding(new Insets(0, 0, 0, d));
 
@@ -282,7 +281,7 @@ public class PipelinesWidget extends AbstractWidget {
 
 			currentPipeline = item;
 
-			if (!empty && item!=null) {
+			if (!empty && item != null) {
 				group.setUserData(currentPipeline.id);
 
 				radioButton.setUserData(this.getItem().id);

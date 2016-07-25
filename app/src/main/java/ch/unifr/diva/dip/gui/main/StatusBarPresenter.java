@@ -1,6 +1,6 @@
 package ch.unifr.diva.dip.gui.main;
 
-import ch.unifr.diva.dip.core.ApplicationSettings;
+import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import ch.unifr.diva.dip.eventbus.events.StatusMessageEvent;
 import ch.unifr.diva.dip.eventbus.events.StatusWorkerEvent;
 import ch.unifr.diva.dip.gui.Presenter;
@@ -103,10 +103,10 @@ public class StatusBarPresenter implements Presenter {
 			t.stop();
 		}
 		final PauseTransition p = new PauseTransition(
-				Duration.millis(ApplicationSettings.Animations.displayDuration)
+				Duration.millis(UIStrategyGUI.Animation.displayDuration)
 		);
 		final FadeTransition f = new FadeTransition(
-				Duration.millis(ApplicationSettings.Animations.fadeOutDuration),
+				Duration.millis(UIStrategyGUI.Animation.fadeOutDuration),
 				node
 		);
 		f.setFromValue(1.0);
@@ -172,14 +172,14 @@ public class StatusBarPresenter implements Presenter {
 	 */
 	private void enableProgress(boolean enable) {
 		if (enable) {
-			final int ms = ApplicationSettings.Animations.fadeInDuration;
+			final int ms = UIStrategyGUI.Animation.fadeInDuration;
 			final FadeTransition fade = new FadeTransition(Duration.millis(ms), progress);
 			fade.setFromValue(0.4);
 			fade.setToValue(1.0);
 			fade.play();
 		} else {
 			progress.setProgress(0);
-			final int ms = ApplicationSettings.Animations.fadeOutDuration;
+			final int ms = UIStrategyGUI.Animation.fadeOutDuration;
 			final FadeTransition fade = new FadeTransition(Duration.millis(ms), progress);
 			fade.setFromValue(1.0);
 			fade.setToValue(0.4);

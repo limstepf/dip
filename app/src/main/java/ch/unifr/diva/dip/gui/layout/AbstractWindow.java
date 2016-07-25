@@ -1,6 +1,6 @@
 package ch.unifr.diva.dip.gui.layout;
 
-import ch.unifr.diva.dip.core.ApplicationSettings;
+import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import javafx.stage.Modality;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
@@ -30,8 +30,8 @@ public abstract class AbstractWindow extends AbstractStage {
 
 		stage().initStyle(StageStyle.DECORATED);
 		stage().initModality(Modality.WINDOW_MODAL);
-		stage().setMinWidth(ApplicationSettings.Stage.minWidth);
-		stage().setMinHeight(ApplicationSettings.Stage.minHeight);
+		stage().setMinWidth(UIStrategyGUI.Stage.minWidth);
+		stage().setMinHeight(UIStrategyGUI.Stage.minHeight);
 		root.getStyleClass().add("dip-window");
 	}
 

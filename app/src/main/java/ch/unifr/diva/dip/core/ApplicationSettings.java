@@ -81,48 +81,4 @@ public class ApplicationSettings {
 		chooser.setSelectedExtensionFilter(filter);
 	}
 
-	/**
-	 * Application-wide animation/transition settings.
-	 */
-	public static class Animations {
-
-		/**
-		 * Time in milliseconds to display auto-disappearing nodes.
-		 */
-		public static final int displayDuration = 5500;
-
-		/**
-		 * Time in milliseconds to fade out nodes.
-		 */
-		public static final int fadeOutDuration = 3000;
-
-		/**
-		 * Time in milliseconds to fade in nodes.
-		 */
-		public static final int fadeInDuration = fadeOutDuration / 4;
-	}
-
-	/**
-	 * Default stage/window settings.
-	 */
-	public static class Stage {
-
-		/**
-		 * Minimum width of a stage/window.
-		 */
-		public static final int minWidth = 480;
-
-		/**
-		 * Minimum height of a stage/window.
-		 */
-		public static final int minHeight = 360;
-
-		/**
-		 * Default insets spacing (or padding). If in doubt, use this global value
-		 * (e.g. for spacing between elements in a lane or what not) instead of
-		 * introducing yet another magic variable.
-		 */
-		public static final int insets = 5;
-	}
-
 }

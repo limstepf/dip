@@ -3,7 +3,7 @@ package ch.unifr.diva.dip.core.ui;
 import java.util.Scanner;
 
 /**
- * Error handler for the command line interface.
+ * UI strategy for the command line interface.
  */
 public class UIStrategyCLI implements UIStrategy, Localizable {
 

@@ -3,6 +3,7 @@ package ch.unifr.diva.dip.core;
 import ch.unifr.diva.dip.utils.FxUtils;
 import ch.unifr.diva.dip.api.utils.XmlUtils;
 import ch.unifr.diva.dip.core.model.PipelineLayoutStrategy;
+import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import ch.unifr.diva.dip.gui.pe.ConnectionView;
 import java.nio.file.Path;
 import javafx.scene.control.SplitPane;
@@ -127,8 +128,8 @@ public class UserSettings {
 	 * @param settings a PrimaryStage container to read the settings from.
 	 */
 	public static void restoreStage(Stage stage, PrimaryStage settings) {
-		stage.setMinWidth(ApplicationSettings.Stage.minWidth);
-		stage.setMinHeight(ApplicationSettings.Stage.minHeight);
+		stage.setMinWidth(UIStrategyGUI.Stage.minWidth);
+		stage.setMinHeight(UIStrategyGUI.Stage.minHeight);
 
 		// note: we can't set `stage.setWidth/stage.setHeight` since this will
 		// fuck up the splitPane and its divider positions, since somehow a
@@ -139,11 +140,11 @@ public class UserSettings {
 		// https://bugs.openjdk.java.net/browse/JDK-8115114
 		final Region root = (Region) stage.getScene().getRoot();
 
-		if (settings.width >= ApplicationSettings.Stage.minWidth) {
+		if (settings.width >= UIStrategyGUI.Stage.minWidth) {
 			//stage.setWidth(settings.width);
 			root.setPrefWidth(settings.width);
 		}
-		if (settings.height >= ApplicationSettings.Stage.minHeight) {
+		if (settings.height >= UIStrategyGUI.Stage.minHeight) {
 			//stage.setHeight(settings.height);
 			root.setPrefHeight(settings.height);
 		}

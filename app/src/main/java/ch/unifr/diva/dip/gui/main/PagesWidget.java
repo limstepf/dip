@@ -1,7 +1,6 @@
 package ch.unifr.diva.dip.gui.main;
 
 import ch.unifr.diva.dip.core.ApplicationHandler;
-import ch.unifr.diva.dip.core.ApplicationSettings;
 import ch.unifr.diva.dip.core.model.PipelineManager;
 import ch.unifr.diva.dip.eventbus.events.ProjectNotification;
 import ch.unifr.diva.dip.eventbus.events.ProjectRequest;
@@ -9,6 +8,7 @@ import ch.unifr.diva.dip.gui.AbstractWidget;
 import ch.unifr.diva.dip.gui.layout.DraggableListCell;
 import ch.unifr.diva.dip.core.model.ProjectPage;
 import ch.unifr.diva.dip.core.ui.Localizable;
+import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import com.google.common.eventbus.Subscribe;
 import java.util.ArrayList;
 import java.util.List;
@@ -186,11 +186,11 @@ public class PagesWidget extends AbstractWidget {
 			label.setMaxWidth(Double.MAX_VALUE);
 			textField.setOnKeyPressed(onEnterHandler);
 
-			final int d = ApplicationSettings.Stage.insets;
+			final int d = UIStrategyGUI.Stage.insets;
 			radioButton.setPadding(new Insets(0, d, 0, 0));
 
 			pipelineLabel.getStyleClass().add("dip-small");
-			vbox.setSpacing(ApplicationSettings.Stage.insets);
+			vbox.setSpacing(UIStrategyGUI.Stage.insets);
 			restoreVbox();
 
 			pane.setLeft(radioButton);
