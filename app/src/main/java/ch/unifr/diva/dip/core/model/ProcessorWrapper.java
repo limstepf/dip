@@ -7,12 +7,14 @@ import ch.unifr.diva.dip.api.parameters.Parameter;
 import ch.unifr.diva.dip.api.parameters.PersistentParameter;
 import ch.unifr.diva.dip.core.services.api.HostProcessor;
 import ch.unifr.diva.dip.api.services.Processor;
+import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.utils.Modifiable;
 import ch.unifr.diva.dip.utils.ModifiedProperty;
 import ch.unifr.diva.dip.core.services.api.HostProcessorContext;
 import ch.unifr.diva.dip.api.utils.ReflectionUtils;
 import ch.unifr.diva.dip.core.ui.Localizable;
+import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -209,6 +211,29 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	}
 
 	/**
+	 * Savely returns the processor's glyph, or the default one.
+	 *
+	 * @return the glyph (factory) of the processor.
+	 */
+	public NamedGlyph glyph() {
+		return glyph(this.processor());
+	}
+
+	/**
+	 * Savely returns a processor's glyph, or the default one.
+	 *
+	 * @param processor a processor.
+	 * @return the glyph (factory) of the processor.
+	 */
+	public static NamedGlyph glyph(Processor processor) {
+		if (processor == null || processor.glyph() == null) {
+			return UIStrategyGUI.Glyphs.defaultProcessor;
+		}
+
+		return processor.glyph();
+	}
+
+	/**
 	 * Returns the pid of the wrapped processor.
 	 *
 	 * @return the pid of the processor.
@@ -331,8 +356,8 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 
 	/**
 	 * Inits the wrapped processor. This signals the wrapped processor service
-	 * that it's ready to be fully initialized, meaning that all parameters
-	 * have been set/restored, and that ports are connected.
+	 * that it's ready to be fully initialized, meaning that all parameters have
+	 * been set/restored, and that ports are connected.
 	 */
 	protected void initProcessor() {
 		initProcessor(this.processor());
@@ -340,8 +365,8 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 
 	/**
 	 * Inits the wrapped processor. This signals the wrapped processor service
-	 * that it's ready to be fully initialized, meaning that all parameters
-	 * have been set/restored, and that ports are connected.
+	 * that it's ready to be fully initialized, meaning that all parameters have
+	 * been set/restored, and that ports are connected.
 	 *
 	 * @param processor the processor to be initialized.
 	 */
