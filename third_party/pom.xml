@@ -22,6 +22,26 @@
 		<module>felix</module>
 		<module>felix-gogo</module>
 
+		<!-- technically neither a copy, nor a repackage; but a (host) bundle.
+		Yet we're just wrapping some third party fonts to use as glyphs, so
+		here we are...
+		Note that we don't deploy them as OSGi bundles directly, but load them
+		as dependency in the APP, where we publish them to the OSGi framework,
+		s.t. the APP and all bundles/plugins can use these glyphs (just like we
+		do with the API).
+
+		Thus for new glyph modules we need to:
+
+			1) adjust `pom-super` to define the version,
+			2) adjust the POM of the APP to include it as a dependency,
+			3) similary adjust `pom-osgi-bundle` to include it as dep., and
+			4) make sure to use the `ch.unifr.diva.dip.glyphs` namespace for the
+			   class, since that's where APP will be looking for glyph classes
+			   by means of reflection (in order to publish them to the OSGi
+			   framework).
+		-->
+		<module>glyphs-materialdesignicons</module>
+
 		<!-- repackage as OSGi bundles. These dependencies are not OSGi bundles
 		yet, so we have to create and add the OSGi bundle manifest file and
 		repackage the dependency as a new jar file, before copying them over to

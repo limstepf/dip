@@ -11,7 +11,7 @@
 	<name>DIVA DIP OSGi Bundle POM</name>
 	<description>
 		The DIVA DIP OSGi Bundle POM is a direct parent POM to create OSGi
-		bundles from scratch. The configuration of the maven-bundle-plugin 
+		bundles from scratch. The configuration of the maven-bundle-plugin
 		might need to be modified/overwritten (e.g. to embed dependencies).
 	</description>
 	<packaging>pom</packaging>
@@ -20,6 +20,11 @@
 		<dependency>
 			<groupId>ch.unifr.diva.dip</groupId>
 			<artifactId>dip-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>ch.unifr.diva.dip</groupId>
+			<artifactId>glyphs-materialdesignicons</artifactId>
 		</dependency>
 
 		<dependency>
@@ -85,7 +90,7 @@
 							</goals>
 						</execution>
 					</executions>
-					
+
 					<configuration>
 						<artifactItems>
 							<artifactItem>
