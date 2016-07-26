@@ -14,7 +14,9 @@ import ch.unifr.diva.dip.api.parameters.XorParameter;
 import ch.unifr.diva.dip.api.services.ProcessableBase;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.services.Transmutable;
+import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.awt.tools.MatrixEditor.MatrixShapeParameter;
+import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import javafx.beans.InvalidationListener;
@@ -222,6 +224,11 @@ public class RankFilter extends ProcessableBase implements Transmutable {
 		deleteFile(context, MATRIX_FILE);
 		resetOutputs();
 		resetLayer(context);
+	}
+
+	@Override
+	public NamedGlyph glyph() {
+		return MaterialDesignIcons.SORT;
 	}
 
 	private final BooleanProperty transmuteProperty = new SimpleBooleanProperty();

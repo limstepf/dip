@@ -12,6 +12,8 @@ import ch.unifr.diva.dip.api.parameters.ExpParameter;
 import ch.unifr.diva.dip.api.services.ProcessableBase;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.services.Transmutable;
+import ch.unifr.diva.dip.api.ui.NamedGlyph;
+import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
 import java.util.Arrays;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
@@ -330,6 +332,11 @@ public class KernelSeparator extends ProcessableBase implements Transmutable {
 	@Override
 	public void reset(ProcessorContext context) {
 		resetOutputs();
+	}
+
+	@Override
+	public NamedGlyph glyph() {
+		return MaterialDesignIcons.MATRIX;
 	}
 
 	private final BooleanProperty transmuteProperty = new SimpleBooleanProperty();

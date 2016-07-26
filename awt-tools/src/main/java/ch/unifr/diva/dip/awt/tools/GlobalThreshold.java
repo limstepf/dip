@@ -12,6 +12,8 @@ import ch.unifr.diva.dip.api.services.ProcessableBase;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.imaging.ops.GlobalThresholdOp;
 import ch.unifr.diva.dip.api.services.Transmutable;
+import ch.unifr.diva.dip.api.ui.NamedGlyph;
+import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import javafx.beans.InvalidationListener;
@@ -218,6 +220,11 @@ public class GlobalThreshold extends ProcessableBase implements Transmutable {
 		deleteFile(context, STORAGE_FILE);
 		resetOutputs();
 		resetLayer(context);
+	}
+
+	@Override
+	public NamedGlyph glyph() {
+		return MaterialDesignIcons.CONTRAST_BOX;
 	}
 
 	private final BooleanProperty transmuteProperty = new SimpleBooleanProperty();

@@ -6,7 +6,9 @@ import ch.unifr.diva.dip.core.services.api.HostProcessor;
 import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.components.Port;
+import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.core.model.ProjectPage;
+import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -87,6 +89,11 @@ public class PageGenerator implements HostProcessor {
 	@Override
 	public String name() {
 		return name;
+	}
+
+	@Override
+	public NamedGlyph glyph() {
+		return MaterialDesignIcons.CUBE_SEND;
 	}
 
 	@Override

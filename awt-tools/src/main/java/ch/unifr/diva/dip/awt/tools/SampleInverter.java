@@ -18,6 +18,8 @@ import ch.unifr.diva.dip.api.parameters.IntegerSliderParameter;
 import ch.unifr.diva.dip.api.parameters.TextParameter;
 import ch.unifr.diva.dip.api.parameters.XorParameter;
 import ch.unifr.diva.dip.api.services.Transmutable;
+import ch.unifr.diva.dip.api.ui.NamedGlyph;
+import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -405,6 +407,11 @@ public class SampleInverter extends ProcessableBase implements Transmutable {
 		deleteFile(context, STORAGE_MAT);
 		resetOutputs();
 		resetLayer(context);
+	}
+
+	@Override
+	public NamedGlyph glyph() {
+		return MaterialDesignIcons.INVERT_COLORS;
 	}
 
 	private final BooleanProperty transmuteProperty = new SimpleBooleanProperty();

@@ -19,6 +19,8 @@ import ch.unifr.diva.dip.api.parameters.LabelParameter;
 import ch.unifr.diva.dip.api.services.ProcessableBase;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.services.Transmutable;
+import ch.unifr.diva.dip.api.ui.NamedGlyph;
+import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
 import java.awt.image.BufferedImage;
 import java.util.Map;
 import javafx.beans.InvalidationListener;
@@ -445,6 +447,11 @@ public class ConvolutionFilter extends ProcessableBase implements Transmutable {
 		deleteFile(context, MATRIX_FILE);
 		resetOutputs();
 		resetLayer(context);
+	}
+
+	@Override
+	public NamedGlyph glyph() {
+		return MaterialDesignIcons.BLUR;
 	}
 
 	private final BooleanProperty transmuteProperty = new SimpleBooleanProperty();

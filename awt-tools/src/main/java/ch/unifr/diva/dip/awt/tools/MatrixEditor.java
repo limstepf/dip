@@ -15,6 +15,8 @@ import ch.unifr.diva.dip.api.parameters.IntegerParameter;
 import ch.unifr.diva.dip.api.parameters.TextParameter;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.services.ProcessorBase;
+import ch.unifr.diva.dip.api.ui.NamedGlyph;
+import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
 import javafx.beans.InvalidationListener;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
@@ -185,6 +187,11 @@ public class MatrixEditor extends ProcessorBase {
 			final BooleanMatrix bmat = this.matrix.get().getBooleanMatrix();
 			this.output_boolean.setOutput(bmat);
 		}
+	}
+
+	@Override
+	public NamedGlyph glyph() {
+		return MaterialDesignIcons.MATRIX;
 	}
 
 }

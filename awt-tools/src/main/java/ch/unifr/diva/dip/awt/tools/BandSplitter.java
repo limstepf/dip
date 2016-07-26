@@ -13,6 +13,8 @@ import ch.unifr.diva.dip.api.imaging.BufferedMatrix;
 import ch.unifr.diva.dip.api.imaging.SimpleColorModel;
 import ch.unifr.diva.dip.api.imaging.ops.BandExtractOp;
 import ch.unifr.diva.dip.api.imaging.ops.ColorBandVisualizationOp;
+import ch.unifr.diva.dip.api.ui.NamedGlyph;
+import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.util.ArrayList;
@@ -513,6 +515,11 @@ public class BandSplitter extends ProcessableBase implements Transmutable {
 		resetOutputs();
 		resetLayer(context);
 		context.objects.clear();
+	}
+
+	@Override
+	public NamedGlyph glyph() {
+		return MaterialDesignIcons.BUFFER;
 	}
 
 	private final BooleanProperty transmuteProperty = new SimpleBooleanProperty();

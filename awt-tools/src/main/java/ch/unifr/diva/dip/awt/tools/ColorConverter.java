@@ -11,6 +11,8 @@ import ch.unifr.diva.dip.api.services.Transmutable;
 import ch.unifr.diva.dip.api.imaging.BufferedMatrix;
 import ch.unifr.diva.dip.api.imaging.SimpleColorModel;
 import ch.unifr.diva.dip.api.imaging.ops.ColorConvertOp;
+import ch.unifr.diva.dip.api.ui.NamedGlyph;
+import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -319,6 +321,11 @@ public class ColorConverter extends ProcessableBase implements Transmutable {
 			deleteFile(context, oc.STORAGE_FILE);
 		}
 		resetOutputs();
+	}
+
+	@Override
+	public NamedGlyph glyph() {
+		return MaterialDesignIcons.PALETTE;
 	}
 
 	private final BooleanProperty transmuteProperty = new SimpleBooleanProperty();
