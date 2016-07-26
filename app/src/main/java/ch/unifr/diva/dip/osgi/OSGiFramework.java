@@ -122,16 +122,6 @@ public class OSGiFramework {
 	}
 
 	/**
-	 * Returns a {@code Processor} service.
-	 *
-	 * @param pid PID of the processor.
-	 * @return the {@code Processor} service.
-	 */
-	public Processor getProcessor(String pid) {
-		return processorServiceTracker.getService(pid);
-	}
-
-	/**
 	 * Creates and starts an embedded OSGi Framework instance.
 	 *
 	 * @param systemPackages List of extra system packages which the system
@@ -274,6 +264,16 @@ public class OSGiFramework {
 				}
 				return j.toString();
 		}
+	}
+
+	/**
+	 * Returns a {@code Processor} service.
+	 *
+	 * @param pid PID of the processor.
+	 * @return the {@code Processor} service.
+	 */
+	public Processor getProcessor(String pid) {
+		return processorServiceTracker.getService(pid);
 	}
 
 	/**

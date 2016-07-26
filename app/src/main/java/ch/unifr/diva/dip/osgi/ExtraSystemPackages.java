@@ -27,9 +27,16 @@ public class ExtraSystemPackages {
 					findPackages("ch.unifr.diva.dip.api")
 			),
 			/**
-			 * Export JavaFx packages. While the Java standard library is already
-			 * exposed to the OSGi framework, the JavaFx packages are not. So we
-			 * have to export them explicitly.
+			 * Export glyph fonts.
+			 */
+			new SystemPackageBundle(
+					"1.0.0",
+					findPackages("ch.unifr.diva.dip.glyphs")
+			),
+			/**
+			 * Export JavaFx packages. While the Java standard library is
+			 * already exposed to the OSGi framework, the JavaFx packages are
+			 * not. So we have to export them explicitly.
 			 */
 			new SystemPackageBundle(
 					"2.2.0",
