@@ -45,6 +45,24 @@
 	-fx-opacity: 0.4;
 }
 
+.dip-glyph {
+}
+
+.dip-hover-effect-disabled,
+.dip-hover-effect {
+	-fx-text-fill: linear-gradient(to bottom,
+            ladder(
+                derive(-fx-base,-16%),
+                derive(-fx-base,-8%) 75%,
+                derive(-fx-base,-4%) 80%
+            ),
+            derive(-fx-base,-24%));
+}
+
+.dip-hover-effect:hover {
+	-fx-text-fill: inherit;
+}
+
 .dip-title {
 	-fx-font-weight: 900;
 	-fx-padding: 0 0 2em 0;
@@ -56,6 +74,10 @@
 .label.dip-small {
 	-fx-text-fill: -dip-faint;
 }
+.cell:focused:selected .label.dip-small {
+	-fx-text-fill: white;
+}
+
 .button.dip-small {
     -fx-padding: 0.166667em 0.333333em 0.166667em 0.333333em;
 }
