@@ -6,6 +6,7 @@ import ch.unifr.diva.dip.api.components.Port;
 import ch.unifr.diva.dip.api.components.ProcessorContext;
 import ch.unifr.diva.dip.api.datatypes.DataType;
 import ch.unifr.diva.dip.api.parameters.Parameter;
+import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.api.utils.L10n;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -158,6 +159,15 @@ public interface Processor {
 	 * @return the name of the processor.
 	 */
 	public String name();
+
+	/**
+	 * Returns the glyph of the processor.
+	 *
+	 * @return the glyph of the processor, or null (for no special glyph).
+	 */
+	default NamedGlyph glyph() {
+		return null;
+	}
 
 	/**
 	 * Returns the parameters of the processor.
