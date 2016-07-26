@@ -41,6 +41,7 @@
 			   framework).
 		-->
 		<module>glyphs-materialdesignicons</module>
+		<module>glyphs-fontawesome</module>
 
 		<!-- repackage as OSGi bundles. These dependencies are not OSGi bundles
 		yet, so we have to create and add the OSGi bundle manifest file and
