@@ -1,4 +1,3 @@
-
 package ch.unifr.diva.dip.gui.editor;
 
 import ch.unifr.diva.dip.core.ui.Localizable;
@@ -9,12 +8,16 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 /**
- * Layers widget.
+ * Layers widget. The layers widget displays the processors of a
+ * {@code RunnablePipeline} ordered/grouped by the stages of the pipeline.
  */
 public class LayersWidget extends AbstractWidget implements Localizable {
 
 	private final LayerTreeView view;
 
+	/**
+	 * Creates a new layers widget.
+	 */
 	public LayersWidget() {
 		super();
 
@@ -23,6 +26,11 @@ public class LayersWidget extends AbstractWidget implements Localizable {
 		setTitle(localize("pipeline"));
 	}
 
+	/**
+	 * Sets the root tree item of the layers widget.
+	 *
+	 * @param root the new root tree item.
+	 */
 	public void setRoot(TreeItem<Layer> root) {
 		this.view.setRoot(root);
 	}
@@ -50,4 +58,5 @@ public class LayersWidget extends AbstractWidget implements Localizable {
 			this.treeView.setRoot(root);
 		}
 	}
+
 }

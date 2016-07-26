@@ -1,15 +1,21 @@
 package ch.unifr.diva.dip.gui.editor;
 
+import ch.unifr.diva.dip.api.ui.Glyph;
+import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
+import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TreeCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 
 /**
- * Layer tree cell.
+ * Layer tree cell. Used by the LayersWidget that displays the processors of a
+ * {@code RunnablePipeline} ordered/grouped by the stages of the pipeline.
  */
 public class LayerTreeCell extends TreeCell<Layer> {
 
@@ -19,6 +25,9 @@ public class LayerTreeCell extends TreeCell<Layer> {
 	private final RadioButton visibleButton;
 	private Layer currentItem;
 
+	/**
+	 * Creates a new layer tree cell.
+	 */
 	public LayerTreeCell() {
 		this.vbox = new VBox();
 		this.title = new Label();
@@ -41,6 +50,37 @@ public class LayerTreeCell extends TreeCell<Layer> {
 		return (item instanceof LayerGroup);
 	}
 
+	private Glyph glyph;
+
+	private void setGlyph(Layer item, boolean empty) {
+		if (empty || item.getHiddenGlyph() == null) {
+			glyph = null;
+			this.focusedProperty().removeListener(glyphListener);
+			this.selectedProperty().removeListener(glyphListener);
+		} else {
+			glyph = UIStrategyGUI.newGlyph(item.getHiddenGlyph(), Glyph.Size.MEDIUM);
+			BorderPane.setAlignment(glyph, Pos.TOP_CENTER);
+			BorderPane.setMargin(glyph, new Insets(0, UIStrategyGUI.Stage.insets, 0, -10));
+			this.focusedProperty().addListener(glyphListener);
+			this.selectedProperty().addListener(glyphListener);
+		}
+
+		this.pane.setLeft(glyph);
+	}
+
+	private final InvalidationListener glyphListener = (c) -> updateColor();
+
+	private void updateColor() {
+		if (glyph == null) {
+			return;
+		}
+		if (isFocused() || isSelected()) {
+			glyph.setColor(Color.WHITE);
+		} else {
+			glyph.setColor(UIStrategyGUI.Colors.accent);
+		}
+	}
+
 	@Override
 	public void updateItem(Layer item, boolean empty) {
 		super.updateItem(item, empty);
@@ -51,6 +91,8 @@ public class LayerTreeCell extends TreeCell<Layer> {
 			visibleButton.selectedProperty().unbindBidirectional(currentItem.visibleProperty());
 			pane.disableProperty().unbind();
 		}
+
+		setGlyph(item, empty);
 
 		if (!empty) {
 			currentItem = item;
@@ -63,4 +105,5 @@ public class LayerTreeCell extends TreeCell<Layer> {
 			setGraphic(pane);
 		}
 	}
+
 }

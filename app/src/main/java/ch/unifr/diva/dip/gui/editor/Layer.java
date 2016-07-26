@@ -1,5 +1,6 @@
 package ch.unifr.diva.dip.gui.editor;
 
+import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import java.util.List;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -42,7 +43,28 @@ public interface Layer {
 		return nameProperty().get();
 	}
 
+	/**
+	 * Returns the "hidden" name of the layer. The "hidden" name of a layer is
+	 * not necessarily the layer's own name. If the parent layer group is
+	 * hidden, then the name is either the parents name (if this layer's name is
+	 * the empty string), or the parents name get's prepended to this layer's
+	 * name (if not the empty string).
+	 *
+	 * @return the "hidden" name. Should be use to display the layer's name
+	 * instead of directly calling {@code getName()}.
+	 */
 	public String getHiddenName();
+
+	public void setGlyph(NamedGlyph glyph);
+
+	/**
+	 * Returns the glyph of the layer.
+	 *
+	 * @return the glyph of the layer, or null (for no glyph).
+	 */
+	public NamedGlyph getGlyph();
+
+	public NamedGlyph getHiddenGlyph();
 
 	BooleanProperty visibleProperty();
 

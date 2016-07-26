@@ -98,6 +98,7 @@ public class RunnableProcessor extends ProcessorWrapper {
 		// transmutable processor might have changed its name once being fully
 		// initialized
 		this.layer.setName(this.processor().name());
+		this.layer.setGlyph(RunnableProcessor.glyph(this.processor()));
 		this.layer.setHideGroupMode(LayerGroup.HideGroupMode.AUTO);
 		this.layer.layerExtensions().add(new ProcessorLayerExtension(this));
 		this.updateState();

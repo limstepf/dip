@@ -1,4 +1,3 @@
-
 package ch.unifr.diva.dip.gui.editor;
 
 import javafx.scene.Node;
@@ -8,5 +7,10 @@ import javafx.scene.Node;
  */
 public interface LayerExtension {
 
+	/**
+	 * Returns the component of the layer extension.
+	 *
+	 * @return the component (or view) of the layer extension.
+	 */
 	public Node getComponent();
 }

@@ -20,6 +20,14 @@ import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.control.TreeItem;
 
+/**
+ * A layer group. A layer group has other layers as children.
+ *
+ * <p>
+ * This class implements {@code EditorLayerGroup} to offer save access to OSGi
+ * services (or usage from any other thread for that matter). All methods of
+ * this interface must be executed on the JavaFx application thread!
+ */
 public class LayerGroup extends LayerBase implements EditorLayerGroup {
 
 	/**
@@ -47,14 +55,29 @@ public class LayerGroup extends LayerBase implements EditorLayerGroup {
 	private final Group group = new Group();
 	private final ListChangeListener<? super Layer> listListener;
 
+	/**
+	 * Creates a new, unnamed layer group.
+	 */
 	public LayerGroup() {
 		this("");
 	}
 
+	/**
+	 * Creates a new layer group.
+	 *
+	 * @param name the name of the layer group.
+	 */
 	public LayerGroup(String name) {
 		this(name, true, true);
 	}
 
+	/**
+	 * Creates a new layer group.
+	 *
+	 * @param name the name of the layer group.
+	 * @param visible direct/the layer's own visibility of the layer group.
+	 * @param passiveVisible indirect/inherited visibility of the layer group.
+	 */
 	public LayerGroup(String name, boolean visible, boolean passiveVisible) {
 		super(name, visible, passiveVisible);
 
@@ -119,9 +142,9 @@ public class LayerGroup extends LayerBase implements EditorLayerGroup {
 
 		// TODO: can't we find a better invariant? It's a bit tricky to know if the parent
 		// group switches hideGroup if set to AUTO...
-		if ((getParent() != null &&
-				!getParent().getHideGroupMode().equals(LayerGroup.HideGroupMode.NEVER)) ||
-				wasHideGroup != isHideGroup()) {
+		if ((getParent() != null
+				&& !getParent().getHideGroupMode().equals(LayerGroup.HideGroupMode.NEVER))
+				|| wasHideGroup != isHideGroup()) {
 			this.updateHideGroupParent();
 		}
 
@@ -170,14 +193,29 @@ public class LayerGroup extends LayerBase implements EditorLayerGroup {
 		}
 	}
 
+	/**
+	 * The hide group mode property.
+	 *
+	 * @return the hide group mode property.
+	 */
 	public final ObjectProperty<HideGroupMode> hideGroupModeProperty() {
 		return this.hideGroupModeProperty;
 	}
 
+	/**
+	 * Returns the hide group mode.
+	 *
+	 * @return the hide group mode.
+	 */
 	public final HideGroupMode getHideGroupMode() {
 		return this.hideGroupModeProperty().get();
 	}
 
+	/**
+	 * Sets the hide group mode.
+	 *
+	 * @param value the new hide group mode.
+	 */
 	public final void setHideGroupMode(HideGroupMode value) {
 		this.hideGroupModeProperty().set(value);
 	}
@@ -195,14 +233,30 @@ public class LayerGroup extends LayerBase implements EditorLayerGroup {
 		}
 	}
 
+	/**
+	 * The hide group property. Might be set/change automatically, depending on
+	 * the hideGroupMode.
+	 *
+	 * @return the hide group property.
+	 */
 	public final ReadOnlyBooleanProperty hideGroupProperty() {
 		return this.hideGroupProperty;
 	}
 
+	/**
+	 * Checks whether the layer group is hidden or not.
+	 *
+	 * @return True if the layer group is hidden, false otherwise.
+	 */
 	public final boolean isHideGroup() {
 		return hideGroupProperty.get();
 	}
 
+	/**
+	 * Returns the children of the layer group.
+	 *
+	 * @return the children of the layer group.
+	 */
 	public ObservableList<Layer> getChildren() {
 		return this.children;
 	}

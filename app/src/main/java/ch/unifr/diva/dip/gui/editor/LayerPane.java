@@ -1,4 +1,3 @@
-
 package ch.unifr.diva.dip.gui.editor;
 
 import ch.unifr.diva.dip.api.components.EditorLayerPane;
@@ -12,24 +11,41 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.Pane;
 
 /**
- * A LayerPane (leaf) is a Layer. It implements EditorLayerPane to offer
- * save access to OSGi services (or usage from any other thread for that
- * matter). All such methods must be executed on the JavaFx application thread!
+ * A layer pane (leaf). A layer pane has JavaFX nodes as children, but can be
+ * considered a leaf in terms of layers.
+ *
+ * <p>
+ * This class implements {@code EditorLayerPane} to offer save access to OSGi
+ * services (or usage from any other thread for that matter). All methods of
+ * this interface must be executed on the JavaFx application thread!
  */
 public class LayerPane extends LayerBase implements EditorLayerPane {
 
-
 	private final Pane pane;
-	// TODO: write extensive listener to auto catch modifications
 
+	/**
+	 * Creates a new, unnamed layer pane.
+	 */
 	public LayerPane() {
 		this("");
 	}
 
+	/**
+	 * Creates a new layer pane.
+	 *
+	 * @param name the name of the layer pane.
+	 */
 	public LayerPane(String name) {
 		this(name, true, true);
 	}
 
+	/**
+	 * Creates a new layer pane.
+	 *
+	 * @param name the name of the layer pane.
+	 * @param visible direct/the layer's own visibility of the layer pane.
+	 * @param passiveVisible indirect/inherited visibility of the layer pane.
+	 */
 	public LayerPane(String name, boolean visible, boolean passiveVisible) {
 		super(name, visible, passiveVisible);
 
@@ -75,6 +91,11 @@ public class LayerPane extends LayerBase implements EditorLayerPane {
 		}
 	}
 
+	/**
+	 * Returns the children of the layer pane.
+	 *
+	 * @return the children of the layer pane.
+	 */
 	public ObservableList<Node> getChildren() {
 		return this.pane.getChildren();
 	}

@@ -1,6 +1,7 @@
 package ch.unifr.diva.dip.gui.editor;
 
 import ch.unifr.diva.dip.api.components.EditorLayer;
+import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.utils.FxUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,9 +19,12 @@ import javafx.scene.control.TreeItem;
 import org.slf4j.LoggerFactory;
 
 /**
- * Layer base class. It implements EditorLayer to offer save access to OSGi
- * services (or usage from any other thread for that matter). All such methods
- * must be executed on the JavaFx application thread!
+ * Layer base class.
+ *
+ * <p>
+ * This class implements {@code EditorLayer} to offer save access to OSGi
+ * services (or usage from any other thread for that matter). All methods of
+ * this interface must be executed on the JavaFx application thread!
  */
 public abstract class LayerBase implements Layer, EditorLayer {
 
@@ -35,6 +39,7 @@ public abstract class LayerBase implements Layer, EditorLayer {
 	protected final TreeItem<Layer> treeItem;
 	protected ObjectProperty<LayerGroup> parentProperty;
 	protected final StringProperty nameProperty;
+	protected NamedGlyph glyph;
 	protected final BooleanProperty visibleProperty;
 	protected final ChangeListener<? super Boolean> visibleListener = (ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
 		this.onVisibileChanged(newValue);
@@ -43,6 +48,13 @@ public abstract class LayerBase implements Layer, EditorLayer {
 	protected final BooleanProperty onModifiedProperty;
 	protected final List<LayerExtension> layerExtensions;
 
+	/**
+	 * Creates a new layer.
+	 *
+	 * @param name the name of the layer.
+	 * @param visible direct/the layer's own visibility of the layer.
+	 * @param passiveVisible indirect/inherited visibility of the layer.
+	 */
 	public LayerBase(String name, boolean visible, boolean passiveVisible) {
 		this.treeItem = new TreeItem<>(this);
 		this.parentProperty = new SimpleObjectProperty<>(null);
@@ -76,10 +88,6 @@ public abstract class LayerBase implements Layer, EditorLayer {
 		while (parent != null) {
 			if (!parent.isHideGroup()) {
 				break;
-			}
-			final int idx = parent.getChildren().indexOf(this);
-			if (idx != 0) {
-				return this.layerExtensions();
 			}
 			layers.add(parent);
 			parent = parent.getParent();
@@ -119,6 +127,33 @@ public abstract class LayerBase implements Layer, EditorLayer {
 	@Override
 	public BooleanProperty passiveVisibleProperty() {
 		return this.passiveVisibleProperty;
+	}
+
+	@Override
+	public void setGlyph(NamedGlyph glyph) {
+		this.glyph = glyph;
+	}
+
+	@Override
+	public NamedGlyph getGlyph() {
+		return this.glyph;
+	}
+
+	@Override
+	public NamedGlyph getHiddenGlyph() {
+		if (this.getParent() == null) {
+			return this.glyph;
+		}
+
+		if (!this.getParent().isHideGroup()) {
+			return this.glyph;
+		}
+
+		if (this.glyph == null) {
+			return this.getParent().getHiddenGlyph();
+		}
+
+		return this.glyph;
 	}
 
 	@Override

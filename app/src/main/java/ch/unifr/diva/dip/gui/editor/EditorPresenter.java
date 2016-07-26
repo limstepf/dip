@@ -98,9 +98,7 @@ public class EditorPresenter implements Presenter {
 		if (page.getPipeline() != null) {
 			for (Pipeline.Stage<RunnableProcessor> stage : page.getPipeline().stages()) {
 				final LayerGroup stageGroup = new LayerGroup(stage.title());
-				if (stage.number == 1) {
-					stageGroup.setHideGroupMode(LayerGroup.HideGroupMode.AUTO);
-				}
+
 				for (RunnableProcessor p : stage.processors) {
 					stageGroup.getChildren().add(p.layer());
 				}
