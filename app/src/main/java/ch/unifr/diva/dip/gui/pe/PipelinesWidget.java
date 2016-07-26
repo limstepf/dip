@@ -42,7 +42,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Pipeline management widget.
+ * Pipeline management widget. Used in the pipeline editor to manage the
+ * pipelines (select, create, delete, ...).
  */
 public class PipelinesWidget extends AbstractWidget {
 
@@ -51,6 +52,12 @@ public class PipelinesWidget extends AbstractWidget {
 	private final PipelineEditor editor;
 	private final View view;
 
+	/**
+	 * Creates a new pipelines widget.
+	 *
+	 * @param handler the application handler.
+	 * @param editor the pipeline editor.
+	 */
 	public PipelinesWidget(ApplicationHandler handler, PipelineEditor editor) {
 		this.handler = handler;
 		this.editor = editor;
