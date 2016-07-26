@@ -1,6 +1,7 @@
 package ch.unifr.diva.dip.gui.pe;
 
 import ch.unifr.diva.dip.core.model.ProcessorWrapper;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 
 /**
@@ -11,7 +12,7 @@ public class ProcessorViewLeftRight extends ProcessorView {
 
 	protected final VBox inputPane = new VBox();
 	protected final VBox outputPane = new VBox();
-	protected final VBox infoPane = new VBox();
+	protected final BorderPane infoPane = new BorderPane();
 
 	public ProcessorViewLeftRight(PipelineEditor editor, ProcessorWrapper wrapper) {
 		super(editor, wrapper);
@@ -24,7 +25,7 @@ public class ProcessorViewLeftRight extends ProcessorView {
 
 		this.setCenter(infoPane);
 		infoPane.getStyleClass().add("dip-processor-leftright");
-		infoPane.getChildren().addAll(title);
+		infoPane.setTop(title);
 		setupDraggable(infoPane);
 
 		this.setRight(outputPane);
@@ -50,10 +51,14 @@ public class ProcessorViewLeftRight extends ProcessorView {
 
 	@Override
 	protected void showParameters(boolean show) {
+		final ClosedParameterView closedView = this.closedParameterView();
 		if (show) {
-			infoPane.getChildren().add(this.parameterView().node());
+			infoPane.setCenter(this.parameterView().node());
 		} else {
-			infoPane.getChildren().remove(this.parameterView().node());
+			infoPane.setCenter(null);
+			if (closedView != null) {
+				infoPane.setCenter(closedView.node());
+			}
 		}
 	}
 

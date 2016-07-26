@@ -6,7 +6,10 @@ import ch.unifr.diva.dip.api.parameters.Parameter;
 import ch.unifr.diva.dip.api.parameters.PersistentParameter;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.services.Transmutable;
+import ch.unifr.diva.dip.api.ui.Glyph;
 import ch.unifr.diva.dip.core.model.ProcessorWrapper;
+import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
+import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
 import ch.unifr.diva.dip.gui.layout.FormGridPane;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +21,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -26,6 +30,7 @@ import javafx.scene.input.DataFormat;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 
 /**
  * Processor view base class.
@@ -41,8 +46,9 @@ public abstract class ProcessorView extends BorderPane {
 	protected final List<PortView> inputPorts;
 	protected final List<PortView> outputPorts;
 
-	protected final Label title;
-	private ParameterView parameterView;
+	protected final HBox title;
+	protected ParameterView parameterView;
+	protected ClosedParameterView closedParameterView;
 	protected double anchorX;
 	protected double anchorY;
 	protected Node minimalNodeX;
@@ -98,7 +104,13 @@ public abstract class ProcessorView extends BorderPane {
 
 		this.getStyleClass().add("dip-processor");
 		this.setBackground(Background.EMPTY);
-		this.title = new Label(wrapper.processor().name());
+
+		final Glyph glyph = UIStrategyGUI.newGlyph(this.wrapper.glyph(), Glyph.Size.NORMAL);
+		final Label label = new Label(wrapper.processor().name());
+		this.title = new HBox();
+		this.title.setSpacing(UIStrategyGUI.Stage.insets);
+		this.title.setAlignment(Pos.CENTER_LEFT);
+		this.title.getChildren().setAll(glyph, label);
 	}
 
 	/**
@@ -106,6 +118,7 @@ public abstract class ProcessorView extends BorderPane {
 	 * are setup, so at the end of the constructor of a sub-class.
 	 */
 	protected void setupEditingListeners() {
+		showParameters(wrapper.isEditing());
 		this.editingProperty.addListener(editingListener);
 		this.editingProperty.set(wrapper.isEditing());
 	}
@@ -157,6 +170,18 @@ public abstract class ProcessorView extends BorderPane {
 
 		updatePorts();
 	};
+
+	protected ClosedParameterView closedParameterView() {
+		if (!this.hasParameters()) {
+			return null;
+		}
+
+		if (this.closedParameterView == null) {
+			this.closedParameterView = new ClosedParameterView();
+		}
+
+		return this.closedParameterView;
+	}
 
 	protected ParameterView parameterView() {
 		if (this.parameterView == null) {
@@ -282,6 +307,9 @@ public abstract class ProcessorView extends BorderPane {
 
 	protected void onMouseEntered(MouseEvent e) {
 		editor.setCursor(Cursor.OPEN_HAND);
+		if (this.closedParameterView != null) {
+			this.closedParameterView.glyph.disabledHoverEffectProperty().set(false);
+		}
 	}
 
 	protected void onMousePressed(MouseEvent e) {
@@ -352,6 +380,13 @@ public abstract class ProcessorView extends BorderPane {
 
 	protected void onMouseExited(MouseEvent e) {
 		editor.setCursor(Cursor.DEFAULT);
+		if (this.closedParameterView != null) {
+			this.closedParameterView.glyph.disabledHoverEffectProperty().set(true);
+		}
+	}
+
+	protected boolean hasParameters() {
+		return wrapper().processor().parameters().size() > 0;
 	}
 
 	// parameter view factory
@@ -362,6 +397,34 @@ public abstract class ProcessorView extends BorderPane {
 
 	public final BooleanProperty selectedProperty() {
 		return selectedProperty;
+	}
+
+	/**
+	 * Closed parameter view. Will only be used for processors that actually
+	 * have some parameters, and indicates exactly this.
+	 */
+	public static class ClosedParameterView {
+
+		protected final HBox hbox;
+		protected final Glyph glyph;
+
+		public ClosedParameterView() {
+			glyph = UIStrategyGUI.newGlyph(
+					MaterialDesignIcons.CHEVRON_DOWN,
+					Glyph.Size.MEDIUM
+			);
+			glyph.setAlignment(Pos.CENTER);
+			glyph.disabledHoverEffectProperty().set(true);
+
+			hbox = new HBox();
+			hbox.setPadding(new Insets(UIStrategyGUI.Stage.insets));
+			hbox.setAlignment(Pos.CENTER);
+			hbox.getChildren().add(glyph);
+		}
+
+		public Parent node() {
+			return hbox;
+		}
 	}
 
 	/**

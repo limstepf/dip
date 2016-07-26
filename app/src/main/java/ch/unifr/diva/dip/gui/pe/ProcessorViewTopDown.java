@@ -1,10 +1,9 @@
-
 package ch.unifr.diva.dip.gui.pe;
 
 import ch.unifr.diva.dip.core.model.ProcessorWrapper;
 import javafx.geometry.Pos;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 
 /**
  * Processor view with input ports at the top, and output ports at the bottom.
@@ -14,7 +13,7 @@ public class ProcessorViewTopDown extends ProcessorView {
 
 	protected final HBox inputPane = new HBox();
 	protected final HBox outputPane = new HBox();
-	protected final VBox infoPane = new VBox();
+	protected final BorderPane infoPane = new BorderPane();
 
 	public ProcessorViewTopDown(PipelineEditor editor, ProcessorWrapper wrapper) {
 		super(editor, wrapper);
@@ -28,7 +27,7 @@ public class ProcessorViewTopDown extends ProcessorView {
 
 		this.setCenter(infoPane);
 		infoPane.getStyleClass().add("dip-processor-topdown");
-		infoPane.getChildren().addAll(title);
+		infoPane.setTop(title);
 		setupDraggable(infoPane);
 
 		this.setBottom(outputPane);
@@ -55,10 +54,14 @@ public class ProcessorViewTopDown extends ProcessorView {
 
 	@Override
 	protected void showParameters(boolean show) {
+		final ClosedParameterView closedView = this.closedParameterView();
 		if (show) {
-			infoPane.getChildren().add(this.parameterView().node());
+			infoPane.setCenter(this.parameterView().node());
 		} else {
-			infoPane.getChildren().remove(this.parameterView().node());
+			infoPane.setCenter(null);
+			if (closedView != null) {
+				infoPane.setCenter(closedView.node());
+			}
 		}
 	}
 
