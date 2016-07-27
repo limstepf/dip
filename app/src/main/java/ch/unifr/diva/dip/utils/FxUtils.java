@@ -2,12 +2,17 @@ package ch.unifr.diva.dip.utils;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
+import javafx.util.Duration;
 
 /**
  * JavaFx utilities.
@@ -28,6 +33,23 @@ public class FxUtils {
 	public static void initToolkit() {
 		// This does the job, although this very much looks like a dirty hack...
 		final JFXPanel jfx = new JFXPanel();
+	}
+
+	/**
+	 * Executes an EventHandler after the specified delay on the JavaFX
+	 * application thread.
+	 *
+	 * @param delay the (minimum) duration to wait before the event handler is
+	 * executed.
+	 * @param afterDelay the event handler to exectue after the delay.
+	 */
+	public static void delay(Duration delay, EventHandler<ActionEvent> afterDelay) {
+		final Timeline t = new Timeline(new KeyFrame(
+				delay,
+				afterDelay
+		));
+
+		t.play();
 	}
 
 	/**
