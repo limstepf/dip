@@ -300,6 +300,11 @@ public abstract class ProcessorView extends BorderPane {
 			editingProperty.set(!editingProperty.get());
 			if (editingProperty.get()) {
 				editor.editorPane().bringToFront(wrapper);
+			} else {
+				// fixes stuck OPEN_HAND from onMouseEntered but onMouseExited
+				// is never fired upon resizing the processor view with the mouse
+				// cursor left out in the open...
+				onMouseExited(null);
 			}
 			e.consume();
 		}
