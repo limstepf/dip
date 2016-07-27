@@ -461,6 +461,11 @@ public abstract class ProcessorView extends BorderPane {
 	 */
 	public static class GridParameterView extends ParameterViewBase<FormGridPane> {
 
+		/**
+		 * Creates a new grid parameter view for the given processor.
+		 *
+		 * @param processor the processor.
+		 */
 		public GridParameterView(Processor processor) {
 			super(new FormGridPane());
 			root.setPadding(new Insets(10, 0, 5, 0));
@@ -489,22 +494,41 @@ public abstract class ProcessorView extends BorderPane {
 			}
 
 			// ...and do our thing now.
-			for (int i = 0; i < n; i++) {
-				final Parameter p = params[i];
-				final String key = keys[i];
-				final Parameter.View v = p.view();
-				final Label label;
+			if (hasLabels(params)) {
+				for (int i = 0; i < n; i++) {
+					final Parameter p = params[i];
+					final String key = keys[i];
+					final Parameter.View v = p.view();
+					final Label label;
 
-				if (p.isPersistent()) {
-					final PersistentParameter pp = (PersistentParameter) p;
-					label = new Label((pp.label().isEmpty()) ? "" : pp.label() + ":");
-				} else {
-					label = new Label("");
+					if (p.isPersistent()) {
+						final PersistentParameter pp = (PersistentParameter) p;
+						label = new Label((pp.label().isEmpty()) ? "" : pp.label() + ":");
+					} else {
+						label = new Label("");
+					}
+
+					label.getStyleClass().add("dip-small");
+					root.addRow(label, v.node());
 				}
-
-				label.getStyleClass().add("dip-small");
-				root.addRow(label, v.node());
+			} else {
+				for (int i = 0; i < n; i++) {
+					final Parameter.View v = params[i].view();
+					root.addRow(v.node());
+				}
 			}
+		}
+
+		private boolean hasLabels(Parameter[] params) {
+			for (int i = 0; i < params.length; i++) {
+				if (params[i].isPersistent()) {
+					final PersistentParameter pp = (PersistentParameter) params[i];
+					if (!pp.label().isEmpty()) {
+						return true;
+					}
+				}
+			}
+			return false;
 		}
 
 		@Override
