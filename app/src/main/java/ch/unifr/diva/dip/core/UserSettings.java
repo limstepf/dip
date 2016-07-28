@@ -171,6 +171,12 @@ public class UserSettings {
 		@XmlAttribute
 		public String pipelineLayout = PipelineLayoutStrategy.getDefault().name();
 
+		@XmlAttribute
+		public boolean autoRearrangeOnChangedLayoutStrategy = true;
+
+		@XmlAttribute
+		public boolean autoRearrangeOnProcessorFold = false;
+
 		/**
 		 * Returns the connection (or wire) type preferred by the user.
 		 *

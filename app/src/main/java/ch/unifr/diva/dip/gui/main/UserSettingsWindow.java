@@ -1,10 +1,14 @@
 package ch.unifr.diva.dip.gui.main;
 
+import ch.unifr.diva.dip.api.parameters.BooleanParameter;
+import ch.unifr.diva.dip.api.parameters.CompositeGrid;
 import ch.unifr.diva.dip.api.parameters.EnumParameter;
+import ch.unifr.diva.dip.api.parameters.LabelParameter;
 import ch.unifr.diva.dip.api.parameters.PersistentParameter;
 import ch.unifr.diva.dip.api.utils.L10n;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.model.PipelineLayoutStrategy;
+import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import ch.unifr.diva.dip.gui.Presenter;
 import ch.unifr.diva.dip.gui.layout.AbstractWindow;
 import ch.unifr.diva.dip.gui.layout.FormGridPane;
@@ -26,6 +30,8 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.stage.Window;
 
 /**
@@ -75,7 +81,7 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 		final ObservableList<Category> cats = FXCollections.observableArrayList();
 
 		/* General settings */
-		final Category general = new Category(L10n.getInstance().getString("general"));
+		final Category general = new Category(localize("general"));
 
 		// locale/language
 		general.addItem(new Item<EnumParameter>() {
@@ -100,7 +106,7 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 		cats.add(general);
 
 		/* pipeline editor settings */
-		final Category pe = new Category(L10n.getInstance().getString("pipeline.editor"));
+		final Category pe = new Category(localize("pipeline.editor"));
 
 		// connection-view/wire type
 		pe.addItem(new Item<EnumParameter>() {
@@ -108,7 +114,7 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 			public PersistentParameter parameter() {
 				if (this.parameter == null) {
 					this.parameter = new EnumParameter(
-							L10n.getInstance().getString("pipeline.connection.type"),
+							localize("pipeline.connection.type"),
 							ConnectionView.Type.class,
 							handler.settings.pipelineEditor.connectionType
 					);
@@ -128,7 +134,7 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 			public PersistentParameter parameter() {
 				if (this.parameter == null) {
 					this.parameter = new EnumParameter(
-							L10n.getInstance().getString("pipeline.layout.strategy.default"),
+							localize("pipeline.layout.strategy.default"),
 							PipelineLayoutStrategy.class,
 							handler.settings.pipelineEditor.pipelineLayout
 					);
@@ -141,8 +147,46 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 				handler.settings.pipelineEditor.pipelineLayout = this.parameter.get();
 			}
 		});
-		cats.add(pe);
 
+		// auto rearrange processor views on layout strategy change and/or
+		// processor view un-/folding (or editing).
+		pe.addItem(new Item<CompositeGrid>() {
+			@Override
+			public PersistentParameter parameter() {
+				if (this.parameter == null) {
+					final LabelParameter layoutLabel = new LabelParameter(localize("pipeline.auto.rearrange.layout") + ": ");
+					final LabelParameter foldLabel = new LabelParameter(localize("pipeline.auto.rearrange.fold") + ": ");
+					final BooleanParameter rearrangeOnLayout = new BooleanParameter(
+							"",
+							handler.settings.pipelineEditor.autoRearrangeOnChangedLayoutStrategy,
+							localize("yes"),
+							localize("no")
+					);
+					final BooleanParameter rearrangeOnFold = new BooleanParameter(
+							"",
+							handler.settings.pipelineEditor.autoRearrangeOnProcessorFold,
+							localize("yes"),
+							localize("no")
+					);
+					this.parameter = new CompositeGrid(
+							localize("pipeline.auto.rearrange"),
+							layoutLabel, rearrangeOnLayout,
+							foldLabel, rearrangeOnFold
+					);
+					this.parameter.setColumnConstraints(2);
+					this.parameter.getColumnConstraints().get(0).setHgrow(Priority.ALWAYS);
+				}
+				return this.parameter;
+			}
+
+			@Override
+			public void save() {
+				handler.settings.pipelineEditor.autoRearrangeOnChangedLayoutStrategy = (boolean) this.parameter.get().get(0);
+				handler.settings.pipelineEditor.autoRearrangeOnProcessorFold = (boolean) this.parameter.get().get(1);
+			}
+		});
+
+		cats.add(pe);
 		return cats;
 	}
 
@@ -183,10 +227,10 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 		lane.setAlignment(Pos.CENTER_RIGHT);
 		lane.setPadding(new Insets(0, 0, 0, 10));
 
-		final Button apply = new Button(L10n.getInstance().getString("apply"));
+		final Button apply = new Button(localize("apply"));
 		apply.setOnAction((c) -> apply());
 
-		final Button cancel = new Button(L10n.getInstance().getString("cancel"));
+		final Button cancel = new Button(localize("cancel"));
 		cancel.setOnAction((c) -> cancel());
 
 		lane.getChildren().addAll(apply, cancel);
@@ -281,6 +325,10 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 			for (Item item : this.items) {
 				final Label title = new Label(item.parameter().label());
 				title.getStyleClass().add("dip-small");
+				GridPane.setMargin(
+						item.parameter().view().node(),
+						new Insets(0, 0, UIStrategyGUI.Stage.insets, 0)
+				);
 				grid.addRow(
 						title,
 						item.parameter().view().node()

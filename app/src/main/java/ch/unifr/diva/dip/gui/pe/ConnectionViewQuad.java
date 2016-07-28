@@ -2,6 +2,7 @@ package ch.unifr.diva.dip.gui.pe;
 
 import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
+import ch.unifr.diva.dip.utils.FxUtils;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -60,6 +61,12 @@ public class ConnectionViewQuad extends ConnectionViewBase<QuadCurve> {
 	private Transition transition;
 
 	private void bounce() {
+		if (this.transition != null) {
+			return;
+		}
+
+		updateControlPoint();
+
 		final int cycles = (Math.random() < .5) ? 1 : 2; // bounce twice as long, sometimes
 		final double v = (Math.random() * 2 + 1) * 37; // quicker vertical (more cycles)
 		final double h = (Math.random() * 2 + 1) * 107; // slower horizontal (less cycles)
@@ -69,18 +76,19 @@ public class ConnectionViewQuad extends ConnectionViewBase<QuadCurve> {
 		final Timeline tY = newBounceTimeline(wire.controlYProperty(), h, hd, 2 * cycles);
 		final ParallelTransition t = new ParallelTransition(tX, tY);
 		this.transition = t;
+		this.transition.setOnFinished((e) -> {
+			this.transition = null;
+		});
 
 		t.play();
 	}
 
-	// the control point is wrong/displaced if we don't have a slight delay here (in/after bind()), so...
 	private void playBounce() {
-		final PauseTransition t = new PauseTransition(Duration.millis(12));
-		t.setOnFinished((e) -> {
-			updateControlPoint();
+		// the control point is wrong/displaced if we don't have a slight delay
+		// here (in/after bind()), so...
+		FxUtils.delay(Duration.millis(52), (e) -> {
 			bounce();
 		});
-		t.play();
 	}
 
 	private Timeline newBounceTimeline(DoubleProperty property, double duration, double distance, int cycle) {

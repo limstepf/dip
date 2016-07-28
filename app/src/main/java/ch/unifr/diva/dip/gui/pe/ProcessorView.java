@@ -306,6 +306,11 @@ public abstract class ProcessorView extends BorderPane {
 				// cursor left out in the open...
 				onMouseExited(null);
 			}
+
+			if (editor.handler.settings.pipelineEditor.autoRearrangeOnProcessorFold) {
+				editor.editorPane().rearrangeProcessors();
+			}
+
 			e.consume();
 		}
 	}

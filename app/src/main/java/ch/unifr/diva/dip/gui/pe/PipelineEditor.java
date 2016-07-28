@@ -153,12 +153,9 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 					}
 					break;
 
-				case L: // do (l)ayout
+				case L: // rearrange/do (l)ayout
 					if (e.isControlDown()) {
-						this.selectedPipeline().getLayoutStrategy().arrange(
-								this.selectedPipeline(),
-								this.editorPane.processorViewMap()
-						);
+						editorPane.rearrangeProcessors();
 					}
 					break;
 

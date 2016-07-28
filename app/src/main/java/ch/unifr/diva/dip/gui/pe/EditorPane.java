@@ -23,6 +23,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +43,11 @@ public class EditorPane {
 	private final Map<InputPort, ConnectionView> connections = new HashMap<>();
 	private final Map<Port, PortView> ports = new HashMap<>();
 
+	/**
+	 * Creates a new editor pane.
+	 *
+	 * @param editor the (parent) pipeline editor.
+	 */
 	public EditorPane(PipelineEditor editor) {
 		this.editor = editor;
 
@@ -53,39 +59,89 @@ public class EditorPane {
 		setupDraggable();
 	}
 
+	/**
+	 * Returns the component/node of the editor pane.
+	 *
+	 * @return the component/node of the editor pane.
+	 */
 	public Region getComponent() {
 		return pane;
 	}
 
+	/**
+	 * Returns a collection of all processor views.
+	 *
+	 * @return a collection of all processor views.
+	 */
 	public Collection<ProcessorView> processorViews() {
 		return this.processorViews.values();
 	}
 
+	/**
+	 * Returns a mapping of processors to their corresponding view.
+	 *
+	 * @return a mapping of processors to their corresponding view.
+	 */
 	public Map<ProcessorWrapper, ProcessorView> processorViewMap() {
 		return this.processorViews;
 	}
 
+	/**
+	 * Converts scene coordinates to local editor pane coordinates.
+	 *
+	 * @param x the X scene coordinate.
+	 * @param y the Y scene coordinate.
+	 * @return the coordinates in local editor pane coordinates.
+	 */
 	public Point2D sceneToPane(double x, double y) {
 		return pane.sceneToLocal(x, y);
 	}
 
+	/**
+	 * Converts scene coordinates to local editor pane coordinates.
+	 *
+	 * @param p a point using scene coordinates.
+	 * @return the coordinates in local editor pane coordinates.
+	 */
 	public Point2D sceneToPane(Point2D p) {
 		return pane.sceneToLocal(p);
 	}
 
+	/**
+	 * Converts scene coordinates to local editor pane coordinates.
+	 *
+	 * @param e a mouse event using scene coordinates.
+	 * @return the coordinates in local editor pane coordinates.
+	 */
 	public Point2D sceneToPane(MouseEvent e) {
 		return pane.sceneToLocal(e.getSceneX(), e.getSceneY());
 	}
 
+	/**
+	 * Converts scene coordinates to local editor pane coordinates.
+	 *
+	 * @param e a drag event using scene coordinates.
+	 * @return the coordinates in local editor pane coordinates.
+	 */
 	public Point2D sceneToPane(DragEvent e) {
 		return pane.sceneToLocal(e.getSceneX(), e.getSceneY());
 	}
 
+	/**
+	 * Brings the view of the processor to front (z-index).
+	 *
+	 * @param wrapper the processor whos view to bring to the front.
+	 */
 	public void bringToFront(ProcessorWrapper wrapper) {
 		final ProcessorView view = processorViews.get(wrapper);
 		bringToFront(view);
 	}
 
+	/**
+	 * Brings the processor view to the front (z-index).
+	 *
+	 * @param view the processor view.
+	 */
 	public void bringToFront(ProcessorView view) {
 		// insert dot to keep pane-bounds intact and prevent viewport-jitter
 		pane.getChildren().add(dot);
@@ -103,10 +159,19 @@ public class EditorPane {
 		pane.getChildren().remove(dot);
 	}
 
+	/**
+	 * Registers a port to the port map.
+	 *
+	 * @param port the port to register.
+	 * @param view the view and parent of the port.
+	 */
 	public void registerPort(Port port, PortView view) {
 		ports.put(port, view);
 	}
 
+	/**
+	 * Clears the editor pane.
+	 */
 	public void clear() {
 		pane().getChildren().clear();
 		processorViews.clear();
@@ -114,48 +179,106 @@ public class EditorPane {
 		ports.clear();
 	}
 
+	/**
+	 * Returns the selected pipeline.
+	 *
+	 * @return the selected pipeline.
+	 */
 	private Pipeline pipeline() {
 		return editor.selectedPipelineProperty().get();
 	}
 
+	/**
+	 * Returns the (actual) pane of the editor pane.
+	 *
+	 * @return the pane of the editor pane.
+	 */
 	public final Pane pane() {
 		return pane;
 	}
 
+	/**
+	 * Returns the currently active wire in the editor pane. An active wire is a
+	 * wire currently used/dragged by the user, but not fully connected yet.
+	 * There can be only a single such active wire in the editor pane.
+	 *
+	 * @return the currently active wire, or null if there isn't any.
+	 */
 	public ConnectionView wire() {
 		return selectedWire;
 	}
 
+	/**
+	 * Checks whether there is an active wire, or not.
+	 *
+	 * @return True if there is currently an active wire being used, False
+	 * otherwise.
+	 */
 	public boolean hasWire() {
 		return (this.selectedWire != null);
 	}
 
+	/**
+	 * Sets the currently active wire.
+	 *
+	 * @param wire the currently active wire.
+	 */
 	public void setWire(ConnectionView wire) {
 		this.selectedWire = wire;
 	}
 
+	/**
+	 * Moves the currently active wire by a drag event.
+	 *
+	 * @param e the drag event.
+	 */
 	public void moveWire(DragEvent e) {
 		final Point2D end = this.sceneToPane(e);
 		wire().setEnd(end);
 	}
 
+	/**
+	 * Moves the currently active wire by a mouse event.
+	 *
+	 * @param e the mouse event.
+	 */
 	public void moveWire(MouseEvent e) {
 		final Point2D end = this.sceneToPane(e);
 		wire().setEnd(end);
 	}
 
+	/**
+	 * Check whether we have an active/selected port.
+	 *
+	 * @return True if there is an active/selected port, False otherwise.
+	 */
 	public boolean hasSelectedPort() {
 		return (this.selectedPort != null);
 	}
 
+	/**
+	 * Sets the active/selected port.
+	 *
+	 * @param output the active/selected output port connected to the active
+	 * wire.
+	 */
 	public void setSelectedPort(OutputPort output) {
 		this.selectedPort = output;
 	}
 
+	/**
+	 * Return the active/selected port. The active (or selected) port is the
+	 * port connected to the currently active wire.
+	 *
+	 * @return the active/selected port, or null if there isn't any.
+	 */
 	public OutputPort selectedPort() {
 		return this.selectedPort;
 	}
 
+	/**
+	 * Initializes the connections of all processors.
+	 */
 	public void setupConnections() {
 		for (Map.Entry<ProcessorWrapper, ProcessorView> e : processorViews.entrySet()) {
 			final ProcessorWrapper wrapper = e.getKey();
@@ -163,6 +286,11 @@ public class EditorPane {
 		}
 	}
 
+	/**
+	 * Initializes the connections of the given processor.
+	 *
+	 * @param wrapper the processor to connect.
+	 */
 	public void setupConnections(ProcessorWrapper wrapper) {
 		for (Map.Entry<String, InputPort> port : wrapper.processor().inputs().entrySet()) {
 			final InputPort input = port.getValue();
@@ -172,10 +300,21 @@ public class EditorPane {
 		}
 	}
 
+	/**
+	 * Returns the wire attached to the given input port.
+	 *
+	 * @param input the input port.
+	 * @return the wire attached to the given input port.
+	 */
 	public ConnectionView getConnectionView(InputPort input) {
 		return connections.get(input);
 	}
 
+	/**
+	 * Removes all connections from the given processor.
+	 *
+	 * @param wrapper the processor to unconnect.
+	 */
 	public void removeConnections(ProcessorWrapper wrapper) {
 		final Set<InputPort> trash = new HashSet<>();
 
@@ -194,11 +333,11 @@ public class EditorPane {
 		}
 	}
 
-	// removes connection, but not the wire
-	private void disconnect(InputPort input) {
-		input.disconnect();
-	}
-
+	/**
+	 * Removes a wire/connection.
+	 *
+	 * @param input the input port owning/connected to the wire.
+	 */
 	public void removeConnection(InputPort input) {
 		if (!input.isConnected()) {
 			return;
@@ -216,9 +355,14 @@ public class EditorPane {
 		bindWire(input, wire, input.connection(), false);
 	}
 
-	// connection with existing wire (e.g. while dragging)
+	/**
+	 * Make a new connection using the selected/active wire.
+	 *
+	 * @param output the output port of the connection.
+	 * @param input the input port of the connection.
+	 * @param wire the wire/connection view.
+	 */
 	public void newConnection(OutputPort output, InputPort input, ConnectionView wire) {
-//		input.connectTo(output);
 		connections.put(input, wire);
 		bindWire(input, wire, output, true);
 	}
@@ -291,7 +435,13 @@ public class EditorPane {
 		}
 	}
 
-	// wires aren't connections yet (only connected to input so far)
+	/**
+	 * Creates a new wire. "Wires" aren't connections yet, and are only owned
+	 * by/connected to an input port.
+	 *
+	 * @param input the input port owning the wire.
+	 * @return a new wire.
+	 */
 	public ConnectionView newWire(InputPort input) {
 		final ConnectionView.Type type = this.editor.handler.settings.pipelineEditor.getDefaultConnectionType();
 		final ConnectionView view = type.newConnection(input);
@@ -301,11 +451,21 @@ public class EditorPane {
 		return view;
 	}
 
+	/**
+	 * Removes the wire owned by an input port.
+	 *
+	 * @param input the input port owning the wire.
+	 */
 	public void removeWire(InputPort input) {
 		final ConnectionView wire = connections.get(input);
 		removeWire(wire);
 	}
 
+	/**
+	 * Removes a wire.
+	 *
+	 * @param wire the wire to be removed.
+	 */
 	public void removeWire(ConnectionView wire) {
 		// clean up first, or end up with reappearing dead wires
 		final PortView input = this.ports.get(wire.inputPort());
@@ -320,6 +480,11 @@ public class EditorPane {
 		pane().getChildren().remove(wire.node());
 	}
 
+	/**
+	 * Adds a processor to the editor pane.
+	 *
+	 * @param wrapper the processor.
+	 */
 	public void addProcessor(ProcessorWrapper wrapper) {
 		final ProcessorView view = this.editor.selectedPipeline().getLayoutStrategy().newProcessorView(editor, wrapper);
 		processorViews.put(wrapper, view);
@@ -327,6 +492,11 @@ public class EditorPane {
 		pane().getChildren().add(view);
 	}
 
+	/**
+	 * Removes a processor from the editor pane.
+	 *
+	 * @param wrapper the processor.
+	 */
 	public void removeProcessor(ProcessorWrapper wrapper) {
 		final ProcessorView view = processorViews.get(wrapper);
 		if (view != null) {
@@ -339,6 +509,11 @@ public class EditorPane {
 		}
 	}
 
+	/**
+	 * Unregisters all ports of a processor.
+	 *
+	 * @param wrapper the processor.
+	 */
 	public void unregisterPorts(ProcessorWrapper wrapper) {
 		for (InputPort port : wrapper.processor().inputs().values()) {
 			ports.remove(port);
@@ -348,10 +523,21 @@ public class EditorPane {
 		}
 	}
 
+	/**
+	 * Unregisters a port.
+	 *
+	 * @param port the port.
+	 */
 	public void unregisterPort(Port port) {
 		ports.remove(port);
 	}
 
+	/**
+	 * Deprecates/disables a processor. This happens when the underlying
+	 * processor service disappears.
+	 *
+	 * @param wrapper the processor.
+	 */
 	public void deprecateProcessor(ProcessorWrapper wrapper) {
 		// no-op; ProcessorView is bound to isAvailableProperty
 	}
@@ -365,6 +551,11 @@ public class EditorPane {
 		return true;
 	}
 
+	/**
+	 * Updates a processor (and it's view).
+	 *
+	 * @param wrapper the processor to update.
+	 */
 	public void updateProcessor(ProcessorWrapper wrapper) {
 		final ProcessorView oldView = processorViews.get(wrapper);
 		if (oldView == null) {
@@ -401,10 +592,38 @@ public class EditorPane {
 		}
 	}
 
+	/**
+	 * Updates the view of all processors. Called after the layout strategy has
+	 * changed.
+	 */
+	public void updateAllProcessors() {
+		final Set<ProcessorWrapper> processors = this.processorViews.keySet();
+		for (ProcessorWrapper p : processors) {
+			updateProcessor(p);
+		}
+		if (editor.handler.settings.pipelineEditor.autoRearrangeOnChangedLayoutStrategy) {
+			// we need some kind of delay here, or the layout will be wrong since
+			// not all processors have been placed yet, uh.
+			// ...and now the wires spazz out since the jiggling from the
+			// preceding view update is still running and now we jiggle again.
+			FxUtils.delay(Duration.millis(12), (e) -> {
+				editor.editorPane().rearrangeProcessors();
+			});
+		}
+	}
+
+	/**
+	 * Rearrange all processors according to the pipeline's layout strategy.
+	 */
+	public void rearrangeProcessors() {
+		this.editor.selectedPipeline().getLayoutStrategy().arrange(
+				this.editor.selectedPipeline(),
+				this.processorViewMap()
+		);
+	}
+
 	private void setupDraggable() {
 		pane().setOnDragOver(e -> onDragOver(e));
-//			pane().setOnDragEntered(e -> onDragEntered(e));
-//			pane().setOnDragExited(e -> onDragExited(e));
 		pane().setOnDragDropped(e -> onDragDropped(e));
 	}
 
@@ -422,13 +641,6 @@ public class EditorPane {
 		e.consume();
 	}
 
-//		private void onDragEntered(DragEvent e) {
-//			e.consume();
-//		}
-//
-//		private void onDragExited(DragEvent e) {
-//			e.consume();
-//		}
 	private void onDragDropped(DragEvent e) {
 		final Dragboard db = e.getDragboard();
 		if (db.hasContent(OSGI_SERVICE_PROCESSOR)) {
@@ -438,11 +650,9 @@ public class EditorPane {
 				editor.selectedPipeline().addProcessor(pid, p.getX(), p.getY());
 			}
 		}
-//			else if (editor.pane().hasWire() &&
-//					db.hasContent(editor.pane().wire().dataType().dataFormat())) {
-//				// nothing to do here
-//			}
+
 		e.setDropCompleted(true);
 		e.consume();
 	}
+
 }

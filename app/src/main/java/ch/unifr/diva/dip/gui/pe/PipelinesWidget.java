@@ -1,8 +1,11 @@
 package ch.unifr.diva.dip.gui.pe;
 
+import ch.unifr.diva.dip.api.parameters.EnumParameter;
+import ch.unifr.diva.dip.api.utils.L10n;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.ApplicationSettings;
 import ch.unifr.diva.dip.core.model.Pipeline;
+import ch.unifr.diva.dip.core.model.PipelineLayoutStrategy;
 import ch.unifr.diva.dip.core.model.PipelineManager;
 import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
@@ -34,6 +37,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
@@ -206,6 +210,9 @@ public class PipelinesWidget extends AbstractWidget {
 		}
 	}
 
+	/**
+	 * A pipeline cell.
+	 */
 	public static class PipelineCell extends DraggableListCell<Pipeline> implements Localizable {
 
 		private final PipelineEditor editor;
@@ -215,7 +222,8 @@ public class PipelinesWidget extends AbstractWidget {
 		private final Label label = new Label();
 		private final Label statusLabel = new Label();
 		private static final Tooltip defaultPipelineTooltip = new Tooltip();
-		private final TextField textField = new TextField();
+		private PipelineCellEditBox editingBox;
+
 		private final InvalidationListener defaultListener = (obs) -> {
 			updateDefault();
 			this.layout();
@@ -234,13 +242,18 @@ public class PipelinesWidget extends AbstractWidget {
 		};
 		private Pipeline currentPipeline;
 
+		/**
+		 * Creates a new pipeline cell.
+		 *
+		 * @param editor the pipeline editor.
+		 * @param group the toggle group of all pipelines.
+		 */
 		public PipelineCell(PipelineEditor editor, ToggleGroup group) {
 			this.editor = editor;
 			this.group = group;
 
 			label.setAlignment(Pos.CENTER_LEFT);
 			label.setMaxWidth(Double.MAX_VALUE);
-			textField.setOnKeyPressed(onEnterHandler);
 
 			final int d = UIStrategyGUI.Stage.insets;
 			radioButton.setPadding(new Insets(0, d, 0, 0));
@@ -252,6 +265,16 @@ public class PipelinesWidget extends AbstractWidget {
 
 			defaultPipelineTooltip.setText(localize("pipeline.default"));
 			editor.pipelineManager().defaultPipelineIdProperty().addListener(defaultListener);
+		}
+
+		// lazily initialize the editing box
+		private PipelineCellEditBox editBox() {
+			if (editingBox == null) {
+				editingBox = new PipelineCellEditBox();
+				editingBox.textField.setOnKeyPressed(onEnterHandler);
+				editingBox.layoutStrategy.view().node().setOnKeyPressed(onEnterHandler);
+			}
+			return editingBox;
 		}
 
 		private boolean isPipelineSelected() {
@@ -309,8 +332,10 @@ public class PipelinesWidget extends AbstractWidget {
 			getListView().addEventHandler(KeyEvent.KEY_PRESSED, onEnterHandler);
 			getListView().addEventHandler(MouseEvent.MOUSE_CLICKED, onDoubleClickHandler);
 
-			textField.setText(label.getText());
-			pane.setCenter(textField);
+			final PipelineCellEditBox edit = editBox();
+			edit.update(currentPipeline, label.getText());
+
+			pane.setCenter(edit.vbox);
 
 			// this seems to be necessary since we ommit commitEdit and just
 			// use cancelEdit. Might also be a bug, who knows...
@@ -324,11 +349,23 @@ public class PipelinesWidget extends AbstractWidget {
 			getListView().removeEventHandler(KeyEvent.KEY_PRESSED, onEnterHandler);
 			getListView().removeEventHandler(MouseEvent.MOUSE_CLICKED, onDoubleClickHandler);
 
-			final String tf = textField.getText();
+			final PipelineCellEditBox edit = editBox();
+			final String tf = edit.textField.getText();
 			if (!tf.equals(label.getText())) {
-				label.setText(textField.getText());
-				currentPipeline.setName(textField.getText());
+				label.setText(tf);
+				currentPipeline.setName(tf);
 			}
+
+			final PipelineLayoutStrategy pls = EnumParameter.valueOf(
+					edit.layoutStrategy.get(),
+					PipelineLayoutStrategy.class,
+					PipelineLayoutStrategy.LEFTRIGHT
+			);
+			if (!currentPipeline.getLayoutStrategy().equals(pls)) {
+				currentPipeline.setLayoutStrategy(pls);
+				editor.editorPane().updateAllProcessors();
+			}
+
 			pane.setCenter(label);
 
 			// this seems to be necessary since we ommit commitEdit and just
@@ -336,6 +373,40 @@ public class PipelinesWidget extends AbstractWidget {
 			getListView().layout();
 		}
 
+	}
+
+	/**
+	 * Editing box of a pipeline cell.
+	 */
+	public static class PipelineCellEditBox {
+
+		public final VBox vbox = new VBox();
+		public final TextField textField = new TextField();
+		public final EnumParameter layoutStrategy = new EnumParameter(
+				L10n.getInstance().getString("pipeline.layout.strategy"),
+				PipelineLayoutStrategy.class,
+				PipelineLayoutStrategy.LEFTRIGHT.name()
+		);
+
+		public PipelineCellEditBox() {
+			final HBox lsbox = new HBox();
+			lsbox.setSpacing(UIStrategyGUI.Stage.insets);
+			final Label lslabel = new Label(layoutStrategy.label() + ": ");
+			lslabel.getStyleClass().add("dip-small");
+			lsbox.getChildren().setAll(
+					lslabel,
+					layoutStrategy.view().node()
+			);
+			HBox.setHgrow(layoutStrategy.view().node(), Priority.ALWAYS);
+
+			vbox.setSpacing(UIStrategyGUI.Stage.insets);
+			vbox.getChildren().setAll(textField, lsbox);
+		}
+
+		public void update(Pipeline pipeline, String name) {
+			layoutStrategy.set(pipeline.getLayoutStrategy().name());
+			textField.setText(name);
+		}
 	}
 
 }
