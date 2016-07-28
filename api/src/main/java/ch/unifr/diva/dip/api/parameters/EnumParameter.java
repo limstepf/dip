@@ -175,6 +175,11 @@ public class EnumParameter extends PersistentParameterBase<String, EnumParameter
 			root.valueProperty().addListener((obs) -> {
 				parameter.valueProperty.set(get());
 			});
+
+			// this fixes some weird layout bug, where the combobox get's sized
+			// wrong/too small initially, and snaps to the correct size once hit
+			// by the mouse...
+			root.layout();
 		}
 
 		protected final String get() {
