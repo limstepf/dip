@@ -148,6 +148,7 @@ public class LayerGroup extends LayerBase implements EditorLayerGroup {
 			this.updateHideGroupParent();
 		}
 
+		reevaluateEmpty();
 		fireEvent(MODIFIED_EVENT);
 	}
 
@@ -257,8 +258,27 @@ public class LayerGroup extends LayerBase implements EditorLayerGroup {
 	 *
 	 * @return the children of the layer group.
 	 */
+	@Override
 	public ObservableList<Layer> getChildren() {
 		return this.children;
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return this.emptyProperty().get();
+	}
+
+	private void reevaluateEmpty() {
+		this.emptyProperty.set(checkEmpty());
+	}
+
+	private boolean checkEmpty() {
+		for (Layer layer : getChildren()) {
+			if (!layer.isEmpty()) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@Override
@@ -285,6 +305,10 @@ public class LayerGroup extends LayerBase implements EditorLayerGroup {
 
 			case MODIFIED_TREE:
 				setAll();
+				break;
+
+			case MODIFIED_EMPTY:
+				reevaluateEmpty();
 				break;
 
 			case DEACTIVATE:
@@ -425,6 +449,7 @@ public class LayerGroup extends LayerBase implements EditorLayerGroup {
 				+ ", visible=" + isVisible() + "|" + isPassiveVisible()
 				+ ", hidden=" + isHideGroup()
 				+ ", children=" + getChildren().size()
+				+ ", empty=" + isEmpty()
 				+ "}";
 	}
 

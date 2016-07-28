@@ -20,6 +20,11 @@ public class LayerEvent {
 		 */
 		MODIFIED_TREE,
 		/**
+		 * The empty property of a layer changed. Notifies the parent layer to
+		 * reevaluate if it also can be considered empty now.
+		 */
+		MODIFIED_EMPTY,
+		/**
 		 * A parent layer turned invisible. Bubble down and make all layers
 		 * below passively invisible (or "deactivated").
 		 */

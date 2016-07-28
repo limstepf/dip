@@ -55,6 +55,7 @@ public class LayerPane extends LayerBase implements EditorLayerPane {
 	}
 
 	private final InvalidationListener childListener = (c) -> {
+		this.emptyProperty.set(getChildren().isEmpty());
 		fireEvent(MODIFIED_EVENT);
 	};
 
@@ -96,8 +97,14 @@ public class LayerPane extends LayerBase implements EditorLayerPane {
 	 *
 	 * @return the children of the layer pane.
 	 */
+	@Override
 	public ObservableList<Node> getChildren() {
 		return this.pane.getChildren();
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return this.pane.getChildren().isEmpty();
 	}
 
 	@Override

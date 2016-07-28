@@ -22,7 +22,7 @@ public class LayerTreeCell extends TreeCell<Layer> {
 	private final BorderPane pane;
 	private final VBox vbox;
 	private final Label title;
-	private final RadioButton visibleButton;
+	private final RadioButton visibleButton = new RadioButton();
 	private Layer currentItem;
 
 	/**
@@ -33,7 +33,6 @@ public class LayerTreeCell extends TreeCell<Layer> {
 		this.title = new Label();
 		this.title.setAlignment(Pos.CENTER_LEFT);
 		this.vbox.getChildren().addAll(title);
-		this.visibleButton = new RadioButton();
 		this.pane = new BorderPane();
 		this.pane.setCenter(this.vbox);
 		this.pane.setRight(this.visibleButton);
@@ -88,6 +87,7 @@ public class LayerTreeCell extends TreeCell<Layer> {
 		setGraphic(null);
 
 		if (currentItem != null) {
+			visibleButton.visibleProperty().unbind();
 			visibleButton.selectedProperty().unbindBidirectional(currentItem.visibleProperty());
 			pane.disableProperty().unbind();
 		}
@@ -96,6 +96,7 @@ public class LayerTreeCell extends TreeCell<Layer> {
 
 		if (!empty) {
 			currentItem = item;
+			visibleButton.visibleProperty().bind(Bindings.not(currentItem.emptyProperty()));
 			visibleButton.selectedProperty().bindBidirectional(currentItem.visibleProperty());
 			// TODO: no! we can't just disable all of it! :D
 			pane.disableProperty().bind(Bindings.not(currentItem.passiveVisibleProperty()));

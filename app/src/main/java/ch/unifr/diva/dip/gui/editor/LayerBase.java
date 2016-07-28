@@ -32,6 +32,7 @@ public abstract class LayerBase implements Layer, EditorLayer {
 
 	protected static LayerEvent MODIFIED_EVENT = new LayerEvent(LayerEvent.Type.MODIFIED);
 	protected static LayerEvent MODIFIED_TREE_EVENT = new LayerEvent(LayerEvent.Type.MODIFIED_TREE);
+	protected static LayerEvent MODIFIED_EMPTY_EVENT = new LayerEvent(LayerEvent.Type.MODIFIED_EMPTY);
 	protected static LayerEvent DEACTIVATE_EVENT = new LayerEvent(LayerEvent.Type.DEACTIVATE);
 	protected static LayerEvent REACTIVATE_PARENT_EVENT = new LayerEvent(LayerEvent.Type.REACTIVATE_PARENT);
 	protected static LayerEvent REACTIVATE_EVENT = new LayerEvent(LayerEvent.Type.REACTIVATE);
@@ -64,6 +65,21 @@ public abstract class LayerBase implements Layer, EditorLayer {
 		this.passiveVisibleProperty = new SimpleBooleanProperty(passiveVisible);
 		this.onModifiedProperty = new SimpleBooleanProperty(false);
 		this.layerExtensions = new ArrayList<>();
+	}
+
+	protected final BooleanProperty emptyProperty = new SimpleBooleanProperty(this, "empty", true) {
+		@Override
+		protected void invalidated() {
+			final LayerGroup parent = parentProperty().get();
+			if (parent != null) {
+				parent.fireEvent(MODIFIED_EMPTY_EVENT);
+			}
+		}
+	};
+
+	@Override
+	public ReadOnlyBooleanProperty emptyProperty() {
+		return this.emptyProperty;
 	}
 
 	protected abstract void onVisibileChanged(boolean visible);
