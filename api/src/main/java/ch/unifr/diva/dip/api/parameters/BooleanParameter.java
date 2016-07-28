@@ -77,7 +77,7 @@ public class BooleanParameter extends PersistentParameterBase<Boolean, BooleanPa
 
 			on.setToggleGroup(group);
 			off.setToggleGroup(group);
-			root.getChildren().addAll(on, off);
+			root.getChildren().addAll(off, on);
 
 			set(parameter.get());
 
