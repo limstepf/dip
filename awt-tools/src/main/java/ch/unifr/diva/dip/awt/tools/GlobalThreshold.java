@@ -208,7 +208,7 @@ public class GlobalThreshold extends ProcessableBase implements Transmutable {
 					break;
 			}
 
-			binaryImage = filter(context, op, source);
+			binaryImage = filter(context, op, source, op.createBinaryDestImage(source));
 			writeBufferedImage(context, STORAGE_FILE, STORAGE_FORMAT, binaryImage);
 		}
 
