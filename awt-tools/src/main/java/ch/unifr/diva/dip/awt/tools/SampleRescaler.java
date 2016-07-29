@@ -101,12 +101,12 @@ public class SampleRescaler extends ProcessableBase implements Transmutable {
 	}
 
 	private void enableAllInputs() {
-		this.inputs.clear();
-
 		enableInput(null);
 	}
 
 	private void enableInput(InputPort input) {
+		this.inputs.clear();
+
 		if (input == null || input.equals(this.input)) {
 			this.inputs.put("buffered-image", this.input);
 		}
