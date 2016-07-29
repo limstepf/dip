@@ -259,6 +259,24 @@ public class SampleInverter extends ProcessableBase implements Transmutable {
 		if (context != null) {
 			restoreOutputs(context);
 		}
+
+		attachListeners();
+	}
+
+	private void attachListeners() {
+		this.input.portStateProperty().addListener(inputListener);
+		this.input_binary.portStateProperty().addListener(inputListener);
+		this.input_float.portStateProperty().addListener(inputListener);
+		for (InputColorPort icp : this.inputColors) {
+			icp.port.portStateProperty().addListener(inputListener);
+		}
+	}
+
+	private final InvalidationListener inputListener = (c) -> inputCallback();
+
+	private void inputCallback() {
+		config.enablePorts();
+		transmute();
 	}
 
 	private final InvalidationListener configListener = (c) -> configCallback();
@@ -282,9 +300,33 @@ public class SampleInverter extends ProcessableBase implements Transmutable {
 		enableInputs(null);
 	}
 
-	// untyped + one specific extra port, or all
 	private void enableInputs(InputPort port) {
 		inputs.clear();
+
+		// only show single connected port
+		final InputPort c = getConnectedInput();
+		if (port != null && c.isConnected()) {
+			if (this.input.equals(c)) {
+				this.inputs.put("buffered-image", this.input);
+				return;
+			} else if (this.input_binary.equals(c)) {
+				this.inputs.put("buffered-image-binary", this.input_binary);
+				return;
+			} else if (this.input_float.equals(c)) {
+				this.inputs.put("buffered-matrix-float", this.input_float);
+				return;
+			} else {
+				for (InputColorPort icp : this.inputColors) {
+					if (icp.port.equals(c)) {
+						this.inputs.put(icp.key, icp.port);
+						return;
+					}
+				}
+			}
+		}
+
+		// otherwise show untyped + one specific extra port,
+		// or all (if port == null)
 		this.inputs.put("buffered-image", this.input);
 
 		if (port == null || port.equals(this.input_binary)) {
