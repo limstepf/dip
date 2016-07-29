@@ -125,7 +125,7 @@ public class ColorConverter extends ProcessableBase implements Transmutable {
 		enableOutputs();
 
 		if (context != null) {
-			restoreOutput(context);
+			restoreOutputs(context);
 		}
 
 		attachListeners();
@@ -141,22 +141,39 @@ public class ColorConverter extends ProcessableBase implements Transmutable {
 		this.cmDst.property().addListener(outputListener);
 	}
 
-	public void restoreOutput(ProcessorContext context) {
+	private boolean restoreOutputs(ProcessorContext context) {
+		return restoreOutputs(context, null);
+	}
+
+	public boolean restoreOutputs(ProcessorContext context, BufferedImage convertedImage) {
+		final InputColorPort in = ColorPort.getColorPort(this.cmSrc.get(), this.inputColors);
 		final OutputColorPort out = ColorPort.getColorPort(this.cmDst.get(), this.outputColors);
 
-		if (out.cm.requiresBufferedMatrix()) {
-			BufferedMatrix mat = readBufferedMatrix(context, out.STORAGE_FILE);
-			if (mat != null) {
-				out.port.setOutput(mat);
-				this.output.port.setOutput(mat);
+		final BufferedImage image;
+		if (convertedImage == null) {
+			if (in.cm.equals(out.cm)) {
+				image = getSource().port.getValue(); // just by-pass
+			} else if (out.cm.requiresBufferedMatrix()) {
+				image = readBufferedMatrix(context, out.STORAGE_FILE);
+			} else {
+				image = readBufferedImage(context, out.STORAGE_FILE);
 			}
 		} else {
-			BufferedImage image = readBufferedImage(context, out.STORAGE_FILE);
-			if (image != null) {
-				out.port.setOutput(image);
-				this.output.port.setOutput(image);
-			}
+			image = convertedImage;
 		}
+
+		if (image == null) {
+			return false;
+		}
+
+		out.port.setOutput(image);
+		this.output.port.setOutput(image);
+
+		if (!out.cm.requiresBufferedMatrix()) {
+			provideImageLayer(context, image);
+		}
+
+		return true;
 	}
 
 	@Override
@@ -264,42 +281,22 @@ public class ColorConverter extends ProcessableBase implements Transmutable {
 
 	@Override
 	public void process(ProcessorContext context) {
-		final OutputColorPort out = ColorPort.getColorPort(this.cmDst.get(), this.outputColors);
-
-		BufferedImage image;
-		if (out.cm.requiresBufferedMatrix()) {
-			image = readBufferedMatrix(context, out.STORAGE_FILE);
-		} else {
-			image = readBufferedImage(context, out.STORAGE_FILE);
-		}
-
-		if (image == null) {
+		if (!restoreOutputs(context)) {
+			final InputColorPort in = ColorPort.getColorPort(this.cmSrc.get(), this.inputColors);
+			final OutputColorPort out = ColorPort.getColorPort(this.cmDst.get(), this.outputColors);
 			final InputColorPort source = getSource();
 			final BufferedImage src = source.port.getValue();
-			final SimpleColorModel srcCm;
-			if (source.equals(this.input)) {
-				final InputColorPort icm = ColorPort.getColorPort(this.cmSrc.get(), this.inputColors);
-				srcCm = icm.cm;
-			} else {
-				srcCm = source.cm;
-			}
-
-			if (srcCm.equals(out.cm)) {
-				image = src; // by-pass, still make a copy (to properly restore...)
-			} else {
-				final ColorConvertOp op = new ColorConvertOp(srcCm, out.cm);
-				image = filter(context, op, src, op.createCompatibleDestImage(src, out.cm));
-			}
+			final ColorConvertOp op = new ColorConvertOp(in.cm, out.cm);
+			final BufferedImage image = filter(context, op, src, op.createCompatibleDestImage(src, out.cm));
 
 			if (out.cm.requiresBufferedMatrix()) {
 				writeBufferedMatrix(context, out.STORAGE_FILE, (BufferedMatrix) image);
 			} else {
 				writeBufferedImage(context, out.STORAGE_FILE, out.STORAGE_FORMAT, image);
 			}
-		}
 
-		this.output.port.setOutput(image);
-		out.port.setOutput(image);
+			restoreOutputs(context, image);
+		}
 	}
 
 	private InputColorPort getSource() {
@@ -321,6 +318,7 @@ public class ColorConverter extends ProcessableBase implements Transmutable {
 			deleteFile(context, oc.STORAGE_FILE);
 		}
 		resetOutputs();
+		resetLayer(context);
 	}
 
 	@Override
