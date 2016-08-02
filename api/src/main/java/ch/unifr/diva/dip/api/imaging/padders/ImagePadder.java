@@ -25,6 +25,18 @@ public interface ImagePadder {
 					}
 				},
 		/**
+		 * Extended (or repeated) border padding (clamped indexing).
+		 */
+		EXTENDED_BORDER() {
+					@Override
+					public ImagePadder getInstance() {
+						if (this.padder == null) {
+							this.padder = new ExtendedBorderPadder();
+						}
+						return this.padder;
+					}
+				},
+		/**
 		 * Tiled padding (circular indexing).
 		 */
 		TILED() {
