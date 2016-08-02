@@ -80,17 +80,44 @@ public class NullOp implements BufferedImageOp {
 		}
 
 		// custom type
-		return new BufferedImage(
-				dstCM,
-				dstCM.createCompatibleWritableRaster(src.getWidth(), src.getHeight()),
-				dstCM.isAlphaPremultiplied(),
-				null
-		);
+		return createCompatibleDestImage(src.getRaster().getBounds(), dstCM);
+	}
+
+	/**
+	 * Creates a zeroed destination image of the same type as the given source
+	 * image, and with specified dimensions.
+	 *
+	 * @param src the source image.
+	 * @param bounds bounds/size of the destination image.
+	 * @param dstCM ColorModel of the destination.
+	 * @return the zeroed destination image.
+	 */
+	public BufferedImage createCompatibleDestImage(BufferedImage src, Rectangle bounds, ColorModel dstCM) {
+		// buffered matrix?
+		if (src instanceof BufferedMatrix) {
+			final BufferedMatrix mat = (BufferedMatrix) src;
+			return new BufferedMatrix(
+					bounds.width,
+					bounds.height,
+					mat.getNumBands(),
+					mat.getSampleDataType(),
+					mat.getInterleave()
+			);
+		}
+
+		// common type?
+		if (src.getType() != 0) {
+			return new BufferedImage(bounds.width, bounds.height, src.getType());
+		}
+
+		// custom type
+		return createCompatibleDestImage(bounds, dstCM);
 	}
 
 	/**
 	 * Creates a zeroed destination image with the correct size and number of
-	 * bands.
+	 * bands. This always produces a {@code BufferedImage}, never a
+	 * {@code BufferedMatrix}.
 	 *
 	 * @param bounds bounds/size of the destination image.
 	 * @param dstCM ColorModel of the destination.
