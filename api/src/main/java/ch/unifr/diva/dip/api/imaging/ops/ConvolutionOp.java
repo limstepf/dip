@@ -161,7 +161,7 @@ public class ConvolutionOp<T extends Matrix> extends NullOp implements PaddedTil
 	}
 
 	@Override
-	public ImageTiler getImageTiler(BufferedImage src, int width, int height) {
+	public ImageTiler getImageTiler(BufferedImage src, BufferedImage dst, int width, int height) {
 		return new PaddedImageTiler(
 				src,
 				width,

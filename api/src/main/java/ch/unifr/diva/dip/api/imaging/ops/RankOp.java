@@ -117,7 +117,7 @@ public class RankOp extends NullOp implements PaddedTileParallelizable {
 	}
 
 	@Override
-	public ImageTiler getImageTiler(BufferedImage src, int width, int height) {
+	public ImageTiler getImageTiler(BufferedImage src, BufferedImage dst, int width, int height) {
 		return new PaddedImageTiler(
 				src,
 				width,

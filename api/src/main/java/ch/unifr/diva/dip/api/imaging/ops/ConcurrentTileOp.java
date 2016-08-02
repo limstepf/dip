@@ -94,7 +94,7 @@ public class ConcurrentTileOp<T extends BufferedImageOp & TileParallelizable> ex
 	}
 
 	private void runOnThreads(BufferedImage src, BufferedImage dst) {
-		final ImageTiler tiler = this.op.getImageTiler(src, this.tileWidth, this.tileHeight);
+		final ImageTiler tiler = this.op.getImageTiler(src, dst, this.tileWidth, this.tileHeight);
 		final Thread[] threads = new Thread[this.threadCount];
 
 		for (int i = 0; i < this.threadCount; i++) {
@@ -112,7 +112,7 @@ public class ConcurrentTileOp<T extends BufferedImageOp & TileParallelizable> ex
 	}
 
 	private void runOnThreadPool(BufferedImage src, BufferedImage dst) {
-		final ImageTiler tiler = this.op.getImageTiler(src, this.tileWidth, this.tileHeight);
+		final ImageTiler tiler = this.op.getImageTiler(src, dst, this.tileWidth, this.tileHeight);
 		final List<Callable<Void>> callables = new ArrayList<>();
 
 		for (int i = 0; i < this.threadCount; i++) {
@@ -162,6 +162,14 @@ public class ConcurrentTileOp<T extends BufferedImageOp & TileParallelizable> ex
 			final BufferedImage srcTile = src.getSubimage(tile.x, tile.y, tile.width, tile.height);
 			final BufferedImage dstTile = dst.getSubimage(tile.x, tile.y, tile.width, tile.height);
 			op.filter(srcTile, dstTile, tile.writableRegion);
+		}
+	}
+
+	public static <T extends InverseMappedTileParallelizable> void processMappedTiles(T op, ImageTiler tiler, BufferedImage src, BufferedImage dst) {
+		Rectangle tile;
+		while ((tile = tiler.next()) != null) {
+			final BufferedImage dstTile = dst.getSubimage(tile.x, tile.y, tile.width, tile.height);
+			op.filter(src, dstTile);
 		}
 	}
 

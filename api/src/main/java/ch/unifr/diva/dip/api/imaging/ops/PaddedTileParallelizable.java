@@ -20,9 +20,17 @@ import java.awt.image.BufferedImage;
  * not in it (at the edges of tiles), as would happen with a
  * {@code SimpleImageTiler}.
  *
+ * <p>
+ * Note that a {@code RasterScanner} should iterate over the given
+ * {@code writableRegion} instead of iterating over the source or destination
+ * image (or raster).
+ *
  * @see TileParallelizable
  */
 public interface PaddedTileParallelizable extends TileParallelizable {
+
+	// TODO: eh, now that the InverseMappedTileParallelizable interface is here,
+	// wouldn't that do the same, but a bit cheaper?!
 
 	@Override
 	default BufferedImage filter(BufferedImage src, BufferedImage dst) {
@@ -50,6 +58,6 @@ public interface PaddedTileParallelizable extends TileParallelizable {
 	 * @return a padded image tiler.
 	 */
 	@Override
-	public ImageTiler getImageTiler(BufferedImage src, int width, int height);
+	public ImageTiler getImageTiler(BufferedImage src, BufferedImage dst, int width, int height);
 
 }

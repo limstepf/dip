@@ -1,7 +1,6 @@
 package ch.unifr.diva.dip.api.imaging.ops;
 
 import ch.unifr.diva.dip.api.imaging.scanners.ImageTiler;
-import ch.unifr.diva.dip.api.imaging.scanners.PaddedImageTiler;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.util.concurrent.Callable;
@@ -36,22 +35,7 @@ public class TileOpCallable<T extends BufferedImageOp & TileParallelizable> impl
 
 	@Override
 	public Void call() throws Exception {
-		if (this.op instanceof PaddedTileParallelizable) {
-			ConcurrentTileOp.processPaddedTiles(
-					(PaddedTileParallelizable) this.op,
-					(PaddedImageTiler) this.tiler,
-					this.src,
-					this.dst
-			);
-		} else {
-			ConcurrentTileOp.processTiles(
-					this.op,
-					this.tiler,
-					this.src,
-					this.dst
-			);
-		}
-
+		TileParallelizable.process(op, tiler, src, dst);
 		return null;
 	}
 

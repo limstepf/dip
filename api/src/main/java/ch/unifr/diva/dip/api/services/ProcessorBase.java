@@ -9,6 +9,7 @@ import ch.unifr.diva.dip.api.parameters.Parameter;
 import ch.unifr.diva.dip.api.imaging.BufferedIO;
 import ch.unifr.diva.dip.api.imaging.BufferedMatrix;
 import ch.unifr.diva.dip.api.imaging.ops.ConcurrentTileOp;
+import ch.unifr.diva.dip.api.imaging.ops.Parallelizable;
 import ch.unifr.diva.dip.api.imaging.ops.TileParallelizable;
 import ch.unifr.diva.dip.api.utils.DipThreadPool;
 import java.awt.Rectangle;
@@ -230,18 +231,34 @@ public abstract class ProcessorBase implements Processor {
 	 * @return the filtered image.
 	 */
 	public static BufferedImage filter(DipThreadPool threadPool, BufferedImageOp op, BufferedImage src, BufferedImage dest) {
-		if (!(op instanceof TileParallelizable) || threadPool.poolSize() < 2) {
-			return op.filter(src, dest);
+
+		// get parallelizable mode of the op...
+		final Parallelizable.Mode mode = Parallelizable.getMode(op, threadPool.poolSize());
+		// ...and maybe have some further checks, if we not rather fall back to
+		// single-threaded execution.
+		switch (mode) {
+			case TILE: {
+				// TODO: do not parallelize super small images/tiles at all
+				final Rectangle tileSize = getOptimalTileSize(threadPool.poolSize(), src);
+				if (tileSize.width > 0 && tileSize.height > 0) {
+					final ConcurrentTileOp cop = new ConcurrentTileOp(
+							op,
+							tileSize.width,
+							tileSize.height,
+							threadPool
+					);
+					return cop.filter(src, dest);
+				}
+				break;
+			}
+
+			case SINGLE_THREADED:
+			default:
+				break;
 		}
 
-		final Rectangle tileSize = getOptimalTileSize(threadPool.poolSize(), src);
-		final ConcurrentTileOp cop = new ConcurrentTileOp(
-				op,
-				tileSize.width,
-				tileSize.height,
-				threadPool
-		);
-		return cop.filter(src, dest);
+		// single threaded execution
+		return op.filter(src, dest);
 	}
 
 	/**
