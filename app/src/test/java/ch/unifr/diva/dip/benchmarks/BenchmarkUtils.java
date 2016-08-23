@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
+import javafx.scene.image.WritableImage;
 import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.results.format.ResultFormatFactory;
 import org.openjdk.jmh.results.format.ResultFormatType;
@@ -83,9 +84,26 @@ public class BenchmarkUtils {
 		final BufferedImage image = new BufferedImage(width, height, type);
 		final WritableRaster raster = image.getRaster();
 		for (Location pt : new RasterScanner(image, true)) {
-			raster.setSample(pt.col, pt.row, pt.band, (int) (Math.random() * 255));
+			raster.setSample(pt.col, pt.row, pt.band, random255());
 		}
 		return image;
 	}
 
+	public static WritableImage newRandomFxImage(int size) {
+		return newRandomFxImage(size, size);
+	}
+
+	public static WritableImage newRandomFxImage(int width, int height) {
+		final WritableImage image = new WritableImage(width, height);
+		final int[] buffer = new int[width * height];
+		for (int i = 0; i < buffer.length; i++) {
+			buffer[i] = random255() | (random255() << 8) | (random255() << 16) | (255 << 24);
+		}
+		return image;
+	}
+
+	public static int random255() {
+		return (int) (Math.random() * 255);
+	}
+	
 }
