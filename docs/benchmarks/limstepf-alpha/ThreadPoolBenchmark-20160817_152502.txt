@@ -1,0 +1,415 @@
+cd D:\unifr\MScMA\dip\app; "JAVA_HOME=C:\\Program Files\\Java\\jdk1.8.0_45" cmd /c "\"\"C:\\Program Files\\NetBeans 8.0.2\\java\\maven\\bin\\mvn.bat\" -Dexec.args=\"-classpath %classpath ch.unifr.diva.dip.benchmarks.ThreadPoolBenchmark\" -Dexec.executable=\"C:\\Program Files\\Java\\jdk1.8.0_45\\bin\\java.exe\" -Dexec.classpathScope=test -Dmaven.ext.class.path=\"C:\\Program Files\\NetBeans 8.0.2\\java\\maven-nblib\\netbeans-eventspy.jar;C:\\Program Files\\NetBeans 8.0.2\\java\\maven-nblib\\netbeans-cos.jar\" org.codehaus.mojo:exec-maven-plugin:1.2.1:exec\""
+Running NetBeans Compile On Save execution. Phase execution is skipped and output directories of dependency projects (with Compile on Save turned on) will be used instead of their jar artifacts.
+Scanning for projects...
+                                                                        
+------------------------------------------------------------------------
+Building DIVA DIP Application 1.0.0-SNAPSHOT
+------------------------------------------------------------------------
+
+--- exec-maven-plugin:1.2.1:exec (default-cli) @ dip-app ---
+# JMH 1.12 (released 138 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ThreadPoolBenchmark.singleThread
+# Parameters: (repeat = 1)
+
+# Run progress: 0.00% complete, ETA 00:02:00
+# Fork: 1 of 1
+# Warmup Iteration   1: 26.828 ns/op
+# Warmup Iteration   2: 25.287 ns/op
+# Warmup Iteration   3: 24.599 ns/op
+# Warmup Iteration   4: 24.685 ns/op
+# Warmup Iteration   5: 24.009 ns/op
+Iteration   1: 23.914 ns/op
+Iteration   2: 23.999 ns/op
+Iteration   3: 23.947 ns/op
+Iteration   4: 23.986 ns/op
+Iteration   5: 24.039 ns/op
+
+
+Result "singleThread":
+  23.977 ?(99.9%) 0.184 ns/op [Average]
+  (min, avg, max) = (23.914, 23.977, 24.039), stdev = 0.048
+  CI (99.9%): [23.793, 24.161] (assumes normal distribution)
+
+
+# JMH 1.12 (released 138 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ThreadPoolBenchmark.singleThread
+# Parameters: (repeat = 2)
+
+# Run progress: 8.33% complete, ETA 00:01:53
+# Fork: 1 of 1
+# Warmup Iteration   1: 44.649 ns/op
+# Warmup Iteration   2: 45.777 ns/op
+# Warmup Iteration   3: 43.989 ns/op
+# Warmup Iteration   4: 44.167 ns/op
+# Warmup Iteration   5: 44.384 ns/op
+Iteration   1: 44.204 ns/op
+Iteration   2: 43.926 ns/op
+Iteration   3: 44.055 ns/op
+Iteration   4: 44.000 ns/op
+Iteration   5: 44.191 ns/op
+
+
+Result "singleThread":
+  44.075 ?(99.9%) 0.465 ns/op [Average]
+  (min, avg, max) = (43.926, 44.075, 44.204), stdev = 0.121
+  CI (99.9%): [43.610, 44.540] (assumes normal distribution)
+
+
+# JMH 1.12 (released 138 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ThreadPoolBenchmark.singleThread
+# Parameters: (repeat = 4)
+
+# Run progress: 16.67% complete, ETA 00:01:43
+# Fork: 1 of 1
+# Warmup Iteration   1: 84.628 ns/op
+# Warmup Iteration   2: 84.896 ns/op
+# Warmup Iteration   3: 82.786 ns/op
+# Warmup Iteration   4: 83.143 ns/op
+# Warmup Iteration   5: 82.960 ns/op
+Iteration   1: 83.013 ns/op
+Iteration   2: 83.810 ns/op
+Iteration   3: 83.542 ns/op
+Iteration   4: 83.530 ns/op
+Iteration   5: 84.104 ns/op
+
+
+Result "singleThread":
+  83.600 ?(99.9%) 1.553 ns/op [Average]
+  (min, avg, max) = (83.013, 83.600, 84.104), stdev = 0.403
+  CI (99.9%): [82.046, 85.153] (assumes normal distribution)
+
+
+# JMH 1.12 (released 138 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ThreadPoolBenchmark.singleThread
+# Parameters: (repeat = 8)
+
+# Run progress: 25.00% complete, ETA 00:01:32
+# Fork: 1 of 1
+# Warmup Iteration   1: 164.136 ns/op
+# Warmup Iteration   2: 164.039 ns/op
+# Warmup Iteration   3: 163.225 ns/op
+# Warmup Iteration   4: 162.176 ns/op
+# Warmup Iteration   5: 161.367 ns/op
+Iteration   1: 162.718 ns/op
+Iteration   2: 161.756 ns/op
+Iteration   3: 161.594 ns/op
+Iteration   4: 162.424 ns/op
+Iteration   5: 162.397 ns/op
+
+
+Result "singleThread":
+  162.178 ?(99.9%) 1.846 ns/op [Average]
+  (min, avg, max) = (161.594, 162.178, 162.718), stdev = 0.479
+  CI (99.9%): [160.332, 164.023] (assumes normal distribution)
+
+
+# JMH 1.12 (released 138 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ThreadPoolBenchmark.singleThread
+# Parameters: (repeat = 16)
+
+# Run progress: 33.33% complete, ETA 00:01:22
+# Fork: 1 of 1
+# Warmup Iteration   1: 327.797 ns/op
+# Warmup Iteration   2: 319.575 ns/op
+# Warmup Iteration   3: 319.315 ns/op
+# Warmup Iteration   4: 320.177 ns/op
+# Warmup Iteration   5: 319.971 ns/op
+Iteration   1: 319.694 ns/op
+Iteration   2: 320.401 ns/op
+Iteration   3: 320.627 ns/op
+Iteration   4: 321.053 ns/op
+Iteration   5: 320.879 ns/op
+
+
+Result "singleThread":
+  320.531 ?(99.9%) 2.038 ns/op [Average]
+  (min, avg, max) = (319.694, 320.531, 321.053), stdev = 0.529
+  CI (99.9%): [318.492, 322.569] (assumes normal distribution)
+
+
+# JMH 1.12 (released 138 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ThreadPoolBenchmark.singleThread
+# Parameters: (repeat = 32)
+
+# Run progress: 41.67% complete, ETA 00:01:12
+# Fork: 1 of 1
+# Warmup Iteration   1: 640.575 ns/op
+# Warmup Iteration   2: 635.457 ns/op
+# Warmup Iteration   3: 635.558 ns/op
+# Warmup Iteration   4: 637.556 ns/op
+# Warmup Iteration   5: 635.713 ns/op
+Iteration   1: 636.857 ns/op
+Iteration   2: 634.790 ns/op
+Iteration   3: 633.889 ns/op
+Iteration   4: 636.699 ns/op
+Iteration   5: 634.876 ns/op
+
+
+Result "singleThread":
+  635.422 ?(99.9%) 4.998 ns/op [Average]
+  (min, avg, max) = (633.889, 635.422, 636.857), stdev = 1.298
+  CI (99.9%): [630.425, 640.420] (assumes normal distribution)
+
+
+# JMH 1.12 (released 138 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ThreadPoolBenchmark.threadPool
+# Parameters: (repeat = 1)
+
+# Run progress: 50.00% complete, ETA 00:01:01
+# Fork: 1 of 1
+# Warmup Iteration   1: 4973.305 ns/op
+# Warmup Iteration   2: 4654.258 ns/op
+# Warmup Iteration   3: 4614.237 ns/op
+# Warmup Iteration   4: 4586.027 ns/op
+# Warmup Iteration   5: 4550.259 ns/op
+Iteration   1: 4522.731 ns/op
+Iteration   2: 4524.042 ns/op
+Iteration   3: 4520.224 ns/op
+Iteration   4: 4503.523 ns/op
+Iteration   5: 4525.039 ns/op
+
+
+Result "threadPool":
+  4519.112 ?(99.9%) 34.268 ns/op [Average]
+  (min, avg, max) = (4503.523, 4519.112, 4525.039), stdev = 8.899
+  CI (99.9%): [4484.844, 4553.380] (assumes normal distribution)
+
+
+# JMH 1.12 (released 138 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ThreadPoolBenchmark.threadPool
+# Parameters: (repeat = 2)
+
+# Run progress: 58.33% complete, ETA 00:00:51
+# Fork: 1 of 1
+# Warmup Iteration   1: 5006.883 ns/op
+# Warmup Iteration   2: 4629.070 ns/op
+# Warmup Iteration   3: 4604.953 ns/op
+# Warmup Iteration   4: 4585.777 ns/op
+# Warmup Iteration   5: 4597.747 ns/op
+Iteration   1: 4597.818 ns/op
+Iteration   2: 4546.830 ns/op
+Iteration   3: 4541.111 ns/op
+Iteration   4: 4508.025 ns/op
+Iteration   5: 4496.249 ns/op
+
+
+Result "threadPool":
+  4538.007 ?(99.9%) 152.909 ns/op [Average]
+  (min, avg, max) = (4496.249, 4538.007, 4597.818), stdev = 39.710
+  CI (99.9%): [4385.098, 4690.915] (assumes normal distribution)
+
+
+# JMH 1.12 (released 138 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ThreadPoolBenchmark.threadPool
+# Parameters: (repeat = 4)
+
+# Run progress: 66.67% complete, ETA 00:00:41
+# Fork: 1 of 1
+# Warmup Iteration   1: 4930.386 ns/op
+# Warmup Iteration   2: 4593.424 ns/op
+# Warmup Iteration   3: 4562.799 ns/op
+# Warmup Iteration   4: 4556.604 ns/op
+# Warmup Iteration   5: 4532.964 ns/op
+Iteration   1: 4585.911 ns/op
+Iteration   2: 4585.668 ns/op
+Iteration   3: 4551.676 ns/op
+Iteration   4: 4517.914 ns/op
+Iteration   5: 4560.266 ns/op
+
+
+Result "threadPool":
+  4560.287 ?(99.9%) 108.407 ns/op [Average]
+  (min, avg, max) = (4517.914, 4560.287, 4585.911), stdev = 28.153
+  CI (99.9%): [4451.880, 4668.694] (assumes normal distribution)
+
+
+# JMH 1.12 (released 138 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ThreadPoolBenchmark.threadPool
+# Parameters: (repeat = 8)
+
+# Run progress: 75.00% complete, ETA 00:00:30
+# Fork: 1 of 1
+# Warmup Iteration   1: 5258.152 ns/op
+# Warmup Iteration   2: 4732.784 ns/op
+# Warmup Iteration   3: 4702.873 ns/op
+# Warmup Iteration   4: 4729.696 ns/op
+# Warmup Iteration   5: 4743.266 ns/op
+Iteration   1: 4737.586 ns/op
+Iteration   2: 4736.841 ns/op
+Iteration   3: 4719.139 ns/op
+Iteration   4: 4676.630 ns/op
+Iteration   5: 4685.854 ns/op
+
+
+Result "threadPool":
+  4711.210 ?(99.9%) 109.831 ns/op [Average]
+  (min, avg, max) = (4676.630, 4711.210, 4737.586), stdev = 28.523
+  CI (99.9%): [4601.379, 4821.041] (assumes normal distribution)
+
+
+# JMH 1.12 (released 138 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ThreadPoolBenchmark.threadPool
+# Parameters: (repeat = 16)
+
+# Run progress: 83.33% complete, ETA 00:00:20
+# Fork: 1 of 1
+# Warmup Iteration   1: 5162.679 ns/op
+# Warmup Iteration   2: 4843.194 ns/op
+# Warmup Iteration   3: 4830.363 ns/op
+# Warmup Iteration   4: 4823.247 ns/op
+# Warmup Iteration   5: 4742.255 ns/op
+Iteration   1: 4752.365 ns/op
+Iteration   2: 4733.745 ns/op
+Iteration   3: 4771.376 ns/op
+Iteration   4: 4753.839 ns/op
+Iteration   5: 4802.728 ns/op
+
+
+Result "threadPool":
+  4762.811 ?(99.9%) 100.065 ns/op [Average]
+  (min, avg, max) = (4733.745, 4762.811, 4802.728), stdev = 25.986
+  CI (99.9%): [4662.746, 4862.875] (assumes normal distribution)
+
+
+# JMH 1.12 (released 138 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.ThreadPoolBenchmark.threadPool
+# Parameters: (repeat = 32)
+
+# Run progress: 91.67% complete, ETA 00:00:10
+# Fork: 1 of 1
+# Warmup Iteration   1: 5651.421 ns/op
+# Warmup Iteration   2: 5143.903 ns/op
+# Warmup Iteration   3: 5207.152 ns/op
+# Warmup Iteration   4: 5113.841 ns/op
+# Warmup Iteration   5: 5050.294 ns/op
+Iteration   1: 5084.637 ns/op
+Iteration   2: 5033.894 ns/op
+Iteration   3: 5013.882 ns/op
+Iteration   4: 5074.043 ns/op
+Iteration   5: 5087.656 ns/op
+
+
+Result "threadPool":
+  5058.823 ?(99.9%) 127.283 ns/op [Average]
+  (min, avg, max) = (5013.882, 5058.823, 5087.656), stdev = 33.055
+  CI (99.9%): [4931.540, 5186.105] (assumes normal distribution)
+
+
+# Run complete. Total time: 00:02:03
+
+Benchmark                         (repeat)  Mode  Cnt     Score     Error  Units
+ThreadPoolBenchmark.singleThread         1  avgt    5    23.977 ?   0.184  ns/op
+ThreadPoolBenchmark.singleThread         2  avgt    5    44.075 ?   0.465  ns/op
+ThreadPoolBenchmark.singleThread         4  avgt    5    83.600 ?   1.553  ns/op
+ThreadPoolBenchmark.singleThread         8  avgt    5   162.178 ?   1.846  ns/op
+ThreadPoolBenchmark.singleThread        16  avgt    5   320.531 ?   2.038  ns/op
+ThreadPoolBenchmark.singleThread        32  avgt    5   635.422 ?   4.998  ns/op
+ThreadPoolBenchmark.threadPool           1  avgt    5  4519.112 ?  34.268  ns/op
+ThreadPoolBenchmark.threadPool           2  avgt    5  4538.007 ? 152.909  ns/op
+ThreadPoolBenchmark.threadPool           4  avgt    5  4560.287 ? 108.407  ns/op
+ThreadPoolBenchmark.threadPool           8  avgt    5  4711.210 ? 109.831  ns/op
+ThreadPoolBenchmark.threadPool          16  avgt    5  4762.811 ? 100.065  ns/op
+ThreadPoolBenchmark.threadPool          32  avgt    5  5058.823 ? 127.283  ns/op
+------------------------------------------------------------------------
+BUILD SUCCESS
+------------------------------------------------------------------------
+Total time: 2:04.112s
+Finished at: Wed Aug 17 15:25:02 CEST 2016
+Final Memory: 7M/309M
+------------------------------------------------------------------------

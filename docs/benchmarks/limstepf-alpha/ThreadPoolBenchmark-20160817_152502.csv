@@ -1,0 +1,13 @@
+"Benchmark","Mode","Threads","Samples","Score","Score Error (99.9%)","Unit","Param: repeat"
+"ch.unifr.diva.dip.benchmarks.ThreadPoolBenchmark.singleThread","avgt",1,5,23.976930,0.184426,"ns/op",1
+"ch.unifr.diva.dip.benchmarks.ThreadPoolBenchmark.singleThread","avgt",1,5,44.075128,0.464652,"ns/op",2
+"ch.unifr.diva.dip.benchmarks.ThreadPoolBenchmark.singleThread","avgt",1,5,83.599527,1.553378,"ns/op",4
+"ch.unifr.diva.dip.benchmarks.ThreadPoolBenchmark.singleThread","avgt",1,5,162.177714,1.845646,"ns/op",8
+"ch.unifr.diva.dip.benchmarks.ThreadPoolBenchmark.singleThread","avgt",1,5,320.530663,2.038352,"ns/op",16
+"ch.unifr.diva.dip.benchmarks.ThreadPoolBenchmark.singleThread","avgt",1,5,635.422241,4.997647,"ns/op",32
+"ch.unifr.diva.dip.benchmarks.ThreadPoolBenchmark.threadPool","avgt",1,5,4519.111896,34.268321,"ns/op",1
+"ch.unifr.diva.dip.benchmarks.ThreadPoolBenchmark.threadPool","avgt",1,5,4538.006526,152.908866,"ns/op",2
+"ch.unifr.diva.dip.benchmarks.ThreadPoolBenchmark.threadPool","avgt",1,5,4560.286956,108.406673,"ns/op",4
+"ch.unifr.diva.dip.benchmarks.ThreadPoolBenchmark.threadPool","avgt",1,5,4711.210176,109.831024,"ns/op",8
+"ch.unifr.diva.dip.benchmarks.ThreadPoolBenchmark.threadPool","avgt",1,5,4762.810642,100.064669,"ns/op",16
+"ch.unifr.diva.dip.benchmarks.ThreadPoolBenchmark.threadPool","avgt",1,5,5058.822600,127.282654,"ns/op",32
