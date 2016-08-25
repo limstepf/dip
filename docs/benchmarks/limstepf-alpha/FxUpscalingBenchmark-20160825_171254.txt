@@ -1,0 +1,1009 @@
+cd D:\unifr\MScMA\dip\app; "JAVA_HOME=C:\\Program Files\\Java\\jdk1.8.0_45" cmd /c "\"\"C:\\Program Files\\NetBeans 8.0.2\\java\\maven\\bin\\mvn.bat\" -Dexec.args=\"-classpath %classpath ch.unifr.diva.dip.benchmarks.FxUpscalingBenchmark\" -Dexec.executable=\"C:\\Program Files\\Java\\jdk1.8.0_45\\bin\\java.exe\" -Dexec.classpathScope=test -Dmaven.ext.class.path=\"C:\\Program Files\\NetBeans 8.0.2\\java\\maven-nblib\\netbeans-eventspy.jar;C:\\Program Files\\NetBeans 8.0.2\\java\\maven-nblib\\netbeans-cos.jar\" org.codehaus.mojo:exec-maven-plugin:1.2.1:exec\""
+Running NetBeans Compile On Save execution. Phase execution is skipped and output directories of dependency projects (with Compile on Save turned on) will be used instead of their jar artifacts.
+Scanning for projects...
+                                                                        
+------------------------------------------------------------------------
+Building DIVA DIP Application 1.0.0-SNAPSHOT
+------------------------------------------------------------------------
+
+--- exec-maven-plugin:1.2.1:exec (default-cli) @ dip-app ---
+# JMH 1.12 (released 146 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.FxUpscalingBenchmark.bresenhamAwt
+# Parameters: (scale = 2)
+
+# Run progress: 0.00% complete, ETA 00:05:00
+# Fork: 1 of 1
+# Warmup Iteration   1: 0.202 ms/op
+# Warmup Iteration   2: 0.172 ms/op
+# Warmup Iteration   3: 0.160 ms/op
+# Warmup Iteration   4: 0.160 ms/op
+# Warmup Iteration   5: 0.160 ms/op
+Iteration   1: 0.160 ms/op
+Iteration   2: 0.160 ms/op
+Iteration   3: 0.161 ms/op
+Iteration   4: 0.163 ms/op
+Iteration   5: 0.160 ms/op
+
+
+Result "bresenhamAwt":
+  0.161 ?(99.9%) 0.004 ms/op [Average]
+  (min, avg, max) = (0.160, 0.161, 0.163), stdev = 0.001
+  CI (99.9%): [0.156, 0.165] (assumes normal distribution)
+
+
+# JMH 1.12 (released 146 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.FxUpscalingBenchmark.bresenhamAwt
+# Parameters: (scale = 4)
+
+# Run progress: 3.33% complete, ETA 00:05:01
+# Fork: 1 of 1
+# Warmup Iteration   1: 0.703 ms/op
+# Warmup Iteration   2: 0.640 ms/op
+# Warmup Iteration   3: 0.622 ms/op
+# Warmup Iteration   4: 0.564 ms/op
+# Warmup Iteration   5: 0.575 ms/op
+Iteration   1: 0.571 ms/op
+Iteration   2: 0.580 ms/op
+Iteration   3: 0.563 ms/op
+Iteration   4: 0.566 ms/op
+Iteration   5: 0.580 ms/op
+
+
+Result "bresenhamAwt":
+  0.572 ?(99.9%) 0.031 ms/op [Average]
+  (min, avg, max) = (0.563, 0.572, 0.580), stdev = 0.008
+  CI (99.9%): [0.541, 0.603] (assumes normal distribution)
+
+
+# JMH 1.12 (released 146 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.FxUpscalingBenchmark.bresenhamAwt
+# Parameters: (scale = 8)
+
+# Run progress: 6.67% complete, ETA 00:04:52
+# Fork: 1 of 1
+# Warmup Iteration   1: 2.837 ms/op
+# Warmup Iteration   2: 2.826 ms/op
+# Warmup Iteration   3: 2.828 ms/op
+# Warmup Iteration   4: 2.675 ms/op
+# Warmup Iteration   5: 2.573 ms/op
+Iteration   1: 2.543 ms/op
+Iteration   2: 2.632 ms/op
+Iteration   3: 2.557 ms/op
+Iteration   4: 2.599 ms/op
+Iteration   5: 2.606 ms/op
+
+
+Result "bresenhamAwt":
+  2.587 ?(99.9%) 0.141 ms/op [Average]
+  (min, avg, max) = (2.543, 2.587, 2.632), stdev = 0.037
+  CI (99.9%): [2.447, 2.728] (assumes normal distribution)
+
+
+# JMH 1.12 (released 146 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.FxUpscalingBenchmark.bresenhamAwt
+# Parameters: (scale = 16)
+
+# Run progress: 10.00% complete, ETA 00:04:42
+# Fork: 1 of 1
+# Warmup Iteration   1: 12.200 ms/op
+# Warmup Iteration   2: 10.958 ms/op
+# Warmup Iteration   3: 10.837 ms/op
+# Warmup Iteration   4: 11.353 ms/op
+# Warmup Iteration   5: 10.933 ms/op
+Iteration   1: 11.004 ms/op
+Iteration   2: 11.023 ms/op
+Iteration   3: 10.881 ms/op
+Iteration   4: 10.880 ms/op
+Iteration   5: 11.041 ms/op
+
+
+Result "bresenhamAwt":
+  10.966 ?(99.9%) 0.304 ms/op [Average]
+  (min, avg, max) = (10.880, 10.966, 11.041), stdev = 0.079
+  CI (99.9%): [10.662, 11.269] (assumes normal distribution)
+
+
+# JMH 1.12 (released 146 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.FxUpscalingBenchmark.bresenhamAwt
+# Parameters: (scale = 32)
+
+# Run progress: 13.33% complete, ETA 00:04:32
+# Fork: 1 of 1
+# Warmup Iteration   1: 61.061 ms/op
+# Warmup Iteration   2: 63.856 ms/op
+# Warmup Iteration   3: 51.958 ms/op
+# Warmup Iteration   4: 62.535 ms/op
+# Warmup Iteration   5: 51.865 ms/op
+Iteration   1: 60.919 ms/op
+Iteration   2: 50.867 ms/op
+Iteration   3: 57.514 ms/op
+Iteration   4: 50.964 ms/op
+Iteration   5: 56.723 ms/op
+
+
+Result "bresenhamAwt":
+  55.397 ?(99.9%) 16.884 ms/op [Average]
+  (min, avg, max) = (50.867, 55.397, 60.919), stdev = 4.385
+  CI (99.9%): [38.514, 72.281] (assumes normal distribution)
+
+
+# JMH 1.12 (released 146 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.FxUpscalingBenchmark.bresenhamAwt
+# Parameters: (scale = 64)
+
+# Run progress: 16.67% complete, ETA 00:04:23
+# Fork: 1 of 1
+# Warmup Iteration   1: 271.023 ms/op
+# Warmup Iteration   2: 266.168 ms/op
+# Warmup Iteration   3: 306.309 ms/op
+# Warmup Iteration   4: 279.198 ms/op
+# Warmup Iteration   5: 203.669 ms/op
+Iteration   1: 240.403 ms/op
+Iteration   2: 239.671 ms/op
+Iteration   3: 196.810 ms/op
+Iteration   4: 236.728 ms/op
+Iteration   5: 244.241 ms/op
+
+
+Result "bresenhamAwt":
+  231.570 ?(99.9%) 75.533 ms/op [Average]
+  (min, avg, max) = (196.810, 231.570, 244.241), stdev = 19.616
+  CI (99.9%): [156.038, 307.103] (assumes normal distribution)
+
+
+# JMH 1.12 (released 146 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.FxUpscalingBenchmark.bresenhamFx
+# Parameters: (scale = 2)
+
+# Run progress: 20.00% complete, ETA 00:04:20
+# Fork: 1 of 1
+# Warmup Iteration   1: 0.178 ms/op
+# Warmup Iteration   2: 0.162 ms/op
+# Warmup Iteration   3: 0.154 ms/op
+# Warmup Iteration   4: 0.154 ms/op
+# Warmup Iteration   5: 0.154 ms/op
+Iteration   1: 0.154 ms/op
+Iteration   2: 0.155 ms/op
+Iteration   3: 0.157 ms/op
+Iteration   4: 0.158 ms/op
+Iteration   5: 0.160 ms/op
+
+
+Result "bresenhamFx":
+  0.157 ?(99.9%) 0.009 ms/op [Average]
+  (min, avg, max) = (0.154, 0.157, 0.160), stdev = 0.002
+  CI (99.9%): [0.148, 0.166] (assumes normal distribution)
+
+
+# JMH 1.12 (released 146 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.FxUpscalingBenchmark.bresenhamFx
+# Parameters: (scale = 4)
+
+# Run progress: 23.33% complete, ETA 00:04:07
+# Fork: 1 of 1
+# Warmup Iteration   1: 0.614 ms/op
+# Warmup Iteration   2: 0.567 ms/op
+# Warmup Iteration   3: 0.541 ms/op
+# Warmup Iteration   4: 0.561 ms/op
+# Warmup Iteration   5: 0.564 ms/op
+Iteration   1: 0.558 ms/op
+Iteration   2: 0.565 ms/op
+Iteration   3: 0.565 ms/op
+Iteration   4: 0.570 ms/op
+Iteration   5: 0.572 ms/op
+
+
+Result "bresenhamFx":
+  0.566 ?(99.9%) 0.022 ms/op [Average]
+  (min, avg, max) = (0.558, 0.566, 0.572), stdev = 0.006
+  CI (99.9%): [0.544, 0.588] (assumes normal distribution)
+
+
+# JMH 1.12 (released 146 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.FxUpscalingBenchmark.bresenhamFx
+# Parameters: (scale = 8)
+
+# Run progress: 26.67% complete, ETA 00:03:56
+# Fork: 1 of 1
+# Warmup Iteration   1: 2.374 ms/op
+# Warmup Iteration   2: 2.293 ms/op
+# Warmup Iteration   3: 2.234 ms/op
+# Warmup Iteration   4: 2.117 ms/op
+# Warmup Iteration   5: 2.144 ms/op
+Iteration   1: 2.124 ms/op
+Iteration   2: 2.141 ms/op
+Iteration   3: 2.158 ms/op
+Iteration   4: 2.114 ms/op
+Iteration   5: 2.119 ms/op
+
+
+Result "bresenhamFx":
+  2.131 ?(99.9%) 0.070 ms/op [Average]
+  (min, avg, max) = (2.114, 2.131, 2.158), stdev = 0.018
+  CI (99.9%): [2.061, 2.201] (assumes normal distribution)
+
+
+# JMH 1.12 (released 146 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.FxUpscalingBenchmark.bresenhamFx
+# Parameters: (scale = 16)
+
+# Run progress: 30.00% complete, ETA 00:03:44
+# Fork: 1 of 1
+# Warmup Iteration   1: 9.444 ms/op
+# Warmup Iteration   2: 8.914 ms/op
+# Warmup Iteration   3: 8.854 ms/op
+# Warmup Iteration   4: 8.704 ms/op
+# Warmup Iteration   5: 8.748 ms/op
+Iteration   1: 8.521 ms/op
+Iteration   2: 8.451 ms/op
+Iteration   3: 8.664 ms/op
+Iteration   4: 8.442 ms/op
+Iteration   5: 8.615 ms/op
+
+
+Result "bresenhamFx":
+  8.539 ?(99.9%) 0.380 ms/op [Average]
+  (min, avg, max) = (8.442, 8.539, 8.664), stdev = 0.099
+  CI (99.9%): [8.159, 8.919] (assumes normal distribution)
+
+
+# JMH 1.12 (released 146 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.FxUpscalingBenchmark.bresenhamFx
+# Parameters: (scale = 32)
+
+# Run progress: 33.33% complete, ETA 00:03:33
+# Fork: 1 of 1
+# Warmup Iteration   1: 45.897 ms/op
+# Warmup Iteration   2: 57.443 ms/op
+# Warmup Iteration   3: 44.619 ms/op
+# Warmup Iteration   4: 54.054 ms/op
+# Warmup Iteration   5: 51.655 ms/op
+Iteration   1: 44.928 ms/op
+Iteration   2: 53.141 ms/op
+Iteration   3: 35.986 ms/op
+Iteration   4: 36.660 ms/op
+Iteration   5: 34.773 ms/op
+
+
+Result "bresenhamFx":
+  41.098 ?(99.9%) 30.170 ms/op [Average]
+  (min, avg, max) = (34.773, 41.098, 53.141), stdev = 7.835
+  CI (99.9%): [10.928, 71.267] (assumes normal distribution)
+
+
+# JMH 1.12 (released 146 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.FxUpscalingBenchmark.bresenhamFx
+# Parameters: (scale = 64)
+
+# Run progress: 36.67% complete, ETA 00:03:23
+# Fork: 1 of 1
+# Warmup Iteration   1: 202.393 ms/op
+# Warmup Iteration   2: 225.198 ms/op
+# Warmup Iteration   3: 214.872 ms/op
+# Warmup Iteration   4: 175.888 ms/op
+# Warmup Iteration   5: 221.526 ms/op
+Iteration   1: 167.866 ms/op
+Iteration   2: 149.434 ms/op
+Iteration   3: 142.928 ms/op
+Iteration   4: 135.297 ms/op
+Iteration   5: 135.670 ms/op
+
+
+Result "bresenhamFx":
+  146.239 ?(99.9%) 51.673 ms/op [Average]
+  (min, avg, max) = (135.297, 146.239, 167.866), stdev = 13.419
+  CI (99.9%): [94.566, 197.912] (assumes normal distribution)
+
+
+# JMH 1.12 (released 146 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.FxUpscalingBenchmark.bresenhamFxIntBuffer
+# Parameters: (scale = 2)
+
+# Run progress: 40.00% complete, ETA 00:03:13
+# Fork: 1 of 1
+# Warmup Iteration   1: 0.160 ms/op
+# Warmup Iteration   2: 0.158 ms/op
+# Warmup Iteration   3: 0.150 ms/op
+# Warmup Iteration   4: 0.151 ms/op
+# Warmup Iteration   5: 0.150 ms/op
+Iteration   1: 0.152 ms/op
+Iteration   2: 0.154 ms/op
+Iteration   3: 0.155 ms/op
+Iteration   4: 0.154 ms/op
+Iteration   5: 0.156 ms/op
+
+
+Result "bresenhamFxIntBuffer":
+  0.154 ?(99.9%) 0.006 ms/op [Average]
+  (min, avg, max) = (0.152, 0.154, 0.156), stdev = 0.002
+  CI (99.9%): [0.148, 0.160] (assumes normal distribution)
+
+
+# JMH 1.12 (released 146 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.FxUpscalingBenchmark.bresenhamFxIntBuffer
+# Parameters: (scale = 4)
+
+# Run progress: 43.33% complete, ETA 00:03:02
+# Fork: 1 of 1
+# Warmup Iteration   1: 0.563 ms/op
+# Warmup Iteration   2: 0.525 ms/op
+# Warmup Iteration   3: 0.513 ms/op
+# Warmup Iteration   4: 0.541 ms/op
+# Warmup Iteration   5: 0.542 ms/op
+Iteration   1: 0.537 ms/op
+Iteration   2: 0.541 ms/op
+Iteration   3: 0.543 ms/op
+Iteration   4: 0.545 ms/op
+Iteration   5: 0.549 ms/op
+
+
+Result "bresenhamFxIntBuffer":
+  0.543 ?(99.9%) 0.017 ms/op [Average]
+  (min, avg, max) = (0.537, 0.543, 0.549), stdev = 0.004
+  CI (99.9%): [0.526, 0.560] (assumes normal distribution)
+
+
+# JMH 1.12 (released 146 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.FxUpscalingBenchmark.bresenhamFxIntBuffer
+# Parameters: (scale = 8)
+
+# Run progress: 46.67% complete, ETA 00:02:51
+# Fork: 1 of 1
+# Warmup Iteration   1: 2.116 ms/op
+# Warmup Iteration   2: 2.085 ms/op
+# Warmup Iteration   3: 2.148 ms/op
+# Warmup Iteration   4: 1.951 ms/op
+# Warmup Iteration   5: 2.017 ms/op
+Iteration   1: 1.980 ms/op
+Iteration   2: 1.960 ms/op
+Iteration   3: 2.016 ms/op
+Iteration   4: 1.990 ms/op
+Iteration   5: 1.991 ms/op
+
+
+Result "bresenhamFxIntBuffer":
+  1.987 ?(99.9%) 0.077 ms/op [Average]
+  (min, avg, max) = (1.960, 1.987, 2.016), stdev = 0.020
+  CI (99.9%): [1.911, 2.064] (assumes normal distribution)
+
+
+# JMH 1.12 (released 146 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.FxUpscalingBenchmark.bresenhamFxIntBuffer
+# Parameters: (scale = 16)
+
+# Run progress: 50.00% complete, ETA 00:02:40
+# Fork: 1 of 1
+# Warmup Iteration   1: 8.544 ms/op
+# Warmup Iteration   2: 8.067 ms/op
+# Warmup Iteration   3: 8.750 ms/op
+# Warmup Iteration   4: 8.022 ms/op
+# Warmup Iteration   5: 8.141 ms/op
+Iteration   1: 8.077 ms/op
+Iteration   2: 8.095 ms/op
+Iteration   3: 7.888 ms/op
+Iteration   4: 7.811 ms/op
+Iteration   5: 8.059 ms/op
+
+
+Result "bresenhamFxIntBuffer":
+  7.986 ?(99.9%) 0.492 ms/op [Average]
+  (min, avg, max) = (7.811, 7.986, 8.095), stdev = 0.128
+  CI (99.9%): [7.494, 8.478] (assumes normal distribution)
+
+
+# JMH 1.12 (released 146 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.FxUpscalingBenchmark.bresenhamFxIntBuffer
+# Parameters: (scale = 32)
+
+# Run progress: 53.33% complete, ETA 00:02:29
+# Fork: 1 of 1
+# Warmup Iteration   1: 38.515 ms/op
+# Warmup Iteration   2: 36.687 ms/op
+# Warmup Iteration   3: 45.988 ms/op
+# Warmup Iteration   4: 34.946 ms/op
+# Warmup Iteration   5: 34.799 ms/op
+Iteration   1: 43.783 ms/op
+Iteration   2: 35.183 ms/op
+Iteration   3: 45.490 ms/op
+Iteration   4: 36.093 ms/op
+Iteration   5: 36.430 ms/op
+
+
+Result "bresenhamFxIntBuffer":
+  39.396 ?(99.9%) 18.652 ms/op [Average]
+  (min, avg, max) = (35.183, 39.396, 45.490), stdev = 4.844
+  CI (99.9%): [20.744, 58.048] (assumes normal distribution)
+
+
+# JMH 1.12 (released 146 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.FxUpscalingBenchmark.bresenhamFxIntBuffer
+# Parameters: (scale = 64)
+
+# Run progress: 56.67% complete, ETA 00:02:19
+# Fork: 1 of 1
+# Warmup Iteration   1: 171.795 ms/op
+# Warmup Iteration   2: 148.588 ms/op
+# Warmup Iteration   3: 178.646 ms/op
+# Warmup Iteration   4: 139.514 ms/op
+# Warmup Iteration   5: 176.224 ms/op
+Iteration   1: 144.743 ms/op
+Iteration   2: 176.920 ms/op
+Iteration   3: 146.062 ms/op
+Iteration   4: 146.009 ms/op
+Iteration   5: 170.311 ms/op
+
+
+Result "bresenhamFxIntBuffer":
+  156.809 ?(99.9%) 59.794 ms/op [Average]
+  (min, avg, max) = (144.743, 156.809, 176.920), stdev = 15.528
+  CI (99.9%): [97.015, 216.603] (assumes normal distribution)
+
+
+# JMH 1.12 (released 146 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.FxUpscalingBenchmark.bresenhamFxIntBufferDst
+# Parameters: (scale = 2)
+
+# Run progress: 60.00% complete, ETA 00:02:08
+# Fork: 1 of 1
+# Warmup Iteration   1: 0.130 ms/op
+# Warmup Iteration   2: 0.115 ms/op
+# Warmup Iteration   3: 0.115 ms/op
+# Warmup Iteration   4: 0.115 ms/op
+# Warmup Iteration   5: 0.115 ms/op
+Iteration   1: 0.115 ms/op
+Iteration   2: 0.115 ms/op
+Iteration   3: 0.115 ms/op
+Iteration   4: 0.115 ms/op
+Iteration   5: 0.115 ms/op
+
+
+Result "bresenhamFxIntBufferDst":
+  0.115 ?(99.9%) 0.001 ms/op [Average]
+  (min, avg, max) = (0.115, 0.115, 0.115), stdev = 0.001
+  CI (99.9%): [0.114, 0.115] (assumes normal distribution)
+
+
+# JMH 1.12 (released 146 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.FxUpscalingBenchmark.bresenhamFxIntBufferDst
+# Parameters: (scale = 4)
+
+# Run progress: 63.33% complete, ETA 00:01:57
+# Fork: 1 of 1
+# Warmup Iteration   1: 0.434 ms/op
+# Warmup Iteration   2: 0.425 ms/op
+# Warmup Iteration   3: 0.409 ms/op
+# Warmup Iteration   4: 0.399 ms/op
+# Warmup Iteration   5: 0.397 ms/op
+Iteration   1: 0.395 ms/op
+Iteration   2: 0.396 ms/op
+Iteration   3: 0.398 ms/op
+Iteration   4: 0.398 ms/op
+Iteration   5: 0.397 ms/op
+
+
+Result "bresenhamFxIntBufferDst":
+  0.397 ?(99.9%) 0.005 ms/op [Average]
+  (min, avg, max) = (0.395, 0.397, 0.398), stdev = 0.001
+  CI (99.9%): [0.392, 0.402] (assumes normal distribution)
+
+
+# JMH 1.12 (released 146 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.FxUpscalingBenchmark.bresenhamFxIntBufferDst
+# Parameters: (scale = 8)
+
+# Run progress: 66.67% complete, ETA 00:01:46
+# Fork: 1 of 1
+# Warmup Iteration   1: 1.762 ms/op
+# Warmup Iteration   2: 1.729 ms/op
+# Warmup Iteration   3: 1.728 ms/op
+# Warmup Iteration   4: 1.725 ms/op
+# Warmup Iteration   5: 1.725 ms/op
+Iteration   1: 1.720 ms/op
+Iteration   2: 1.726 ms/op
+Iteration   3: 1.730 ms/op
+Iteration   4: 1.725 ms/op
+Iteration   5: 1.635 ms/op
+
+
+Result "bresenhamFxIntBufferDst":
+  1.707 ?(99.9%) 0.156 ms/op [Average]
+  (min, avg, max) = (1.635, 1.707, 1.730), stdev = 0.041
+  CI (99.9%): [1.551, 1.863] (assumes normal distribution)
+
+
+# JMH 1.12 (released 146 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.FxUpscalingBenchmark.bresenhamFxIntBufferDst
+# Parameters: (scale = 16)
+
+# Run progress: 70.00% complete, ETA 00:01:35
+# Fork: 1 of 1
+# Warmup Iteration   1: 7.727 ms/op
+# Warmup Iteration   2: 7.531 ms/op
+# Warmup Iteration   3: 7.515 ms/op
+# Warmup Iteration   4: 7.528 ms/op
+# Warmup Iteration   5: 7.514 ms/op
+Iteration   1: 7.509 ms/op
+Iteration   2: 7.494 ms/op
+Iteration   3: 7.490 ms/op
+Iteration   4: 7.478 ms/op
+Iteration   5: 7.489 ms/op
+
+
+Result "bresenhamFxIntBufferDst":
+  7.492 ?(99.9%) 0.043 ms/op [Average]
+  (min, avg, max) = (7.478, 7.492, 7.509), stdev = 0.011
+  CI (99.9%): [7.449, 7.535] (assumes normal distribution)
+
+
+# JMH 1.12 (released 146 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.FxUpscalingBenchmark.bresenhamFxIntBufferDst
+# Parameters: (scale = 32)
+
+# Run progress: 73.33% complete, ETA 00:01:25
+# Fork: 1 of 1
+# Warmup Iteration   1: 29.719 ms/op
+# Warmup Iteration   2: 28.290 ms/op
+# Warmup Iteration   3: 28.178 ms/op
+# Warmup Iteration   4: 28.354 ms/op
+# Warmup Iteration   5: 28.376 ms/op
+Iteration   1: 28.383 ms/op
+Iteration   2: 28.449 ms/op
+Iteration   3: 28.451 ms/op
+Iteration   4: 28.340 ms/op
+Iteration   5: 28.204 ms/op
+
+
+Result "bresenhamFxIntBufferDst":
+  28.365 ?(99.9%) 0.391 ms/op [Average]
+  (min, avg, max) = (28.204, 28.365, 28.451), stdev = 0.102
+  CI (99.9%): [27.974, 28.757] (assumes normal distribution)
+
+
+# JMH 1.12 (released 146 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.FxUpscalingBenchmark.bresenhamFxIntBufferDst
+# Parameters: (scale = 64)
+
+# Run progress: 76.67% complete, ETA 00:01:14
+# Fork: 1 of 1
+# Warmup Iteration   1: 131.869 ms/op
+# Warmup Iteration   2: 113.003 ms/op
+# Warmup Iteration   3: 112.959 ms/op
+# Warmup Iteration   4: 113.488 ms/op
+# Warmup Iteration   5: 113.101 ms/op
+Iteration   1: 113.012 ms/op
+Iteration   2: 112.947 ms/op
+Iteration   3: 113.164 ms/op
+Iteration   4: 113.388 ms/op
+Iteration   5: 113.248 ms/op
+
+
+Result "bresenhamFxIntBufferDst":
+  113.152 ?(99.9%) 0.685 ms/op [Average]
+  (min, avg, max) = (112.947, 113.152, 113.388), stdev = 0.178
+  CI (99.9%): [112.467, 113.836] (assumes normal distribution)
+
+
+# JMH 1.12 (released 146 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.FxUpscalingBenchmark.nativeNNAwt
+# Parameters: (scale = 2)
+
+# Run progress: 80.00% complete, ETA 00:01:03
+# Fork: 1 of 1
+# Warmup Iteration   1: 0.247 ms/op
+# Warmup Iteration   2: 0.217 ms/op
+# Warmup Iteration   3: 0.203 ms/op
+# Warmup Iteration   4: 0.203 ms/op
+# Warmup Iteration   5: 0.193 ms/op
+Iteration   1: 0.192 ms/op
+Iteration   2: 0.191 ms/op
+Iteration   3: 0.192 ms/op
+Iteration   4: 0.194 ms/op
+Iteration   5: 0.192 ms/op
+
+
+Result "nativeNNAwt":
+  0.192 ?(99.9%) 0.003 ms/op [Average]
+  (min, avg, max) = (0.191, 0.192, 0.194), stdev = 0.001
+  CI (99.9%): [0.189, 0.196] (assumes normal distribution)
+
+
+# JMH 1.12 (released 146 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.FxUpscalingBenchmark.nativeNNAwt
+# Parameters: (scale = 4)
+
+# Run progress: 83.33% complete, ETA 00:00:53
+# Fork: 1 of 1
+# Warmup Iteration   1: 0.832 ms/op
+# Warmup Iteration   2: 0.738 ms/op
+# Warmup Iteration   3: 0.682 ms/op
+# Warmup Iteration   4: 0.666 ms/op
+# Warmup Iteration   5: 0.676 ms/op
+Iteration   1: 0.675 ms/op
+Iteration   2: 0.674 ms/op
+Iteration   3: 0.677 ms/op
+Iteration   4: 0.680 ms/op
+Iteration   5: 0.681 ms/op
+
+
+Result "nativeNNAwt":
+  0.677 ?(99.9%) 0.012 ms/op [Average]
+  (min, avg, max) = (0.674, 0.677, 0.681), stdev = 0.003
+  CI (99.9%): [0.666, 0.689] (assumes normal distribution)
+
+
+# JMH 1.12 (released 146 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.FxUpscalingBenchmark.nativeNNAwt
+# Parameters: (scale = 8)
+
+# Run progress: 86.67% complete, ETA 00:00:42
+# Fork: 1 of 1
+# Warmup Iteration   1: 3.058 ms/op
+# Warmup Iteration   2: 2.958 ms/op
+# Warmup Iteration   3: 2.975 ms/op
+# Warmup Iteration   4: 2.748 ms/op
+# Warmup Iteration   5: 2.756 ms/op
+Iteration   1: 2.747 ms/op
+Iteration   2: 2.787 ms/op
+Iteration   3: 2.733 ms/op
+Iteration   4: 2.597 ms/op
+Iteration   5: 2.596 ms/op
+
+
+Result "nativeNNAwt":
+  2.692 ?(99.9%) 0.344 ms/op [Average]
+  (min, avg, max) = (2.596, 2.692, 2.787), stdev = 0.089
+  CI (99.9%): [2.349, 3.036] (assumes normal distribution)
+
+
+# JMH 1.12 (released 146 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.FxUpscalingBenchmark.nativeNNAwt
+# Parameters: (scale = 16)
+
+# Run progress: 90.00% complete, ETA 00:00:31
+# Fork: 1 of 1
+# Warmup Iteration   1: 11.688 ms/op
+# Warmup Iteration   2: 10.964 ms/op
+# Warmup Iteration   3: 10.911 ms/op
+# Warmup Iteration   4: 11.079 ms/op
+# Warmup Iteration   5: 11.171 ms/op
+Iteration   1: 11.318 ms/op
+Iteration   2: 11.078 ms/op
+Iteration   3: 11.037 ms/op
+Iteration   4: 11.092 ms/op
+Iteration   5: 11.195 ms/op
+
+
+Result "nativeNNAwt":
+  11.144 ?(99.9%) 0.436 ms/op [Average]
+  (min, avg, max) = (11.037, 11.144, 11.318), stdev = 0.113
+  CI (99.9%): [10.708, 11.580] (assumes normal distribution)
+
+
+# JMH 1.12 (released 146 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.FxUpscalingBenchmark.nativeNNAwt
+# Parameters: (scale = 32)
+
+# Run progress: 93.33% complete, ETA 00:00:21
+# Fork: 1 of 1
+# Warmup Iteration   1: 53.253 ms/op
+# Warmup Iteration   2: 64.757 ms/op
+# Warmup Iteration   3: 50.956 ms/op
+# Warmup Iteration   4: 61.210 ms/op
+# Warmup Iteration   5: 51.153 ms/op
+Iteration   1: 59.206 ms/op
+Iteration   2: 49.826 ms/op
+Iteration   3: 55.865 ms/op
+Iteration   4: 49.793 ms/op
+Iteration   5: 54.822 ms/op
+
+
+Result "nativeNNAwt":
+  53.902 ?(99.9%) 15.679 ms/op [Average]
+  (min, avg, max) = (49.793, 53.902, 59.206), stdev = 4.072
+  CI (99.9%): [38.223, 69.582] (assumes normal distribution)
+
+
+# JMH 1.12 (released 146 days ago, please consider updating!)
+# VM version: JDK 1.8.0_45, VM 25.45-b02
+# VM invoker: C:\Program Files\Java\jdk1.8.0_45\jre\bin\java.exe
+# VM options: <none>
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: ch.unifr.diva.dip.benchmarks.FxUpscalingBenchmark.nativeNNAwt
+# Parameters: (scale = 64)
+
+# Run progress: 96.67% complete, ETA 00:00:10
+# Fork: 1 of 1
+# Warmup Iteration   1: 211.307 ms/op
+# Warmup Iteration   2: 251.916 ms/op
+# Warmup Iteration   3: 203.100 ms/op
+# Warmup Iteration   4: 237.311 ms/op
+# Warmup Iteration   5: 234.591 ms/op
+Iteration   1: 202.649 ms/op
+Iteration   2: 235.848 ms/op
+Iteration   3: 202.267 ms/op
+Iteration   4: 232.231 ms/op
+Iteration   5: 235.517 ms/op
+
+
+Result "nativeNNAwt":
+  221.702 ?(99.9%) 67.868 ms/op [Average]
+  (min, avg, max) = (202.267, 221.702, 235.848), stdev = 17.625
+  CI (99.9%): [153.835, 289.570] (assumes normal distribution)
+
+
+# Run complete. Total time: 00:05:19
+
+Benchmark                                     (scale)  Mode  Cnt    Score    Error  Units
+FxUpscalingBenchmark.bresenhamAwt                   2  avgt    5    0.161 ?  0.004  ms/op
+FxUpscalingBenchmark.bresenhamAwt                   4  avgt    5    0.572 ?  0.031  ms/op
+FxUpscalingBenchmark.bresenhamAwt                   8  avgt    5    2.587 ?  0.141  ms/op
+FxUpscalingBenchmark.bresenhamAwt                  16  avgt    5   10.966 ?  0.304  ms/op
+FxUpscalingBenchmark.bresenhamAwt                  32  avgt    5   55.397 ? 16.884  ms/op
+FxUpscalingBenchmark.bresenhamAwt                  64  avgt    5  231.570 ? 75.533  ms/op
+FxUpscalingBenchmark.bresenhamFx                    2  avgt    5    0.157 ?  0.009  ms/op
+FxUpscalingBenchmark.bresenhamFx                    4  avgt    5    0.566 ?  0.022  ms/op
+FxUpscalingBenchmark.bresenhamFx                    8  avgt    5    2.131 ?  0.070  ms/op
+FxUpscalingBenchmark.bresenhamFx                   16  avgt    5    8.539 ?  0.380  ms/op
+FxUpscalingBenchmark.bresenhamFx                   32  avgt    5   41.098 ? 30.170  ms/op
+FxUpscalingBenchmark.bresenhamFx                   64  avgt    5  146.239 ? 51.673  ms/op
+FxUpscalingBenchmark.bresenhamFxIntBuffer           2  avgt    5    0.154 ?  0.006  ms/op
+FxUpscalingBenchmark.bresenhamFxIntBuffer           4  avgt    5    0.543 ?  0.017  ms/op
+FxUpscalingBenchmark.bresenhamFxIntBuffer           8  avgt    5    1.987 ?  0.077  ms/op
+FxUpscalingBenchmark.bresenhamFxIntBuffer          16  avgt    5    7.986 ?  0.492  ms/op
+FxUpscalingBenchmark.bresenhamFxIntBuffer          32  avgt    5   39.396 ? 18.652  ms/op
+FxUpscalingBenchmark.bresenhamFxIntBuffer          64  avgt    5  156.809 ? 59.794  ms/op
+FxUpscalingBenchmark.bresenhamFxIntBufferDst        2  avgt    5    0.115 ?  0.001  ms/op
+FxUpscalingBenchmark.bresenhamFxIntBufferDst        4  avgt    5    0.397 ?  0.005  ms/op
+FxUpscalingBenchmark.bresenhamFxIntBufferDst        8  avgt    5    1.707 ?  0.156  ms/op
+FxUpscalingBenchmark.bresenhamFxIntBufferDst       16  avgt    5    7.492 ?  0.043  ms/op
+FxUpscalingBenchmark.bresenhamFxIntBufferDst       32  avgt    5   28.365 ?  0.391  ms/op
+FxUpscalingBenchmark.bresenhamFxIntBufferDst       64  avgt    5  113.152 ?  0.685  ms/op
+FxUpscalingBenchmark.nativeNNAwt                    2  avgt    5    0.192 ?  0.003  ms/op
+FxUpscalingBenchmark.nativeNNAwt                    4  avgt    5    0.677 ?  0.012  ms/op
+FxUpscalingBenchmark.nativeNNAwt                    8  avgt    5    2.692 ?  0.344  ms/op
+FxUpscalingBenchmark.nativeNNAwt                   16  avgt    5   11.144 ?  0.436  ms/op
+FxUpscalingBenchmark.nativeNNAwt                   32  avgt    5   53.902 ? 15.679  ms/op
+FxUpscalingBenchmark.nativeNNAwt                   64  avgt    5  221.702 ? 67.868  ms/op
+------------------------------------------------------------------------
+BUILD SUCCESS
+------------------------------------------------------------------------
+Total time: 5:20.901s
+Finished at: Thu Aug 25 17:12:54 CEST 2016
+Final Memory: 7M/309M
+------------------------------------------------------------------------
