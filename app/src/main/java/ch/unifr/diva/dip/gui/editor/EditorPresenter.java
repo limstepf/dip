@@ -37,8 +37,11 @@ public class EditorPresenter implements Presenter {
 		this.handler = handler;
 
 		this.rootLayer = new LayerGroup();
-		this.zoomPane = new ZoomPane(this.rootLayer.getComponent());
+		this.zoomPane = new ZoomPane(handler.threadPool, this.rootLayer.getComponent());
 		this.zoomPane.getStyleClass().add("dip-editor");
+		this.zoomPane.setInterpolation(
+				ZoomPane.Interpolation.get(handler.settings.editor.interpolation)
+		);
 		this.onModifiedListener = (c) -> {
 			this.zoomPane.fireContentChange();
 		};
@@ -125,6 +128,15 @@ public class EditorPresenter implements Presenter {
 
 	private void onClosingProject() {
 		clear();
+	}
+
+	/**
+	 * Sets the interpolation type used for zooming/resampling.
+	 *
+	 * @param type the interpolation type.
+	 */
+	public void setInterpolation(ZoomPane.Interpolation type) {
+		this.zoomPane.setInterpolation(type);
 	}
 
 	/**

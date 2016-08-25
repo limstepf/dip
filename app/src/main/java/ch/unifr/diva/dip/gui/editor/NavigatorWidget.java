@@ -8,6 +8,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
+import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Separator;
@@ -31,6 +32,8 @@ import javafx.scene.transform.Scale;
  */
 public class NavigatorWidget extends AbstractWidget {
 
+	private static double MIN_ZOOM_VALUE = 0; // 1 := 100%
+	private static double MAX_ZOOM_VALUE = 4800;
 	private final View view = new View();
 	private ZoomPane master;
 
@@ -57,13 +60,21 @@ public class NavigatorWidget extends AbstractWidget {
 		}
 	}
 
+	private static double sliderToZoomVal(double v) {
+		return Math.pow(10, v) - 1;
+	}
+
+	private static double zoomValToSlider(double v) {
+		return Math.log10(v + 1);
+	}
+
 	private final ChangeListener<Number> zoomListener = (
 			ObservableValue<? extends Number> observable,
 			Number oldValue,
 			Number newValue) -> {
-				final double v = newValue.doubleValue() * 100;
-				view.slider.valueProperty().setValue(v);
-				view.zoom.setText(String.format("%.1f%%", v));
+				final double v = newValue.doubleValue();
+				view.slider.valueProperty().setValue(zoomValToSlider(v));
+				view.zoom.setText(String.format("%.1f%%", v * 100));
 				updateSnapshot();
 			};
 
@@ -86,7 +97,7 @@ public class NavigatorWidget extends AbstractWidget {
 			ObservableValue<? extends Number> observable,
 			Number oldValue,
 			Number newValue) -> {
-				master.setZoom(newValue.doubleValue() * 0.01);
+				master.setZoom(sliderToZoomVal(newValue.doubleValue()));
 				updateSnapshot();
 			};
 
@@ -163,8 +174,7 @@ public class NavigatorWidget extends AbstractWidget {
 		view.slider.valueProperty().addListener(sliderListener);
 		view.viewport.setOnMousePressed(viewportDownEvent);
 		view.viewport.setOnMouseDragged(viewportDragEvent);
-
-		sliderListener.changed(null, 0, master.getZoom() * 100);
+		sliderListener.changed(null, 0, zoomValToSlider(master.getZoom()));
 		zoomListener.changed(null, 0, master.getZoom());
 		contentListener.invalidated(null);
 		updateSnapshot();
@@ -257,14 +267,17 @@ public class NavigatorWidget extends AbstractWidget {
 		private double v;
 
 		public View() {
-			zoom.setPrefWidth(55);
+			zoom.setPrefWidth(62.5);
+			zoom.setAlignment(Pos.CENTER_RIGHT);
 
-			slider.setMin(0);
-			slider.setMax(500); // TODO: min/max zoom params, and validate input!
-			slider.setValue(100);
-			slider.setBlockIncrement(10);
-			slider.setMinorTickCount(5);
-			slider.setMajorTickUnit(50);
+			final double one = zoomValToSlider(1);
+
+			slider.setMin(zoomValToSlider(MIN_ZOOM_VALUE));
+			slider.setMax(zoomValToSlider(MAX_ZOOM_VALUE * 0.01));
+			slider.setValue(one);
+			slider.setBlockIncrement(one * 0.05);
+			slider.setMinorTickCount(4);
+			slider.setMajorTickUnit(one);
 
 			viewport.setFill(Color.TRANSPARENT);
 			viewport.getStyleClass().add("dip-viewport");

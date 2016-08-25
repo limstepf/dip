@@ -4,6 +4,7 @@ import ch.unifr.diva.dip.utils.FxUtils;
 import ch.unifr.diva.dip.api.utils.XmlUtils;
 import ch.unifr.diva.dip.core.model.PipelineLayoutStrategy;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
+import ch.unifr.diva.dip.gui.layout.ZoomPane;
 import ch.unifr.diva.dip.gui.pe.ConnectionView;
 import java.nio.file.Path;
 import javafx.scene.control.SplitPane;
@@ -155,6 +156,19 @@ public class UserSettings {
 			stage.setY(settings.y);
 		}
 		stage.setMaximized(settings.maximized);
+	}
+
+	/**
+	 * General (pixel) editor settings.
+	 */
+	public Editor editor = new Editor();
+
+	@XmlRootElement
+	public static class Editor {
+
+		@XmlAttribute
+		public String interpolation = ZoomPane.Interpolation.BILINEAR.name();
+
 	}
 
 	/**

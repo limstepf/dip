@@ -61,7 +61,7 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 		this.manager = manager;
 		this.editorPane = new EditorPane(this);
 
-		this.zoomPane = new ZoomPane(editorPane.getComponent());
+		this.zoomPane = new ZoomPane(handler.threadPool, editorPane.getComponent());
 		zoomPane.bindMinDimensions(editorPane.pane());
 
 		this.rubberBandSelector = new RubberBandSelector<>(this.editorPane.pane(), ProcessorView.class);

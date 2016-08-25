@@ -15,6 +15,8 @@ import ch.unifr.diva.dip.gui.dialogs.ConfirmationDialog;
 import ch.unifr.diva.dip.gui.dialogs.ErrorDialog;
 import ch.unifr.diva.dip.gui.dialogs.NewProjectDialog;
 import ch.unifr.diva.dip.gui.dialogs.RepairProjectDialog;
+import ch.unifr.diva.dip.gui.editor.EditorPresenter;
+import ch.unifr.diva.dip.gui.layout.ZoomPane;
 import com.google.common.eventbus.Subscribe;
 import java.io.File;
 import java.io.IOException;
@@ -45,7 +47,7 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 
 	private final Presenter menuBar;
 	private final Presenter statusBar;
-	private final Presenter editor;
+	private final EditorPresenter editor;
 	private final Presenter sideBar;
 
 	private final List<Parent> splitPaneComponents = new ArrayList<>();
@@ -65,7 +67,7 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 			ApplicationHandler handler,
 			Stage stage,
 			MainView view,
-			Presenter editor,
+			EditorPresenter editor,
 			Presenter menuBar,
 			Presenter statusBar,
 			Presenter sideBar
@@ -166,6 +168,11 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 				break;
 			case OPEN_USER_SETTINGS:
 				openUserSettings();
+				break;
+			case EDITOR_INTERPOLATION:
+				this.editor.setInterpolation(
+						ZoomPane.Interpolation.get(this.handler.settings.editor.interpolation)
+				);
 				break;
 			case EXIT:
 				exit();

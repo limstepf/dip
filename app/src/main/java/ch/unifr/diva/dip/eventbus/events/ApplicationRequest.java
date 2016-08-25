@@ -27,6 +27,10 @@ public class ApplicationRequest {
 		 */
 		OPEN_USER_SETTINGS,
 		/**
+		 * Request to update the interpolation type of the main/pixel editor.
+		 */
+		EDITOR_INTERPOLATION,
+		/**
 		 * Request to exit the application.
 		 */
 		EXIT

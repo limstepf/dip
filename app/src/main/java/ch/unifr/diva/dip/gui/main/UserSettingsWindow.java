@@ -9,10 +9,12 @@ import ch.unifr.diva.dip.api.utils.L10n;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.model.PipelineLayoutStrategy;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
+import ch.unifr.diva.dip.eventbus.events.ApplicationRequest;
 import ch.unifr.diva.dip.gui.Presenter;
 import ch.unifr.diva.dip.gui.layout.AbstractWindow;
 import ch.unifr.diva.dip.gui.layout.FormGridPane;
 import ch.unifr.diva.dip.gui.layout.Lane;
+import ch.unifr.diva.dip.gui.layout.ZoomPane;
 import ch.unifr.diva.dip.gui.pe.ConnectionView;
 import java.util.ArrayList;
 import java.util.List;
@@ -104,6 +106,33 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 		});
 
 		cats.add(general);
+
+		/* main/pixel editor settings */
+		final Category me = new Category(localize("editor.main"));
+
+		me.addItem(new Item<EnumParameter>() {
+			@Override
+			public PersistentParameter parameter() {
+				if (this.parameter == null) {
+					this.parameter = new EnumParameter(
+							localize("interpolation"),
+							ZoomPane.Interpolation.class,
+							handler.settings.editor.interpolation
+					);
+				}
+				return this.parameter;
+			}
+
+			@Override
+			public void save() {
+				handler.settings.editor.interpolation = this.parameter.get();
+				handler.eventBus.post(
+						new ApplicationRequest(ApplicationRequest.Type.EDITOR_INTERPOLATION)
+				);
+			}
+		});
+
+		cats.add(me);
 
 		/* pipeline editor settings */
 		final Category pe = new Category(localize("pipeline.editor"));
