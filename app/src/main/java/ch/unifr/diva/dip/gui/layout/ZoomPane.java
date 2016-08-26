@@ -210,6 +210,18 @@ public class ZoomPane extends ScrollPane {
 	 * @param viewport viewport bounds.
 	 */
 	private void invalidate(Bounds zoomed, Bounds viewport) {
+		updateScalingGroupOffset(zoomed, viewport);
+		updateNN();
+	}
+
+	/**
+	 * Updates the offset of the scaling group to center content that is smaller
+	 * than the viewport itself.
+	 *
+	 * @param zoomed zommed content bounds.
+	 * @param viewport viewport bounds.
+	 */
+	private void updateScalingGroupOffset(Bounds zoomed, Bounds viewport) {
 		// center zommed content pane in viewport if it's smaller than the
 		// viewport itself
 		final double offsetX = (zoomed.getWidth() < viewport.getWidth())
@@ -221,8 +233,6 @@ public class ZoomPane extends ScrollPane {
 
 		scalingGroup.setTranslateX(offsetX);
 		scalingGroup.setTranslateY(offsetY);
-
-		updateNN();
 	}
 
 	/**
@@ -321,6 +331,7 @@ public class ZoomPane extends ScrollPane {
 			// FX application thread). :)
 			Platform.runLater(() -> {
 				nnOverlay.setImage(dst);
+				updateScalingGroupOffset(getContentBoundsZoomed(), getViewportBounds());
 			});
 		};
 		threadPool.getExecutorService().submit(run);
