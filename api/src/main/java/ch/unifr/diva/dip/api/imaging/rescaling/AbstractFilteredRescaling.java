@@ -19,11 +19,18 @@ package ch.unifr.diva.dip.api.imaging.rescaling;
  * </ul>
  *
  * <p>
- * Further changes:
+ * Further changes/notes:
  * <ul>
- * <li>Pixel-shift correction.</li>
- * <li>Use extended border image padding (clamped indexing), instead of
+ * <li>Use of extended border image padding (clamped indexing), instead of
  * reflective indexing.</li>
+ *
+ * <li>Pixel-shift correction (upscaling small images, e.g. with a BOX filter is
+ * very wrong otherwise). Note that in comparison to native AWT bilinear/bicubic
+ * resampling, anything other than a box filter seems to slightly offset the
+ * image by half a pixel or what not - yet this isn't due to this pixel-shift
+ * here! You can easily verify this by setting PIXEL_SHIFT below to 0. So I'm
+ * not really sure where that is coming from... Do we need a PIXEL_SHIFT
+ * depending on the filter support or something?</li>
  * </ul>
  */
 public abstract class AbstractFilteredRescaling {
@@ -60,7 +67,7 @@ public abstract class AbstractFilteredRescaling {
 	 * @param maxValues max. values of the bands.
 	 */
 	public AbstractFilteredRescaling(FilterFunction filterf, double[] maxValues) {
-		this.filterf = filterf;
+		setFiterFunction(filterf);
 		this.maxValues = maxValues;
 	}
 
@@ -69,8 +76,8 @@ public abstract class AbstractFilteredRescaling {
 	 *
 	 * @param filterf the filter function used for resampling.
 	 */
-	public void setFiterFunction(FilterFunction filterf) {
-		if (this.filterf.equals(filterf)) {
+	final public void setFiterFunction(FilterFunction filterf) {
+		if (this.filterf != null && this.filterf.equals(filterf)) {
 			return;
 		}
 		this.filterf = filterf;
@@ -358,12 +365,12 @@ public abstract class AbstractFilteredRescaling {
 	/**
 	 * Returns the index into a linear pixel array.
 	 *
-	 * @param col column of the pixel.
 	 * @param row row of the pixel.
+	 * @param col column of the pixel.
 	 * @param width width of the image.
 	 * @return index of the pixel in the pixel array.
 	 */
-	protected int index(int col, int row, int width) {
+	protected int index(int row, int col, int width) {
 		return col * width + row;
 	}
 
