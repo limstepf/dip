@@ -31,6 +31,9 @@ import javafx.scene.transform.Scale;
  */
 public class ZoomPane extends ScrollPane {
 
+	private static double MIN_ZOOM_VALUE = 0; // 1 := 100%
+	private static double MAX_ZOOM_VALUE = 4800;
+
 	private final DipThreadPool threadPool;
 	private final Scale scale = new Scale(1.0, 1.0);
 	private final DoubleProperty zoom = new SimpleDoubleProperty(1.0);
@@ -211,6 +214,22 @@ public class ZoomPane extends ScrollPane {
 	 */
 	private void invalidate(Bounds zoomed, Bounds viewport) {
 		updateScalingGroupOffset(zoomed, viewport);
+		updateNN();
+	}
+
+	/**
+	 * Updates the position of the viewport. Updates the {@code hvalueProperty}
+	 * and the {@code vvalueProperty) at the same time, triggering only a single zoom pane
+	 * redraw listener (as opposed to setting both properties individually).
+	 *
+	 * @param hpos the hvalue of the viewport (or the zoompane's slider).
+	 * @param vpos the vvalue of the viewport (or the zoompane's slider).
+	 */
+	public void updateViewportPosition(double hpos, double vpos) {
+		suppressRedrawListener = true;
+		hvalueProperty().setValue(hpos);
+		vvalueProperty().setValue(vpos);
+		suppressRedrawListener = false;
 		updateNN();
 	}
 
@@ -602,6 +621,24 @@ public class ZoomPane extends ScrollPane {
 		if (listener != null) {
 			this.viewportBoundsProperty().removeListener(listener);
 		}
+	}
+
+	/**
+	 * Returns the minimum zoom value.
+	 *
+	 * @return the minimum zoom value (1 equals 100%).
+	 */
+	public double minZoomValue() {
+		return MIN_ZOOM_VALUE;
+	}
+
+	/**
+	 * Returns the maximum zoom value.
+	 *
+	 * @return the maximum zoom value (1 equals 100%).
+	 */
+	public double maxZoomValue() {
+		return MAX_ZOOM_VALUE;
 	}
 
 }

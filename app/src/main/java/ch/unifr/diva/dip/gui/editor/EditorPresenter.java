@@ -146,8 +146,7 @@ public class EditorPresenter implements Presenter {
 	 */
 	public NavigatorWidget navigatorWidget() {
 		if (this.navigatorWidget == null) {
-			this.navigatorWidget = new NavigatorWidget();
-			this.navigatorWidget.bind(this.zoomPane);
+			this.navigatorWidget = new NavigatorWidget(this.zoomPane);
 		}
 		return this.navigatorWidget;
 	}
