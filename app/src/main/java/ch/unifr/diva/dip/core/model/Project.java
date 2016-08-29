@@ -213,8 +213,10 @@ public class Project implements Modifiable, Localizable {
 	private void saveInternal() throws Exception {
 		final ProjectData data = new ProjectData(this);
 
-		// save current pipeline (e.g. the object map)
-		this.getSelectedPage().getPipeline().save();
+		// save current page and its pipeline (e.g. the object map)
+		if (this.getSelectedPageId() > 0) {
+			this.getSelectedPage().save();
+		}
 
 		// write project root xml
 		Files.deleteIfExists(zip.getPath(ProjectData.PROJECT_ROOT_XML));
@@ -253,6 +255,7 @@ public class Project implements Modifiable, Localizable {
 
 	/**
 	 * Returns the (opened) zip file system (or savefile) of the project.
+	 *
 	 * @return the zip file system of the project.
 	 */
 	public ZipFileSystem zipFileSystem() {

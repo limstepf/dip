@@ -9,6 +9,7 @@ import ch.unifr.diva.dip.api.parameters.Parameter;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.api.utils.L10n;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -175,7 +176,16 @@ public interface Processor {
 	 * @return a map of the parameters of the processor indexed by their keys.
 	 */
 	default Map<String, Parameter> parameters() {
-		return new HashMap<>();
+		return Collections.emptyMap();
+	}
+
+	/**
+	 * Checks whether the processor has parameters or not.
+	 *
+	 * @return True if the processor has parameters, False otherwise.
+	 */
+	default boolean hasParameters() {
+		return !parameters().isEmpty();
 	}
 
 	/**

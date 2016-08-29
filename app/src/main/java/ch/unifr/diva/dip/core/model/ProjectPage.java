@@ -248,6 +248,7 @@ public class ProjectPage implements Modifiable, Localizable {
 
 	/**
 	 * Returns the pipeline id property.
+	 *
 	 * @return pipeline id property.
 	 */
 	public ReadOnlyIntegerProperty pipelineIdProperty() {
@@ -256,6 +257,7 @@ public class ProjectPage implements Modifiable, Localizable {
 
 	/**
 	 * Returns the pipeline's name.
+	 *
 	 * @return the name of the pipeline.
 	 */
 	public String getPipelineName() {
@@ -279,6 +281,7 @@ public class ProjectPage implements Modifiable, Localizable {
 
 	/**
 	 * Checks whether the image associated to the page exists.
+	 *
 	 * @return True if the image exists, False otherwise.
 	 */
 	public boolean imageExists() {
@@ -336,8 +339,8 @@ public class ProjectPage implements Modifiable, Localizable {
 		}
 
 		// make sure we have a pipeline.xml file for the RunnablePipeline of the page.
-		if (!Files.exists(pipelineXML())) {
-			if (!initPipelineXML(pipelineId)) {
+		if (!Files.exists(pipelineXml())) {
+			if (!initPipelineXml(pipelineId)) {
 				return null;
 			}
 		}
@@ -352,23 +355,41 @@ public class ProjectPage implements Modifiable, Localizable {
 		return new RunnablePipeline(handler, this, data);
 	}
 
-	private boolean initPipelineXML() {
-		return initPipelineXML(getPipelineId());
-	}
-
 	/**
 	 * Creates the pipeline.xml file, copying from the pipeline's prototype.
 	 *
 	 * @return True if all went just fine, False in case we did not end up with
 	 * a `pipeline.xml` file.
 	 */
-	private boolean initPipelineXML(int pipelineId) {
+	private boolean initPipelineXml(int pipelineId) {
 		final List<Pipeline> prototype = new ArrayList<>();
 		prototype.add(getPipelinePrototype(pipelineId));
-		try (OutputStream stream = new BufferedOutputStream(Files.newOutputStream(pipelineXML()))) {
+		try (OutputStream stream = new BufferedOutputStream(Files.newOutputStream(pipelineXml()))) {
 			PipelineManager.exportPipelines(prototype, stream);
 		} catch (JAXBException | IOException ex) {
 			log.error("failed to init the project page's `pipeline.xml`: {}", this, ex);
+			handler.uiStrategy.showError(ex);
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Saves the page's (runnable) pipeline. This overwrites the pipeline.xml
+	 * file.
+	 *
+	 * @return True if all went just fine, False in case of an error.
+	 */
+	private boolean savePipelineXml() {
+		final List<Pipeline> pipe = new ArrayList<>();
+		pipe.add(this.getPipeline());
+
+		deletePipelineXmlIfExists();
+
+		try (OutputStream stream = new BufferedOutputStream(Files.newOutputStream(pipelineXml()))) {
+			PipelineManager.exportPipelines(pipe, stream);
+		} catch (JAXBException | IOException ex) {
+			log.error("failed to save the project page's `pipeline.xml`: {}", this, ex);
 			handler.uiStrategy.showError(ex);
 			return false;
 		}
@@ -390,12 +411,23 @@ public class ProjectPage implements Modifiable, Localizable {
 			handler.uiStrategy.showError(ex);
 		}
 
+		deletePipelineXmlIfExists();
+	}
+
+	/**
+	 * Deletes the pipeline.xml file (if it exists).
+	 *
+	 * @return True if the file got deleted by this method, False otherwise
+	 * (e.g. if it did not exist).
+	 */
+	private boolean deletePipelineXmlIfExists() {
 		try {
-			Files.deleteIfExists(pipelineXML());
+			return Files.deleteIfExists(pipelineXml());
 		} catch (IOException ex) {
 			log.error("failed to clear the project page's `pipeline.xml`: {}", this, ex);
 			handler.uiStrategy.showError(ex);
 		}
+		return false;
 	}
 
 	/**
@@ -441,7 +473,7 @@ public class ProjectPage implements Modifiable, Localizable {
 	 *
 	 * @return a path to the pipeline XML file of the page.
 	 */
-	private Path pipelineXML() {
+	private Path pipelineXml() {
 		return project.zipFileSystem().getPath(PIPELINE_XML);
 	}
 
@@ -453,7 +485,7 @@ public class ProjectPage implements Modifiable, Localizable {
 	 */
 	private PipelineData.Pipeline pipelineData() {
 		try {
-			final PipelineData data = PipelineData.loadAsStream(pipelineXML());
+			final PipelineData data = PipelineData.loadAsStream(pipelineXml());
 			if (!data.hasPrimaryPipeline()) {
 				return null;
 			}
@@ -481,15 +513,27 @@ public class ProjectPage implements Modifiable, Localizable {
 	 * selected/opened or before the project is closed.
 	 */
 	public synchronized void close() {
-		// TODO/CHECK: only if actually modified? (or better be save than sorry...)
-		if (getPipeline() != null) {
-			this.modifiedPageProperty.removeManagedProperty(this.pipeline);
-			this.getPipeline().save();
-		}
+		save();
 
 		this.image = null;
 		this.bufferedImage = null;
 		this.pipeline = null;
+	}
+
+	/**
+	 * Saves the page.
+	 */
+	public synchronized void save() {
+		// TODO/CHECK: only if actually modified? (or better be save than sorry...)
+		if (getPipeline() != null) {
+			this.modifiedPageProperty.removeManagedProperty(this.pipeline);
+			if (this.getPipelineId() > 0) {
+				// TODO: refactor this mess; who's in charge here? the page or the
+				// runnable pipeline??
+				this.getPipeline().save(); // saves processor data
+				savePipelineXml(); // writes the pipeline (and proc. parameters)
+			}
+		}
 	}
 
 	@Override

@@ -12,6 +12,7 @@ import ch.unifr.diva.dip.eventbus.events.StatusMessageEvent;
 import ch.unifr.diva.dip.gui.editor.LayerExtension;
 import ch.unifr.diva.dip.gui.editor.LayerGroup;
 import ch.unifr.diva.dip.gui.layout.Lane;
+import ch.unifr.diva.dip.gui.pe.ProcessorParameterWindow;
 import ch.unifr.diva.dip.utils.BackgroundTask;
 import ch.unifr.diva.dip.utils.FileFinder;
 import ch.unifr.diva.dip.utils.FxUtils;
@@ -33,6 +34,9 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javax.xml.bind.JAXBException;
 
@@ -105,6 +109,25 @@ public class RunnableProcessor extends ProcessorWrapper {
 	}
 
 	/**
+	 * Returns the project page this runnable processor is associated to (via
+	 * runnable pipeline).
+	 *
+	 * @return the project page.
+	 */
+	public ProjectPage getPage() {
+		return this.page;
+	}
+
+	/**
+	 * Returns the runnable pipeline this runnable processor is associated to.
+	 *
+	 * @return the runnable pipeline.
+	 */
+	public RunnablePipeline getPipeline() {
+		return this.pipeline;
+	}
+
+	/**
 	 * Returns the layer group of the runnable processor.
 	 *
 	 * @return the layer group of the runnable processor.
@@ -119,13 +142,20 @@ public class RunnableProcessor extends ProcessorWrapper {
 	 */
 	public static class ProcessorLayerExtension implements LayerExtension, Localizable {
 
-		final RunnableProcessor runnable;
-		final VBox vbox = new VBox();
-		final Label status = new Label();
-		final Lane lane = new Lane();
-		final Button processButton = new Button();
-		final Button resetButton = new Button();
+		final private RunnableProcessor runnable;
+		final private VBox vbox = new VBox();
+		final private Label status = new Label();
+		final private Lane lane = new Lane();
+		private Button paramButton;
+		private Button processButton;
+		private Button resetButton;
+		private ProcessorParameterWindow paramWindow;
 
+		/**
+		 * Creates a new processor layer extension.
+		 *
+		 * @param runnable the runnable processor.
+		 */
 		public ProcessorLayerExtension(RunnableProcessor runnable) {
 			this.runnable = runnable;
 
@@ -133,9 +163,28 @@ public class RunnableProcessor extends ProcessorWrapper {
 			stateCallback();
 			this.runnable.stateProperty().addListener((e) -> stateCallback());
 
+			if (runnable.processor().hasParameters()) {
+				paramButton = newButton(localize("parameters"));
+				paramButton.setOnAction((e) -> {
+					if (paramWindow == null) {
+						paramWindow = new ProcessorParameterWindow(
+								runnable.handler.uiStrategy.getStage(),
+								runnable.handler,
+								runnable
+						);
+					}
+					paramWindow.show();
+				});
+				lane.add(paramButton);
+
+				final Region spacer = new Region();
+				spacer.setMaxWidth(Double.MAX_VALUE);
+				HBox.setHgrow(spacer, Priority.ALWAYS);
+				lane.add(spacer);
+			}
+
 			if (runnable.processor().canProcess()) {
-				processButton.setText(localize("process"));
-				processButton.getStyleClass().add("dip-small");
+				processButton = newButton(localize("process"));
 				processButton.setOnAction((e) -> {
 					this.runnable.processBackgroundTask();
 				});
@@ -143,23 +192,33 @@ public class RunnableProcessor extends ProcessorWrapper {
 			}
 
 			if (runnable.processor().canReset()) {
-				resetButton.setText(localize("reset"));
-				resetButton.getStyleClass().add("dip-small");
+				resetButton = newButton(localize("reset"));
 				resetButton.setOnAction((e) -> {
 					this.runnable.resetBackgroundTask();
 				});
 				lane.add(resetButton);
 			}
 
-			lane.setAlignment(Pos.CENTER_LEFT);
+//			lane.setAlignment(Pos.CENTER_LEFT);
+			lane.setAlignment(Pos.CENTER_RIGHT);
 			lane.setPadding(new Insets(4, 4, 4, 4));
 			vbox.getChildren().addAll(status, lane);
 		}
 
+		private Button newButton(String label) {
+			final Button b = new Button(label);
+			b.getStyleClass().add("dip-small");
+			return b;
+		}
+
 		private void stateCallback() {
 			status.setText(runnable.getState().label);
-			processButton.setDisable(!runnable.getState().equals(Processor.State.PROCESSING));
-			resetButton.setDisable(runnable.getState().equals(Processor.State.UNAVAILABLE));
+			if (processButton != null) {
+				processButton.setDisable(!runnable.getState().equals(Processor.State.PROCESSING));
+			}
+			if (resetButton != null) {
+				resetButton.setDisable(runnable.getState().equals(Processor.State.UNAVAILABLE));
+			}
 		}
 
 		@Override
@@ -448,4 +507,5 @@ public class RunnableProcessor extends ProcessorWrapper {
 			this.setModified(true);
 		});
 	}
+
 }
