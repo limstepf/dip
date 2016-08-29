@@ -1,8 +1,11 @@
 Document Image Processor (DIP) Documentation
 ============================================
 
-Contents
---------
+* [DIP File Format](dip_file-format.md)
+* [BMAT File Format](bmat_file-format.md)
+
+Additional Contents
+-------------------
 * [Benchmarks](benchmarks/index.md):
     latest benchmark results which were the basis of profound decisions that have been made.
 
