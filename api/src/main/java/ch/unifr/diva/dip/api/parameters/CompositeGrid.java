@@ -44,7 +44,7 @@ public class CompositeGrid extends CompositeGridBase<ValueList> {
 	 *
 	 * @param parameters child parameters to populate the grid with.
 	 */
-	public CompositeGrid(List<Parameter> parameters) {
+	public CompositeGrid(Collection<Parameter> parameters) {
 		this("", parameters);
 	}
 
@@ -54,17 +54,17 @@ public class CompositeGrid extends CompositeGridBase<ValueList> {
 	 * @param label label.
 	 * @param parameters child parameters to populate the grid with.
 	 */
-	public CompositeGrid(String label, List<Parameter> parameters) {
+	public CompositeGrid(String label, Collection<Parameter> parameters) {
 		super(label, initValue(parameters), initValue(parameters));
 
-		this.children = parameters;
+		this.children = new ArrayList<>(parameters);
 		this.persistentChildren = Parameter.filterPersistent(this.children);
 
 		addChildListeners(this.persistentChildren);
 	}
 
 	// yes, we do this twice to not override the default later on...
-	private static ValueList initValue(List<Parameter> parameters) {
+	private static ValueList initValue(Collection<Parameter> parameters) {
 		final List<Object> defaultValues = new ArrayList<>();
 		for (Parameter p : parameters) {
 			if (p.isPersistent()) {
