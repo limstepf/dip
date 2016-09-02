@@ -187,12 +187,14 @@ public class ZoomPane extends ScrollPane {
 
 		suppressRedrawListener = true;
 		if (scrollableWidth > 0) {
-			final double hx = dx * scrollRangeX() / scrollableWidth;
-			this.setHvalue(getHvalue() - hx);
+			final double sdx = dx * scrollRangeX() / scrollableWidth;
+			final double x = getHvalue();
+			this.setHvalue((x < sdx) ? 0 : x - sdx);
 		}
 		if (scrollableHeight > 0) {
-			final double hy = dy * scrollRangeY() / scrollableHeight;
-			this.setVvalue(getVvalue() - hy);
+			final double sdy = dy * scrollRangeY() / scrollableHeight;
+			final double y = getVvalue();
+			this.setVvalue((y < sdy) ? 0 : y - sdy);
 		}
 		suppressRedrawListener = false;
 
