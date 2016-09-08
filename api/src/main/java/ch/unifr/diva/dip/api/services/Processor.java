@@ -5,6 +5,7 @@ import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.components.Port;
 import ch.unifr.diva.dip.api.components.ProcessorContext;
 import ch.unifr.diva.dip.api.datatypes.DataType;
+import ch.unifr.diva.dip.api.parameters.CompositeGrid;
 import ch.unifr.diva.dip.api.parameters.Parameter;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.api.utils.L10n;
@@ -14,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javafx.beans.property.ReadOnlyObjectProperty;
 
 /**
  * Processor interface. The processor interface is the core interface of a DIP
@@ -177,6 +179,17 @@ public interface Processor {
 	 */
 	default Map<String, Parameter> parameters() {
 		return Collections.emptyMap();
+	}
+
+	/**
+	 * Returns a property of a composite parameter of all parameters. A property
+	 * to listen to any parameter changes.
+	 *
+	 * @return a composite parameter of all parameters.
+	 */
+	default ReadOnlyObjectProperty getCompositeProperty() {
+		final CompositeGrid composite = new CompositeGrid(parameters().values());
+		return composite.property();
 	}
 
 	/**
