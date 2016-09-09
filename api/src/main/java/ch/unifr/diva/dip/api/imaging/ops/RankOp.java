@@ -76,6 +76,11 @@ public class RankOp extends NullOp implements PaddedTileParallelizable {
 	}
 
 	@Override
+	public BufferedImage filter(BufferedImage src, BufferedImage dst) {
+		return filter(src, dst, new Rectangle(src.getWidth(), src.getHeight()));
+	}
+
+	@Override
 	public BufferedImage filter(BufferedImage src, BufferedImage dst, Rectangle writableRegion) {
 		if (dst == null) {
 			dst = this.createCompatibleDestImage(src);

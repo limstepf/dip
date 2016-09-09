@@ -172,6 +172,11 @@ public class ConvolutionOp<T extends Matrix> extends NullOp implements PaddedTil
 	}
 
 	@Override
+	public BufferedImage filter(BufferedImage src, BufferedImage dst) {
+		return filter(src, dst, new Rectangle(src.getWidth(), src.getHeight()));
+	}
+
+	@Override
 	public BufferedImage filter(BufferedImage src, BufferedImage dst, Rectangle writableRegion) {
 		if (dst == null) {
 			dst = createCompatibleDestImage(src, this.precision);

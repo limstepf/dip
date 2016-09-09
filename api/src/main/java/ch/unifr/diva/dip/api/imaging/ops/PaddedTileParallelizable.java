@@ -32,11 +32,20 @@ public interface PaddedTileParallelizable extends TileParallelizable {
 	// TODO: eh, now that the InverseMappedTileParallelizable interface is here,
 	// wouldn't that do the same, but a bit cheaper?!
 
-	@Override
-	default BufferedImage filter(BufferedImage src, BufferedImage dst) {
-		return filter(src, dst, dst.getRaster().getBounds());
-	}
-
+	/*
+	 * Make sure to overwrite the filter method for single threaded execution,
+	 * and put the following bit in the implementing class. We can't implement it
+	 * here as default method, since it will be implemented/overwritten in the
+	 * base class NullOp, so that wouldn't have any effect:
+	 * 
+	 * {@code
+	 *		@Override
+	 *		public BufferedImage filter(BufferedImage src, BufferedImage dst) {
+	 *			return filter(src, dst, new Rectangle(src.getWidth(), src.getHeight()));
+	 *		}
+	 * }
+	 */
+//
 	/**
 	 * Performs a single-input/output operation on a BufferedImage within a
 	 * writable region only.
