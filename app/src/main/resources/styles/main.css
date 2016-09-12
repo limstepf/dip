@@ -48,8 +48,13 @@
 .dip-glyph {
 }
 
+.dip-hover-effect:hover {
+	-fx-text-fill: inherit;
+}
+
 .dip-hover-effect-disabled,
-.dip-hover-effect {
+.dip-hover-effect,
+.dip-hover-effect:pressed {
 	-fx-text-fill: linear-gradient(to bottom,
             ladder(
                 derive(-fx-base,-16%),
@@ -57,10 +62,6 @@
                 derive(-fx-base,-4%) 80%
             ),
             derive(-fx-base,-24%));
-}
-
-.dip-hover-effect:hover {
-	-fx-text-fill: inherit;
 }
 
 .dip-title {
