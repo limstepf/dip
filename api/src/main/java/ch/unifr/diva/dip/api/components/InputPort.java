@@ -1,4 +1,3 @@
-
 package ch.unifr.diva.dip.api.components;
 
 import ch.unifr.diva.dip.api.datatypes.DataType;
@@ -6,13 +5,20 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * Input port. Input ports provide objects to DIP processors.
  *
- * @param <T>
+ * @param <T> type of the port.
  */
 public class InputPort<T> extends AbstractPort<T> {
 
 	private OutputPort output;
 
+	/**
+	 * Creates a new input port.
+	 *
+	 * @param dataType data type of the port.
+	 * @param required flag if the port is absolutely required to work.
+	 */
 	public InputPort(DataType dataType, boolean required) {
 		super(dataType, required);
 		setPortState(State.UNCONNECTED);
@@ -32,10 +38,21 @@ public class InputPort<T> extends AbstractPort<T> {
 		return outputs;
 	}
 
+	/**
+	 * Returns the connection of the port. Input ports can only have one
+	 * connection at max.
+	 *
+	 * @return the output port connected to this input port, or null.
+	 */
 	public OutputPort connection() {
 		return output;
 	}
 
+	/**
+	 * Returns the value on the port.
+	 *
+	 * @return the value on the port, or null.
+	 */
 	public T getValue() {
 		if (this.connection() == null) {
 			return null;

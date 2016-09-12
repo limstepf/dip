@@ -2,11 +2,11 @@ package ch.unifr.diva.dip.api.components;
 
 import ch.unifr.diva.dip.api.datatypes.DataType;
 import java.util.Set;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 
 /**
  * Port interface.
+ *
  * @param <T> type of the port.
  */
 public interface Port<T> {
@@ -111,4 +111,5 @@ public interface Port<T> {
 	 * Disconnects all connections to this port.
 	 */
 	public void disconnect();
+
 }

@@ -24,6 +24,12 @@ public abstract class AbstractPort<T> implements Port<T> {
 	private final boolean required;
 	private final ObjectProperty<State> portStateProperty;
 
+	/**
+	 * Creates a new port.
+	 *
+	 * @param dataType data type of the port.
+	 * @param required flag if the port is absolutely required to work.
+	 */
 	public AbstractPort(DataType dataType, boolean required) {
 		this.dataType = dataType;
 		this.type = this.dataType.type();

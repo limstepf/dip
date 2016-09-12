@@ -1,4 +1,3 @@
-
 package ch.unifr.diva.dip.api.components;
 
 import ch.unifr.diva.dip.api.datatypes.DataType;
@@ -6,18 +5,29 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * Output port. DIP processors provide objects to output ports.
  *
- * @param <T>
+ * @param <T> type of the port.
  */
 public class OutputPort<T> extends AbstractPort<T> {
 
 	private volatile T value;
 	private final Set<InputPort> inputs = new HashSet<>();
 
+	/**
+	 * Creates a new output port.
+	 *
+	 * @param dataType the data type of the port.
+	 */
 	public OutputPort(DataType dataType) {
 		super(dataType, false);
 	}
 
+	/**
+	 * Sets/updates the value on the output port.
+	 *
+	 * @param value the new value on the port.
+	 */
 	public void setOutput(T value) {
 		this.value = value;
 
