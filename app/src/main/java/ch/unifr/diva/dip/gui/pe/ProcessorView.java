@@ -7,7 +7,9 @@ import ch.unifr.diva.dip.api.parameters.PersistentParameter;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.services.Transmutable;
 import ch.unifr.diva.dip.api.ui.Glyph;
+import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.core.model.ProcessorWrapper;
+import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
 import ch.unifr.diva.dip.gui.layout.FormGridPane;
@@ -31,6 +33,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.stage.Window;
 
 /**
  * Processor view base class.
@@ -41,12 +44,15 @@ public abstract class ProcessorView extends BorderPane {
 	protected static final PseudoClass SELECTED = PseudoClass.getPseudoClass("selected");
 	protected static final PseudoClass UNAVAILABLE = PseudoClass.getPseudoClass("unavailable");
 
+	protected static final NamedGlyph IMPORT_GLYPH = MaterialDesignIcons.IMPORT;
+	protected static final NamedGlyph EXPORT_GLYPH = MaterialDesignIcons.EXPORT;
+
 	protected final PipelineEditor editor;
 	protected final ProcessorWrapper wrapper;
 	protected final List<PortView> inputPorts;
 	protected final List<PortView> outputPorts;
 
-	protected final HBox title;
+	protected final ProcessorHead head;
 	protected ParameterView parameterView;
 	protected ClosedParameterView closedParameterView;
 	protected double anchorX;
@@ -105,12 +111,67 @@ public abstract class ProcessorView extends BorderPane {
 		this.getStyleClass().add("dip-processor");
 		this.setBackground(Background.EMPTY);
 
-		final Glyph glyph = UIStrategyGUI.newGlyph(this.wrapper.glyph(), Glyph.Size.NORMAL);
-		final Label label = new Label(wrapper.processor().name());
-		this.title = new HBox();
-		this.title.setSpacing(UIStrategyGUI.Stage.insets);
-		this.title.setAlignment(Pos.CENTER_LEFT);
-		this.title.getChildren().setAll(glyph, label);
+		this.head = new ProcessorHead(editor.applicationHandler().uiStrategy.getStage(), wrapper);
+	}
+
+	/**
+	 * Processor head. Shows the title and generic processor functionality (e.g.
+	 * im-/export of presets).
+	 */
+	public static class ProcessorHead implements Localizable {
+
+		private final BorderPane pane;
+		private final HBox title;
+		private final HBox menu;
+
+		/**
+		 * Creates a new processor head.
+		 *
+		 * @param owner owner of dialogs that will be opened.
+		 * @param wrapper the processor wrapper.
+		 */
+		public ProcessorHead(Window owner, ProcessorWrapper wrapper) {
+			this.pane = new BorderPane();
+			pane.setMaxWidth(Double.MAX_VALUE);
+
+			final Glyph glyph = UIStrategyGUI.newGlyph(wrapper.glyph(), Glyph.Size.NORMAL);
+			final Label label = new Label(wrapper.processor().name());
+			this.title = new HBox();
+			title.setMaxWidth(Double.MAX_VALUE);
+			title.setSpacing(UIStrategyGUI.Stage.insets);
+			title.setAlignment(Pos.CENTER_LEFT);
+			title.getChildren().setAll(glyph, label);
+
+			final Glyph importGlyph = UIStrategyGUI.newGlyph(IMPORT_GLYPH, Glyph.Size.NORMAL);
+			importGlyph.enableHoverEffect(true);
+			importGlyph.setTooltip(localize("preset.load"));
+			importGlyph.setOnMouseClicked((e) -> {
+				final ProcessorPresetImportDialog dialog = new ProcessorPresetImportDialog(owner, wrapper);
+				dialog.show();
+			});
+			final Glyph exportGlyph = UIStrategyGUI.newGlyph(EXPORT_GLYPH, Glyph.Size.NORMAL);
+			exportGlyph.enableHoverEffect(true);
+			exportGlyph.setTooltip(localize("preset.save"));
+			exportGlyph.setOnMouseClicked((e) -> {
+				final ProcessorPresetExportDialog dialog = new ProcessorPresetExportDialog(owner, wrapper);
+				dialog.show();
+			});
+			this.menu = new HBox();
+			menu.setSpacing(UIStrategyGUI.Stage.insets);
+			menu.setAlignment(Pos.CENTER_RIGHT);
+			menu.getChildren().setAll(importGlyph, exportGlyph);
+
+			pane.setCenter(title);
+			pane.setRight(menu);
+		}
+
+		public Node getNode() {
+			return pane;
+		}
+
+		public void showMenu(boolean show) {
+			pane.setRight(show ? menu : null);
+		}
 	}
 
 	/**
@@ -403,7 +464,9 @@ public abstract class ProcessorView extends BorderPane {
 	protected abstract ParameterView newParameterView();
 
 	// add/remove parameterView from main/info pane
-	protected abstract void showParameters(boolean show);
+	protected void showParameters(boolean show) {
+		head.showMenu(show);
+	}
 
 	public final BooleanProperty selectedProperty() {
 		return selectedProperty;

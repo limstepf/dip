@@ -37,7 +37,7 @@ public class EditorPresenter implements Presenter {
 		this.handler = handler;
 
 		this.rootLayer = new LayerGroup();
-		this.zoomPane = new ZoomPane(handler.threadPool, this.rootLayer.getComponent());
+		this.zoomPane = new ZoomPane(handler.discardingThreadPool, this.rootLayer.getComponent());
 		this.zoomPane.getStyleClass().add("dip-editor");
 		this.zoomPane.setInterpolation(
 				ZoomPane.Interpolation.get(handler.settings.editor.interpolation)

@@ -53,6 +53,13 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 	private final ListChangeListener<ProcessorWrapper> processorListener;
 	private final RubberBandSelector rubberBandSelector;
 
+	/**
+	 * Creates a pipeline editor.
+	 *
+	 * @param owner owner of the pipeline editor's window.
+	 * @param handler the application handler.
+	 * @param manager the pipeline manager.
+	 */
 	public PipelineEditor(Window owner, ApplicationHandler handler, PipelineManager manager) {
 		super(owner);
 		setTitle(localize("pipeline.editor"));
@@ -61,7 +68,7 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 		this.manager = manager;
 		this.editorPane = new EditorPane(this);
 
-		this.zoomPane = new ZoomPane(handler.threadPool, editorPane.getComponent());
+		this.zoomPane = new ZoomPane(handler.discardingThreadPool, editorPane.getComponent());
 		zoomPane.bindMinDimensions(editorPane.pane());
 
 		this.rubberBandSelector = new RubberBandSelector<>(this.editorPane.pane(), ProcessorView.class);
@@ -195,26 +202,65 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 		super.showAndWait();
 	}
 
+	/**
+	 * Return the application handler.
+	 *
+	 * @return the application handler.
+	 */
+	public ApplicationHandler applicationHandler() {
+		return handler;
+	}
+
+	/**
+	 * Returns the (main) editor pane.
+	 *
+	 * @return the editor pane.
+	 */
 	public final EditorPane editorPane() {
 		return editorPane;
 	}
 
+	/**
+	 * Returns the pipeline manager.
+	 *
+	 * @return the pipeline manager.
+	 */
 	public final PipelineManager pipelineManager() {
 		return manager;
 	}
 
+	/**
+	 * Returns the selected pipeline property.
+	 *
+	 * @return the selected pipeline property.
+	 */
 	public ObjectProperty<Pipeline> selectedPipelineProperty() {
 		return selectedPipelineProperty;
 	}
 
+	/**
+	 * Returns the selected pipeline.
+	 *
+	 * @return the selected pipeline.
+	 */
 	public final Pipeline selectedPipeline() {
 		return selectedPipelineProperty.get();
 	}
 
+	/**
+	 * Selects a pipeline.
+	 *
+	 * @param id the id of the pipeline to be selected.
+	 */
 	public final void selectPipeline(int id) {
 		selectPipeline(manager.getPipeline(id));
 	}
 
+	/**
+	 * Selects a pipeline.
+	 *
+	 * @param pipeline the pipeline to be selected.
+	 */
 	public final void selectPipeline(Pipeline<ProcessorWrapper> pipeline) {
 		if (selectedPipeline() != null && selectedPipeline().equals(pipeline)) {
 			return;
@@ -243,25 +289,50 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 		}
 	}
 
+	/**
+	 * Disables/enables the processor widgets.
+	 *
+	 * @param disable True to disable, False to enable the processor widgets.
+	 */
 	public void setDisableProcessorWidgets(boolean disable) {
 		for (ProcessorsWidget w : processorWidgets) {
 			w.setDisable(disable);
 		}
 	}
 
+	/**
+	 * Creates a new pipeline.
+	 *
+	 * @param name name of the new pipeline.
+	 */
 	public void createPipeline(String name) {
 		Pipeline pipeline = manager.createPipeline(name);
 		selectPipeline(pipeline);
 	}
 
+	/**
+	 * Changes the cursor in the (main) editor pane.
+	 *
+	 * @param cursor the new cursor.
+	 */
 	public void setCursor(Cursor cursor) {
 		editorPane().pane().setCursor(cursor);
 	}
 
+	/**
+	 * Observable set of selected nodes in the (main) editor pane.
+	 *
+	 * @return observable set of selected nodes.
+	 */
 	public final ObservableSet<Node> selection() {
 		return rubberBandSelector.selection();
 	}
 
+	/**
+	 * Shows/hides the side bar of the pipeline editor.
+	 *
+	 * @param show True to show, False to hide the side bar.
+	 */
 	public void showSideBar(boolean show) {
 		if (show) {
 			if (!splitPaneComponents.contains(sideBar.getComponent())) {

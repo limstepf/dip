@@ -27,7 +27,7 @@ public class ProcessorViewTopDown extends ProcessorView {
 
 		this.setCenter(infoPane);
 		infoPane.getStyleClass().add("dip-processor-topdown");
-		infoPane.setTop(title);
+		infoPane.setTop(head.getNode());
 		setupDraggable(infoPane);
 
 		this.setBottom(outputPane);
@@ -54,6 +54,8 @@ public class ProcessorViewTopDown extends ProcessorView {
 
 	@Override
 	protected void showParameters(boolean show) {
+		super.showParameters(show);
+
 		final ClosedParameterView closedView = this.closedParameterView();
 		if (show) {
 			infoPane.setCenter(this.parameterView().node());

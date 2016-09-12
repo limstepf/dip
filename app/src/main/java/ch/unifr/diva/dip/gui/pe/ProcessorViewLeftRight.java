@@ -25,7 +25,7 @@ public class ProcessorViewLeftRight extends ProcessorView {
 
 		this.setCenter(infoPane);
 		infoPane.getStyleClass().add("dip-processor-leftright");
-		infoPane.setTop(title);
+		infoPane.setTop(head.getNode());
 		setupDraggable(infoPane);
 
 		this.setRight(outputPane);
@@ -51,6 +51,8 @@ public class ProcessorViewLeftRight extends ProcessorView {
 
 	@Override
 	protected void showParameters(boolean show) {
+		super.showParameters(show);
+
 		final ClosedParameterView closedView = this.closedParameterView();
 		if (show) {
 			infoPane.setCenter(this.parameterView().node());

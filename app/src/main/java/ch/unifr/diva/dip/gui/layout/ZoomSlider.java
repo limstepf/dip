@@ -23,6 +23,7 @@ public class ZoomSlider {
 
 	private final EventHandler<KeyEvent> zoomHandler;
 	private final ChangeListener<Number> sliderListener;
+	private final ChangeListener<Number> zoomListener;
 	private boolean propagate = true;
 
 	/**
@@ -57,6 +58,12 @@ public class ZoomSlider {
 		};
 		slider.valueProperty().addListener(sliderListener);
 		sliderListener.changed(null, 0, zoomValToSlider(zoomPane.getZoom()));
+
+		zoomListener = (ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+			setZoomValue(newValue.doubleValue());
+		};
+		zoomPane.zoomProperty().addListener(zoomListener);
+		zoomListener.changed(null, 0, zoomPane.getZoom());
 
 		lane.add(zoom);
 		lane.add(slider, Priority.ALWAYS);

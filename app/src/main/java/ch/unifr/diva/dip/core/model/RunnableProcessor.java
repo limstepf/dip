@@ -2,6 +2,7 @@ package ch.unifr.diva.dip.core.model;
 
 import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.ProcessorContext;
+import ch.unifr.diva.dip.api.services.Previewable;
 import ch.unifr.diva.dip.api.services.Processable;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.services.Resetable;
@@ -109,6 +110,24 @@ public class RunnableProcessor extends ProcessorWrapper {
 	}
 
 	/**
+	 * Checks whether the runnable processor is previewable, or not.
+	 *
+	 * @return True if a preview is offered, False otherwise.
+	 */
+	public boolean isPreviewable() {
+		return this.processor() instanceof Previewable;
+	}
+
+	/**
+	 * Returns a previewable instance of the processor service.
+	 *
+	 * @return a previewable instance of the processor service.
+	 */
+	public Previewable getPreviewable() {
+		return (Previewable) this.processor();
+	}
+
+	/**
 	 * Returns the project page this runnable processor is associated to (via
 	 * runnable pipeline).
 	 *
@@ -149,7 +168,6 @@ public class RunnableProcessor extends ProcessorWrapper {
 		private Button paramButton;
 		private Button processButton;
 		private Button resetButton;
-		private ProcessorParameterWindow paramWindow;
 
 		/**
 		 * Creates a new processor layer extension.
@@ -166,13 +184,11 @@ public class RunnableProcessor extends ProcessorWrapper {
 			if (runnable.processor().hasParameters()) {
 				paramButton = newButton(localize("parameters"));
 				paramButton.setOnAction((e) -> {
-					if (paramWindow == null) {
-						paramWindow = new ProcessorParameterWindow(
-								runnable.handler.uiStrategy.getStage(),
-								runnable.handler,
-								runnable
-						);
-					}
+					final ProcessorParameterWindow paramWindow = new ProcessorParameterWindow(
+							runnable.handler.uiStrategy.getStage(),
+							runnable.handler,
+							runnable
+					);
 					paramWindow.show();
 				});
 				lane.add(paramButton);
@@ -199,7 +215,6 @@ public class RunnableProcessor extends ProcessorWrapper {
 				lane.add(resetButton);
 			}
 
-//			lane.setAlignment(Pos.CENTER_LEFT);
 			lane.setAlignment(Pos.CENTER_RIGHT);
 			lane.setPadding(new Insets(4, 4, 4, 4));
 			vbox.getChildren().addAll(status, lane);
@@ -379,6 +394,15 @@ public class RunnableProcessor extends ProcessorWrapper {
 				objectMap.objects,
 				this.layer
 		);
+	}
+
+	/**
+	 * Returns the processor context.
+	 *
+	 * @return the processor context.
+	 */
+	public ProcessorContext getProcessorContext() {
+		return newProcessorContext();
 	}
 
 	/**

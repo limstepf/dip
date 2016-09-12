@@ -31,7 +31,6 @@ public class NavigatorWidget extends AbstractWidget {
 	private final View view;
 	private final ZoomPane master;
 
-	private final ChangeListener<Number> zoomListener;
 	private final InvalidationListener contentListener;
 	private final ChangeListener<Object> scrollListener;
 	private final EventHandler<MouseEvent> viewportDownEvent;
@@ -47,11 +46,6 @@ public class NavigatorWidget extends AbstractWidget {
 
 		master = zoomPane;
 		view = new View(master);
-
-		zoomListener = (ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
-			view.zoomSlider.updateZoomValue(newValue.doubleValue());
-			updateSnapshot();
-		};
 
 		contentListener = (observable) -> {
 			view.setDisableViewport(!master.hasZoomContent());
@@ -134,7 +128,6 @@ public class NavigatorWidget extends AbstractWidget {
 	 */
 	private void bind(ZoomPane zoomPane) {
 		master.zoomContentProperty().addListener(contentListener);
-		master.zoomProperty().addListener(zoomListener);
 		master.hvalueProperty().addListener(scrollListener);
 		master.vvalueProperty().addListener(scrollListener);
 		master.widthProperty().addListener(scrollListener);
@@ -142,7 +135,6 @@ public class NavigatorWidget extends AbstractWidget {
 		master.needsLayoutProperty().addListener(scrollListener);
 		view.viewport.setOnMousePressed(viewportDownEvent);
 		view.viewport.setOnMouseDragged(viewportDragEvent);
-		zoomListener.changed(null, 0, master.getZoom());
 		contentListener.invalidated(null);
 	}
 
