@@ -38,22 +38,58 @@ public class ApplicationHandler implements Localizable {
 	 * The application data manager.
 	 */
 	public final ApplicationDataManager dataManager;
+
 	/**
-	 * Application wide thread pool/executor service.
+	 * Application wide thread pool/executor service. This thread pool is also
+	 * passed to processors to do their job, so keep this, and the fact that
+	 * dependent tasks are a big NO, in mind, or face another talk with the
+	 * dining philosophers.
+	 *
+	 * <p>
+	 * For example the preview widget is not allowed to use this thread pool to
+	 * update its viewport; all threads in the pool could end up being occupied
+	 * by a preview task, which each in turn require a processor to return the
+	 * preview image for which we need threads from this thread pool... and it's
+	 * the Great Famine all over again (i.e. thread starvation). You get the
+	 * idea...
 	 */
 	public final DipThreadPool threadPool;
+
+	/**
+	 * A discarding thread pool. This pool (with a single worker and a blocking
+	 * array queue of size 1) is used to update viewports in ZoomPanes, hence
+	 * its not so important if intermediate tasks get discarded.
+	 *
+	 * <p>
+	 * Technically each such viewport (or similar) should have its own such
+	 * pool, exactly because it's a discarding one (otherwise it's no longer
+	 * guaranteed that the last task is always processed/never discarded), but
+	 * we go by the assumption that only one client of this pool is actively in
+	 * use at a time (it's rather hard to operate multiple ZoomPanes, or other
+	 * GUI widgets at the same time).
+	 *
+	 * <p>
+	 * If in doubt, just make your own thread pool (with blackjack, and...), no
+	 * big deal. E.g. the preview widget uses it's own discarding thread pool,
+	 * since it's exactly used together with a ZoomPane.
+	 */
+	public final DipThreadPool discardingThreadPool;
+
 	/**
 	 * OSGi framework.
 	 */
 	public final OSGiFramework osgi;
+
 	/**
 	 * The user settings.
 	 */
 	public final UserSettings settings;
+
 	/**
 	 * The UI strategy.
 	 */
 	public final UIStrategy uiStrategy;
+
 	/**
 	 * The application's event bus.
 	 */
@@ -84,6 +120,7 @@ public class ApplicationHandler implements Localizable {
 		this.context = context;
 		this.dataManager = context.dataManager;
 		this.threadPool = context.threadPool;
+		this.discardingThreadPool = context.discardingThreadPool;
 		this.osgi = context.osgi;
 		this.settings = context.settings;
 		this.uiStrategy = uiStrategy;
@@ -329,6 +366,9 @@ public class ApplicationHandler implements Localizable {
 		selectedPageProperty.bind(project.selectedPageIdProperty());
 	}
 
+	/**
+	 * Closes the current project.
+	 */
 	public void closeProject() {
 		if (!hasProject()) {
 			return;
@@ -360,26 +400,57 @@ public class ApplicationHandler implements Localizable {
 		hasProjectProperty.set(false);
 	}
 
+	/**
+	 * Returns the current project.
+	 *
+	 * @return the current project, or null.
+	 */
 	public Project getProject() {
 		return project;
 	}
 
+	/**
+	 * Checks whether a project is opened or not.
+	 *
+	 * @return True if a project is opened, false otherwise.
+	 */
 	public boolean hasProject() {
 		return hasProjectProperty.get();
 	}
 
+	/**
+	 * The has project property. This property is True if a project is opened,
+	 * false otherwise.
+	 *
+	 * @return the has project property.
+	 */
 	public ReadOnlyBooleanProperty hasProjectProperty() {
 		return hasProjectProperty.getReadOnlyProperty();
 	}
 
+	/**
+	 * The selected page property. Holds the index of the selected page, or -1.
+	 *
+	 * @return the selected page property.
+	 */
 	public ReadOnlyIntegerProperty selectedPageProperty() {
 		return selectedPageProperty.getReadOnlyProperty();
 	}
 
+	/**
+	 * The modified property.
+	 *
+	 * @return the modified property.
+	 */
 	public ReadOnlyBooleanProperty modifiedProjectProperty() {
 		return modifiedProjectProperty.getReadOnlyProperty();
 	}
 
+	/**
+	 * Checks whether the project has been modified since opening.
+	 *
+	 * @return True if the project has been modified, False otherwise.
+	 */
 	public boolean isProjectModified() {
 		if (!hasProject()) {
 			return false;
@@ -388,6 +459,11 @@ public class ApplicationHandler implements Localizable {
 		return modifiedProjectProperty.get();
 	}
 
+	/**
+	 * Returns the filename of the project.
+	 *
+	 * @return the filename of the project.
+	 */
 	public String getProjectFileName() {
 		return project.getFilename();
 	}

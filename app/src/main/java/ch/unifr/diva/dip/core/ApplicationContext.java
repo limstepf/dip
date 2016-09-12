@@ -28,14 +28,22 @@ public class ApplicationContext {
 	 * The data manager knows about the filesystem.
 	 */
 	public final ApplicationDataManager dataManager;
+
 	/**
 	 * The application wide thread pool/executor service.
 	 */
 	public final DipThreadPool threadPool;
+
+	/**
+	 * A discarding thread pool. Single worker, and a work queue size of 1.
+	 */
+	public final DipThreadPool discardingThreadPool;
+
 	/**
 	 * The plugin/service framework.
 	 */
 	public final OSGiFramework osgi;
+
 	/**
 	 * The user settings.
 	 */
@@ -80,8 +88,9 @@ public class ApplicationContext {
 		}
 		dataManager = tmpDataManager;
 
-		// init thread pool/executor service
+		// init thread pools/executor services
 		threadPool = new DipThreadPool();
+		discardingThreadPool = DipThreadPool.newDiscardingThreadPool("dip-discarding-pool", 1, 1);
 
 		// init OSGi framework
 		OSGiFramework tmpOsgi = null;
@@ -142,6 +151,9 @@ public class ApplicationContext {
 		if (threadPool != null) {
 			threadPool.stop();
 		}
+		if (discardingThreadPool != null) {
+			discardingThreadPool.stop();
+		}
 
 		if (osgi != null) {
 			try {
@@ -157,9 +169,12 @@ public class ApplicationContext {
 	 * have been terminated.
 	 */
 	public void waitForStop() {
-		// gracefully shutdown the thread pool
+		// gracefully shutdown the thread pools
 		if (threadPool != null) {
 			threadPool.waitForStop();
+		}
+		if (discardingThreadPool != null) {
+			discardingThreadPool.waitForStop();
 		}
 
 		// gracefully shutdown OSGi framework (and all installed bundles...)
