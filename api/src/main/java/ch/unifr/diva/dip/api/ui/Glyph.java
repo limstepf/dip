@@ -3,6 +3,7 @@ package ch.unifr.diva.dip.api.ui;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.BooleanPropertyBase;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
@@ -232,6 +233,16 @@ public class Glyph extends Label {
 	private Glyph setFont(String fontFamily, double size) {
 		this.setFont(Font.font(fontFamily, size));
 		return this;
+	}
+
+	/**
+	 * Creates a tooltip on the glyph.
+	 *
+	 * @param tooltip the text of the tooltip.
+	 */
+	public void setTooltip(String tooltip) {
+		final Tooltip t = new Tooltip(tooltip);
+		this.setTooltip(t);
 	}
 
 }
