@@ -29,8 +29,6 @@ public class SimpleImageTilerTest extends ImageTilerTestBase {
 					assertTrue("valid start y coordinate", tile.y >= 0);
 					assertTrue("valid end x coordinate", tile.x + tile.width <= region.width);
 					assertTrue("valid end y coordinate", tile.y + tile.height <= region.height);
-					assertTrue("valid tile width", tile.width <= tileSpec.width);
-					assertTrue("valid tile height", tile.height <= tileSpec.height);
 					pixelCount += tile.width * tile.height;
 					tileCount++;
 				}
@@ -38,8 +36,7 @@ public class SimpleImageTilerTest extends ImageTilerTestBase {
 				final int expectedPixels = region.width * region.height;
 				assertEquals("number of processed pixels", expectedPixels, pixelCount);
 
-				final int expectedTiles = (int) (Math.ceil(region.width / (double) tileSpec.width)
-						* Math.ceil(region.height / (double) tileSpec.height));
+				final int expectedTiles = getTilesOnAxis(region.width, tileSpec.width) * getTilesOnAxis(region.height, tileSpec.height);
 				assertEquals("number of tiles", expectedTiles, tileCount);
 
 			}

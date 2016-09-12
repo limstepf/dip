@@ -28,4 +28,8 @@ public class ImageTilerTestBase {
 			new Rectangle(1024, 1024)
 	);
 
+	protected int getTilesOnAxis(double imageLen, double tileLen) {
+		return (tileLen >= imageLen) ? 1 : (int) Math.floor(imageLen / tileLen);
+	}
+
 }

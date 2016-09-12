@@ -50,9 +50,6 @@ public class PaddedImageTilerTest extends ImageTilerTestBase {
 				paddingSpec.height
 		);
 
-		final int maxPadWidth = tileSpec.width + 2 * paddingSpec.width;
-		final int maxPadHeight = tileSpec.height + 2 * paddingSpec.height;
-
 		final int expectedWritablePixels = region.width * region.height;
 		final BitSet pixels;
 		if (maxPixelCountForBitSet > expectedWritablePixels) {
@@ -70,8 +67,6 @@ public class PaddedImageTilerTest extends ImageTilerTestBase {
 			assertTrue("valid start y coordinate", tile.y >= 0);
 			assertTrue("valid end x coordinate", tile.x + tile.width <= region.width);
 			assertTrue("valid end y coordinate", tile.y + tile.height <= region.height);
-			assertTrue("valid tile width", tile.width <= maxPadWidth);
-			assertTrue("valid tile height", tile.height <= maxPadHeight);
 
 			// writable region
 			assertTrue(
@@ -127,8 +122,8 @@ public class PaddedImageTilerTest extends ImageTilerTestBase {
 		}
 
 		// proper tile count
-		final int expectedTiles = (int) (Math.ceil(region.width / (double) tileSpec.width)
-				* Math.ceil(region.height / (double) tileSpec.height));
+		final int expectedTiles = getTilesOnAxis(region.width, tileSpec.width)
+				* getTilesOnAxis(region.height, tileSpec.height);
 		assertEquals("number of tiles", expectedTiles, tileCount);
 
 	}

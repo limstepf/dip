@@ -17,12 +17,13 @@ public abstract class ImageTiler<T extends Rectangle> implements Iterator<T>, It
 	protected final int height;
 	protected final int rows;
 	protected final int cols;
+	protected final int last;
 	protected int index;
 
 	/**
-	 * Creates a new image tiler with quadratic/square tiles. Returned tiles at
-	 * the border of an image may be smaller than specified (i.e. there is no
-	 * need to intersect a given tile with the image plane).
+	 * Creates a new image tiler with quadratic/square tiles. Returned tiles may
+	 * be larger than specified, but never smaller (except for the case where
+	 * the tile size is larger than the image size).
 	 *
 	 * @param src the source image to be tiled.
 	 * @param size width/height of a tile.
@@ -46,15 +47,27 @@ public abstract class ImageTiler<T extends Rectangle> implements Iterator<T>, It
 		this.width = width;
 		this.height = height;
 		this.index = -1;
-		this.cols = (int) Math.ceil(this.imageWidth / this.width)
-				+ (this.imageWidth % this.width == 0 ? 0 : 1);
-		this.rows = (int) Math.ceil(this.imageHeight / this.height)
-				+ (this.imageHeight % this.height == 0 ? 0 : 1);
+
+		// in cases of remainding pixels we want to end up with larger tiles
+		// than specified, not smaller ones (see note below)!
+		if (this.width >= this.imageWidth) {
+			this.cols = 1;
+		} else {
+			this.cols = (int) Math.floor(this.imageWidth / this.width);
+		}
+
+		if (this.height >= this.imageHeight) {
+			this.rows = 1;
+		} else {
+			this.rows = (int) Math.floor(this.imageHeight / this.height);
+		}
+
+		this.last = this.cols * this.rows - 1;
 	}
 
 	@Override
 	public synchronized boolean hasNext() {
-		return this.index < (this.cols * this.rows - 1);
+		return this.index < last;
 	}
 
 	@Override
@@ -79,14 +92,21 @@ public abstract class ImageTiler<T extends Rectangle> implements Iterator<T>, It
 		return this.index / this.cols * this.height;
 	}
 
+	/*
+	 * For thread safety with binary images we need to make sure to not produce
+	 * smaller rest-tiles at the border, but larger tiles an iteration earlier!
+	 * See notes in ProcessorBase.java, getOptimalTileSize() method.
+	 */
 	protected int getWidth(int x) {
 		final int w = x + this.width;
-		return (w > this.imageWidth) ? (this.width - (w - this.imageWidth)) : this.width;
+		final int remainder = this.imageWidth - w;
+		return (remainder < this.width) ? this.width + remainder : this.width;
 	}
 
 	protected int getHeight(int y) {
 		final int h = y + this.height;
-		return (h > this.imageHeight) ? (this.height - (h - this.imageHeight)) : this.height;
+		final int remainder = this.imageHeight - h;
+		return (remainder < this.height) ? this.height + remainder : this.height;
 	}
 
 	@Override

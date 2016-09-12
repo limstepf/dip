@@ -10,8 +10,8 @@ import ch.unifr.diva.dip.api.imaging.BufferedIO;
 import ch.unifr.diva.dip.api.imaging.BufferedMatrix;
 import ch.unifr.diva.dip.api.imaging.ops.ConcurrentTileOp;
 import ch.unifr.diva.dip.api.imaging.ops.Parallelizable;
-import ch.unifr.diva.dip.api.imaging.ops.TileParallelizable;
 import ch.unifr.diva.dip.api.utils.DipThreadPool;
+import ch.unifr.diva.dip.api.utils.MathUtils;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
@@ -231,14 +231,19 @@ public abstract class ProcessorBase implements Processor {
 	 * @return the filtered image.
 	 */
 	public static BufferedImage filter(DipThreadPool threadPool, BufferedImageOp op, BufferedImage src, BufferedImage dest) {
-
 		// get parallelizable mode of the op...
 		final Parallelizable.Mode mode = Parallelizable.getMode(op, threadPool.poolSize());
 		// ...and maybe have some further checks, if we not rather fall back to
 		// single-threaded execution.
 		switch (mode) {
 			case TILE: {
-				// TODO: do not parallelize super small images/tiles at all
+				// do not parallelize super small images/tiles at all
+				final int samples = src.getWidth() * src.getHeight() * src.getRaster().getNumBands();
+				// TODO: find optimal threshold, this here is just a wild guess
+				if (samples < (64 * 64 * 3)) {
+					break;
+				}
+
 				final Rectangle tileSize = getOptimalTileSize(threadPool.poolSize(), src);
 				if (tileSize.width > 0 && tileSize.height > 0) {
 					final ConcurrentTileOp cop = new ConcurrentTileOp(
@@ -291,13 +296,30 @@ public abstract class ProcessorBase implements Processor {
 		 * although that overhead isn't that great and fades in comparison to the
 		 * usual workload, so...
 		 *
-		 * This might occasionally yield super small workloads/tiles at the
-		 * border of the image, but it really doesn't matter too much (see
-		 * dynamic tiles benchmark).
+		 * About THREAD SAFETY on binary images
+		 * ------------------------------------
+		 * Here comes a fun story: if we're operating on a BufferedImage of type
+		 * BufferedImage.TYPE_BYTE_BINARY there will be errors/artifacts in the
+		 * result IFF we're using a tile size that is not a power of two (and
+		 * larger than or equal to 8)! Why? Most likely because the backing data
+		 * buffer isn't a bit, but a byte buffer, so different threads want to
+		 * manipulate different bits packed in the same bytes, hence the artifacts.
+		 *
+		 * As a solution we'd like to fix the tile size to be a power of two if
+		 * we're dealing with a binary destination image. But since the destination
+		 * image at this point might still be null, we can't reliably know that.
+		 * Thanksfully the tile size doesn't matter much anyways, so we fix it in
+		 * any case, while also making sure to not produce smaller tiles at the
+		 * border, but larger ones an iteration earlier.
 		 */
+		// 1) a power of two
+		final int w = MathUtils.nextPowerOfTwo(src.getWidth() / (numThreads + 1));
+		final int h = MathUtils.nextPowerOfTwo(src.getHeight() / (numThreads + 1));
+
+		// 2) at least 8
 		return new Rectangle(
-				src.getWidth() / numThreads,
-				src.getHeight() / numThreads
+				Math.max(8, w),
+				Math.max(8, h)
 		);
 	}
 
