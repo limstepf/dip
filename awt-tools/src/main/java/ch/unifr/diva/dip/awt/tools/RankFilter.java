@@ -1,5 +1,6 @@
 package ch.unifr.diva.dip.awt.tools;
 
+import ch.unifr.diva.dip.api.components.ActiveInputPort;
 import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.components.ProcessorContext;
@@ -11,17 +12,21 @@ import ch.unifr.diva.dip.api.imaging.padders.ImagePadder;
 import ch.unifr.diva.dip.api.parameters.EnumParameter;
 import ch.unifr.diva.dip.api.parameters.TextParameter;
 import ch.unifr.diva.dip.api.parameters.XorParameter;
+import ch.unifr.diva.dip.api.services.Previewable;
 import ch.unifr.diva.dip.api.services.ProcessableBase;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.services.Transmutable;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.awt.tools.MatrixEditor.MatrixShapeParameter;
 import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.Image;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
 
@@ -30,14 +35,14 @@ import org.apache.felix.scr.annotations.Service;
  */
 @Component
 @Service
-public class RankFilter extends ProcessableBase implements Transmutable {
+public class RankFilter extends ProcessableBase implements Transmutable, Previewable {
 
 	private final static String IMAGE_FORMAT = "PNG";
 	private final static String IMAGE_FILE = "ranked.png";
 	private final static String MATRIX_FILE = "ranked.bmat";
 
 	private final InputPort<BufferedImage> input;
-	private final InputPort<BooleanMatrix> mask;
+	private final ActiveInputPort<BooleanMatrix> mask;
 	private final OutputPort<BufferedImage> output;
 
 	private final EnumParameter padderOption;
@@ -45,6 +50,9 @@ public class RankFilter extends ProcessableBase implements Transmutable {
 	private final XorParameter maskOption;
 	private final MatrixShapeParameter shape;
 
+	/**
+	 * Creates a new rank filter.
+	 */
 	public RankFilter() {
 		super("Rank Filter");
 
@@ -67,7 +75,7 @@ public class RankFilter extends ProcessableBase implements Transmutable {
 		this.parameters.put("mask", this.maskOption);
 
 		this.input = new InputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImage(), true);
-		this.mask = new InputPort(new ch.unifr.diva.dip.api.datatypes.BooleanMatrix(), false);
+		this.mask = new ActiveInputPort(new ch.unifr.diva.dip.api.datatypes.BooleanMatrix(), false);
 		enableAllInputs();
 
 		this.output = new OutputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImage());
@@ -188,25 +196,43 @@ public class RankFilter extends ProcessableBase implements Transmutable {
 		return this.mask.isConnected();
 	}
 
+	/**
+	 * Processing configuration. Reads out and holds the rank filter's
+	 * configuration parameters/objects.
+	 */
+	private static class ProcessConfig {
+
+		final public RankOp.Rank rank;
+		final public ImagePadder.Type padderType;
+		final public Mask mask;
+
+		/**
+		 * Creates a new process configuration.
+		 *
+		 * @param filter the rank filter.
+		 */
+		public ProcessConfig(RankFilter filter) {
+			rank = EnumParameter.valueOf(
+					filter.rankOption.get(),
+					RankOp.Rank.class,
+					RankOp.Rank.MEDIAN
+			);
+			padderType = EnumParameter.valueOf(
+					filter.padderOption.get(),
+					ImagePadder.Type.class,
+					ImagePadder.Type.REFLECTIVE
+			);
+			mask = filter.getMask();
+		}
+
+	}
+
 	@Override
 	public void process(ProcessorContext context) {
 		if (!restoreOutputs(context)) {
 			final BufferedImage src = input.getValue();
-			final RankOp.Rank rank = EnumParameter.valueOf(
-					this.rankOption.get(),
-					RankOp.Rank.class,
-					RankOp.Rank.MEDIAN
-			);
-			final ImagePadder.Type padderType = EnumParameter.valueOf(
-					this.padderOption.get(),
-					ImagePadder.Type.class,
-					ImagePadder.Type.REFLECTIVE
-			);
-
-			final RankOp op = new RankOp(rank, getMask(), padderType.getInstance());
-			final BufferedImage image = filter(
-					context, op, src, op.createCompatibleDestImage(src)
-			);
+			final ProcessConfig cfg = new ProcessConfig(this);
+			final BufferedImage image = doProcess(context, src, cfg);
 
 			if (isBufferedMatrix()) {
 				writeBufferedMatrix(context, MATRIX_FILE, (BufferedMatrix) image);
@@ -216,6 +242,43 @@ public class RankFilter extends ProcessableBase implements Transmutable {
 
 			restoreOutputs(context, image);
 		}
+	}
+
+	private BufferedImage doProcess(ProcessorContext context, BufferedImage src, ProcessConfig cfg) {
+		final RankOp op = new RankOp(cfg.rank, cfg.mask, cfg.padderType.getInstance());
+		return filter(context, op, src, op.createCompatibleDestImage(src));
+	}
+
+	private ProcessConfig previewCfg;
+
+	@Override
+	public void previewSetup(ProcessorContext context) {
+		previewCfg = new ProcessConfig(this);
+	}
+
+	@Override
+	public Image previewSource(ProcessorContext context) {
+		final BufferedImage src = input.getValue();
+		if (src instanceof BufferedMatrix) {
+			return null;
+		}
+		return SwingFXUtils.toFXImage(src, null);
+	}
+
+	@Override
+	public Image preview(ProcessorContext context, Rectangle bounds) {
+		if (isBufferedMatrix()) {
+			return null;
+		}
+		final BufferedImage src = input.getValue();
+		final BufferedImage region = src.getSubimage(
+				bounds.x,
+				bounds.y,
+				bounds.width,
+				bounds.height
+		);
+		final BufferedImage preview = doProcess(context, region, previewCfg);
+		return SwingFXUtils.toFXImage(preview, null);
 	}
 
 	@Override

@@ -11,14 +11,18 @@ import ch.unifr.diva.dip.api.parameters.XorParameter;
 import ch.unifr.diva.dip.api.services.ProcessableBase;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.imaging.ops.GlobalThresholdOp;
+import ch.unifr.diva.dip.api.services.Previewable;
 import ch.unifr.diva.dip.api.services.Transmutable;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.Image;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
 
@@ -27,7 +31,7 @@ import org.apache.felix.scr.annotations.Service;
  */
 @Component
 @Service
-public class GlobalThreshold extends ProcessableBase implements Transmutable {
+public class GlobalThreshold extends ProcessableBase implements Transmutable, Previewable {
 
 	private final InputPort<BufferedImage> input;
 	private final InputPort<BufferedImage> input_gray;
@@ -38,6 +42,9 @@ public class GlobalThreshold extends ProcessableBase implements Transmutable {
 	private final static String STORAGE_FILE = "binary.png";
 	private final static String STORAGE_FORMAT = "PNG";
 
+	/**
+	 * Adaptive methods to find an optimal global threshold.
+	 */
 	enum AdaptiveMethod {
 
 		MEAN {
@@ -62,6 +69,9 @@ public class GlobalThreshold extends ProcessableBase implements Transmutable {
 		abstract int computeThreshold(BufferedImage source, int band);
 	}
 
+	/**
+	 * Creates a new global threshold filter.
+	 */
 	public GlobalThreshold() {
 		super("Global Threshold");
 
@@ -174,45 +184,74 @@ public class GlobalThreshold extends ProcessableBase implements Transmutable {
 		BufferedImage binaryImage = readBufferedImage(context, STORAGE_FILE);
 
 		if (binaryImage == null) {
-			final BufferedImage source = getConnectedInput().getValue();
+			final BufferedImage src = getConnectedInput().getValue();
 
-			if (source instanceof BufferedMatrix) {
+			if (src instanceof BufferedMatrix) {
 				// GloablThresholdOp can't handle BufferedMatrix; BITS and BYTES only
 				// TODO: standard error handling!
 				return;
 			}
 
 			final int band = this.bandParameter.get() - 1; // to index
-			final GlobalThresholdOp op = new GlobalThresholdOp(band);
-
-			final ValueListSelection vs = this.thresholdParameter.get();
-			int th;
-			switch (vs.selection) {
-				case 1: // manual/fixed threshold
-					th = (int) vs.list.get(vs.selection);
-					log.info("global threshold filter (manual/fixed), threshold={}", th);
-					op.setThreshold(th);
-					break;
-
-				case 0: // adaptive threshold
-				default:
-					final String mname = (String) vs.list.get(vs.selection);
-					final AdaptiveMethod method = EnumParameter.valueOf(
-							mname,
-							AdaptiveMethod.class,
-							AdaptiveMethod.OTSU
-					);
-					th = method.computeThreshold(source, band);
-					log.info("global threshold filter ({}), threshold={}", method.name(), th);
-					op.setThreshold(th);
-					break;
-			}
-
-			binaryImage = filter(context, op, source, op.createBinaryDestImage(source));
+			final int threshold = computeThreshold(src, band);
+			binaryImage = doProcess(context, src, band, threshold);
 			writeBufferedImage(context, STORAGE_FILE, STORAGE_FORMAT, binaryImage);
 		}
 
 		setOutputs(context, binaryImage);
+	}
+
+	private BufferedImage doProcess(ProcessorContext context, BufferedImage src, int band, int threshold) {
+		final GlobalThresholdOp op = new GlobalThresholdOp(band);
+		op.setThreshold(threshold);
+		return filter(context, op, src, op.createBinaryDestImage(src));
+	}
+
+	private int computeThreshold(BufferedImage source, int band) {
+		final ValueListSelection vs = this.thresholdParameter.get();
+		switch (vs.selection) {
+			case 1: // manual/fixed threshold
+				return (int) vs.list.get(vs.selection);
+
+			default:
+			case 0: // adaptive threshold
+				final String mname = (String) vs.list.get(vs.selection);
+				final AdaptiveMethod method = EnumParameter.valueOf(
+						mname,
+						AdaptiveMethod.class,
+						AdaptiveMethod.OTSU
+				);
+				return method.computeThreshold(source, band);
+		}
+	}
+
+	private int previewBand;
+	private int previewThreshold;
+
+	@Override
+	public void previewSetup(ProcessorContext context) {
+		final BufferedImage src = getConnectedInput().getValue();
+		previewBand = this.bandParameter.get() - 1; // to index
+		previewThreshold = computeThreshold(src, previewBand);
+	}
+
+	@Override
+	public Image previewSource(ProcessorContext context) {
+		final BufferedImage src = getConnectedInput().getValue();
+		return SwingFXUtils.toFXImage(src, null);
+	}
+
+	@Override
+	public Image preview(ProcessorContext context, Rectangle bounds) {
+		final BufferedImage src = getConnectedInput().getValue();
+		final BufferedImage region = src.getSubimage(
+				bounds.x,
+				bounds.y,
+				bounds.width,
+				bounds.height
+		);
+		final BufferedImage preview = doProcess(context, region, previewBand, previewThreshold);
+		return SwingFXUtils.toFXImage(preview, null);
 	}
 
 	@Override

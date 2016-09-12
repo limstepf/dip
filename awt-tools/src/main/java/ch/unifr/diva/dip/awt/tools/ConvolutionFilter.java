@@ -1,5 +1,6 @@
 package ch.unifr.diva.dip.awt.tools;
 
+import ch.unifr.diva.dip.api.components.ActiveInputPort;
 import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.components.Port;
@@ -16,17 +17,21 @@ import ch.unifr.diva.dip.api.imaging.padders.ImagePadder;
 import ch.unifr.diva.dip.api.parameters.CompositeGrid;
 import ch.unifr.diva.dip.api.parameters.EnumParameter;
 import ch.unifr.diva.dip.api.parameters.LabelParameter;
+import ch.unifr.diva.dip.api.services.Previewable;
 import ch.unifr.diva.dip.api.services.ProcessableBase;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.services.Transmutable;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.Map;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
+import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
@@ -36,7 +41,7 @@ import org.apache.felix.scr.annotations.Service;
  */
 @Component
 @Service
-public class ConvolutionFilter extends ProcessableBase implements Transmutable {
+public class ConvolutionFilter extends ProcessableBase implements Transmutable, Previewable {
 
 	private final static String IMAGE_FORMAT = "PNG";
 	private final static String IMAGE_FILE = "convolved.png";
@@ -56,26 +61,26 @@ public class ConvolutionFilter extends ProcessableBase implements Transmutable {
 	/**
 	 * Kernel input set.
 	 *
-	 * @param <T>
+	 * @param <T> type of the matrix.
 	 */
 	private static class KernelInput<T extends Matrix> {
 
 		private final String postfix;
-		public final InputPort<T> kernel;
-		public final InputPort<T> rowVector;
-		public final InputPort<T> columnVector;
+		public final ActiveInputPort<T> kernel;
+		public final ActiveInputPort<T> rowVector;
+		public final ActiveInputPort<T> columnVector;
 
 		public KernelInput(Class<T> clazz) {
 			if (clazz.equals(DoubleMatrix.class)) {
 				this.postfix = "d";
-				this.kernel = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.DoubleMatrix(), false);
-				this.rowVector = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.DoubleMatrix(), false);
-				this.columnVector = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.DoubleMatrix(), false);
+				this.kernel = new ActiveInputPort<>(new ch.unifr.diva.dip.api.datatypes.DoubleMatrix(), false);
+				this.rowVector = new ActiveInputPort<>(new ch.unifr.diva.dip.api.datatypes.DoubleMatrix(), false);
+				this.columnVector = new ActiveInputPort<>(new ch.unifr.diva.dip.api.datatypes.DoubleMatrix(), false);
 			} else {
 				this.postfix = "f";
-				this.kernel = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.FloatMatrix(), false);
-				this.rowVector = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.FloatMatrix(), false);
-				this.columnVector = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.FloatMatrix(), false);
+				this.kernel = new ActiveInputPort<>(new ch.unifr.diva.dip.api.datatypes.FloatMatrix(), false);
+				this.rowVector = new ActiveInputPort<>(new ch.unifr.diva.dip.api.datatypes.FloatMatrix(), false);
+				this.columnVector = new ActiveInputPort<>(new ch.unifr.diva.dip.api.datatypes.FloatMatrix(), false);
 			}
 		}
 
@@ -96,6 +101,9 @@ public class ConvolutionFilter extends ProcessableBase implements Transmutable {
 		}
 	}
 
+	/**
+	 * Creates a new convolution filter.
+	 */
 	public ConvolutionFilter() {
 		super("Convolution Filter");
 
@@ -348,65 +356,59 @@ public class ConvolutionFilter extends ProcessableBase implements Transmutable {
 		return !input.isConnected() || !input.getPortState().equals(Port.State.READY);
 	}
 
+	/**
+	 * Processing configuration. Reads out and holds the convolution
+	 * configuration parameters/objects.
+	 */
+	private static class ProcessConfig {
+
+		final public Kernel.Precision precision;
+		final public Kernel kernel;
+		final public Kernel columnVector;
+		final public ImagePadder.Type padderType;
+
+		/**
+		 * Creates a new process configuration.
+		 *
+		 * @param filter the convolution filter.
+		 */
+		public ProcessConfig(ConvolutionFilter filter) {
+			this.precision = filter.getKernelPrecision();
+
+			if (precision.equals(Kernel.Precision.DOUBLE)) {
+				if (filter.kernelDouble.isSeparable()) {
+					kernel = new DoubleKernel(filter.kernelDouble.rowVector.getValue());
+					columnVector = new DoubleKernel(filter.kernelDouble.columnVector.getValue());
+				} else {
+					kernel = new DoubleKernel(filter.kernelDouble.kernel.getValue());
+					columnVector = null;
+				}
+			} else {
+				if (filter.kernelFloat.isSeparable()) {
+					kernel = new FloatKernel(filter.kernelFloat.rowVector.getValue());
+					columnVector = new FloatKernel(filter.kernelFloat.columnVector.getValue());
+				} else {
+					kernel = new FloatKernel(filter.kernelFloat.kernel.getValue());
+					columnVector = null;
+				}
+			}
+
+			padderType = EnumParameter.valueOf(
+					filter.padderOption.get(),
+					ImagePadder.Type.class,
+					ImagePadder.Type.REFLECTIVE
+			);
+		}
+	}
+
 	@Override
 	public void process(ProcessorContext context) {
 		if (!restoreOutputs(context)) {
 			final InputPort<BufferedImage> source = getConnectedInput();
 			final BufferedImage src = source.getValue();
 
-			final Kernel kernel;
-			final Kernel columnVector;
-			final Kernel.Precision p = getKernelPrecision();
-			if (p.equals(Kernel.Precision.DOUBLE)) {
-				if (this.kernelDouble.isSeparable()) {
-					kernel = new DoubleKernel(this.kernelDouble.rowVector.getValue());
-					columnVector = new DoubleKernel(this.kernelDouble.columnVector.getValue());
-				} else {
-					kernel = new DoubleKernel(this.kernelDouble.kernel.getValue());
-					columnVector = null;
-				}
-			} else {
-				if (this.kernelFloat.isSeparable()) {
-					kernel = new FloatKernel(this.kernelFloat.rowVector.getValue());
-					columnVector = new FloatKernel(this.kernelFloat.columnVector.getValue());
-				} else {
-					kernel = new FloatKernel(this.kernelFloat.kernel.getValue());
-					columnVector = null;
-				}
-			}
-
-			final ImagePadder.Type padderType = EnumParameter.valueOf(
-					this.padderOption.get(),
-					ImagePadder.Type.class,
-					ImagePadder.Type.REFLECTIVE
-			);
-
-			final BufferedImage image;
-
-			// We need to manually do the two passes if run in parallel, or
-			// errors will be produced (see ConvolutionOp)
-			if (columnVector != null) {
-				// 2-pass convolution
-				ConvolutionOp op = getConvolutionOp(columnVector, padderType);
-				final BufferedImage tmp = filter(
-						context, op, src,
-						getCompatibleDestImage(op, src)
-				);
-
-				op = getConvolutionOp(kernel, padderType);
-				image = filter(
-						context, op, tmp,
-						getCompatibleDestImage(op, src)
-				);
-			} else {
-				// 1-pass convolution
-				final ConvolutionOp op = getConvolutionOp(kernel, padderType);
-
-				image = filter(
-						context, op, src,
-						getCompatibleDestImage(op, src)
-				);
-			}
+			final ProcessConfig cfg = new ProcessConfig(this);
+			final BufferedImage image = doProcess(context, src, cfg);
 
 			if (this.rescaleUnit.isBufferedMatrix()) {
 				writeBufferedMatrix(context, MATRIX_FILE, (BufferedMatrix) image);
@@ -416,6 +418,37 @@ public class ConvolutionFilter extends ProcessableBase implements Transmutable {
 
 			restoreOutputs(context, image);
 		}
+	}
+
+	private BufferedImage doProcess(ProcessorContext context, BufferedImage src, ProcessConfig cfg) {
+		final BufferedImage image;
+
+		// We need to manually do the two passes if run in parallel, or
+		// errors will be produced (see ConvolutionOp)
+		if (cfg.columnVector != null) {
+			// 2-pass convolution
+			ConvolutionOp op = getConvolutionOp(cfg.columnVector, cfg.padderType);
+			final BufferedImage tmp = filter(
+					context, op, src,
+					getCompatibleDestImage(op, src)
+			);
+
+			op = getConvolutionOp(cfg.kernel, cfg.padderType);
+			image = filter(
+					context, op, tmp,
+					getCompatibleDestImage(op, src)
+			);
+		} else {
+			// 1-pass convolution
+			final ConvolutionOp op = getConvolutionOp(cfg.kernel, cfg.padderType);
+
+			image = filter(
+					context, op, src,
+					getCompatibleDestImage(op, src)
+			);
+		}
+
+		return image;
 	}
 
 	private ConvolutionOp getConvolutionOp(Kernel kernel, ImagePadder.Type padderType) {
@@ -439,6 +472,38 @@ public class ConvolutionFilter extends ProcessableBase implements Transmutable {
 				this.rescaleUnit.getPrecision(),
 				this.rescaleUnit.numBands()
 		);
+	}
+
+	private ProcessConfig previewCfg;
+
+	@Override
+	public void previewSetup(ProcessorContext context) {
+		previewCfg = new ProcessConfig(this);
+	}
+
+	@Override
+	public Image previewSource(ProcessorContext context) {
+		final BufferedImage src = getConnectedInput().getValue();
+		if (src instanceof BufferedMatrix) {
+			return null;
+		}
+		return SwingFXUtils.toFXImage(src, null);
+	}
+
+	@Override
+	public Image preview(ProcessorContext context, Rectangle bounds) {
+		if (this.rescaleUnit.isBufferedMatrix()) {
+			return null;
+		}
+		final BufferedImage src = getConnectedInput().getValue();
+		final BufferedImage region = src.getSubimage(
+				bounds.x,
+				bounds.y,
+				bounds.width,
+				bounds.height
+		);
+		final BufferedImage preview = doProcess(context, region, previewCfg);
+		return SwingFXUtils.toFXImage(preview, null);
 	}
 
 	@Override

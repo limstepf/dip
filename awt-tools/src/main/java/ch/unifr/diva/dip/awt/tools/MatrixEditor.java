@@ -86,6 +86,9 @@ public class MatrixEditor extends ProcessorBase {
 		}
 	}
 
+	/**
+	 * Creates a new matrix editor.
+	 */
 	public MatrixEditor() {
 		super("Matrix Editor");
 
@@ -159,6 +162,7 @@ public class MatrixEditor extends ProcessorBase {
 		if (context != null) {
 			setOutputs();
 			this.matrix.property().addListener(matrixListener);
+			this.multiplier.property().addListener(matrixListener);
 		}
 	}
 

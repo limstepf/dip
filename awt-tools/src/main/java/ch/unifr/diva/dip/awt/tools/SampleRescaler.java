@@ -7,13 +7,17 @@ import ch.unifr.diva.dip.api.imaging.BufferedMatrix;
 import ch.unifr.diva.dip.api.imaging.ops.RescaleOp;
 import ch.unifr.diva.dip.api.parameters.CompositeGrid;
 import ch.unifr.diva.dip.api.parameters.EmptyParameter;
+import ch.unifr.diva.dip.api.services.Previewable;
 import ch.unifr.diva.dip.api.services.ProcessableBase;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.services.Transmutable;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
@@ -23,7 +27,7 @@ import org.apache.felix.scr.annotations.Service;
  */
 @Component
 @Service
-public class SampleRescaler extends ProcessableBase implements Transmutable {
+public class SampleRescaler extends ProcessableBase implements Transmutable, Previewable {
 
 	private final static String STORAGE_IMAGE = "rescaled.png";
 	private final static String STORAGE_IMAGE_FORMAT = "PNG";
@@ -35,6 +39,9 @@ public class SampleRescaler extends ProcessableBase implements Transmutable {
 	private final RescaleUnit rescaleUnit;
 	private final CompositeGrid configGrid;
 
+	/**
+	 * Creates a new sample rescaler.
+	 */
 	public SampleRescaler() {
 		super("Sample Rescaler");
 
@@ -178,31 +185,61 @@ public class SampleRescaler extends ProcessableBase implements Transmutable {
 		if (!restoreOutputs(context)) {
 			final InputPort<BufferedImage> source = getConnectedInput();
 			final BufferedImage src = source.getValue();
-			final RescaleOp op = new RescaleOp(
-					this.rescaleUnit.getAbs(),
-					this.rescaleUnit.getGain(),
-					this.rescaleUnit.getBias(),
-					this.rescaleUnit.getMin(),
-					this.rescaleUnit.getMax(),
-					this.rescaleUnit.getPrecision()
-			);
-			final BufferedImage rescaledImage = filter(
-					context, op, src,
-					op.createCompatibleDestImage(
-							src.getWidth(),
-							src.getHeight(),
-							this.rescaleUnit.getPrecision(),
-							this.rescaleUnit.numBands()
-					)
-			);
+			final BufferedImage rescaledImage = doProcess(context, src);
+
 			if (this.rescaleUnit.isBufferedMatrix()) {
 				writeBufferedMatrix(context, STORAGE_MAT, (BufferedMatrix) rescaledImage);
 			} else {
 				writeBufferedImage(context, STORAGE_IMAGE, STORAGE_IMAGE_FORMAT, rescaledImage);
 			}
 			restoreOutputs(context, rescaledImage);
-
 		}
+	}
+
+	private BufferedImage doProcess(ProcessorContext context, BufferedImage src) {
+		final RescaleOp op = new RescaleOp(
+				this.rescaleUnit.getAbs(),
+				this.rescaleUnit.getGain(),
+				this.rescaleUnit.getBias(),
+				this.rescaleUnit.getMin(),
+				this.rescaleUnit.getMax(),
+				this.rescaleUnit.getPrecision()
+		);
+
+		return filter(
+				context, op, src,
+				op.createCompatibleDestImage(
+						src.getWidth(),
+						src.getHeight(),
+						this.rescaleUnit.getPrecision(),
+						this.rescaleUnit.numBands()
+				)
+		);
+	}
+
+	@Override
+	public Image previewSource(ProcessorContext context) {
+		final BufferedImage src = getConnectedInput().getValue();
+		if (src instanceof BufferedMatrix) {
+			return null;
+		}
+		return SwingFXUtils.toFXImage(src, null);
+	}
+
+	@Override
+	public Image preview(ProcessorContext context, Rectangle bounds) {
+		if (this.rescaleUnit.isBufferedMatrix()) {
+			return null;
+		}
+		final BufferedImage src = getConnectedInput().getValue();
+		final BufferedImage region = src.getSubimage(
+				bounds.x,
+				bounds.y,
+				bounds.width,
+				bounds.height
+		);
+		final BufferedImage preview = doProcess(context, region);
+		return SwingFXUtils.toFXImage(preview, null);
 	}
 
 	@Override
