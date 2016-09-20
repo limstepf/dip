@@ -5,6 +5,7 @@ import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.ProcessorContext;
 import ch.unifr.diva.dip.api.parameters.EnumParameter;
 import ch.unifr.diva.dip.api.services.Previewable;
+import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.utils.DipThreadPool;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.model.RunnableProcessor;
@@ -102,7 +103,10 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 		sideBox.getChildren().addAll(ok, reset);
 		this.root.setRight(sideBox);
 
-		if (runnable.isPreviewable()) {
+		// kill off preview if the processor isn't in PROCESSING state
+		final boolean canPreview = runnable.getState().equals(Processor.State.PROCESSING);
+
+		if (runnable.isPreviewable() && canPreview) {
 			this.previewWidget = new PreviewWidget(handler, runnable);
 			this.root.setLeft(this.previewWidget.getNode());
 
