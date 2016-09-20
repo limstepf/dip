@@ -434,32 +434,74 @@ public class Project implements Modifiable, Localizable {
 		return null;
 	}
 
+	/**
+	 * Adds a page to the project.
+	 *
+	 * @param file the file of the page.
+	 * @throws IOException
+	 */
 	public void addPage(File file) throws IOException {
 		addPage(file.toPath());
 	}
 
+	/**
+	 * Adds a page to the paroject.
+	 *
+	 * @param file the path to the file of the page.
+	 * @throws IOException
+	 */
 	public void addPage(Path file) throws IOException {
 		addPage(new ProjectPage(this, file));
 	}
 
+	/**
+	 * Adds a page to the project.
+	 *
+	 * @param page the new project page.
+	 */
 	public void addPage(ProjectPage page) {
 		this.modifiedProjectProperty.addManagedProperty(page);
 		pages.add(page);
+
+		this.modifiedProperty().set(true);
 	}
 
+	/**
+	 * Removes a page from the project.
+	 *
+	 * @param id the id of the page.
+	 */
 	public void deletePage(int id) {
 		deletePage(getPage(id));
 	}
 
+	/**
+	 * Remoces a page from the project.
+	 *
+	 * @param page the project page.
+	 */
 	public void deletePage(ProjectPage page) {
 		final List<ProjectPage> list = Arrays.asList(page);
 		deletePages(list);
 	}
 
+	/**
+	 * Removes a list of pages from the project, but asks for confirmation
+	 * first.
+	 *
+	 * @param selection the list of pages.
+	 */
 	public void deletePages(List<ProjectPage> selection) {
 		deletePages(selection, true);
 	}
 
+	/**
+	 * Removes a list of pages from the project.
+	 *
+	 * @param selection the list of pages.
+	 * @param confirm True to ask for confirmation first, False to directly
+	 * remove the pages, no questions asked.
+	 */
 	public void deletePages(List<ProjectPage> selection, boolean confirm) {
 		if (confirm) {
 			final List<String> names = new ArrayList<>();
@@ -491,8 +533,15 @@ public class Project implements Modifiable, Localizable {
 					new ProjectNotification(ProjectNotification.Type.PAGE_REMOVED, page.id)
 			);
 		}
+
+		this.modifiedProperty().set(true);
 	}
 
+	/**
+	 * Returns a new, unique page id.
+	 *
+	 * @return the new page id.
+	 */
 	protected int newPageId() {
 		maxPageId++;
 		return maxPageId;
