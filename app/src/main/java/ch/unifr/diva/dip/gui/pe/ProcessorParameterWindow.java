@@ -202,8 +202,6 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 			zoomPane.setPrefHeight(256);
 			zoomPane.setMaxWidth(512);
 			zoomPane.setMaxHeight(512);
-			zoomPane.setHvalue(.5);
-			zoomPane.setVvalue(.5);
 
 			this.scrollListener = (ObservableValue<? extends Object> observable, Object oldValue, Object newValue) -> {
 				update();
@@ -266,6 +264,22 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 			final ReadOnlyObjectProperty p = runnable.processor().getCompositeProperty();
 			p.addListener((e) -> onParamChanged());
 			onParamChanged();
+
+			// Center the preview clipping assuming a larger image, but dont set
+			// slider position if we can see all the image at once (or the zoompane
+			// will go bonkers...).
+			// zoomPane.getViewportBounds() aren't set/ready yet, so we take the
+			// bounds of the vbox (call to layout is required to update bounds of
+			// the zoompane).
+			vbox.layout();
+			final Bounds content = zoomPane.getContentBoundsZoomed();
+
+			if (content.getWidth() > zoomPane.getWidth()) {
+				zoomPane.setHvalue(.5);
+			}
+			if (content.getHeight() > zoomPane.getHeight()) {
+				zoomPane.setVvalue(.5);
+			}
 		}
 
 		private Label newLabel(String text) {
@@ -276,12 +290,12 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 			return label;
 		}
 
-		protected void onParamChanged() {
+		final protected void onParamChanged() {
 			this.previewable.previewSetup(context);
 			update();
 		}
 
-		protected void update() {
+		final protected void update() {
 			/*
 			 * There are two cases to consider (for each axis individually):
 			 *
