@@ -178,8 +178,6 @@ public class RunnableProcessor extends ProcessorWrapper {
 			this.runnable = runnable;
 
 			status.getStyleClass().add("dip-small");
-			stateCallback();
-			this.runnable.stateProperty().addListener((e) -> stateCallback());
 
 			if (runnable.processor().hasParameters()) {
 				paramButton = newButton(localize("parameters"));
@@ -218,6 +216,9 @@ public class RunnableProcessor extends ProcessorWrapper {
 			lane.setAlignment(Pos.CENTER_RIGHT);
 			lane.setPadding(new Insets(4, 4, 4, 4));
 			vbox.getChildren().addAll(status, lane);
+
+			stateCallback();
+			this.runnable.stateProperty().addListener((e) -> stateCallback());
 		}
 
 		private Button newButton(String label) {
