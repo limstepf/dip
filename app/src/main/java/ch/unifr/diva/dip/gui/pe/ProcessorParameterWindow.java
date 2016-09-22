@@ -105,9 +105,13 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 
 		// kill off preview if the processor isn't in PROCESSING state
 		final boolean canPreview = runnable.getState().equals(Processor.State.PROCESSING);
+		// and make sure we have a valid previewContext
+		final PreviewContext previewContext = (runnable.isPreviewable() && canPreview)
+				? new PreviewContext(handler, runnable)
+				: new PreviewContext();
 
-		if (runnable.isPreviewable() && canPreview) {
-			this.previewWidget = new PreviewWidget(handler, runnable);
+		if (previewContext.isValid()) {
+			this.previewWidget = new PreviewWidget(handler, previewContext);
 			this.root.setLeft(this.previewWidget.getNode());
 
 			// listen to input changes
@@ -154,14 +158,58 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 	}
 
 	/**
+	 * Preview context. A preview context is only valid if we manage to retireve
+	 * the source image (to be previewed). Even if a processor implements
+	 * previewable it is still free to return null here to abort the preview
+	 * (for whatever reason).
+	 */
+	public static class PreviewContext {
+
+		public final RunnableProcessor runnable;
+		public final Previewable previewable;
+		public final ProcessorContext context;
+		public final Image source;
+
+		/**
+		 * Creates a new preview context.
+		 *
+		 * @param handler the application handler.
+		 * @param runnable the runnable (and previewable) processor.
+		 */
+		public PreviewContext(ApplicationHandler handler, RunnableProcessor runnable) {
+			this.runnable = runnable;
+			this.previewable = runnable.getPreviewable();
+			this.context = runnable.getProcessorContext();
+			this.source = previewable.previewSource(context);
+		}
+
+		/**
+		 * Creates an invalid preview context.
+		 */
+		public PreviewContext() {
+			this.runnable = null;
+			this.previewable = null;
+			this.context = null;
+			this.source = null;
+		}
+
+		/**
+		 * Checks whether this is a valid preview context or not.
+		 *
+		 * @return True if the preview context is valid, False otherwise.
+		 */
+		public boolean isValid() {
+			return source != null;
+		}
+	}
+
+	/**
 	 * A preview widget with ZoomPane and ZoomSlider.
 	 */
 	public static class PreviewWidget implements Localizable {
 
 		private final DipThreadPool threadPool;
-		private final RunnableProcessor runnable;
-		private final Previewable previewable;
-		private final ProcessorContext context;
+		private final PreviewContext previewContext;
 		private final VBox vbox;
 		private final ZoomPane zoomPane;
 		private final ZoomSlider zoomSlider;
@@ -180,18 +228,16 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 		 * Creates a new preview widget.
 		 *
 		 * @param handler the application handler.
-		 * @param runnable the runnable processor.
+		 * @param previewContext the preview context.
 		 */
-		public PreviewWidget(ApplicationHandler handler, RunnableProcessor runnable) {
+		public PreviewWidget(ApplicationHandler handler, PreviewContext previewContext) {
 			/*
 			 * Eh..., let's rather have our own (discarding) thread pool, since the
 			 * other one is also used by the active zoom pane of the preview widget.
 			 */
 //			this.threadPool = handler.discardingThreadPool;
 			this.threadPool = DipThreadPool.newDiscardingThreadPool("dip-preview-pool", 1, 1);
-			this.runnable = runnable;
-			this.previewable = runnable.getPreviewable();
-			this.context = runnable.getProcessorContext();
+			this.previewContext = previewContext;
 			this.zoomPane = new ZoomPane(handler.discardingThreadPool);
 			zoomPane.setInterpolation(
 					ZoomPane.Interpolation.get(handler.settings.editor.interpolation)
@@ -213,10 +259,14 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 			zoomPane.needsLayoutProperty().addListener(scrollListener);
 
 			this.previewSource = new ImageView();
-			final Image source = previewable.previewSource(context);
-			this.previewSourceWidth = (int) source.getWidth();
-			this.previewSourceHeight = (int) source.getHeight();
-			previewSource.setImage(source);
+			if (previewContext.isValid()) {
+				this.previewSourceWidth = (int) previewContext.source.getWidth();
+				this.previewSourceHeight = (int) previewContext.source.getHeight();
+				previewSource.setImage(previewContext.source);
+			} else {
+				this.previewSourceWidth = 0;
+				this.previewSourceHeight = 0;
+			}
 
 			this.previewSubImage = new ImageView();
 			this.previewPane = new Pane();
@@ -261,7 +311,7 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 			// TODO/VERIFY: what about transmutable procs? Would they change params?
 			// Should we re-listen? Or should transmutable procs that actually do
 			// change params overwrite getCompositeProperty? Maybe easier...
-			final ReadOnlyObjectProperty p = runnable.processor().getCompositeProperty();
+			final ReadOnlyObjectProperty p = previewContext.runnable.processor().getCompositeProperty();
 			p.addListener((e) -> onParamChanged());
 			onParamChanged();
 
@@ -291,7 +341,7 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 		}
 
 		final protected void onParamChanged() {
-			this.previewable.previewSetup(context);
+			previewContext.previewable.previewSetup(previewContext.context);
 			update();
 		}
 
@@ -356,13 +406,15 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 
 			if (region.width > 0 && region.height > 0) {
 				final Runnable run = () -> {
-					final Image preview = previewable.preview(context, region);
-					Platform.runLater(() -> {
-						previewSubImage.setImage(preview);
-						previewSubImage.setLayoutX(regionOffsetX);
-						previewSubImage.setLayoutY(regionOffsetY);
-						zoomPane.fireContentChange();
-					});
+					final Image preview = previewContext.previewable.preview(previewContext.context, region);
+					if (preview != null) {
+						Platform.runLater(() -> {
+							previewSubImage.setImage(preview);
+							previewSubImage.setLayoutX(regionOffsetX);
+							previewSubImage.setLayoutY(regionOffsetY);
+							zoomPane.fireContentChange();
+						});
+					}
 				};
 
 				this.threadPool.getExecutorService().submit(run);
