@@ -1,5 +1,6 @@
 package ch.unifr.diva.dip.gui.layout;
 
+import ch.unifr.diva.dip.api.ui.KeyEventHandler;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
@@ -36,11 +37,13 @@ public class ZoomSlider {
 
 		zoom.setPrefWidth(62.5);
 		zoom.setAlignment(Pos.CENTER_RIGHT);
-		zoomHandler = (e) -> {
-			if (e.getCode().equals(KeyCode.ENTER)) {
-				zoomPane.setZoom(getZoomValueFromTextField());
-			}
-		};
+		zoomHandler = new KeyEventHandler(
+				KeyCode.ENTER,
+				(e) -> {
+					zoomPane.setZoom(getZoomValueFromTextField());
+					return true;
+				}
+		);
 		zoom.setOnKeyPressed(zoomHandler);
 
 		final double one = zoomValToSlider(1);
