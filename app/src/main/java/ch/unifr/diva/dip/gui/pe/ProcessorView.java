@@ -28,6 +28,7 @@ import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
@@ -40,6 +41,10 @@ import javafx.stage.Window;
  */
 public abstract class ProcessorView extends BorderPane {
 
+	/**
+	 * Data format of a node in the pane of the pipeline editor. A node is the
+	 * view of a processor in the pipeline.
+	 */
 	public static final DataFormat PIPELINE_NODE = new DataFormat("pipeline-editor/node");
 	protected static final PseudoClass SELECTED = PseudoClass.getPseudoClass("selected");
 	protected static final PseudoClass UNAVAILABLE = PseudoClass.getPseudoClass("unavailable");
@@ -134,22 +139,28 @@ public abstract class ProcessorView extends BorderPane {
 			this.pane = new BorderPane();
 			pane.setMaxWidth(Double.MAX_VALUE);
 
-			final Glyph glyph = UIStrategyGUI.newGlyph(wrapper.glyph(), Glyph.Size.NORMAL);
+			final Glyph glyph = UIStrategyGUI.Glyphs.newGlyph(wrapper.glyph(), Glyph.Size.NORMAL);
 			final Label label = new Label(wrapper.processor().name());
+			final Tooltip tooltip = new Tooltip(String.format(
+					"%s\nv.%s",
+					wrapper.pid(),
+					wrapper.version().toString()
+			));
+			label.setTooltip(tooltip);
 			this.title = new HBox();
 			title.setMaxWidth(Double.MAX_VALUE);
 			title.setSpacing(UIStrategyGUI.Stage.insets);
 			title.setAlignment(Pos.CENTER_LEFT);
 			title.getChildren().setAll(glyph, label);
 
-			final Glyph importGlyph = UIStrategyGUI.newGlyph(IMPORT_GLYPH, Glyph.Size.NORMAL);
+			final Glyph importGlyph = UIStrategyGUI.Glyphs.newGlyph(IMPORT_GLYPH, Glyph.Size.NORMAL);
 			importGlyph.enableHoverEffect(true);
 			importGlyph.setTooltip(localize("preset.load"));
 			importGlyph.setOnMouseClicked((e) -> {
 				final ProcessorPresetImportDialog dialog = new ProcessorPresetImportDialog(owner, wrapper);
 				dialog.show();
 			});
-			final Glyph exportGlyph = UIStrategyGUI.newGlyph(EXPORT_GLYPH, Glyph.Size.NORMAL);
+			final Glyph exportGlyph = UIStrategyGUI.Glyphs.newGlyph(EXPORT_GLYPH, Glyph.Size.NORMAL);
 			exportGlyph.enableHoverEffect(true);
 			exportGlyph.setTooltip(localize("preset.save"));
 			exportGlyph.setOnMouseClicked((e) -> {
@@ -482,7 +493,7 @@ public abstract class ProcessorView extends BorderPane {
 		protected final Glyph glyph;
 
 		public ClosedParameterView() {
-			glyph = UIStrategyGUI.newGlyph(
+			glyph = UIStrategyGUI.Glyphs.newGlyph(
 					MaterialDesignIcons.CHEVRON_DOWN,
 					Glyph.Size.MEDIUM
 			);

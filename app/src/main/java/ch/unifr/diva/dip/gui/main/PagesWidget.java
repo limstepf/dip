@@ -1,5 +1,8 @@
 package ch.unifr.diva.dip.gui.main;
 
+import ch.unifr.diva.dip.api.ui.KeyEventHandler;
+import ch.unifr.diva.dip.api.ui.MouseEventHandler;
+import ch.unifr.diva.dip.api.ui.MouseEventHandler.ClickCount;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.model.PipelineManager;
 import ch.unifr.diva.dip.eventbus.events.ProjectNotification;
@@ -9,6 +12,7 @@ import ch.unifr.diva.dip.gui.layout.DraggableListCell;
 import ch.unifr.diva.dip.core.model.ProjectPage;
 import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
+import ch.unifr.diva.dip.gui.layout.FormGridPane;
 import com.google.common.eventbus.Subscribe;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +38,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.slf4j.Logger;
@@ -48,6 +53,11 @@ public class PagesWidget extends AbstractWidget {
 	private final View view;
 	private final ApplicationHandler handler;
 
+	/**
+	 * Creates a new pages widget.
+	 *
+	 * @param handler the application handler.
+	 */
 	public PagesWidget(ApplicationHandler handler) {
 		super();
 
@@ -112,6 +122,11 @@ public class PagesWidget extends AbstractWidget {
 			);
 		};
 
+		/**
+		 * Creates a new view of the pages widget.
+		 *
+		 * @param handler the application handler.
+		 */
 		public View(ApplicationHandler handler) {
 			setMaxHeight(Double.MAX_VALUE);
 			VBox.setVgrow(listView, Priority.ALWAYS);
@@ -120,7 +135,7 @@ public class PagesWidget extends AbstractWidget {
 			listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 			listView.setPrefHeight(0);
 			listView.setMaxHeight(Double.MAX_VALUE);
-			listView.setCellFactory((ListView<ProjectPage> param) -> new ProjectCell(handler, group));
+			listView.setCellFactory((ListView<ProjectPage> param) -> new ProjectPageCell(handler, group));
 
 			final MenuItem importItem = new MenuItem(localize("page.import"));
 			importItem.setOnAction((e) -> {
@@ -140,10 +155,20 @@ public class PagesWidget extends AbstractWidget {
 			this.getChildren().addAll(listView);
 		}
 
+		/**
+		 * Returns the selected project page.
+		 *
+		 * @return the selected project page.
+		 */
 		public final ProjectPage getSelectedItem() {
 			return listView.getSelectionModel().getSelectedItem();
 		}
 
+		/**
+		 * Returns a list of selected project pages.
+		 *
+		 * @return a list of selected project pages.
+		 */
 		public final List<ProjectPage> getSelectedItems() {
 			// ye, we really need to make a copy, or otherwise feeding that list
 			// back to listView (e.g. to delete those items) wont behave as expected...
@@ -151,7 +176,10 @@ public class PagesWidget extends AbstractWidget {
 		}
 	}
 
-	public static class ProjectCell extends DraggableListCell<ProjectPage> implements Localizable {
+	/**
+	 * A project page cell.
+	 */
+	public static class ProjectPageCell extends DraggableListCell<ProjectPage> implements Localizable {
 
 		private final ApplicationHandler handler;
 		private final ToggleGroup group;
@@ -160,45 +188,50 @@ public class PagesWidget extends AbstractWidget {
 		private final RadioButton radioButton = new RadioButton();
 		private final Label label = new Label();
 		private final TextField textField = new TextField();
-		private final Label pipelineLabel = new Label();
-
+		private final Label pipelineName = new Label();
+		private final Label pipelinesLabel = FormGridPane.newLabel(localize("pipeline") + ":");
+		private final FormGridPane grid = new FormGridPane();
 		private ProjectPage currentPage;
 		private ComboBox pipelines;
+		private final EventHandler<KeyEvent> onEnterHandler = new KeyEventHandler(
+				KeyCode.ENTER,
+				(e) -> {
+					cancelEdit();
+					return true;
+				}
+		);
+		private final EventHandler<MouseEvent> onDoubleClickHandler = new MouseEventHandler(
+				ClickCount.DOUBLE_CLICK,
+				(e) -> {
+					cancelEdit();
+					return true;
+				}
+		);
 
-		private final EventHandler<KeyEvent> onEnterHandler = (e) -> {
-			if (e.getCode() == KeyCode.ENTER) {
-				cancelEdit();
-				e.consume();
-			}
-		};
-		private final EventHandler<MouseEvent> onDoubleClickHandler = (e) -> {
-			if (e.getClickCount() == 2) {
-				cancelEdit();
-				e.consume();
-			}
-		};
-
-		public ProjectCell(ApplicationHandler handler, ToggleGroup group) {
+		/**
+		 * Creates a new project page cell.
+		 *
+		 * @param handler the application handler.
+		 * @param group the toogle group for all project pages (only one can be
+		 * loaded/displayed at a time).
+		 */
+		public ProjectPageCell(ApplicationHandler handler, ToggleGroup group) {
 			this.handler = handler;
 			this.group = group;
 
 			label.setAlignment(Pos.CENTER_LEFT);
 			label.setMaxWidth(Double.MAX_VALUE);
+			GridPane.setMargin(textField, new Insets(0, 0, 2, 0));
 			textField.setOnKeyPressed(onEnterHandler);
 
 			final int d = UIStrategyGUI.Stage.insets;
 			radioButton.setPadding(new Insets(0, d, 0, 0));
-
-			pipelineLabel.getStyleClass().add("dip-small");
+			pipelineName.getStyleClass().add("dip-small");
 			vbox.setSpacing(UIStrategyGUI.Stage.insets);
-			restoreVbox();
-
+			vbox.getChildren().setAll(label, pipelineName);
 			pane.setLeft(radioButton);
 			pane.setCenter(vbox);
-		}
-
-		private void restoreVbox() {
-			vbox.getChildren().setAll(label, pipelineLabel);
+			grid.setPadding(new Insets(0, 0, d * 2, 0));
 		}
 
 		private boolean isPageSelected() {
@@ -206,7 +239,7 @@ public class PagesWidget extends AbstractWidget {
 		}
 
 		private void updatePipelineLabel() {
-			pipelineLabel.setText(String.format(
+			pipelineName.setText(String.format(
 					"%s: %s",
 					localize("pipeline"),
 					currentPage.getPipelineName()
@@ -251,7 +284,11 @@ public class PagesWidget extends AbstractWidget {
 
 			pipelines.getSelectionModel().select(item);
 			pipelines.setOnKeyPressed(onEnterHandler);
-			vbox.getChildren().setAll(textField, pipelines);
+			grid.clear();
+			grid.addSpanRow(textField, 2);
+			grid.addRow(pipelinesLabel, pipelines);
+
+			pane.setCenter(grid);
 
 			// this seems to be necessary since we ommit commitEdit and just
 			// use cancelEdit. Might also be a bug, who knows...
@@ -283,7 +320,10 @@ public class PagesWidget extends AbstractWidget {
 			}
 
 			pipelines = null;
-			restoreVbox();
+			pane.setCenter(vbox);
+
+			getListView().layout();
 		}
 	}
+
 }

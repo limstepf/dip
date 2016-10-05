@@ -1,15 +1,15 @@
 package ch.unifr.diva.dip.core.model;
 
-import ch.unifr.diva.dip.api.utils.L10n;
 import ch.unifr.diva.dip.api.services.Processor;
+import ch.unifr.diva.dip.api.utils.L10n;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.utils.Modifiable;
 import ch.unifr.diva.dip.utils.ModifiedProperty;
-import ch.unifr.diva.dip.core.services.PageGenerator;
 import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.core.ui.UIStrategy.Answer;
-import ch.unifr.diva.dip.osgi.ServiceMonitor.Service;
 import ch.unifr.diva.dip.api.utils.XmlUtils;
+import ch.unifr.diva.dip.core.services.api.HostService;
+import ch.unifr.diva.dip.osgi.ServiceCollection;
 import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -35,10 +35,6 @@ import org.slf4j.LoggerFactory;
 public class PipelineManager implements Modifiable, Localizable {
 
 	private static final Logger log = LoggerFactory.getLogger(PipelineManager.class);
-	/**
-	 * PID of the PageGenerator.
-	 */
-	public static final String GENERATION_PROCESSOR = PageGenerator.class.getCanonicalName();
 
 	private final ApplicationHandler handler;
 	private int maxPipelineId = 0;
@@ -69,38 +65,36 @@ public class PipelineManager implements Modifiable, Localizable {
 		this.modifiedPipelinesProperty.addObservedProperty(pipelines);
 		this.modifiedPipelinesProperty.addObservedProperty(defaultPipelineIdProperty);
 
-		registerServiceListener();
+		// listen to the service monitor, and update created/running proc. instances
+		// as proc./services are removed and re-added (OSGi is rather dynamic, remember?).
+		// This is no killer-feature we absolutely need to have, still nice to have
+		// in order to update services devs are working on, without having to shutdown
+		// and start up DIP all over again...
+		this.handler.osgi.processors.getServiceCollectionList().addListener(processorListener);
 	}
 
-	private void registerServiceListener() {
-		this.handler.osgi.processors.services().addListener(processorListener);
-	}
-
-	private final ListChangeListener<? super Service<? extends Processor>> processorListener = (ListChangeListener.Change<? extends Service<? extends Processor>> c) -> {
+	private final ListChangeListener<? super ServiceCollection<Processor>> processorListener = (ListChangeListener.Change<? extends ServiceCollection<Processor>> c) -> {
 		while (c.next()) {
 			if (c.wasReplaced()) {
-				for (Service<? extends Processor> s : c.getRemoved()) {
+				for (ServiceCollection<Processor> collection : c.getRemoved()) {
 					forAllPipelines(pipelines(), (wrappers, wrapper) -> {
-						if (wrapper.pid().equals(s.pid)) {
-							wrapper.updateProcessor(true);
+						if (wrapper.pid().equals(collection.pid())) {
+							wrapper.updateProcessor();
 							ProcessorWrapperRunnable.notify(wrappers, wrapper);
 						}
 					});
 				}
 			} else if (c.wasRemoved()) {
-				for (Service<? extends Processor> s : c.getRemoved()) {
-					forAllPipelines(pipelines(), (wrappers, wrapper) -> {
-						if (wrapper.pid().equals(s.pid)) {
-							wrapper.deprecateProcessor();
-							// no need to notify (availableProperty is used/listened to)
-						}
-					});
-				}
+				// nothing to do here. Removed services (or just some version) will
+				// be removed from the processor list (pipeline editor) automatically,
+				// and already created/instantiated processors are not a problem,
+				// and will be replaced/updated should the removed version show
+				// up again.
 			} else if (c.wasAdded()) {
-				for (Service<? extends Processor> s : c.getAddedSubList()) {
+				for (ServiceCollection<Processor> collection : c.getAddedSubList()) {
 					forAllPipelines(pipelines(), (wrappers, wrapper) -> {
-						if (wrapper.pid().equals(s.pid)) {
-							wrapper.updateProcessor(true);
+						if (wrapper.pid().equals(collection.pid())) {
+							wrapper.updateProcessor();
 							ProcessorWrapperRunnable.notify(wrappers, wrapper);
 						}
 					});
@@ -421,7 +415,7 @@ public class PipelineManager implements Modifiable, Localizable {
 				0,
 				L10n.getInstance().getString("pipeline.new")
 		);
-		pipeline.addProcessor(GENERATION_PROCESSOR, 20, 20);
+		pipeline.addProcessor(HostService.DEFAULT_GENERATOR, HostService.VERSION.toString(), 20, 20);
 		return pipeline;
 	}
 
@@ -465,7 +459,7 @@ public class PipelineManager implements Modifiable, Localizable {
 		box.setCellFactory((ListView<PipelineItem> p) -> new SimplePipelineCell());
 		box.setButtonCell(new SimplePipelineCell());
 
-		box.getItems().add(new PipelineItem(-1, " "));
+		box.getItems().add(new PipelineItem(-1, ""));
 		for (Pipeline pipeline : pipelines) {
 			box.getItems().add(new PipelineItem(pipeline));
 		}
@@ -486,7 +480,11 @@ public class PipelineManager implements Modifiable, Localizable {
 			setGraphic(null);
 
 			if (!empty) {
-				setText(item.label);
+				setText(
+						item.label.isEmpty()
+								? PipelineItem.emptyPipeline
+								: item.label
+				);
 			}
 		}
 	}
@@ -497,18 +495,28 @@ public class PipelineManager implements Modifiable, Localizable {
 	 */
 	public static class PipelineItem {
 
+		/**
+		 * Name of the empty pipeline.
+		 */
+		public static String emptyPipeline = L10n.getInstance().getString("none").toLowerCase();
+
+		/**
+		 * The pipeline id.
+		 */
 		public final int id;
-		public final String name;
+
+		/**
+		 * The name/label of the pipeline.
+		 */
 		public final String label;
 
 		public PipelineItem(Pipeline pipeline) {
 			this(pipeline.id, pipeline.getName());
 		}
 
-		public PipelineItem(int id, String name) {
+		public PipelineItem(int id, String label) {
 			this.id = id;
-			this.name = name;
-			this.label = (id > -1) ? name : " ";
+			this.label = (id > -1) ? label : "";
 		}
 
 		@Override
@@ -528,4 +536,5 @@ public class PipelineManager implements Modifiable, Localizable {
 			return this.id == other.id;
 		}
 	}
+
 }

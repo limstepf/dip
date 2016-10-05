@@ -1,7 +1,9 @@
 package ch.unifr.diva.dip.osgi;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -11,8 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * OSGi Service Tracker. Not thread safe (e.g. to be accessed from the JavaFX
- * application thread).
+ * OSGi Service Tracker. Thread-safe.
  *
  * @param <T> class of the service interface of the tracked services.
  */
@@ -31,11 +32,12 @@ public class OSGiServiceTracker<T> {
 	 * @param service the class of the interface of the declarative service.
 	 */
 	public OSGiServiceTracker(BundleContext context, Class<T> service) {
-		log.info("service tracker: {}", service);
 		this.context = context;
 		this.service = service;
 		this.customizer = new TrackerCustomizer<>(context);
 		this.tracker = new ServiceTracker(context, service.getName(), this.customizer);
+
+		log.debug("starting service tracker: {}", service);
 	}
 
 	/**
@@ -53,22 +55,31 @@ public class OSGiServiceTracker<T> {
 	}
 
 	/**
-	 * Returns a map of currently tracked services.
+	 * Returns a copy of a list of all tracked service collections.
 	 *
-	 * @return a map of PID -> tracked services.
+	 * @return a list of all service collections.
 	 */
-	public Map<String, T> getServices() {
-		return customizer.getServices();
+	public List<ServiceCollection<T>> getServiceCollectionList() {
+		return customizer.getServiceCollectionList();
 	}
 
 	/**
-	 * Returns a service.
+	 * Returns a copy of the map of all tracked service collections.
 	 *
-	 * @param pid PID of the requested service.
-	 * @return the requested service, or null.
+	 * @return a map of all service collections, indexed by their PID.
 	 */
-	public T getService(String pid) {
-		return (T) customizer.getServices().get(pid);
+	public Map<String, ServiceCollection<T>> getServiceCollectionMap() {
+		return customizer.getServiceCollectionMap();
+	}
+
+	/**
+	 * Returns the collection of available versions of a service.
+	 *
+	 * @param pid PID of the service.
+	 * @return a collection of available versions of the service.
+	 */
+	public ServiceCollection<T> getServiceCollection(String pid) {
+		return customizer.getServiceCollection(pid);
 	}
 
 	/**
@@ -112,38 +123,38 @@ public class OSGiServiceTracker<T> {
 		/**
 		 * Fires if a service has been added.
 		 *
-		 * @param pid PID of the service.
-		 * @param service the service.
+		 * @param collection the service collection of the OSGi service.
+		 * @param service the OSGi service.
 		 */
-		public void onAdded(String pid, T service);
+		public void onAdded(OSGiServiceCollection<T> collection, OSGiService<T> service);
 
 		/**
 		 * Fires if a service has been modified.
 		 *
-		 * @param pid PID of the service.
-		 * @param service the (modified) service.
+		 * @param collection the service collection of the OSGi service.
+		 * @param service the OSGi service.
 		 */
-		public void onModified(String pid, T service);
+		public void onModified(OSGiServiceCollection<T> collection, OSGiService<T> service);
 
 		/**
-		 * Fies if a service has been removed.
+		 * Fires if a service has been removed.
 		 *
-		 * @param pid PID of the service.
-		 * @param service the (removed) service.
+		 * @param collection the service collection of the OSGi service.
+		 * @param service the OSGi service.
 		 */
-		public void onRemoved(String pid, T service);
+		public void onRemoved(OSGiServiceCollection<T> collection, OSGiService<T> service);
 
 	}
 
 	/**
-	 * Service tracker customizer.
+	 * Service tracker customizer. Thread-safe.
 	 *
 	 * @param <T> class of the service interface of the tracked services.
 	 */
 	private static class TrackerCustomizer<T> implements ServiceTrackerCustomizer {
 
 		private final BundleContext context;
-		private final Map<String, T> services;
+		private final Map<String, OSGiServiceCollection<T>> services;
 		private final CopyOnWriteArrayList<TrackerListener> listeners;
 
 		/**
@@ -153,17 +164,36 @@ public class OSGiServiceTracker<T> {
 		 */
 		public TrackerCustomizer(BundleContext context) {
 			this.context = context;
-			services = new ConcurrentHashMap<>();
-			listeners = new CopyOnWriteArrayList<>();
+			this.services = new HashMap<>();
+			this.listeners = new CopyOnWriteArrayList<>();
 		}
 
 		/**
-		 * Returns a map of currently tracked services.
+		 * Returns a copy of a list of all tracked service collections.
 		 *
-		 * @return a map of PID -> tracked services.
+		 * @return a list of all service collections.
 		 */
-		public Map<String, T> getServices() {
-			return services;
+		public synchronized List<OSGiServiceCollection<T>> getServiceCollectionList() {
+			return new ArrayList<>(services.values());
+		}
+
+		/**
+		 * Returns a copy of the map of all tracked service collections.
+		 *
+		 * @return a map of all service collections, indexed by their PID.
+		 */
+		public synchronized Map<String, OSGiServiceCollection<T>> getServiceCollectionMap() {
+			return new HashMap<>(services);
+		}
+
+		/**
+		 * Returns the collection of available versions of a service.
+		 *
+		 * @param pid PID of the service.
+		 * @return a collection of available versions of the service.
+		 */
+		public synchronized OSGiServiceCollection<T> getServiceCollection(String pid) {
+			return services.get(pid);
 		}
 
 		/**
@@ -184,55 +214,76 @@ public class OSGiServiceTracker<T> {
 			listeners.remove(listener);
 		}
 
-		/**
-		 * Returns the PID of a service (reference).
-		 *
-		 * @param reference the service reference.
-		 * @return the PID of a service (reference).
-		 */
-		private String getPid(ServiceReference reference) {
-			return (String) reference.getProperty("service.pid");
-		}
-
 		@Override
 		public T addingService(ServiceReference reference) {
-			final T service = (T) context.getService(reference);
-			final String pid = getPid(reference);
-			log.info("adding service: {}, {}", pid, reference);
+			final OSGiService<T> service = new OSGiService(context, reference);
+			log.debug("adding service: {}", service);
 
-			if (service != null && pid != null) {
-				services.put(pid, service);
-
-				for (TrackerListener listener : listeners) {
-					listener.onAdded(pid, service);
+			final OSGiServiceCollection<T> collection;
+			synchronized (this) {
+				if (!services.containsKey(service.pid)) {
+					collection = new OSGiServiceCollection(service.pid);
+					services.put(service.pid, collection);
+				} else {
+					collection = services.get(service.pid);
 				}
+				collection.add(service);
 			}
 
-			return service;
+			for (TrackerListener listener : listeners) {
+				listener.onAdded(collection, service);
+			}
+
+			return service.serviceObject;
 		}
 
+		/*
+		 * modifiedService is called when a service being tracked by the
+		 * ServiceTracker has had its properties modified (so probably never...).
+		 * Other than that, services are usually just added, removed, and
+		 * re-added again, ... Anyways.
+		 */
 		@Override
 		public void modifiedService(ServiceReference reference, Object obj) {
-			final T service = (T) obj;
-			final String pid = getPid(reference);
-			log.info("modified service: {}", pid);
+			final OSGiService<T> service = new OSGiService(context, reference);
+
+			final OSGiServiceCollection<T> collection;
+			synchronized (this) {
+				collection = services.get(service.pid);
+				if (collection == null) {
+					return;
+				}
+
+				collection.update(service);
+			}
 
 			for (TrackerListener listener : listeners) {
-				listener.onModified(pid, service);
+				listener.onModified(collection, service);
 			}
 		}
 
 		@Override
 		public void removedService(ServiceReference reference, Object obj) {
-			final T service = (T) obj;
-			final String pid = getPid(reference);
-			log.info("removed service: {}", pid);
-			context.ungetService(reference);
+			final OSGiService<T> service = new OSGiService(context, reference);
+
+			final OSGiServiceCollection<T> collection;
+			synchronized (this) {
+				collection = services.get(service.pid);
+				if (collection == null) {
+					return;
+				}
+
+				context.ungetService(reference);
+				collection.remove(service);
+			}
+
+			log.debug("removed service: {}", service);
 
 			for (TrackerListener listener : listeners) {
-				listener.onRemoved(pid, service);
+				listener.onRemoved(collection, service);
 			}
 		}
+
 	}
 
 }

@@ -1,9 +1,9 @@
-
 package ch.unifr.diva.dip.core.model;
 
 import ch.unifr.diva.dip.core.ApplicationContext;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.ApplicationSettings;
+import ch.unifr.diva.dip.core.services.api.HostService;
 import ch.unifr.diva.dip.core.ui.UIStrategyCLI;
 import ch.unifr.diva.dip.eventbus.EventBusGuava;
 import java.io.IOException;
@@ -59,7 +59,7 @@ public class PipelineIT {
 		assertTrue(
 				"verify processor pid",
 				sameEmptyPipeline.processors().get(0).pid().equals(
-						PipelineManager.GENERATION_PROCESSOR
+						HostService.DEFAULT_GENERATOR
 				)
 		);
 

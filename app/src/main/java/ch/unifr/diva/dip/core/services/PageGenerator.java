@@ -3,32 +3,20 @@ package ch.unifr.diva.dip.core.services;
 import ch.unifr.diva.dip.api.components.EditorLayerPane;
 import ch.unifr.diva.dip.core.services.api.HostProcessorContext;
 import ch.unifr.diva.dip.core.services.api.HostProcessor;
-import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.components.Port;
-import ch.unifr.diva.dip.api.ui.NamedGlyph;
-import ch.unifr.diva.dip.core.model.ProjectPage;
-import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
+import ch.unifr.diva.dip.core.services.api.HostService;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import javafx.scene.image.ImageView;
-import org.slf4j.LoggerFactory;
 
 /**
  * The page generator (or source) provides the image of a page to the pipeline.
  */
-public class PageGenerator implements HostProcessor {
+public class PageGenerator extends HostService {
 
-	private static final org.slf4j.Logger log = LoggerFactory.getLogger(ProjectPage.class);
-
-	private static final String name = "Page Generator";
 	private static final String OUT_FX = "image";
 	private static final String OUT_AWT = "buffered-image";
 
-	private final Map<String, InputPort> inputs = new HashMap();
-	private final Map<String, OutputPort> outputs = new LinkedHashMap();
 	private final OutputPort output_awt;
 	private final OutputPort output_fx;
 
@@ -37,6 +25,8 @@ public class PageGenerator implements HostProcessor {
 	}
 
 	public PageGenerator(HostProcessorContext context) {
+		super("Page Generator");
+
 		this.output_awt = new OutputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImage());
 		this.outputs.put(OUT_AWT, this.output_awt);
 
@@ -84,26 +74,6 @@ public class PageGenerator implements HostProcessor {
 				log.error("failed to load the page's image as BufferedImage: {}", context.page.file, ex);
 			}
 		}
-	}
-
-	@Override
-	public String name() {
-		return name;
-	}
-
-	@Override
-	public NamedGlyph glyph() {
-		return MaterialDesignIcons.CUBE_SEND;
-	}
-
-	@Override
-	public Map<String, InputPort> inputs() {
-		return inputs;
-	}
-
-	@Override
-	public Map<String, OutputPort> outputs() {
-		return outputs;
 	}
 
 }

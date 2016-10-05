@@ -57,9 +57,9 @@ public class LayerTreeCell extends TreeCell<Layer> {
 			this.focusedProperty().removeListener(glyphListener);
 			this.selectedProperty().removeListener(glyphListener);
 		} else {
-			glyph = UIStrategyGUI.newGlyph(item.getHiddenGlyph(), Glyph.Size.MEDIUM);
+			glyph = UIStrategyGUI.Glyphs.newGlyph(item.getHiddenGlyph(), Glyph.Size.MEDIUM);
 			BorderPane.setAlignment(glyph, Pos.TOP_CENTER);
-			BorderPane.setMargin(glyph, new Insets(0, UIStrategyGUI.Stage.insets, 0, -10));
+			BorderPane.setMargin(glyph, new Insets(2, UIStrategyGUI.Stage.insets, 0, -15));
 			this.focusedProperty().addListener(glyphListener);
 			this.selectedProperty().addListener(glyphListener);
 		}

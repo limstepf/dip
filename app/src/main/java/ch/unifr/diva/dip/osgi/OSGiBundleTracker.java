@@ -21,22 +21,33 @@ public class OSGiBundleTracker {
 	private final TrackerCustomizer customizer;
 	private final BundleTracker tracker;
 
+	/**
+	 * Creates a new OSGi bundle tracker.
+	 *
+	 * @param context the bundle context.
+	 */
 	public OSGiBundleTracker(BundleContext context) {
 		this(
 				context,
-						BundleEvent.INSTALLED
-						| BundleEvent.STARTED
-						| BundleEvent.STOPPED
-						| BundleEvent.UPDATED
-						| BundleEvent.UNINSTALLED
-						| BundleEvent.RESOLVED
-						| BundleEvent.UNRESOLVED
-						| BundleEvent.STARTING
-						| BundleEvent.STOPPING
-						| BundleEvent.LAZY_ACTIVATION
+				BundleEvent.INSTALLED
+				| BundleEvent.STARTED
+				| BundleEvent.STOPPED
+				| BundleEvent.UPDATED
+				| BundleEvent.UNINSTALLED
+				| BundleEvent.RESOLVED
+				| BundleEvent.UNRESOLVED
+				| BundleEvent.STARTING
+				| BundleEvent.STOPPING
+				| BundleEvent.LAZY_ACTIVATION
 		);
 	}
 
+	/**
+	 * Creates a new OSGi bundle tracker.
+	 *
+	 * @param context the bundle context.
+	 * @param stateMask the state mask of the bundle tracker.
+	 */
 	public OSGiBundleTracker(BundleContext context, int stateMask) {
 		this.context = context;
 		this.customizer = new TrackerCustomizer();
@@ -47,44 +58,106 @@ public class OSGiBundleTracker {
 		);
 	}
 
+	/**
+	 * Opens the bundle tracker.
+	 */
 	public final void open() {
 		tracker.open();
 	}
 
+	/**
+	 * Closes the bundle tracker.
+	 */
 	public final void close() {
 		tracker.close();
 	}
 
+	/**
+	 * Returns the bundles tracked by the bundle tracker.
+	 *
+	 * @return a list of tracked bundles.
+	 */
 	public List<Bundle> getBundles() {
 		return Arrays.asList(tracker.getBundles());
 	}
 
+	/**
+	 * Adds a tracker listener.
+	 *
+	 * @param listener the tracker listener.
+	 */
 	public void addListener(TrackerListener listener) {
 		customizer.addListener(listener);
 	}
 
+	/**
+	 * Removes a tracker listener.
+	 *
+	 * @param listener the tracker listener.
+	 */
 	public void removeListener(TrackerListener listener) {
 		customizer.removeListener(listener);
 	}
 
-	public interface TrackerListener<T> {
+	/**
+	 * Bundle tracker listener.
+	 */
+	public interface TrackerListener {
+
+		/**
+		 * Fires if a bundle is detected and tracked by the bundle tracker.
+		 *
+		 * @param bundle the bundle.
+		 * @param event the bundle event.
+		 */
 		public void onAdded(Bundle bundle, BundleEvent event);
+
+		/**
+		 * Fires if a bundle has been modified.
+		 *
+		 * @param bundle the bundle.
+		 * @param event the bundle event.
+		 */
 		public void onModified(Bundle bundle, BundleEvent event);
+
+		/**
+		 * Fires if a bundle got removed.
+		 *
+		 * @param bundle the bundle.
+		 * @param event the bundle event.
+		 */
 		public void onRemoved(Bundle bundle, BundleEvent event);
+
 	}
 
+	/**
+	 * Bundle tracker customizer.
+	 */
 	private static class TrackerCustomizer implements BundleTrackerCustomizer {
 
 		private final CopyOnWriteArrayList<TrackerListener> listeners;
 
+		/**
+		 * Creates a new bundle tracker customizer.
+		 */
 		public TrackerCustomizer() {
 			listeners = new CopyOnWriteArrayList<>();
 		}
 
+		/**
+		 * Adds a tracker listener.
+		 *
+		 * @param listener the tracker listener.
+		 */
 		public void addListener(TrackerListener listener) {
 			listeners.add(listener);
 		}
 
+		/**
+		 * Removes a tracker listener.
+		 *
+		 * @param listener the tracker listener.
+		 */
 		public void removeListener(TrackerListener listener) {
 			listeners.remove(listener);
 		}
@@ -110,6 +183,6 @@ public class OSGiBundleTracker {
 				listener.onRemoved(bundle, event);
 			}
 		}
-
 	}
+
 }

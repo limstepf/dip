@@ -325,7 +325,7 @@ public class ProjectPage implements Modifiable, Localizable {
 			return new RunnablePipeline(
 					handler,
 					this,
-					PipelineData.emptyPipeline(PipelineManager.GENERATION_PROCESSOR)
+					PipelineData.emptyPipeline(handler.settings)
 			);
 		}
 

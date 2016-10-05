@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
+import org.osgi.framework.Version;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
 import org.osgi.framework.startlevel.BundleStartLevel;
@@ -37,8 +39,12 @@ public class OSGiFramework {
 	private final List<Path> bundleWatchDirs;
 	private final int watchBundleStartLevel;
 	private final Path bundleCacheDir;
-	private final OSGiBundleTracker bundleTracker;
+//	The bundle tracker is not needed so far, but I'll leave it here outcommented
+//  for quick activation/experimentation. Plus we might wanna use it to check if
+//  required bundles are (already) loaded, later, for head-less/batch execution...
+//	private final OSGiBundleTracker bundleTracker;
 	private final OSGiServiceTracker<Processor> processorServiceTracker;
+	private final HostServiceTracker<Processor> processorHostServiceTracker;
 
 	/**
 	 * {@code Processor} service monitor. Safe to be accessed from the JavaFX
@@ -78,12 +84,12 @@ public class OSGiFramework {
 		this.bundleCacheDir = bundleCacheDir;
 		this.framework = createFramework(systemPackages);
 		this.context = framework.getBundleContext();
-
-		this.bundleTracker = new OSGiBundleTracker(this.context);
+//		this.bundleTracker = new OSGiBundleTracker(this.context);
 		this.processorServiceTracker = new OSGiServiceTracker(this.context, Processor.class);
+		this.processorHostServiceTracker = new HostServiceTracker();
 		this.processors = new OSGiServiceMonitor(processorServiceTracker);
-		this.hostProcessors = new HostServiceMonitor();
-		this.bundleTracker.open();
+		this.hostProcessors = new HostServiceMonitor(processorHostServiceTracker);
+//		this.bundleTracker.open();
 		this.processorServiceTracker.open();
 
 		registerShutdownHook();
@@ -267,30 +273,134 @@ public class OSGiFramework {
 	}
 
 	/**
-	 * Returns a {@code Processor} service.
+	 * Returns a copy of a list of all tracked processor collections. This does
+	 * not include the host services/processors.
 	 *
-	 * @param pid PID of the processor.
-	 * @return the {@code Processor} service.
+	 * @return a list of all processor collections.
 	 */
-	public Processor getProcessor(String pid) {
-		return processorServiceTracker.getService(pid);
+	public List<ServiceCollection<Processor>> getProcessorCollectionList() {
+		return processorServiceTracker.getServiceCollectionList();
 	}
 
 	/**
-	 * Compiles a list of compatible processors. A processor is considered
-	 * compatible if all input port and output port types occur at least once.
-	 * Anything more specific (like having a some port type multiple times)
-	 * isn't supported as of now.
+	 * Returns a copy of the map of all tracked processor collections. This does
+	 * not include the host services/processors.
 	 *
+	 * @return a map of all processor collections, indexed by their PID.
+	 */
+	public Map<String, ServiceCollection<Processor>> getProcessorCollectionMap() {
+		return processorServiceTracker.getServiceCollectionMap();
+	}
+
+	/**
+	 * Returns the collection of a processor. A collection stores all available
+	 * versions of the same processor. This may return a normal OSGi service, or
+	 * a host service.
+	 *
+	 * @param pid PID of the processor.
+	 * @return the OSGi service collection of the processor.
+	 */
+	public ServiceCollection<Processor> getProcessorCollection(String pid) {
+		final ServiceCollection<Processor> collection = processorServiceTracker.getServiceCollection(pid);
+		if (collection != null) {
+			return collection;
+		}
+
+		return processorHostServiceTracker.getServiceCollection(pid);
+	}
+
+	/**
+	 * Returns a version of a processor. May be a normal OSGi service, or a host
+	 * service.
+	 *
+	 * @param pid PID of the processor.
+	 * @param version version of the processor.
+	 * @return the OSGiService of the processor with desired version, or null if
+	 * not available.
+	 */
+	public OSGiService<Processor> getProcessor(String pid, Version version) {
+		final ServiceCollection<Processor> collection = getProcessorCollection(pid);
+		return collection.getService(version);
+	}
+
+	/**
+	 * Compiles a list of collections with compatible processors. A processor is
+	 * considered compatible if all input port and output port types occur at
+	 * least once. Anything more specific (like having a some port type multiple
+	 * times) isn't supported as of now.
+	 *
+	 * @param collections the list of collections to be filtered.
 	 * @param inputTypes required input port types.
 	 * @param outputTypes required output port types.
 	 * @return a list of compatible processors.
 	 */
-	public List<ServiceMonitor.Service<Processor>> getCompatibleProcessors(Collection<String> inputTypes, Collection<String> outputTypes) {
-		final List list = new ArrayList<>();
-		for (ServiceMonitor.Service<Processor> p : this.processors.services()) {
-			final List<String> inputs = p.service.portTypes(p.service.inputs());
-			final List<String> outputs = p.service.portTypes(p.service.outputs());
+	public static List<ServiceCollection<Processor>> getCompatibleProcessors(List<ServiceCollection<Processor>> collections, Collection<String> inputTypes, Collection<String> outputTypes) {
+		return getCompatibleProcessors(collections, Collections.EMPTY_LIST, inputTypes, outputTypes);
+	}
+
+	/**
+	 * Compiles a list of collections with compatible processors. A processor is
+	 * considered compatible if all input port and output port types occur at
+	 * least once. Anything more specific (like having a some port type multiple
+	 * times) isn't supported as of now.
+	 *
+	 * @param collections the list of collections to be filtered.
+	 * @param excludeCollections a list of PIDs of services/collections to skip.
+	 * @param inputTypes required input port types.
+	 * @param outputTypes required output port types.
+	 * @return a list of compatible processors.
+	 */
+	public static List<ServiceCollection<Processor>> getCompatibleProcessors(List<ServiceCollection<Processor>> collections, List<String> excludeCollections, Collection<String> inputTypes, Collection<String> outputTypes) {
+		final List<ServiceCollection<Processor>> compatible = new ArrayList<>();
+		for (ServiceCollection<Processor> collection : collections) {
+			if (excludeCollections.contains(collection.pid())) {
+				continue;
+			}
+			final ServiceCollection<Processor> c = filterCollection(collection, inputTypes, outputTypes);
+			if (c.numVersions() > 0) {
+				compatible.add(c);
+			}
+		}
+		return compatible;
+	}
+
+	/**
+	 * Compiles a map of collections with compatible processors.
+	 *
+	 * @param collections the list of collections to be filtered.
+	 * @param excludeCollections a list of PIDs of services/collections to skip.
+	 * @param inputTypes required input port types.
+	 * @param outputTypes required output port types.
+	 * @return a map of compatible processors, indexed by PID.
+	 */
+	public static Map<String, ServiceCollection<Processor>> getCompatibleProcessorMap(List<ServiceCollection<Processor>> collections, List<String> excludeCollections, Collection<String> inputTypes, Collection<String> outputTypes) {
+		final Map<String, ServiceCollection<Processor>> compatible = new HashMap<>();
+		for (ServiceCollection<Processor> collection : collections) {
+			if (excludeCollections.contains(collection.pid())) {
+				continue;
+			}
+			final ServiceCollection<Processor> c = filterCollection(collection, inputTypes, outputTypes);
+			if (c.numVersions() > 0) {
+				compatible.put(c.pid(), c);
+			}
+		}
+		return compatible;
+	}
+
+	/**
+	 * Returns a filtered collection of compatible processors.
+	 *
+	 * @param collection the service collection.
+	 * @param inputTypes required input port types.
+	 * @param outputTypes required output port types.
+	 * @return a filtered service collection of compatible processors.
+	 */
+	public static ServiceCollection<Processor> filterCollection(ServiceCollection<Processor> collection, Collection<String> inputTypes, Collection<String> outputTypes) {
+		final ServiceCollectionSnapshot<Processor> filtered = new ServiceCollectionSnapshot(collection.pid());
+		for (OSGiService<Processor> service : collection.getVersions()) {
+			final Processor p = service.serviceObject;
+			final List<String> inputs = p.portTypes(p.inputs());
+			final List<String> outputs = p.portTypes(p.outputs());
 
 			boolean compatible = true;
 			for (String in : inputTypes) {
@@ -311,10 +421,11 @@ public class OSGiFramework {
 				outputs.remove(out);
 			}
 			if (compatible) {
-				list.add(p);
+				filtered.add(service);
 			}
 		}
-		return list;
+
+		return filtered;
 	}
 
 }

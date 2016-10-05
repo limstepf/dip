@@ -6,6 +6,7 @@ import ch.unifr.diva.dip.api.components.Port;
 import ch.unifr.diva.dip.core.model.Pipeline;
 import ch.unifr.diva.dip.core.model.ProcessorWrapper;
 import static ch.unifr.diva.dip.gui.pe.ProcessorsWidget.ProcessorListCell.OSGI_SERVICE_PROCESSOR;
+import ch.unifr.diva.dip.osgi.OSGiServiceReference;
 import ch.unifr.diva.dip.utils.FxUtils;
 import java.util.Collection;
 import java.util.HashMap;
@@ -601,7 +602,7 @@ public class EditorPane {
 		for (ProcessorWrapper p : processors) {
 			updateProcessor(p);
 		}
-		if (editor.handler.settings.pipelineEditor.autoRearrangeOnChangedLayoutStrategy) {
+		if (editor.handler.settings.pipelineEditor.autoRearrangeOnChangedLayout) {
 			// we need some kind of delay here, or the layout will be wrong since
 			// not all processors have been placed yet, uh.
 			// ...and now the wires spazz out since the jiggling from the
@@ -644,10 +645,10 @@ public class EditorPane {
 	private void onDragDropped(DragEvent e) {
 		final Dragboard db = e.getDragboard();
 		if (db.hasContent(OSGI_SERVICE_PROCESSOR)) {
-			final String pid = (String) db.getContent(OSGI_SERVICE_PROCESSOR);
+			final OSGiServiceReference ref = (OSGiServiceReference) db.getContent(OSGI_SERVICE_PROCESSOR);
 			if (editor.selectedPipeline() != null) {
 				final Point2D p = editor.editorPane().sceneToPane(e);
-				editor.selectedPipeline().addProcessor(pid, p.getX(), p.getY());
+				editor.selectedPipeline().addProcessor(ref.pid, ref.version, p.getX(), p.getY());
 			}
 		}
 

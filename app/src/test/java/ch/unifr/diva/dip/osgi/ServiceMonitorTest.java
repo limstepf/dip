@@ -18,10 +18,11 @@ public class ServiceMonitorTest {
 	 */
 	@Test
 	public void testHostServiceMonitor() {
-		HostServiceMonitor monitor = new HostServiceMonitor();
+		final HostServiceTracker tracker = new HostServiceTracker();
+		final HostServiceMonitor monitor = new HostServiceMonitor(tracker);
 		assertNotEquals(
 				"At least one host service must have been registered",
-				monitor.services().size(),
+				monitor.getServiceCollectionMap().size(),
 				0
 		);
 	}

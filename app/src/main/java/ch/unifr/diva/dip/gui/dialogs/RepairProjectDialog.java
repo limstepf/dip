@@ -1,12 +1,16 @@
 package ch.unifr.diva.dip.gui.dialogs;
 
 import ch.unifr.diva.dip.api.services.Processor;
+import ch.unifr.diva.dip.api.ui.Glyph;
+import ch.unifr.diva.dip.api.ui.RadioChoiceBox;
+import ch.unifr.diva.dip.api.utils.L10n;
 import ch.unifr.diva.dip.api.utils.XmlUtils;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.model.PipelineData;
 import ch.unifr.diva.dip.core.model.ProcessorWrapper;
 import ch.unifr.diva.dip.core.model.ProjectData;
 import ch.unifr.diva.dip.core.ui.Localizable;
+import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import static ch.unifr.diva.dip.gui.dialogs.AbstractDialog.getCancelButton;
 import static ch.unifr.diva.dip.gui.dialogs.AbstractDialog.getDefaultButton;
 import ch.unifr.diva.dip.gui.layout.ArrowHead;
@@ -14,7 +18,9 @@ import ch.unifr.diva.dip.gui.layout.FormGridPane;
 import ch.unifr.diva.dip.gui.layout.HLine;
 import ch.unifr.diva.dip.gui.layout.Lane;
 import ch.unifr.diva.dip.gui.layout.Listable;
-import ch.unifr.diva.dip.osgi.ServiceMonitor.Service;
+import ch.unifr.diva.dip.osgi.OSGiFramework;
+import ch.unifr.diva.dip.osgi.OSGiService;
+import ch.unifr.diva.dip.osgi.ServiceCollection;
 import ch.unifr.diva.dip.utils.FileFinderService;
 import ch.unifr.diva.dip.utils.FileFinderTask;
 import ch.unifr.diva.dip.utils.IOUtils;
@@ -25,18 +31,24 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -49,9 +61,9 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -61,7 +73,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Repair project dialog.
+ * Repair project dialog. Select/search paths to missing files, replace
+ * unavailable services used in the project, such stuff...
  */
 public class RepairProjectDialog extends AbstractDialog {
 
@@ -78,6 +91,12 @@ public class RepairProjectDialog extends AbstractDialog {
 	private RepairImageSection repairImageSection = null;
 	private boolean done = false;
 
+	/**
+	 * Creates a new repair project dialog.
+	 *
+	 * @param owner the window owner of the dialog.
+	 * @param handler the application handler.
+	 */
 	public RepairProjectDialog(Window owner, ApplicationHandler handler) {
 		super(owner);
 
@@ -122,6 +141,8 @@ public class RepairProjectDialog extends AbstractDialog {
 		this.setOnCloseRequest((e) -> cleanUpOnClose());
 
 		root.setCenter(box);
+
+		updateRepairedProperty();
 	}
 
 	private void cleanUpOnClose() {
@@ -167,80 +188,272 @@ public class RepairProjectDialog extends AbstractDialog {
 	}
 
 	/**
+	 * Repair status interface.
+	 */
+	private interface RepairStatus {
+
+		final public static Glyph.Size GLYPH_SIZE = Glyph.Size.SMALL;
+		final public static String STATE_NOT_FOUND = L10n.getInstance().getString("state.notfound");
+		final public static String STATE_MODIFIED = L10n.getInstance().getString("state.modified");
+		final public static String STATE_MOVED = L10n.getInstance().getString("state.moved");
+		//
+		final public static String STATE_UNAVAILABLE = L10n.getInstance().getString("state.unavailable");
+		final public static String STATE_UPGRADED = L10n.getInstance().getString("state.updowngraded");
+		final public static String STATE_REPLACED = L10n.getInstance().getString("state.replaced");
+
+		/**
+		 * Returns the repair status message.
+		 *
+		 * @return the repair status message.
+		 */
+		public String getMessage();
+
+		/**
+		 * Returns the repair status glyph.
+		 *
+		 * @return the repair status glyph.
+		 */
+		public Glyph getGlyph();
+	}
+
+	/**
+	 * Listable base class for items that need to be repaired, or ignored.
+	 */
+	private static abstract class ListableBase<T extends Parent> implements Listable, Localizable {
+
+		private static final Insets margin = new Insets(UIStrategyGUI.Stage.insets, 0, UIStrategyGUI.Stage.insets, 0);
+		protected final BorderPane parent;
+		protected final Header header;
+		protected final T body;
+		protected final BooleanProperty repairedProperty = new SimpleBooleanProperty(false);
+		protected final ChangeListener repairedListener = (obs, a, b) -> updateRepairedProperty();
+
+		/**
+		 * Creates a new listable base object.
+		 *
+		 * @param title the title of the listable object.
+		 * @param body the body of the listable object.
+		 */
+		public ListableBase(String title, T body) {
+			this.header = new Header(title, localize("ignore"));
+			this.header.ignore.selectedProperty().addListener(repairedListener);
+			this.body = body;
+			this.parent = new BorderPane();
+			this.parent.setTop(this.header.grid);
+			this.parent.setCenter(body);
+			BorderPane.setMargin(body, margin);
+		}
+
+		/**
+		 * Header of a listable object.
+		 */
+		public static class Header {
+
+			private final static Glyph.Size statusGlyphSize = Glyph.Size.SMALL;
+			public final Label title;
+			public final Label status;
+			public final CheckBox ignore;
+			public final FormGridPane grid;
+			private Glyph glyph;
+
+			/**
+			 * Creates a new listable object header.
+			 *
+			 * @param title title of the listable object.
+			 * @param ignore the ignore label.
+			 */
+			public Header(String title, String ignore) {
+				this.title = new Label(title);
+				this.title.getStyleClass().add("dip-title");
+				this.status = new Label();
+				this.ignore = new CheckBox(ignore);
+
+				final int n = 4;
+				final ColumnConstraints[] cc = new ColumnConstraints[n];
+				for (int i = 0; i < n; i++) {
+					cc[i] = new ColumnConstraints();
+					cc[i].setHgrow(Priority.SOMETIMES);
+					cc[i].setHalignment(HPos.LEFT);
+				}
+				cc[0].setHgrow(Priority.ALWAYS);
+				cc[0].setPercentWidth(66.7);
+				cc[1].setHgrow(Priority.NEVER);
+				cc[1].setHalignment(HPos.RIGHT);
+				cc[n - 1].setHalignment(HPos.RIGHT);
+
+				this.grid = new FormGridPane(cc);
+				setupGrid();
+			}
+
+			private void setupGrid() {
+				this.grid.getChildren().clear();
+				this.grid.add(this.title, 0, 0);
+				// 1 reserved for status glyph
+				this.grid.add(this.status, 2, 0);
+				this.grid.add(this.ignore, 3, 0);
+			}
+
+			private void updateStatus(Glyph glyph, String message) {
+				// maintain opactiy from setIgnored!
+				final double opacity = this.glyph == null ? 1.0 : this.glyph.getOpacity();
+				this.glyph = glyph;
+				this.glyph.setOpacity(opacity);
+				setupGrid();
+				this.grid.add(this.glyph, 1, 0);
+				this.status.setText(message);
+			}
+
+			public void setStatus(RepairStatus state) {
+				updateStatus(state.getGlyph(), state.getMessage());
+			}
+
+			public void setIgnored(boolean ignored) {
+				if (this.glyph != null) {
+					this.glyph.setOpacity(ignored ? 0.33 : 1.0);
+				}
+				this.status.setOpacity(ignored ? 0.33 : 1.0);
+			}
+		}
+
+		// overwrite, but call super
+		protected void updateRepairedProperty() {
+			// don't show body if ignored
+			this.parent.setCenter(doIgnore() ? null : this.body);
+			this.header.setIgnored(doIgnore());
+		}
+
+		public ReadOnlyBooleanProperty repairedProperty() {
+			return this.repairedProperty;
+		}
+
+		final public boolean doIgnore() {
+			return this.header.ignore.isSelected();
+		}
+
+		@Override
+		public Parent node() {
+			return parent;
+		}
+	}
+
+	/**
+	 * RepairSection base class.
+	 */
+	private static abstract class RepairSectionBase implements RepairSection, Localizable {
+
+		protected final Stage stage;
+		protected final ProjectData projectData;
+		protected final ProjectData.ValidationResult validation;
+		protected final ListView<Listable> listView;
+		protected final VBox parent;
+		protected final Label title;
+		protected final BooleanProperty repairedProperty = new SimpleBooleanProperty(false);
+		protected final ChangeListener repairedListener = (obs, a, b) -> updateRepairedProperty();
+
+		public RepairSectionBase(Stage stage, ProjectData projectData, ProjectData.ValidationResult validation, String title) {
+			this.stage = stage;
+			this.projectData = projectData;
+			this.validation = validation;
+
+			this.parent = new VBox();
+			this.title = new Label(title + ":");
+			this.listView = Listable.newListView();
+			parent.getChildren().addAll(this.title, this.listView);
+		}
+
+		@Override
+		public ReadOnlyBooleanProperty repairedProperty() {
+			return repairedProperty;
+		}
+
+		abstract void updateRepairedProperty();
+
+		@Override
+		public Parent getComponent() {
+			return parent;
+		}
+	}
+
+	/**
 	 * Resource states.
 	 */
-	private enum ResourceState {
+	private enum ResourceState implements RepairStatus {
 
 		/**
 		 * File not found.
 		 */
-		NOT_FOUND,
+		NOT_FOUND(STATE_NOT_FOUND) {
+					@Override
+					public Glyph getGlyph() {
+						return UIStrategyGUI.Glyphs.newErrorGlyph(GLYPH_SIZE);
+					}
+				},
 		/**
 		 * File has been modified (differing checksum).
 		 */
-		MODIFIED,
+		MODIFIED(STATE_MODIFIED) {
+					@Override
+					public Glyph getGlyph() {
+						return UIStrategyGUI.Glyphs.newWarningGlyph(GLYPH_SIZE);
+					}
+				},
 		/**
 		 * File has been moved (prior state: NOT_FOUND).
 		 */
-		MOVED,
+		MOVED(STATE_MOVED) {
+					@Override
+					public Glyph getGlyph() {
+						return UIStrategyGUI.Glyphs.newOkGlyph(GLYPH_SIZE);
+					}
+				},
 		/**
 		 * File has been replaced (prior state: MODIFIED).
 		 */
-		REPLACED
+		REPLACED(STATE_MODIFIED) {
+					@Override
+					public Glyph getGlyph() {
+						return UIStrategyGUI.Glyphs.newOkGlyph(GLYPH_SIZE);
+					}
+				};
+
+		private final String message;
+
+		ResourceState(String message) {
+			this.message = message;
+		}
+
+		@Override
+		public String getMessage() {
+			return this.message;
+		}
 	}
 
-//	private static Label newLabel(String text) {
-//		final Label label = new Label(text);
-//		label.setMaxWidth(Double.MAX_VALUE);
-//		label.setAlignment(Pos.CENTER_LEFT);
-//		return label;
-//	}
 	/**
 	 * Invalid Image line.
 	 */
-	private static class InvalidImage implements Listable, Localizable {
+	private static class InvalidImage extends ListableBase<FormGridPane> {
 
 		private final Stage stage;
 		private final ProjectData.Page page;
 		private final String latestChecksum;
-		private final BorderPane parent = new BorderPane();
-		private final VBox vbox = new VBox();
-		private final FormGridPane form;
+
 		private final Label primaryLabel = new Label();
 		private final Label primaryValue = new Label();
 		private final Label secondaryLabel = new Label();
 		private final Label secondaryValue = new Label();
-		private final Label pageLabel = new Label();
-		private final Lane actionLane = new Lane();
 		private final Button locate = new Button(localize("locate"));
-		private final CheckBox ignore = new CheckBox(localize("ignore"));
-		private final BooleanProperty repairedProperty = new SimpleBooleanProperty(false);
-		private ResourceState state;
+
+		private ResourceState state = ResourceState.NOT_FOUND;
 		private Path newPath;
 		private String newChecksum;
 
 		public InvalidImage(Stage stage, ProjectData.Page page, ResourceState state, String checksum) {
+			super(getTitle(page), new FormGridPane(getColumnConstraints()));
 			this.stage = stage;
 			this.page = page;
+			this.state = state;
 			this.latestChecksum = checksum;
 			this.newChecksum = this.latestChecksum;
-
-			pageLabel.setText(String.format("%s (id: %d)", page.name, page.id));
-
-			final int numCC = 2;
-			final ColumnConstraints[] cc = new ColumnConstraints[numCC];
-			for (int i = 0; i < numCC; i++) {
-				cc[i] = new ColumnConstraints();
-				cc[i].setHgrow(Priority.SOMETIMES);
-			}
-			cc[1].setHgrow(Priority.ALWAYS);
-
-			form = new FormGridPane(cc);
-			primaryLabel.getStyleClass().add("dip-small");
-			secondaryLabel.getStyleClass().add("dip-small");
-			form.addRow(primaryLabel, primaryValue);
-			form.addRow(secondaryLabel, secondaryValue);
-			vbox.getChildren().addAll(pageLabel, form);
 
 			locate.getStyleClass().add("dip-small");
 			locate.setOnAction((e) -> {
@@ -250,19 +463,33 @@ public class RepairProjectDialog extends AbstractDialog {
 					setPath(file.toPath());
 				}
 			});
-			actionLane.setPadding(new Insets(0, 0, 0, 10));
-			actionLane.getChildren().addAll(locate, ignore);
-			parent.setCenter(vbox);
-			parent.setRight(actionLane);
-
-			ignore.selectedProperty().addListener((obs, a, b) -> {
-				updateRepairedProperty();
-			});
-			if (state.equals(ResourceState.MODIFIED)) {
-				this.ignore.setSelected(true);
+			if (isModified()) {
+				this.header.ignore.setSelected(true);
 			}
 
+			this.body.add(primaryLabel, 0, 0);
+			this.body.add(primaryValue, 1, 0);
+			this.body.add(secondaryLabel, 0, 1);
+			this.body.add(secondaryValue, 1, 1);
+			this.body.add(locate, 1, 2);
+
 			setState(state);
+		}
+
+		private static String getTitle(ProjectData.Page page) {
+			return String.format("%s (id: %d)", page.name, page.id);
+		}
+
+		private static ColumnConstraints[] getColumnConstraints() {
+			final int n = 2;
+			final ColumnConstraints[] cc = new ColumnConstraints[n];
+			for (int i = 0; i < n; i++) {
+				cc[i] = new ColumnConstraints();
+				cc[i].setHgrow(Priority.SOMETIMES);
+				cc[i].setHalignment(HPos.LEFT);
+			}
+			cc[1].setHgrow(Priority.ALWAYS);
+			return cc;
 		}
 
 		public ResourceState getState() {
@@ -272,12 +499,12 @@ public class RepairProjectDialog extends AbstractDialog {
 		private void setLabels(ResourceState state) {
 			switch (state) {
 				case MODIFIED:
-					primaryLabel.setText(localize("path") + ":");
+					primaryLabel.setText(localize("file") + ":");
 					secondaryLabel.setText("");
 					break;
 				default:
-					primaryLabel.setText(localize("path.old") + ":");
-					secondaryLabel.setText(localize("path.new") + ":");
+					primaryLabel.setText(localize("file.old") + ":");
+					secondaryLabel.setText(localize("file.new") + ":");
 					break;
 			}
 		}
@@ -285,12 +512,10 @@ public class RepairProjectDialog extends AbstractDialog {
 		public final void setState(ResourceState state) {
 			this.state = state;
 
-			final String s;
 			switch (state) {
 				default:
 				case NOT_FOUND:
 					secondaryValue.setText("???");
-					s = localize("state.notfound");
 					break;
 				case MODIFIED:
 					secondaryValue.setText(
@@ -300,47 +525,31 @@ public class RepairProjectDialog extends AbstractDialog {
 									this.newChecksum
 							)
 					);
-					s = localize("state.modified");
 					break;
 				case MOVED:
 					secondaryValue.setText(this.newPath.toString());
-					s = localize("state.moved");
 					break;
 				case REPLACED:
 					secondaryValue.setText(this.newPath.toString());
 					primaryValue.setText(page.file.toString());
-					s = localize("state.modified");
 					break;
 			}
 
-			primaryValue.setText(String.format("%s (%s)", page.file, s));
+			this.header.setStatus(state);
+			primaryValue.setText(page.file.toString());
 			setLabels(state);
 			updateRepairedProperty();
 		}
 
-		private void updateRepairedProperty() {
-			this.repairedProperty.set(
-					doIgnore() || (!isNotFound() && !isModified())
-			);
-		}
-
-		public ReadOnlyBooleanProperty repairedProperty() {
-			return this.repairedProperty;
-		}
-
-		public boolean doIgnore() {
-			return this.ignore.isSelected();
-		}
-
-		public boolean isNotFound() {
+		final public boolean isNotFound() {
 			return this.state.equals(ResourceState.NOT_FOUND);
 		}
 
-		public boolean isModified() {
+		final public boolean isModified() {
 			return this.state.equals(ResourceState.MODIFIED);
 		}
 
-		public void setPath(Path file) {
+		final public void setPath(Path file) {
 			this.newPath = file;
 			try {
 				this.newChecksum = IOUtils.checksum(file);
@@ -358,6 +567,23 @@ public class RepairProjectDialog extends AbstractDialog {
 			}
 		}
 
+		@Override
+		protected void updateRepairedProperty() {
+			super.updateRepairedProperty();
+			this.repairedProperty.set(
+					doIgnore() || (!isNotFound() && !isModified())
+			);
+			if (doIgnore()) {
+				this.header.setStatus(
+						this.state.equals(ResourceState.MODIFIED)
+								? ResourceState.MODIFIED
+								: ResourceState.NOT_FOUND
+				);
+			} else {
+				this.header.setStatus(this.state);
+			}
+		}
+
 		public void apply() {
 			if (this.doIgnore()) {
 				// ignore (PageGenerator handles non existing images just fine...)
@@ -366,21 +592,13 @@ public class RepairProjectDialog extends AbstractDialog {
 				this.page.checksum = this.newChecksum;
 			}
 		}
-
-		@Override
-		public Parent node() {
-			return parent;
-		}
 	}
 
 	/**
 	 * Repair missing pages/images section.
 	 */
-	private static class RepairImageSection implements RepairSection, Localizable {
+	private static class RepairImageSection extends RepairSectionBase {
 
-		private final VBox parent = new VBox();
-		private final Label title = new Label(localize("page.images.missing"));
-		private final ListView<Listable> listView = Listable.newListView();
 		private final List<InvalidImage> items = new ArrayList<>();
 		private final Map<FileFinderTask.FileDescriptor, InvalidImage> finderFiles = new HashMap<>();
 		private final Label finderDirectory = new Label();
@@ -390,12 +608,12 @@ public class RepairProjectDialog extends AbstractDialog {
 		private final Button searchCancel = new Button(localize("cancel"));
 		private final Lane action = new Lane();
 		private final DirectoryChooser searchChooser = new DirectoryChooser();
-		private final BooleanProperty repairedProperty = new SimpleBooleanProperty(false);
-		private final ChangeListener repairedListener = (obs, a, b) -> updateRepairedProperty();
 		private final Path finderRoot;
 		private final FileFinderService finder;
 
 		public RepairImageSection(Stage stage, ProjectData projectData, ProjectData.ValidationResult validation) {
+			super(stage, projectData, validation, L10n.getInstance().getString("page.images.missing"));
+
 			searchFrom.getStyleClass().add("dip-small");
 			searchCancel.getStyleClass().add("dip-small");
 			searchLabel.setPadding(new Insets(5, 0, 0, 0));
@@ -434,10 +652,7 @@ public class RepairProjectDialog extends AbstractDialog {
 				item.repairedProperty().addListener(repairedListener);
 				items.add(item);
 			}
-
 			listView.getItems().addAll(items);
-			parent.getChildren().addAll(title, listView);
-
 			action.setAlignment(Pos.CENTER_LEFT);
 			action.setSpacing(5);
 			searchChooser.setTitle(localize("search.from"));
@@ -466,8 +681,8 @@ public class RepairProjectDialog extends AbstractDialog {
 				}
 			});
 			searchCancel.setOnAction((e) -> finder.cancel());
-
-			if (finder.numQueries() > 0) { // start searching for missing files...
+			// start searching for missing files...
+			if (finder.numQueries() > 0) {
 				activateSearch(true);
 				action.getChildren().addAll(finderProgressBar, searchFrom, searchCancel);
 				parent.getChildren().addAll(searchLabel, action, finderDirectory);
@@ -514,11 +729,7 @@ public class RepairProjectDialog extends AbstractDialog {
 		}
 
 		@Override
-		public Parent getComponent() {
-			return parent;
-		}
-
-		private void updateRepairedProperty() {
+		void updateRepairedProperty() {
 			for (InvalidImage item : items) {
 				if (!item.repairedProperty().get()) {
 					repairedProperty.set(false);
@@ -534,37 +745,91 @@ public class RepairProjectDialog extends AbstractDialog {
 				item.apply();
 			}
 		}
-
-		@Override
-		public ReadOnlyBooleanProperty repairedProperty() {
-			return repairedProperty;
-		}
-
 	}
 
 	/**
-	 * Invalid Service line.
+	 * Service states.
 	 */
-	private static class InvalidService implements Listable, Localizable {
+	private enum ServiceState implements RepairStatus {
 
+		/**
+		 * Unavailable service.
+		 */
+		UNAVAILABLE(STATE_UNAVAILABLE) {
+					@Override
+					public Glyph getGlyph() {
+						return UIStrategyGUI.Glyphs.newErrorGlyph(GLYPH_SIZE);
+					}
+				},
+		/**
+		 * Up-/downgraded service.
+		 */
+		UPGRADED(STATE_UPGRADED) {
+					@Override
+					public Glyph getGlyph() {
+						return UIStrategyGUI.Glyphs.newOkGlyph(GLYPH_SIZE);
+					}
+				},
+		/**
+		 * Replaced service.
+		 */
+		REPLACED(STATE_REPLACED) {
+					@Override
+					public Glyph getGlyph() {
+						return UIStrategyGUI.Glyphs.newOkGlyph(GLYPH_SIZE);
+					}
+				};
+
+		private final String message;
+
+		ServiceState(String message) {
+			this.message = message;
+		}
+
+		@Override
+		public String getMessage() {
+			return this.message;
+		}
+	}
+
+	/**
+	 * Invalid service line.
+	 */
+	private static class InvalidService extends ListableBase<FormGridPane> {
+
+		private final static Insets comboInsets = new Insets(0, 0, 0, 3);
+		private final static Insets mappingInsets = new Insets(UIStrategyGUI.Stage.insets, 0, 0, 0);
 		private final String pid;
-		private final VBox parent = new VBox();
-		// known/used ports we need to map to ports on a compatible processor
-		//    map: key, type-string
+		private final String version;
+		private final boolean canUpgrade;
+		private final boolean canReplace;
 		private final Map<String, String> inputs = new LinkedHashMap<>();
 		private final Map<String, String> outputs = new LinkedHashMap<>();
-		private final List<String> compatibleProcessors = new ArrayList<>();
-		private final ComboBox processorCombo;
 		private final List<ComboBox> inputCombos = new ArrayList<>();
 		private final List<ComboBox> outputCombos = new ArrayList<>();
-		private final CheckBox ignore;
 		private final List<List<String>> inputKeys = new ArrayList<>();
 		private final List<List<String>> outputKeys = new ArrayList<>();
-		private final BooleanProperty repairedProperty = new SimpleBooleanProperty(false);
-		private final ChangeListener repairedListener = (obs, a, b) -> updateRepairedProperty();
 
-		public InvalidService(String pid, ProjectData projectData, ApplicationHandler handler) {
+		private final ServiceCollection<Processor> compatibleVersions; // same proc, different version
+		private final ObservableList<String> compatibleVersionList;
+		private final Map<String, ServiceCollection<Processor>> compatibleServices; // replacement procs, any version
+		private final ObservableList<String> compatibleServiceList; // replacement procs, as list of pids
+		private final Map<String, List<String>> compatibleServiceVersions; // maps pid to list of available version
+
+		private final RadioChoiceBox choice;
+		private final HBox upgradeOption;
+		private final HBox replaceOption;
+		private final ComboBox upgradeVersionOption;
+		private final ComboBox replaceProcessorOption;
+		private final ComboBox replaceVersionOption;
+		private final ObservableList<String> replaceVersionList;
+
+		private ServiceState state = ServiceState.UNAVAILABLE;
+
+		public InvalidService(String pid, String version, ProjectData projectData, ApplicationHandler handler) {
+			super(getTitle(pid, version), new FormGridPane(getColumnConstraints()));
 			this.pid = pid;
+			this.version = version;
 
 			// read all (global) pipeline prototypes
 			for (PipelineData.Pipeline<ProcessorWrapper> pipeline : projectData.pipelines()) {
@@ -588,125 +853,325 @@ public class RepairProjectDialog extends AbstractDialog {
 				}
 			}
 
-			final List<Service<Processor>> compatibleServices = handler.osgi.getCompatibleProcessors(
+			// 1) get list of available versions of the missing processor for an up-/downgrade
+			final ServiceCollection<Processor> serviceCollection = handler.osgi.getProcessorCollection(pid);
+			// make sure they're also compatible
+			if (serviceCollection != null) {
+				final List<ServiceCollection<Processor>> collections = OSGiFramework.getCompatibleProcessors(
+						Arrays.asList(serviceCollection),
+						inputs.values(),
+						outputs.values()
+				);
+				this.compatibleVersions = collections.isEmpty() ? null : collections.get(0);
+			} else {
+				this.compatibleVersions = null;
+			}
+			this.canUpgrade = this.compatibleVersions != null;
+			this.compatibleVersionList = FXCollections.observableArrayList();
+			if (canUpgrade) {
+				for (OSGiService v : compatibleVersions.getVersions()) {
+					this.compatibleVersionList.add(v.version.toString());
+				}
+			}
+
+			// 2) get list of compatible processors to replace the processor with a different one
+			this.compatibleServices = OSGiFramework.getCompatibleProcessorMap(
+					handler.osgi.getProcessorCollectionList(),
+					Arrays.asList(pid),
 					inputs.values(),
 					outputs.values()
 			);
-
-			for (Service<Processor> p : compatibleServices) {
-				compatibleProcessors.add(p.pid);
+			this.canReplace = !compatibleServices.isEmpty();
+			this.compatibleServiceList = FXCollections.observableArrayList();
+			for (ServiceCollection collection : compatibleServices.values()) {
+				this.compatibleServiceList.add(collection.pid());
 			}
 
-			this.processorCombo = new ComboBox();
-			processorCombo.setOnAction((e) -> {
-				final int index = processorCombo.getSelectionModel().getSelectedIndex();
-				final Service<Processor> p = handler.osgi.processors.getService(compatibleProcessors.get(index));
-				if (p != null) {
+			this.compatibleServiceVersions = new HashMap<>();
+			this.upgradeVersionOption = newComboBox(this.compatibleVersionList);
+			this.replaceProcessorOption = newComboBox(this.compatibleServiceList);
+			this.replaceVersionList = FXCollections.observableArrayList();
+			this.replaceVersionOption = newComboBox(this.replaceVersionList);
+			this.upgradeOption = new HBox();
+			this.upgradeOption.getChildren().setAll(
+					new Label(localize("version.change.to")),
+					this.upgradeVersionOption
+			);
+			this.replaceOption = new HBox();
+			this.replaceOption.getChildren().setAll(
+					new Label(localize("replace.with")),
+					this.replaceProcessorOption,
+					this.replaceVersionOption
+			);
+			this.choice = new RadioChoiceBox(
+					this.upgradeOption,
+					this.replaceOption
+			);
 
-					int i = 0;
-					for (Map.Entry<String, String> in : inputs.entrySet()) {
-						inputKeys.add(p.service.inputs(in.getValue()));
-						inputCombos.get(i).getItems().setAll(
-								inputKeys.get(i)
-						);
-						inputCombos.get(i).getSelectionModel().select(0);
-						i++;
-					}
-					i = 0;
-					for (Map.Entry<String, String> out : outputs.entrySet()) {
-						outputKeys.add(p.service.outputs(out.getValue()));
-						outputCombos.get(i).getItems().setAll(
-								outputKeys.get(i)
-						);
-						outputCombos.get(i).getSelectionModel().select(0);
-						i++;
-					}
+			// make sure to not select an invalid/disabled option
+			final RadioChoiceBox.RadioChoice upgradeChoice = this.choice.get(0);
+			final RadioChoiceBox.RadioChoice replaceChoice = this.choice.get(1);
+			if (!canUpgrade) {
+				upgradeChoice.setDisable(true);
+				upgradeChoice.radio.setSelected(false);
+				if (canReplace) {
+					replaceChoice.radio.setSelected(true);
 				}
-			});
-			processorCombo.getItems().setAll(compatibleProcessors);
-
-			for (int i = 0; i < inputs.size(); i++) {
-				final ComboBox combo = new ComboBox();
-				combo.getSelectionModel().selectedIndexProperty().addListener(repairedListener);
-				inputCombos.add(combo);
+			}
+			if (!canReplace) {
+				replaceChoice.setDisable(true);
 			}
 
-			for (int i = 0; i < outputs.size(); i++) {
-				final ComboBox combo = new ComboBox();
-				combo.getSelectionModel().selectedIndexProperty().addListener(repairedListener);
-				outputCombos.add(combo);
+			// 0        | 1         | 2      | 3
+			// choice...
+			// ins/outs | port-desc | map to | combobox
+			int row = 0;
+			GridPane.setColumnSpan(choice, GridPane.REMAINING);
+			this.body.add(choice, 0, row++);
+
+			final Label mapping = new Label(localize("processor.port.mapping") + ":");
+			mapping.setPadding(mappingInsets);
+			GridPane.setColumnSpan(mapping, GridPane.REMAINING);
+			this.body.add(mapping, 0, row++);
+
+			final int ins = inputs.size();
+			if (ins > 0) {
+				final Label label = newLabel(localize("processor.inputs"));
+				GridPane.setRowSpan(label, ins);
+				this.body.add(label, 0, row);
+
+				int i = 0;
+				for (Map.Entry<String, String> port : inputs.entrySet()) {
+					final ComboBox combo = newComboBox();
+					inputCombos.add(combo);
+					addPortToGrid(port, combo, row++);
+				}
 			}
 
-			final int numCC = 7;
-			final ColumnConstraints[] cc = new ColumnConstraints[numCC];
-			for (int i = 0; i < numCC; i++) {
+			final int outs = outputs.size();
+			if (outs > 0) {
+				final Label label = newLabel(localize("processor.outputs"));
+				GridPane.setRowSpan(label, outs);
+				this.body.add(label, 0, row);
+
+				for (Map.Entry<String, String> port : outputs.entrySet()) {
+					final ComboBox combo = newComboBox();
+					outputCombos.add(combo);
+					addPortToGrid(port, combo, row++);
+				}
+			}
+
+			this.choice.selectedToggleProperty().addListener((c) -> updatePortMapping());
+			this.upgradeVersionOption.setOnAction((c) -> updatePortMapping());
+			this.replaceProcessorOption.setOnAction((c) -> updateReplaceVersions());
+			this.replaceVersionOption.setOnAction((c) -> updatePortMapping());
+			updateReplaceVersions();
+
+			this.choice.selectedToggleProperty().addListener((c) -> updateStatus());
+			updateStatus();
+		}
+
+		private static ColumnConstraints[] getColumnConstraints() {
+			final int n = 4;
+			final ColumnConstraints[] cc = new ColumnConstraints[n];
+			for (int i = 0; i < n; i++) {
 				cc[i] = new ColumnConstraints();
-				cc[i].setHgrow(Priority.SOMETIMES);
+				cc[i].setHgrow(Priority.ALWAYS);
 			}
-			cc[2].setHgrow(Priority.ALWAYS);
-			cc[4].setHgrow(Priority.ALWAYS);
-			cc[6].setHgrow(Priority.ALWAYS);
+			cc[0].setHgrow(Priority.SOMETIMES);
+			cc[1].setHgrow(Priority.SOMETIMES);
+			cc[3].setPercentWidth(33.3);
+			return cc;
+		}
 
-			final FormGridPane form = new FormGridPane(cc);
-
-			final Label serviceLabel = new Label(pid);
-			GridPane.setColumnSpan(serviceLabel, 2);
-
-			final Label replaceLabel = new Label(localize("replace.with").toLowerCase());
-			final HLine arrowStart = new HLine();
-			final HLine arrowEnd = new HLine();
+		private void addPortToGrid(Map.Entry<String, String> port, ComboBox combo, int row) {
+			final Parent desc = newPortDescription(port.getKey(), port.getValue());
+//			final Label map = new Label(localize("map.to"));
+			final HLine map = new HLine();
 			final ArrowHead head = new ArrowHead();
-			head.setFillColor(Color.WHITE);
-			arrowEnd.addArrowHead(head);
-
-			final Lane actionLane = new Lane();
-			actionLane.setPadding(new Insets(0, 0, 0, 5));
-			actionLane.setAlignment(Pos.CENTER_RIGHT);
-			this.ignore = new CheckBox(localize("ignore"));
-			this.ignore.selectedProperty().addListener(repairedListener);
-			actionLane.getChildren().addAll(ignore);
-			form.addRow(0, serviceLabel, new Label(), arrowStart, replaceLabel, arrowEnd, processorCombo, actionLane);
-
-			int k = 1;
-			k = populateForm(form, k, localize("processor.inputs"), inputs, inputCombos);
-			populateForm(form, k, localize("processor.outputs"), outputs, outputCombos);
-
-			this.parent.setPadding(new Insets(2));
-			this.parent.getChildren().addAll(form);
+			map.addArrowHead(head);
+			this.body.add(desc, 1, row);
+			this.body.add(map, 2, row);
+			this.body.add(combo, 3, row);
 		}
 
-		private void centerLabel(Label label) {
-			label.setAlignment(Pos.CENTER);
-			label.setMaxWidth(Double.MAX_VALUE);
-		}
-
-		private int populateForm(FormGridPane form, int row, String title, Map<String, String> ports, List<ComboBox> combos) {
-			int i = 0;
-			for (Map.Entry<String, String> port : ports.entrySet()) {
-				final Label portLabel = new Label(title);
-				GridPane.setRowSpan(portLabel, 2);
-				portLabel.getStyleClass().add("dip-small");
-				final Parent portBox = formatPort(port.getKey(), port.getValue());
-				final Label mapToLabel = new Label(localize("map.to").toLowerCase());
-				centerLabel(mapToLabel);
-				form.addRow(
-						row++,
-						portLabel, portBox, null, mapToLabel, null, combos.get(i)
-				);
-				title = "";
-				i++;
-			}
-
-			return row;
-		}
-
-		private Parent formatPort(String port, String type) {
+		private Parent newPortDescription(String port, String type) {
 			final VBox box = new VBox();
 			final Label portLabel = new Label(port);
-			final Label typeLabel = new Label(type);
-			typeLabel.getStyleClass().add("dip-small");
+			final Label typeLabel = newLabel(type);
 			box.getChildren().addAll(portLabel, typeLabel);
 			return box;
+		}
+
+		private static Label newLabel(String text) {
+			final Label label = new Label(text);
+			label.getStyleClass().add("dip-small");
+			return label;
+		}
+
+		// for port mappings
+		private static ComboBox newComboBox() {
+			final ComboBox box = new ComboBox();
+			box.getStyleClass().add("dip-small");
+			return box;
+		}
+
+		// for service/version
+		private static ComboBox newComboBox(ObservableList items) {
+			final ComboBox box = new ComboBox(items);
+			box.getStyleClass().add("dip-small");
+			HBox.setMargin(box, comboInsets);
+			if (items.size() > 0) {
+				box.getSelectionModel().select(0);
+			}
+			return box;
+		}
+
+		private void updateReplaceVersions() {
+			final int index = this.replaceProcessorOption.getSelectionModel().getSelectedIndex();
+			if (index < 0) {
+				this.replaceVersionList.clear();
+				updatePortMapping();
+				return;
+			}
+			final String rpid = this.compatibleServiceList.get(index);
+			this.replaceVersionList.setAll(this.getReplacementVersions(rpid));
+			if (this.replaceVersionList.size() > 0) {
+				this.replaceVersionOption.getSelectionModel().select(0);
+			}
+			updatePortMapping();
+		}
+
+		// don't update again...
+		private OSGiService<Processor> currentService;
+
+		private void updatePortMapping() {
+			final OSGiService<Processor> p = selectedVersion();
+			if (p != null) {
+				if (p.equals(currentService)) {
+					return;
+				}
+				currentService = p;
+
+				inputKeys.clear();
+				int i = 0;
+				for (Map.Entry<String, String> port : inputs.entrySet()) {
+					final List<String> opt = p.serviceObject.inputs(port.getValue());
+					inputKeys.add(opt);
+					final ComboBox combo = inputCombos.get(i++);
+					combo.getItems().setAll(opt);
+					combo.getSelectionModel().select(0);
+				}
+
+				outputKeys.clear();
+				i = 0;
+				for (Map.Entry<String, String> port : outputs.entrySet()) {
+					final List<String> opt = p.serviceObject.outputs(port.getValue());
+					outputKeys.add(opt);
+					final ComboBox combo = outputCombos.get(i++);
+					combo.getItems().setAll(opt);
+					combo.getSelectionModel().select(0);
+				}
+			} else {
+				for (int i = 0; i < inputs.size(); i++) {
+					inputCombos.get(i).getItems().clear();
+				}
+				for (int i = 0; i < outputs.size(); i++) {
+					outputCombos.get(i).getItems().clear();
+				}
+			}
+			updateRepairedProperty();
+		}
+
+		private void updateStatus() {
+			final int opt = selectedOption();
+			switch (opt) {
+				case 0:
+					this.state = ServiceState.UPGRADED;
+					break;
+				case 1:
+					this.state = ServiceState.REPLACED;
+					break;
+				default:
+					this.state = ServiceState.UNAVAILABLE;
+					break;
+			}
+			this.header.setStatus(this.state);
+		}
+
+		// upgrade or replace
+		private OSGiService<Processor> selectedVersion() {
+			final int opt = selectedOption();
+			if (opt < 0) {
+				return null;
+			}
+			return (opt == 0) ? selectedUpgradeVersion() : selectedReplaceVersion();
+		}
+
+		// -1: none, 0: upgrade, 1: replace
+		private int selectedOption() {
+			final RadioChoiceBox.RadioChoice r = this.choice.selectedRadioChoice();
+			if (r == null) {
+				return -1;
+			}
+			if (r.node.equals(this.upgradeOption)) {
+				return this.choice.get(0).radio.isDisable() ? -1 : 0;
+			} else {
+				return this.choice.get(1).radio.isDisable() ? -1 : 1;
+			}
+		}
+
+		private int selectedUpgradeVersionIndex() {
+			return this.upgradeVersionOption.getSelectionModel().getSelectedIndex();
+		}
+
+		private OSGiService<Processor> selectedUpgradeVersion() {
+			final int index = selectedUpgradeVersionIndex();
+			if (index < 0 || this.compatibleVersions == null) {
+				return null;
+			}
+			final String v = this.compatibleVersionList.get(index);
+			return this.compatibleVersions.getService(v);
+		}
+
+		private int selectedReplaceProcessorIndex() {
+			return this.replaceProcessorOption.getSelectionModel().getSelectedIndex();
+		}
+
+		private int selectedReplaceVersionIndex() {
+			return this.replaceVersionOption.getSelectionModel().getSelectedIndex();
+		}
+
+		private OSGiService<Processor> selectedReplaceVersion() {
+			final int pindex = selectedReplaceProcessorIndex();
+			final int vindex = selectedReplaceVersionIndex();
+			if (pindex < 0 || vindex < 0) {
+				return null;
+			}
+			final String rpid = this.compatibleServiceList.get(pindex);
+			final ServiceCollection<Processor> collection = this.compatibleServices.get(rpid);
+			final String v = getReplacementVersions(rpid).get(vindex);
+			return collection.getService(v);
+		}
+
+		private static String getTitle(String pid, String version) {
+			return String.format("%s (v.%s)", pid, version);
+		}
+
+		private List<String> getReplacementVersions(String pid) {
+			if (!compatibleServiceVersions.containsKey(pid)) {
+				final List<String> versions;
+				if (compatibleServices.containsKey(pid)) {
+					versions = compatibleServices.get(pid).getVersions().stream().map((p) -> {
+						return p.version.toString();
+					}).collect(Collectors.toList());
+				} else {
+					versions = Collections.EMPTY_LIST;
+				}
+				compatibleServiceVersions.put(pid, versions);
+				return versions;
+			}
+			return compatibleServiceVersions.get(pid);
 		}
 
 		private void parsePipeline(String pid, PipelineData.Pipeline<ProcessorWrapper> pipeline, Map<String, String> inputs, Map<String, String> outputs) {
@@ -727,51 +1192,37 @@ public class RepairProjectDialog extends AbstractDialog {
 			}
 		}
 
-		private void updateRepairedProperty() {
+		@Override
+		protected void updateRepairedProperty() {
+			super.updateRepairedProperty();
 			this.repairedProperty.set(
-					doIgnore() || hasMapping()
+					doIgnore() || hasValidMapping()
 			);
+			if (doIgnore()) {
+				this.header.setStatus(ServiceState.UNAVAILABLE);
+			} else {
+				this.header.setStatus(this.state);
+			}
 		}
 
-		public ReadOnlyBooleanProperty repairedProperty() {
-			return this.repairedProperty;
-		}
-
-		public boolean doIgnore() {
-			return this.ignore.isSelected();
-		}
-
-		public boolean hasMapping() {
-			final int procIdx = this.processorCombo.getSelectionModel().getSelectedIndex();
-			if (procIdx < 0) {
-				return false;
-			}
-			final String toPID = this.compatibleProcessors.get(procIdx);
-			for (ComboBox combo : inputCombos) {
-				if (combo.getSelectionModel().getSelectedIndex() < 0) {
-					return false;
-				}
-			}
-			for (ComboBox combo : outputCombos) {
-				if (combo.getSelectionModel().getSelectedIndex() < 0) {
-					return false;
-				}
-			}
-			return true;
+		public boolean hasValidMapping() {
+			// it's currently not possible to have an invalid mapping, unless no
+			// option is available at all. This might change with a more clever
+			// test for valid mappings (some configurations can be invalid after
+			// all, e.g. by reusing the same port...), but until then, this will
+			// do...
+			return selectedOption() >= 0;
 		}
 
 		public PipelineData.ProcessorSwap apply() {
-			final int procIdx = this.processorCombo.getSelectionModel().getSelectedIndex();
-			if (procIdx < 0) {
+			final OSGiService<Processor> p = selectedVersion();
+			if (p == null) {
 				return null;
 			}
-			final String toPID = this.compatibleProcessors.get(procIdx);
-
+			final String toPID = p.pid;
+			final String toVersion = p.version.toString();
 			final Map<String, String> inMap = new HashMap<>();
 			final Map<String, String> outMap = new HashMap<>();
-
-			final int[] inIdx = new int[inputs.size()];
-
 			int i = 0;
 			for (Map.Entry<String, String> in : inputs.entrySet()) {
 				final int idx = inputCombos.get(i).getSelectionModel().getSelectedIndex();
@@ -785,51 +1236,34 @@ public class RepairProjectDialog extends AbstractDialog {
 				outMap.put(out.getKey(), outputKeys.get(i).get(idx));
 				i++;
 			}
-
-			return new PipelineData.ProcessorSwap(pid, toPID, inMap, outMap);
+			return new PipelineData.ProcessorSwap(pid, version, toPID, toVersion, inMap, outMap);
 		}
-
-		@Override
-		public Parent node() {
-			return parent;
-		}
-
 	}
 
 	/**
 	 * Repair missing processor/OSGI services section.
 	 */
-	private static class RepairServiceSection implements RepairSection, Localizable {
+	private static class RepairServiceSection extends RepairSectionBase {
 
-		private final ProjectData projectData;
-		private final VBox parent = new VBox();
-		private final Label title = new Label(localize("pipeline.services.missing"));
-		private final ListView<Listable> listView = Listable.newListView();
 		private final List<InvalidService> items = new ArrayList<>();
-		private final BooleanProperty repairedProperty = new SimpleBooleanProperty(false);
-		private final ChangeListener repairedListener = (obs, a, b) -> updateRepairedProperty();
 
 		public RepairServiceSection(ApplicationHandler handler, Stage stage, ProjectData projectData, ProjectData.ValidationResult validation) {
-			this.projectData = projectData;
-			for (String pid : validation.missingServices) {
-				final InvalidService is = new InvalidService(pid, projectData, handler);
-				is.repairedProperty().addListener(repairedListener);
-				items.add(is);
-				listView.getItems().add(is);
+			super(stage, projectData, validation, L10n.getInstance().getString("pipeline.services.missing"));
+
+			for (String pid : validation.missingServices.keySet()) {
+				final Set<String> versions = validation.missingServices.get(pid);
+				for (String version : versions) {
+					final InvalidService is = new InvalidService(pid, version, projectData, handler);
+					is.repairedProperty.addListener(repairedListener);
+					items.add(is);
+				}
 			}
-
-			parent.getChildren().addAll(title, listView);
-
-			/**/
-			repairedProperty.set(true);
+			listView.getItems().addAll(items);
+			updateRepairedProperty();
 		}
 
 		@Override
-		public Parent getComponent() {
-			return parent;
-		}
-
-		private void updateRepairedProperty() {
+		final void updateRepairedProperty() {
 			for (InvalidService item : items) {
 				if (!item.repairedProperty().get()) {
 					repairedProperty.set(false);
@@ -875,14 +1309,7 @@ public class RepairProjectDialog extends AbstractDialog {
 					}
 				}
 			}
-
 		}
-
-		@Override
-		public ReadOnlyBooleanProperty repairedProperty() {
-			return repairedProperty;
-		}
-
 	}
 
 }

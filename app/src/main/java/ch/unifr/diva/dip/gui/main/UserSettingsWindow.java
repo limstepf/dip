@@ -187,7 +187,7 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 					final LabelParameter foldLabel = new LabelParameter(localize("pipeline.auto.rearrange.fold") + ": ");
 					final BooleanParameter rearrangeOnLayout = new BooleanParameter(
 							"",
-							handler.settings.pipelineEditor.autoRearrangeOnChangedLayoutStrategy,
+							handler.settings.pipelineEditor.autoRearrangeOnChangedLayout,
 							localize("yes"),
 							localize("no")
 					);
@@ -210,7 +210,7 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 
 			@Override
 			public void save() {
-				handler.settings.pipelineEditor.autoRearrangeOnChangedLayoutStrategy = (boolean) this.parameter.get().get(0);
+				handler.settings.pipelineEditor.autoRearrangeOnChangedLayout = (boolean) this.parameter.get().get(0);
 				handler.settings.pipelineEditor.autoRearrangeOnProcessorFold = (boolean) this.parameter.get().get(1);
 			}
 		});

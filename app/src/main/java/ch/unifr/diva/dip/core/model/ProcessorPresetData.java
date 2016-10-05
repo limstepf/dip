@@ -1,6 +1,5 @@
 package ch.unifr.diva.dip.core.model;
 
-import ch.unifr.diva.dip.api.parameters.Parameter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,8 +30,6 @@ public class ProcessorPresetData {
 
 	public static class Preset {
 
-		// arbitrary name in case of a public presets file (per processor), or
-		// string-representation of the internal processor id in a pipeline
 		@XmlAttribute
 		public String name;
 

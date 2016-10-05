@@ -108,6 +108,20 @@ public class UIStrategyGUI implements UIStrategy {
 		 */
 		public static final Color accent = Color.web("0x0096C9");
 
+		/**
+		 * Ok status color.
+		 */
+		public static final Color ok = Color.FORESTGREEN;
+
+		/**
+		 * Warning/alert status color.
+		 */
+		public static final Color warning = Color.GOLD;
+
+		/**
+		 * Error status color.
+		 */
+		public static final Color error = Color.ORANGERED;
 	}
 
 	/**
@@ -141,45 +155,92 @@ public class UIStrategyGUI implements UIStrategy {
 		 * a special glyph.
 		 */
 		public static final NamedGlyph defaultProcessor = MaterialDesignIcons.CHIP;
-	}
 
-	/**
-	 * Creates a new glyph in normal size and default color.
-	 *
-	 * @param glyph the named glyph (or glyph factory).
-	 * @return a new glyph.
-	 */
-	public static Glyph newGlyph(NamedGlyph glyph) {
-		return newGlyph(glyph, Glyph.Size.NORMAL, Colors.accent);
-	}
+		/**
+		 * Default ok glyph.
+		 */
+		public static final NamedGlyph ok = MaterialDesignIcons.CHECK_CIRCLE;
 
-	/**
-	 * Creates a new glyph in default color.
-	 *
-	 * @param glyph the named glyph (or glyph factory).
-	 * @param size the size of the glyph. Consider using one of the standardized
-	 * sizes defined on the {@code Size} enum. The font size specified in points
-	 * which are a real world measurement of approximately 1/72 inch.
-	 * @return a new glyph.
-	 */
-	public static Glyph newGlyph(NamedGlyph glyph, Glyph.Size size) {
-		return newGlyph(glyph, size, Colors.accent);
-	}
+		/**
+		 * Default warning/alert glyph.
+		 */
+		public static final NamedGlyph warning = MaterialDesignIcons.ALERT_CIRCLE;
 
-	/**
-	 * Creates a new glyph.
-	 *
-	 * @param glyph the named glyph (or glyph factory).
-	 * @param size the size of the glyph. Consider using one of the standardized
-	 * sizes defined on the {@code Size} enum. The font size specified in points
-	 * which are a real world measurement of approximately 1/72 inch.
-	 * @param color the color of the glyph.
-	 * @return a new glyph.
-	 */
-	public static Glyph newGlyph(NamedGlyph glyph, Glyph.Size size, Color color) {
-		final Glyph g = glyph.get(size.pt);
-		g.setColor(color);
-		return g;
+		/**
+		 * Default error glyph.
+		 */
+		public static final NamedGlyph error = MaterialDesignIcons.CLOSE_CIRCLE;
+
+		/**
+		 * Returns a new ok status glyph.
+		 *
+		 * @param size the size of the glyph.
+		 * @return new ok status glyph.
+		 */
+		public static Glyph newOkGlyph(Glyph.Size size) {
+			return newGlyph(ok, Glyph.Size.NORMAL, Colors.ok);
+		}
+
+		/**
+		 * Returns a new warning/alert status glyph.
+		 *
+		 * @param size the size of the glyph.
+		 * @return new warning status glyph.
+		 */
+		public static Glyph newWarningGlyph(Glyph.Size size) {
+			return newGlyph(warning, Glyph.Size.NORMAL, Colors.warning);
+		}
+
+		/**
+		 * Returns a new error status glyph.
+		 *
+		 * @param size the size of the glyph.
+		 * @return new error status glyph.
+		 */
+		public static Glyph newErrorGlyph(Glyph.Size size) {
+			return newGlyph(error, Glyph.Size.NORMAL, Colors.error);
+		}
+
+		/**
+		 * Creates a new glyph in normal size and default color.
+		 *
+		 * @param glyph the named glyph (or glyph factory).
+		 * @return a new glyph.
+		 */
+		public static Glyph newGlyph(NamedGlyph glyph) {
+			return newGlyph(glyph, Glyph.Size.NORMAL, Colors.accent);
+		}
+
+		/**
+		 * Creates a new glyph in default color.
+		 *
+		 * @param glyph the named glyph (or glyph factory).
+		 * @param size the size of the glyph. Consider using one of the
+		 * standardized sizes defined on the {@code Size} enum. The font size
+		 * specified in points which are a real world measurement of
+		 * approximately 1/72 inch.
+		 * @return a new glyph.
+		 */
+		public static Glyph newGlyph(NamedGlyph glyph, Glyph.Size size) {
+			return newGlyph(glyph, size, Colors.accent);
+		}
+
+		/**
+		 * Creates a new glyph.
+		 *
+		 * @param glyph the named glyph (or glyph factory).
+		 * @param size the size of the glyph. Consider using one of the
+		 * standardized sizes defined on the {@code Size} enum. The font size
+		 * specified in points which are a real world measurement of
+		 * approximately 1/72 inch.
+		 * @param color the color of the glyph.
+		 * @return a new glyph.
+		 */
+		public static Glyph newGlyph(NamedGlyph glyph, Glyph.Size size, Color color) {
+			final Glyph g = glyph.get(size.pt);
+			g.setColor(color);
+			return g;
+		}
 	}
 
 }

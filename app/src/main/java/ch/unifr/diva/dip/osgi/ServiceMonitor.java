@@ -1,6 +1,8 @@
 package ch.unifr.diva.dip.osgi;
 
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
+import org.osgi.framework.Version;
 
 /**
  * Services monitor safe to be accessed from the JavaFX application thread.
@@ -10,91 +12,174 @@ import javafx.collections.ObservableList;
 public interface ServiceMonitor<T> {
 
 	/**
-	 * Observable list of registered services.
+	 * Returns an observable list of all tracked service collections.
 	 *
-	 * @return observable list of registered services.
+	 * @return an observable list of service collections.
 	 */
-	public ObservableList<Service<T>> services();
+	public ObservableList<OSGiServiceCollection<T>> getServiceCollectionList();
 
 	/**
-	 * Returns the requested service.
+	 * Returns an observable map of all tracked service collections.
 	 *
-	 * @param pid PID of the service.
-	 * @return the requested service, or null if not available.
+	 * @return an observable map of service collections, indexed by their PID.
 	 */
-	default Service<T> getService(String pid) {
-		for (Service<T> s : services()) {
-			if (s.pid.equals(pid)) {
-				return s;
-			}
-		}
-		return null;
+	public ObservableMap<String, OSGiServiceCollection<T>> getServiceCollectionMap();
+
+	/**
+	 * Returns a service collection.
+	 *
+	 * @param pid the PID of the service collection.
+	 * @return the service collection, or null if not available.
+	 */
+	default OSGiServiceCollection<T> getServiceCollection(String pid) {
+		return getServiceCollectionMap().get(pid);
 	}
 
 	/**
-	 * Checks whether a service is available, or not.
+	 * Returns the latest version of a service.
+	 *
+	 * @param pid the PID of the service.
+	 * @return the latest service, or null if not available.
+	 */
+	default OSGiService<T> getService(String pid) {
+		final OSGiServiceCollection<T> collection = getServiceCollection(pid);
+		if (collection == null) {
+			return null;
+		}
+		return collection.getService();
+	}
+
+	/**
+	 * Checks whether a service (any version) is available.
 	 *
 	 * @param pid PID of the service.
 	 * @return True if the service is available, False otherwise.
 	 */
 	default boolean isAvailable(String pid) {
-		return (getService(pid) != null);
+		return getService(pid) != null;
 	}
 
 	/**
-	 * A service object.
+	 * Returns a certain version of a service.
 	 *
-	 * @param <T> type/interface of the service.
+	 * @param pid the PID of the service.
+	 * @param major the major version.
+	 * @return the latest service with given major version, or null if not
+	 * available.
 	 */
-	public static class Service<T> {
-
-		/**
-		 * PID of the service.
-		 */
-		public final String pid;
-
-		/**
-		 * The service.
-		 */
-		public final T service;
-
-		/**
-		 * Creates a new service wrapper.
-		 *
-		 * @param pid PID of the service.
-		 * @param service the service.
-		 */
-		public Service(String pid, T service) {
-			this.pid = pid;
-			this.service = service;
+	default OSGiService<T> getService(String pid, int major) {
+		final OSGiServiceCollection<T> collection = getServiceCollection(pid);
+		if (collection == null) {
+			return null;
 		}
+		return collection.getService(major);
+	}
 
-		@Override
-		public int hashCode() {
-			return pid.hashCode();
-		}
+	/**
+	 * Checks whether a certain version of a service is available.
+	 *
+	 * @param pid the PID of the service.
+	 * @param major the major version.
+	 * @return True if the service is available, False otherwise.
+	 */
+	default boolean isAvailable(String pid, int major) {
+		return getService(pid, major) != null;
+	}
 
-		@Override
-		public boolean equals(Object obj) {
-			if (obj == null) {
-				return false;
-			}
-			if (getClass() != obj.getClass()) {
-				return false;
-			}
-			final Service other = (Service) obj;
-			return this.pid.equals(other.pid);
+	/**
+	 * Returns a certain version of a service.
+	 *
+	 * @param pid the PID of the service.
+	 * @param major the major version.
+	 * @param minor the minor version.
+	 * @return the latest service with given major and minor version, or null if
+	 * not available.
+	 */
+	default OSGiService<T> getService(String pid, int major, int minor) {
+		final OSGiServiceCollection<T> collection = getServiceCollection(pid);
+		if (collection == null) {
+			return null;
 		}
+		return collection.getService(major, minor);
+	}
 
-		@Override
-		public String toString() {
-			return this.getClass().getSimpleName()
-					+ "@" + Integer.toHexString(this.hashCode())
-					+ "{"
-					+ "pid=" + this.pid
-					+ ", service=" + this.service
-					+ "}";
+	/**
+	 * Checks whether a certain version of a service is available.
+	 *
+	 * @param pid the PID of the service.
+	 * @param major the major version.
+	 * @param minor the minor version.
+	 * @return True if the service is available, False otherwise.
+	 */
+	default boolean isAvailable(String pid, int major, int minor) {
+		return getService(pid, major, minor) != null;
+	}
+
+	/**
+	 * Returns a certain version of a service.
+	 *
+	 * @param pid the PID of the service.
+	 * @param major the major version.
+	 * @param minor the minor version.
+	 * @param micro the micro version.
+	 * @return the requested service, or null if not available.
+	 */
+	default OSGiService<T> getService(String pid, int major, int minor, int micro) {
+		final OSGiServiceCollection<T> collection = getServiceCollection(pid);
+		if (collection == null) {
+			return null;
 		}
+		return collection.getService(major, minor, micro);
+	}
+
+	/**
+	 * Returns a specific version of a service.
+	 *
+	 * @param pid the PID of the service.
+	 * @param version the semantic version of the service.
+	 * @return the requested service, or null if not available.
+	 */
+	default OSGiService<T> getService(String pid, Version version) {
+		final OSGiServiceCollection<T> collection = getServiceCollection(pid);
+		if (collection == null) {
+			return null;
+		}
+		return collection.getService(version);
+	}
+
+	/**
+	 * Checks whether a certain version of a service is available.
+	 *
+	 * @param pid the PID of the service.
+	 * @param major the major version.
+	 * @param minor the minor version.
+	 * @param micro the micro version.
+	 * @return True if the service is available, False otherwise.
+	 */
+	default boolean isAvailable(String pid, int major, int minor, int micro) {
+		return getService(pid, major, minor, micro) != null;
+	}
+
+	/**
+	 * Checks whether a specific version of a service is available.
+	 *
+	 * @param pid the PID of the service.
+	 * @param version the semantic version of the service.
+	 * @return True if the service is available, False otherwise.
+	 */
+	default boolean isAvailable(String pid, String version) {
+		return isAvailable(pid, new Version(version));
+	}
+
+	/**
+	 * Checks whether a specific version of a service is available.
+	 *
+	 * @param pid the PID of the service.
+	 * @param version the semantic version of the service.
+	 * @return True if the service is available, False otherwise.
+	 */
+	default boolean isAvailable(String pid, Version version) {
+		return getService(pid, version) != null;
 	}
 
 }

@@ -6,6 +6,7 @@ import ch.unifr.diva.dip.core.model.PipelineLayoutStrategy;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import ch.unifr.diva.dip.gui.layout.ZoomPane;
 import ch.unifr.diva.dip.gui.pe.ConnectionView;
+import ch.unifr.diva.dip.osgi.OSGiVersionPolicy;
 import java.nio.file.Path;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.Region;
@@ -28,12 +29,24 @@ public class UserSettings {
 	 */
 	public Locale locale = new Locale();
 
+	/**
+	 * User locale object.
+	 */
 	@XmlRootElement
 	public static class Locale {
 
+		/**
+		 * The language of the locale. ISO 639 alpha-2 or alpha-3 language code,
+		 * or registered language subtags up to 8 alpha letters (for future
+		 * enhancements).
+		 */
 		@XmlAttribute
 		public String language = "en";
 
+		/**
+		 * The country (region) of the locale. ISO 3166 alpha-2 country code or
+		 * UN M.49 numeric-3 area code.
+		 */
 		@XmlAttribute
 		public String country = null;
 	}
@@ -60,24 +73,45 @@ public class UserSettings {
 	 */
 	public PrimaryStage pipelineStage = new PrimaryStage();
 
+	/**
+	 * Primary stage object.
+	 */
 	@XmlRootElement
 	public static class PrimaryStage {
 
+		/**
+		 * The X position of the primary stage.
+		 */
 		@XmlAttribute
 		public int x = -1;
 
+		/**
+		 * The Y position of the primary stage.
+		 */
 		@XmlAttribute
 		public int y = -1;
 
+		/**
+		 * The width of the primary stage.
+		 */
 		@XmlAttribute
 		public int width = 640;
 
+		/**
+		 * The height of the primary stage.
+		 */
 		@XmlAttribute
 		public int height = 380;
 
+		/**
+		 * Whether or not the stage is maximized.
+		 */
 		@XmlAttribute
 		public boolean maximized = false;
 
+		/**
+		 * The position of the side bar divider.
+		 */
 		@XmlAttribute
 		public double sideBarDivider = 0.75;
 	}
@@ -163,9 +197,15 @@ public class UserSettings {
 	 */
 	public Editor editor = new Editor();
 
+	/**
+	 * Editor object.
+	 */
 	@XmlRootElement
 	public static class Editor {
 
+		/**
+		 * The interpolation method/algorithm to be used by the main editor.
+		 */
 		@XmlAttribute
 		public String interpolation = ZoomPane.Interpolation.BILINEAR.name();
 
@@ -176,18 +216,35 @@ public class UserSettings {
 	 */
 	public PipelineEditor pipelineEditor = new PipelineEditor();
 
+	/**
+	 * Pipeline editor object.
+	 */
 	@XmlRootElement
 	public static class PipelineEditor {
 
+		/**
+		 * The default connection/wire type.
+		 */
 		@XmlAttribute
 		public String connectionType = ConnectionView.Type.getDefault().name();
 
+		/**
+		 * The default pipeline layout.
+		 */
 		@XmlAttribute
 		public String pipelineLayout = PipelineLayoutStrategy.getDefault().name();
 
+		/**
+		 * Whether or not to auto-rearrange all processors in the pipeline
+		 * editor upon changing the pipeline layout.
+		 */
 		@XmlAttribute
-		public boolean autoRearrangeOnChangedLayoutStrategy = true;
+		public boolean autoRearrangeOnChangedLayout = true;
 
+		/**
+		 * Whether or not to auto-rearrange all processors in the pipeline
+		 * editor upon un-/folding a single processor.
+		 */
 		@XmlAttribute
 		public boolean autoRearrangeOnProcessorFold = false;
 
@@ -210,6 +267,25 @@ public class UserSettings {
 		public PipelineLayoutStrategy getDefaultPipelineLayout() {
 			return PipelineLayoutStrategy.get(pipelineLayout);
 		}
+	}
+
+	/**
+	 * OSGi framework settings.
+	 */
+	public OSGi osgi = new OSGi();
+
+	/**
+	 * OSGi object.
+	 */
+	@XmlRootElement
+	public static class OSGi {
+
+		/**
+		 * The default OSGi service (auto) upgrade policy.
+		 */
+		@XmlAttribute
+		public OSGiVersionPolicy versionPolicy = OSGiVersionPolicy.getDefault();
+
 	}
 
 	/**

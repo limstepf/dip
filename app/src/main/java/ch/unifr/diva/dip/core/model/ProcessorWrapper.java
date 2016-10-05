@@ -15,6 +15,7 @@ import ch.unifr.diva.dip.core.services.api.HostProcessorContext;
 import ch.unifr.diva.dip.api.utils.ReflectionUtils;
 import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
+import ch.unifr.diva.dip.osgi.OSGiService;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import org.osgi.framework.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +57,7 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	public final int id;
 
 	protected volatile String pid;
+	protected final Version version;
 	protected volatile Processor processor;
 	protected volatile boolean isHostProcessor;
 	protected final DoubleProperty layoutXProperty;
@@ -76,6 +79,7 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 		this(
 				processor.id,
 				processor.pid,
+				processor.version,
 				processor.x,
 				processor.y,
 				processor.editing,
@@ -90,14 +94,16 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	 * @param id new, unique id of the ProcessorWrapper, usually assigned by the
 	 * parent pipeline.
 	 * @param pid pid of the wrapped processor.
+	 * @param version version of the wrapped processor.
 	 * @param x x position of the processor view.
 	 * @param y y position of the processor view.
 	 * @param handler the application handler.
 	 */
-	public ProcessorWrapper(int id, String pid, double x, double y, ApplicationHandler handler) {
+	public ProcessorWrapper(int id, String pid, String version, double x, double y, ApplicationHandler handler) {
 		this(
 				id,
 				pid,
+				version,
 				x,
 				y,
 				false,
@@ -106,9 +112,10 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 		);
 	}
 
-	private ProcessorWrapper(int id, String pid, double x, double y, boolean editing, Map<String, Object> parameters, ApplicationHandler handler) {
+	private ProcessorWrapper(int id, String pid, String version, double x, double y, boolean editing, Map<String, Object> parameters, ApplicationHandler handler) {
 		this.id = id;
 		this.pid = pid;
+		this.version = new Version(version);
 		this.handler = handler;
 		this.layoutXProperty = new SimpleDoubleProperty(x);
 		this.layoutYProperty = new SimpleDoubleProperty(y);
@@ -243,6 +250,15 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	}
 
 	/**
+	 * Returns the version of the wrapped processor.
+	 *
+	 * @return the version of the wrapped processor.
+	 */
+	public Version version() {
+		return version;
+	}
+
+	/**
 	 * Returns the wrapped processor.
 	 *
 	 * @return the wrapped processor instance.
@@ -280,7 +296,7 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	 * processor services.
 	 */
 	public void updateProcessor(boolean forceInit) {
-		final Processor newProcessor = getProcessor(pid);
+		final Processor newProcessor = getProcessor(pid, version);
 
 		if (newProcessor == null) {
 			availableProperty.set(false);
@@ -386,7 +402,13 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 			final Parameter p = processor.parameters().get(key);
 			if (p.isPersistent()) {
 				final PersistentParameter pp = (PersistentParameter) p;
-				pp.set(value);
+				try {
+					pp.set(value);
+				} catch (ClassCastException ex) {
+					// this cast might go wrong upon having updated or replaced
+					// a processor - which is okay. The parameter is lost.
+					log.warn("Invalid processor parameter: {}={}, in: {}", key, value, this);
+				}
 			}
 		}
 	}
@@ -428,7 +450,7 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	 * @param pid id of the processor service.
 	 * @return a new instance of the processor.
 	 */
-	private Processor getProcessor(String pid) {
+	private Processor getProcessor(String pid, Version version) {
 		// check if pid is a host processor
 		final Class<?> clazz = getHostProcessorClass(pid);
 		if (clazz != null) {
@@ -438,7 +460,7 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 
 		// return osgi service processor otherwise
 		this.isHostProcessor = false;
-		return newProcessor(pid);
+		return newProcessor(pid, version);
 	}
 
 	/**
@@ -471,9 +493,13 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	 * @param pid pid of the processor.
 	 * @return new instance of a processor, or null.
 	 */
-	private Processor newProcessor(String pid) {
-		final Processor proc = handler.osgi.getProcessor(pid);
-		if (proc != null) {
+	private Processor newProcessor(String pid, Version version) {
+		final OSGiService<Processor> service = handler.osgi.getProcessor(
+				pid,
+				version
+		);
+		if (service != null) {
+			final Processor proc = service.serviceObject;
 			try {
 				final ProcessorContext context = getProcessorContext();
 				// make sure to use constructur without args unless we actually
@@ -616,6 +642,7 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 		 * Unique id of the ProcessorWrapper/RunnableProcessor.
 		 */
 		public final int id;
+
 		/**
 		 * Unique key of the port.
 		 */

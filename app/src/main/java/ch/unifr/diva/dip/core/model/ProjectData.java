@@ -1,10 +1,14 @@
 package ch.unifr.diva.dip.core.model;
 
+import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.utils.IOUtils;
 import ch.unifr.diva.dip.api.utils.XmlUtils;
 import ch.unifr.diva.dip.utils.ZipFileSystem;
 import ch.unifr.diva.dip.api.utils.jaxb.PathAdapter;
 import ch.unifr.diva.dip.core.ApplicationHandler;
+import ch.unifr.diva.dip.osgi.OSGiService;
+import ch.unifr.diva.dip.osgi.OSGiVersionPolicy;
+import ch.unifr.diva.dip.osgi.ServiceCollection;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -24,6 +28,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.osgi.framework.Version;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@code ProjectData} is just that; a pure data object (as in a struct) and not
@@ -38,6 +44,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlRootElement
 public class ProjectData {
 
+	private static final org.slf4j.Logger log = LoggerFactory.getLogger(ProjectData.class);
+
 	/**
 	 * The project's root XML file.
 	 */
@@ -50,10 +58,16 @@ public class ProjectData {
 	@XmlTransient
 	public static final String PROJECT_PIPELINES_XML = "/pipelines.xml";
 
-	// just used to pass ZipFileSystem pointer to the Project constructor
+	/**
+	 * The zip file system of the project. Used to pass ZipFileSystem pointer to
+	 * the Project constructor.
+	 */
 	@XmlTransient
 	public ZipFileSystem zip;
 
+	/**
+	 * The path to the zip file system of the project.
+	 */
 	@XmlTransient
 	public Path zipFile;
 
@@ -61,8 +75,16 @@ public class ProjectData {
 	@XmlTransient
 	public PipelineData pipelines;
 
+	/**
+	 * The id of the default pipeline.
+	 */
 	public int defaultPipeline = -1;
 
+	/**
+	 * Returns the pipeline data list.
+	 *
+	 * @return the pipeline data list.
+	 */
 	public List<PipelineData.Pipeline> pipelines() {
 		if (pipelines == null) {
 			return null;
@@ -70,13 +92,21 @@ public class ProjectData {
 		return pipelines.list;
 	}
 
-	// file should be overwritten after reading existing project data since it
-	// could have been moved
+	/**
+	 * The path to the project file. Should be overwritten after reading
+	 * existing project data since it could have been moved.
+	 */
 	@XmlJavaTypeAdapter(PathAdapter.class)
 	public Path file;
 
+	/**
+	 * The name of the project.
+	 */
 	public String name;
 
+	/**
+	 * The list of project pages.
+	 */
 	@XmlElement(name = "pages")
 	public PageList pages = new PageList();
 
@@ -151,6 +181,11 @@ public class ProjectData {
 		return this.pages.list.size() + 1;
 	}
 
+	/**
+	 * Returns the selected page.
+	 *
+	 * @return the selected page.
+	 */
 	public int getSelectedPage() {
 		return this.pages.selectedPage;
 	}
@@ -178,15 +213,60 @@ public class ProjectData {
 	 */
 	public static class ValidationResult {
 
+		/**
+		 * Exceptions that have been thrown during validation.
+		 */
 		public final List<Exception> exceptions = new ArrayList<>();
-		public final Map<Integer, String> checksums = new HashMap<>();
-		public final List<Page> modifiedImages = new ArrayList<>();
-		public final List<Page> movedImages = new ArrayList<>();
-		public final List<Page> missingImages = new ArrayList<>();
-		public final Set<String> missingServices = new HashSet<>();
 
+		/**
+		 * Checksums of modified image files, indexed by page ids.
+		 */
+		public final Map<Integer, String> checksums = new HashMap<>();
+
+		/**
+		 * A list of images that have been modified. I.e. the checksum doesn't
+		 * match.
+		 */
+		public final List<Page> modifiedImages = new ArrayList<>();
+
+		/**
+		 * A list of images that have been moved.
+		 */
+		public final List<Page> movedImages = new ArrayList<>();
+
+		/**
+		 * A list of images that are missing/not found.
+		 */
+		public final List<Page> missingImages = new ArrayList<>();
+
+		/**
+		 * A map of unavailable services. Indexed by PID pointing to the set of
+		 * missing versions/version strings.
+		 */
+		public final Map<String, Set<String>> missingServices = new HashMap<>();
+
+		/**
+		 * Creates a new validation result.
+		 */
 		public ValidationResult() {
 
+		}
+
+		/**
+		 * Adds a missing/unavailable service.
+		 *
+		 * @param pid PID of the service.
+		 * @param version version of the service.
+		 */
+		public void addMissingService(String pid, String version) {
+			final Set<String> versions;
+			if (missingServices.containsKey(pid)) {
+				versions = missingServices.get(pid);
+			} else {
+				versions = new HashSet<>();
+				missingServices.put(pid, versions);
+			}
+			versions.add(version);
 		}
 
 		/**
@@ -260,14 +340,33 @@ public class ProjectData {
 		// check required processors/OSGI services
 		if (pipelines() != null) {
 			for (PipelineData.Pipeline<ProcessorWrapper> pipeline : pipelines()) {
+				final OSGiVersionPolicy policy = OSGiVersionPolicy.get(pipeline.versionPolicy);
+
 				for (PipelineData.Processor processor : pipeline.processors()) {
-					if (handler.osgi.processors.isAvailable(processor.pid)) {
-						continue;
+					// retrieve service by pipeline's version policy. If a service is available it's
+					// either the exact version, or an up-/downgraded one. If null, the service is
+					// unavailable (and needs to be manually replaced or something...)
+					final ServiceCollection<Processor> collection = handler.osgi.getProcessorCollection(processor.pid);
+					final OSGiService<Processor> service = policy.getService(collection, new Version(processor.version));
+					if (service != null) {
+						final String versionByPolicy = service.version.toString();
+						if (versionByPolicy.equals(processor.version)) {
+							// exact same version is available
+							continue;
+						} else {
+							// different version has been supplied, auto-update
+							log.info(
+									"OSGi Service {} up-/downgraded from {} to {} by version policy: {}",
+									processor.pid, processor.version, versionByPolicy, policy
+							);
+							processor.version = versionByPolicy;
+							continue;
+						}
+					} else {
+						// service is not available
 					}
-					if (handler.osgi.hostProcessors.isAvailable(processor.pid)) {
-						continue;
-					}
-					v.missingServices.add(processor.pid);
+
+					v.addMissingService(processor.pid, processor.version);
 				}
 			}
 		}
@@ -326,26 +425,58 @@ public class ProjectData {
 		XmlUtils.marshal(this, stream);
 	}
 
+	/**
+	 * A page list object.
+	 */
 	@XmlRootElement
 	public static class PageList {
 
+		/**
+		 * The id of the selected page.
+		 */
 		@XmlAttribute(name = "selected")
 		public int selectedPage = 1;
 
+		/**
+		 * The list of pages.
+		 */
 		@XmlElement(name = "page")
 		public List<Page> list = new ArrayList<>();
 	}
 
+	/**
+	 * Page object.
+	 */
 	@XmlRootElement
 	public static class Page {
 
+		/**
+		 * The id of the page.
+		 */
 		@XmlAttribute
 		public int id = -1;
+
+		/**
+		 * The id of the used/parent pipeline.
+		 */
 		@XmlAttribute(name = "pipeline")
 		public int pipelineId = -1;
+
+		/**
+		 * The name of the page. Get's initialized to the filename of the image
+		 * file, but can be changed to anything.
+		 */
 		public String name;
+
+		/**
+		 * The path to the image file of the page.
+		 */
 		@XmlJavaTypeAdapter(PathAdapter.class)
 		public Path file;
+
+		/**
+		 * The checksum of the image file of the page.
+		 */
 		public String checksum;
 
 		@Override
@@ -366,14 +497,38 @@ public class ProjectData {
 		public Page() {
 		}
 
+		/**
+		 * Creates a new page object.
+		 *
+		 * @param id the id of the page.
+		 * @param file the image of the page.
+		 * @throws IOException
+		 */
 		public Page(int id, Path file) throws IOException {
 			this(id, null, file, IOUtils.checksum(file), -1);
 		}
 
+		/**
+		 * Creates a new page object.
+		 *
+		 * @param id the id of the page.
+		 * @param file the image of the page.
+		 * @param pipelineId the id of the used/parent pipeline.
+		 * @throws IOException
+		 */
 		public Page(int id, Path file, int pipelineId) throws IOException {
 			this(id, null, file, IOUtils.checksum(file), pipelineId);
 		}
 
+		/**
+		 * Creates a new page object.
+		 *
+		 * @param id the id of the page.
+		 * @param name the name of the page.
+		 * @param file the path to the image file of the page.
+		 * @param checksum the checksum of the image file.
+		 * @param pipelineId the id of the used/parent pipeline.
+		 */
 		public Page(int id, String name, Path file, String checksum, int pipelineId) {
 			this.id = id;
 			if (name == null) {
@@ -395,6 +550,11 @@ public class ProjectData {
 			return defaultName;
 		}
 
+		/**
+		 * Returns the path to the pipeline XML file.
+		 *
+		 * @return the path to the pipeline XML file.
+		 */
 		public String pipelineXmlPath() {
 			return String.format(ProjectPage.PIPELINE_XML_FORMAT, id);
 		}

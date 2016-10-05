@@ -1,6 +1,9 @@
 package ch.unifr.diva.dip.gui.pe;
 
 import ch.unifr.diva.dip.api.parameters.EnumParameter;
+import ch.unifr.diva.dip.api.ui.KeyEventHandler;
+import ch.unifr.diva.dip.api.ui.MouseEventHandler;
+import ch.unifr.diva.dip.api.ui.MouseEventHandler.ClickCount;
 import ch.unifr.diva.dip.api.utils.L10n;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.ApplicationSettings;
@@ -12,6 +15,7 @@ import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import ch.unifr.diva.dip.gui.AbstractWidget;
 import ch.unifr.diva.dip.gui.dialogs.ErrorDialog;
 import ch.unifr.diva.dip.gui.layout.DraggableListCell;
+import ch.unifr.diva.dip.gui.layout.FormGridPane;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +41,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
@@ -142,6 +145,9 @@ public class PipelinesWidget extends AbstractWidget {
 		return chooser;
 	}
 
+	/**
+	 * View of the pipelines widget.
+	 */
 	public static class View extends VBox implements Localizable {
 
 		private static final org.slf4j.Logger log = LoggerFactory.getLogger(PipelineEditor.class);
@@ -161,6 +167,11 @@ public class PipelinesWidget extends AbstractWidget {
 			);
 		};
 
+		/**
+		 * Creates a new view of the pipelines widget.
+		 *
+		 * @param widget the pipelines widget.
+		 */
 		public View(PipelinesWidget widget) {
 			this.widget = widget;
 			setMaxHeight(Double.MAX_VALUE);
@@ -222,24 +233,24 @@ public class PipelinesWidget extends AbstractWidget {
 		private final Label label = new Label();
 		private final Label statusLabel = new Label();
 		private static final Tooltip defaultPipelineTooltip = new Tooltip();
-		private PipelineCellEditBox editingBox;
-
 		private final InvalidationListener defaultListener = (obs) -> {
 			updateDefault();
 			this.layout();
 		};
-		private final EventHandler<KeyEvent> onEnterHandler = (e) -> {
-			if (e.getCode() == KeyCode.ENTER) {
-				cancelEdit();
-				e.consume();
-			}
-		};
-		private final EventHandler<MouseEvent> onDoubleClickHandler = (e) -> {
-			if (e.getClickCount() == 2) {
-				cancelEdit();
-				e.consume();
-			}
-		};
+		private final EventHandler<KeyEvent> onEnterHandler = new KeyEventHandler(
+				KeyCode.ENTER,
+				(e) -> {
+					cancelEdit();
+					return true;
+				}
+		);
+		private final EventHandler<MouseEvent> onDoubleClickHandler = new MouseEventHandler(
+				ClickCount.DOUBLE_CLICK,
+				(e) -> {
+					cancelEdit();
+					return true;
+				}
+		);
 		private Pipeline currentPipeline;
 
 		/**
@@ -268,13 +279,13 @@ public class PipelinesWidget extends AbstractWidget {
 		}
 
 		// lazily initialize the editing box
+		private PipelineCellEditBox editBox;
+
 		private PipelineCellEditBox editBox() {
-			if (editingBox == null) {
-				editingBox = new PipelineCellEditBox();
-				editingBox.textField.setOnKeyPressed(onEnterHandler);
-				editingBox.layoutStrategy.view().node().setOnKeyPressed(onEnterHandler);
+			if (editBox == null) {
+				editBox = new PipelineCellEditBox(onEnterHandler);
 			}
-			return editingBox;
+			return editBox;
 		}
 
 		private boolean isPipelineSelected() {
@@ -333,9 +344,9 @@ public class PipelinesWidget extends AbstractWidget {
 			getListView().addEventHandler(MouseEvent.MOUSE_CLICKED, onDoubleClickHandler);
 
 			final PipelineCellEditBox edit = editBox();
-			edit.update(currentPipeline, label.getText());
+			edit.init(currentPipeline, label.getText());
 
-			pane.setCenter(edit.vbox);
+			pane.setCenter(edit);
 
 			// this seems to be necessary since we ommit commitEdit and just
 			// use cancelEdit. Might also be a bug, who knows...
@@ -350,17 +361,13 @@ public class PipelinesWidget extends AbstractWidget {
 			getListView().removeEventHandler(MouseEvent.MOUSE_CLICKED, onDoubleClickHandler);
 
 			final PipelineCellEditBox edit = editBox();
-			final String tf = edit.textField.getText();
+			final String tf = edit.getPipelineName();
 			if (!tf.equals(label.getText())) {
 				label.setText(tf);
 				currentPipeline.setName(tf);
 			}
 
-			final PipelineLayoutStrategy pls = EnumParameter.valueOf(
-					edit.layoutStrategy.get(),
-					PipelineLayoutStrategy.class,
-					PipelineLayoutStrategy.LEFTRIGHT
-			);
+			final PipelineLayoutStrategy pls = edit.getLayoutStrategy();
 			if (!currentPipeline.getLayoutStrategy().equals(pls)) {
 				currentPipeline.setLayoutStrategy(pls);
 				editor.editorPane().updateAllProcessors();
@@ -376,36 +383,68 @@ public class PipelinesWidget extends AbstractWidget {
 	}
 
 	/**
-	 * Editing box of a pipeline cell.
+	 * Edit box of a pipeline cell.
 	 */
-	public static class PipelineCellEditBox {
+	public static class PipelineCellEditBox extends VBox {
 
-		public final VBox vbox = new VBox();
-		public final TextField textField = new TextField();
-		public final EnumParameter layoutStrategy = new EnumParameter(
-				L10n.getInstance().getString("pipeline.layout.strategy"),
-				PipelineLayoutStrategy.class,
-				PipelineLayoutStrategy.LEFTRIGHT.name()
-		);
+		private final FormGridPane grid;
+		private final TextField pipelineName;
+		private final EnumParameter layoutStrategy;
 
-		public PipelineCellEditBox() {
-			final HBox lsbox = new HBox();
-			lsbox.setSpacing(UIStrategyGUI.Stage.insets);
-			final Label lslabel = new Label(layoutStrategy.label() + ": ");
-			lslabel.getStyleClass().add("dip-small");
-			lsbox.getChildren().setAll(
-					lslabel,
-					layoutStrategy.view().node()
+		/**
+		 * Creates a new edit box for a pipeline cell.
+		 *
+		 * @param onEnterHandler the enter handler to close and save/update.
+		 */
+		public PipelineCellEditBox(EventHandler<KeyEvent> onEnterHandler) {
+			this.grid = new FormGridPane();
+			this.grid.setPadding(new Insets(0, 0, UIStrategyGUI.Stage.insets * 2, 0));
+			this.pipelineName = new TextField();
+			VBox.setMargin(pipelineName, new Insets(0, 0, 2, 0));
+			pipelineName.setOnKeyPressed(onEnterHandler);
+			this.layoutStrategy = new EnumParameter(
+					L10n.getInstance().getString("pipeline.layout.strategy"),
+					PipelineLayoutStrategy.class,
+					PipelineLayoutStrategy.LEFTRIGHT.name()
 			);
-			HBox.setHgrow(layoutStrategy.view().node(), Priority.ALWAYS);
+			layoutStrategy.view().node().setOnKeyPressed(onEnterHandler);
+			grid.addParameters(layoutStrategy);
 
-			vbox.setSpacing(UIStrategyGUI.Stage.insets);
-			vbox.getChildren().setAll(textField, lsbox);
+			this.setSpacing(UIStrategyGUI.Stage.insets);
+			this.getChildren().setAll(pipelineName, grid);
 		}
 
-		public void update(Pipeline pipeline, String name) {
+		/**
+		 * Inits the edit box with a new pipeline.
+		 *
+		 * @param pipeline the pipeline.
+		 * @param name the name of the pipeline.
+		 */
+		public void init(Pipeline pipeline, String name) {
 			layoutStrategy.set(pipeline.getLayoutStrategy().name());
-			textField.setText(name);
+			pipelineName.setText(name);
+		}
+
+		/**
+		 * Returns the (new) name of the pipeline.
+		 *
+		 * @return the name of the pipeline.
+		 */
+		public String getPipelineName() {
+			return pipelineName.getText();
+		}
+
+		/**
+		 * Returns the (new) layout strategy of the pipeline.
+		 *
+		 * @return the layout strategy of the pipeline.
+		 */
+		public PipelineLayoutStrategy getLayoutStrategy() {
+			return EnumParameter.valueOf(
+					layoutStrategy.get(),
+					PipelineLayoutStrategy.class,
+					PipelineLayoutStrategy.LEFTRIGHT
+			);
 		}
 	}
 

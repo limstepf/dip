@@ -5,6 +5,7 @@ import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.ui.Localizable;
+import ch.unifr.diva.dip.osgi.OSGiVersionPolicy;
 import ch.unifr.diva.dip.utils.Modifiable;
 import ch.unifr.diva.dip.utils.ModifiedProperty;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Pipeline. A prototype of a pipeline to be used in the Pipeline Editor (can
  * not be run).
+ *
  * @param <T>
  */
 public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
@@ -39,6 +41,7 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 	protected final StringProperty name;
 	protected final ObservableList<T> processors;
 	protected final ObjectProperty<PipelineLayoutStrategy> layoutStrategyProperty;
+	protected final ObjectProperty<OSGiVersionPolicy> versionPolicyProperty;
 	protected final ModifiedProperty modifiedPipelineProperty;
 
 	/**
@@ -56,6 +59,9 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 		this.processors = FXCollections.observableArrayList();
 		this.layoutStrategyProperty = new SimpleObjectProperty(
 				handler.settings.pipelineEditor.getDefaultPipelineLayout()
+		);
+		this.versionPolicyProperty = new SimpleObjectProperty(
+				handler.settings.osgi.versionPolicy
 		);
 		this.modifiedPipelineProperty = new ModifiedProperty();
 		this.modifiedPipelineProperty.addObservedProperty(this.name);
@@ -76,6 +82,9 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 
 		this.layoutStrategyProperty.set(
 				PipelineLayoutStrategy.get(pipeline.layoutStrategy)
+		);
+		this.versionPolicyProperty.set(
+				OSGiVersionPolicy.get(pipeline.versionPolicy)
 		);
 
 		for (PipelineData.Processor p : pipeline.processors.list) {
@@ -140,7 +149,17 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 	}
 
 	/**
+	 * Returns the layout strategy property.
+	 *
+	 * @return the layout strategy property.
+	 */
+	public ObjectProperty<PipelineLayoutStrategy> layoutStrategyProperty() {
+		return this.layoutStrategyProperty;
+	}
+
+	/**
 	 * Returns the pipeline's layout strategy.
+	 *
 	 * @return the pipeline layout strategy in use.
 	 */
 	public PipelineLayoutStrategy getLayoutStrategy() {
@@ -149,10 +168,38 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 
 	/**
 	 * Sets/updates the pipeline its layout strategy.
+	 *
 	 * @param strategy the new pipeline layout strategy.
 	 */
 	public void setLayoutStrategy(PipelineLayoutStrategy strategy) {
 		this.layoutStrategyProperty.set(strategy);
+	}
+
+	/**
+	 * Returns the pipeline's version policy property.
+	 *
+	 * @return the version policy property.
+	 */
+	public ObjectProperty<OSGiVersionPolicy> versionPolicyProperty() {
+		return this.versionPolicyProperty;
+	}
+
+	/**
+	 * Returns the pipeline's version policy.
+	 *
+	 * @return the version politcy.
+	 */
+	public OSGiVersionPolicy getVersionPolicy() {
+		return this.versionPolicyProperty.get();
+	}
+
+	/**
+	 * Sets the pipeline's version policy.
+	 *
+	 * @param policy the new version policy.
+	 */
+	public void setVersionPolicy(OSGiVersionPolicy policy) {
+		this.versionPolicyProperty.set(policy);
 	}
 
 	/**
@@ -222,11 +269,12 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 	 * Adds a processor to the pipeline.
 	 *
 	 * @param pid pid of the processor.
+	 * @param version version of the processor.
 	 * @param x initial x position of the processor view.
 	 * @param y initial y position of the processor view.
 	 */
-	public final void addProcessor(String pid, double x, double y) {
-		final T wrapper = (T) new ProcessorWrapper(newProcessorId(), pid, x, y, handler);
+	public final void addProcessor(String pid, String version, double x, double y) {
+		final T wrapper = (T) new ProcessorWrapper(newProcessorId(), pid, version, x, y, handler);
 		wrapper.init();
 		wrapper.initProcessor();
 		addProcessor(wrapper);
@@ -290,12 +338,26 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 	 */
 	public static class PipelineStages<T extends ProcessorWrapper> implements Iterable<Stage<T>> {
 
+		/**
+		 * The stages.
+		 */
 		public final List<Stage<T>> stages = new ArrayList<>();
 
+		/**
+		 * Creates new pipeline stages.
+		 *
+		 * @param pipeline the pipeline.
+		 */
 		public PipelineStages(Pipeline pipeline) {
 			this(pipeline, getPortMap(pipeline));
 		}
 
+		/**
+		 * Creates new pipeline stages.
+		 *
+		 * @param pipeline the pipeline.
+		 * @param portMap the port map of the pipeline.
+		 */
 		public PipelineStages(Pipeline pipeline, Map<OutputPort, ProcessorWrapper.PortMapEntry> portMap) {
 			buildStages(pipeline, portMap);
 		}
@@ -384,10 +446,21 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 			return sb.toString();
 		}
 
-		public Stage<T> get(int i) {
-			return this.stages.get(i);
+		/**
+		 * Returns a stage of the pipeline.
+		 *
+		 * @param index index of the stage.
+		 * @return the stage.
+		 */
+		public Stage<T> get(int index) {
+			return this.stages.get(index);
 		}
 
+		/**
+		 * Returns the number of stages.
+		 *
+		 * @return the number of stages.
+		 */
 		public int size() {
 			return this.stages.size();
 		}
@@ -400,6 +473,7 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 
 	/**
 	 * A pipeline stage.
+	 *
 	 * @param <T> type of the processor wrapper.
 	 */
 	public static class Stage<T extends ProcessorWrapper> implements Localizable {
@@ -407,14 +481,29 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 		public final int number;
 		public final List<T> processors = new ArrayList<>();
 
+		/**
+		 * Creates a new pipeline stage.
+		 *
+		 * @param number number of the stage (starts with 1, unlike its index).
+		 */
 		public Stage(int number) {
 			this.number = number;
 		}
 
+		/**
+		 * Adds a processor to the stage.
+		 *
+		 * @param processor a processor.
+		 */
 		protected void addProcessor(T processor) {
 			this.processors.add(processor);
 		}
 
+		/**
+		 * Returns a formatted title of the stage.
+		 *
+		 * @return the title of the stage.
+		 */
 		public String title() {
 			return String.format("%s %d", localize("pipeline.stage"), number);
 		}
