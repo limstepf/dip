@@ -16,6 +16,7 @@ import ch.unifr.diva.dip.gui.AbstractWidget;
 import ch.unifr.diva.dip.gui.dialogs.ErrorDialog;
 import ch.unifr.diva.dip.gui.layout.DraggableListCell;
 import ch.unifr.diva.dip.gui.layout.FormGridPane;
+import ch.unifr.diva.dip.osgi.OSGiVersionPolicy;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -373,6 +374,11 @@ public class PipelinesWidget extends AbstractWidget {
 				editor.editorPane().updateAllProcessors();
 			}
 
+			final OSGiVersionPolicy v = edit.getVersionPolicy();
+			if (!currentPipeline.getVersionPolicy().equals(v)) {
+				currentPipeline.setVersionPolicy(v);
+			}
+
 			pane.setCenter(label);
 
 			// this seems to be necessary since we ommit commitEdit and just
@@ -390,6 +396,7 @@ public class PipelinesWidget extends AbstractWidget {
 		private final FormGridPane grid;
 		private final TextField pipelineName;
 		private final EnumParameter layoutStrategy;
+		private final EnumParameter versionPolicy;
 
 		/**
 		 * Creates a new edit box for a pipeline cell.
@@ -402,13 +409,24 @@ public class PipelinesWidget extends AbstractWidget {
 			this.pipelineName = new TextField();
 			VBox.setMargin(pipelineName, new Insets(0, 0, 2, 0));
 			pipelineName.setOnKeyPressed(onEnterHandler);
+
 			this.layoutStrategy = new EnumParameter(
 					L10n.getInstance().getString("pipeline.layout.strategy"),
 					PipelineLayoutStrategy.class,
 					PipelineLayoutStrategy.LEFTRIGHT.name()
 			);
 			layoutStrategy.view().node().setOnKeyPressed(onEnterHandler);
+			layoutStrategy.view().node().getStyleClass().add("dip-small");
 			grid.addParameters(layoutStrategy);
+
+			this.versionPolicy = new EnumParameter(
+					L10n.getInstance().getString("processor.version.policy"),
+					OSGiVersionPolicy.class,
+					OSGiVersionPolicy.getDefault().name()
+			);
+			versionPolicy.view().node().setOnKeyPressed(onEnterHandler);
+			versionPolicy.view().node().getStyleClass().add("dip-small");
+			grid.addParameters(versionPolicy);
 
 			this.setSpacing(UIStrategyGUI.Stage.insets);
 			this.getChildren().setAll(pipelineName, grid);
@@ -422,6 +440,7 @@ public class PipelinesWidget extends AbstractWidget {
 		 */
 		public void init(Pipeline pipeline, String name) {
 			layoutStrategy.set(pipeline.getLayoutStrategy().name());
+			versionPolicy.set(pipeline.getVersionPolicy().name());
 			pipelineName.setText(name);
 		}
 
@@ -445,6 +464,15 @@ public class PipelinesWidget extends AbstractWidget {
 					PipelineLayoutStrategy.class,
 					PipelineLayoutStrategy.LEFTRIGHT
 			);
+		}
+
+		/**
+		 * Returns the (new) version policy of the pipeline.
+		 *
+		 * @return the version policy of the pipeline.
+		 */
+		public OSGiVersionPolicy getVersionPolicy() {
+			return OSGiVersionPolicy.get(versionPolicy.get());
 		}
 	}
 
