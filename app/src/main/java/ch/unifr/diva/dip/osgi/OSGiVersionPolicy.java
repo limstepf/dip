@@ -1,5 +1,6 @@
 package ch.unifr.diva.dip.osgi;
 
+import ch.unifr.diva.dip.api.utils.L10n;
 import org.osgi.framework.Version;
 
 /**
@@ -92,6 +93,22 @@ public enum OSGiVersionPolicy {
 						version.getMicro()
 				);
 		}
+	}
+
+	/**
+	 * Returns the formatted label of the version policy.
+	 *
+	 * @return the formatted label.
+	 */
+	public String label() {
+		if (this.equals(getDefault())) {
+			return String.format(
+					"%s (%s)",
+					name(),
+					L10n.getInstance().getString("default")
+			);
+		}
+		return name();
 	}
 
 	/**

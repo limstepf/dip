@@ -16,6 +16,7 @@ import ch.unifr.diva.dip.gui.layout.FormGridPane;
 import ch.unifr.diva.dip.gui.layout.Lane;
 import ch.unifr.diva.dip.gui.layout.ZoomPane;
 import ch.unifr.diva.dip.gui.pe.ConnectionView;
+import ch.unifr.diva.dip.osgi.OSGiVersionPolicy;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.beans.InvalidationListener;
@@ -91,7 +92,7 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 			public PersistentParameter parameter() {
 				if (this.parameter == null) {
 					this.parameter = new EnumParameter(
-							L10n.getInstance().getString("language"),
+							localize("language"),
 							new ArrayList<>(L10n.availableLanguages()),
 							handler.settings.locale.language
 					);
@@ -105,11 +106,42 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 			}
 		});
 
+		// default processor/OSGi service version (or auto-upgrade) policy
+		general.addItem(new Item<EnumParameter>() {
+			@Override
+			public PersistentParameter parameter() {
+				if (this.parameter == null) {
+					this.parameter = new EnumParameter(
+							localize("processor.version.policy.default"),
+							OSGiVersionPolicy.class,
+							(e) -> {
+								if (e.equals(OSGiVersionPolicy.getDefault())) {
+									return String.format(
+											"%s (%s)",
+											e.name(),
+											localize("default")
+									);
+								}
+								return e.name();
+							},
+							handler.settings.osgi.versionPolicy.name()
+					);
+				}
+				return this.parameter;
+			}
+
+			@Override
+			public void save() {
+				handler.settings.osgi.versionPolicy = OSGiVersionPolicy.get(this.parameter.get());
+			}
+		});
+
 		cats.add(general);
 
 		/* main/pixel editor settings */
 		final Category me = new Category(localize("editor.main"));
 
+		// display/zoom interpolation method/algorithm
 		me.addItem(new Item<EnumParameter>() {
 			@Override
 			public PersistentParameter parameter() {
@@ -311,8 +343,16 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 	 */
 	public static class Category {
 
+		/**
+		 * The label/name of the category.
+		 */
 		public final String label;
+
+		/**
+		 * List of items in the category.
+		 */
 		public final List<Item> items;
+
 		private Node contentPane;
 
 		/**
@@ -334,11 +374,22 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 			this.items.add(item);
 		}
 
-		// only save a category if it actually has been initialized/used
+		/**
+		 * Checks whether the category has been initialized (viewed/opened).
+		 * Used to only save a category if it actually has been
+		 * initialized/used.
+		 *
+		 * @return True if the category has been initialized, False otherwise.
+		 */
 		public boolean hasBeenInitialized() {
 			return this.contentPane != null;
 		}
 
+		/**
+		 * Returns the content pane.
+		 *
+		 * @return the content pane.
+		 */
 		public Node getContentPane() {
 			if (contentPane == null) {
 				this.contentPane = newContentPane();
@@ -378,15 +429,27 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 
 		protected T parameter;
 
-		// only save an item if it actually has been initialized/used
+		/**
+		 * Checks whether the item has been initialized (viewed/opened). Used to
+		 * only save an item if it actually has been initialized/used.
+		 *
+		 * @return True if the item has been initialized, False otherwise.
+		 */
 		public boolean hasBeenInitialized() {
 			return this.parameter != null;
 		}
 
-		// lazy initialization
+		/**
+		 * Returns the parameter backing the item. Lazily initialized!
+		 *
+		 * @return the parameter backing the item.
+		 */
 		public abstract PersistentParameter<T> parameter();
 
-		// first check with hasBeenInitialized, or face a possible NPE
+		/**
+		 * Saves the item. First check if the item {@code hasBeenInitialized},
+		 * or face a possible NPE.
+		 */
 		public abstract void save();
 	}
 

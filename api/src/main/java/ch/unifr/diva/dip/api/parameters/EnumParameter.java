@@ -1,5 +1,6 @@
 package ch.unifr.diva.dip.api.parameters;
 
+import ch.unifr.diva.dip.api.utils.EnumStringMapper;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.scene.control.ComboBox;
@@ -28,6 +29,22 @@ public class EnumParameter extends PersistentParameterBase<String, EnumParameter
 	 */
 	public <E extends Enum<E>> EnumParameter(String label, Class<E> e, String defaultValue) {
 		this(label, getEnumNames(e), getEnumLabels(e), defaultValue);
+	}
+
+	/**
+	 * Constructor to turn an Enum into an EnumParameter.
+	 *
+	 * @param <E> enumeration class.
+	 * @param label label.
+	 * @param e the enumeration to choose an option from. The toString() method
+	 * is used for the label, and is the same as the name of the enumeration
+	 * option unless the toString() method is overridden.
+	 * @param mapper custom enumeration string mapper to format (or translate)
+	 * the labels.
+	 * @param defaultValue name of the default enumeration option.
+	 */
+	public <E extends Enum<E>> EnumParameter(String label, Class<E> e, EnumStringMapper mapper, String defaultValue) {
+		this(label, getEnumNames(e), getEnumLabels(e, mapper), defaultValue);
 	}
 
 	/**
@@ -70,6 +87,10 @@ public class EnumParameter extends PersistentParameterBase<String, EnumParameter
 			items.add(e.toString());
 		}
 		return items;
+	}
+
+	private static <E extends Enum<E>> List<String> getEnumLabels(Class<E> enumeration, EnumStringMapper mapper) {
+		return EnumStringMapper.map(enumeration, mapper);
 	}
 
 	/**
