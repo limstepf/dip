@@ -140,7 +140,7 @@ public class SelectionListCellFactory<T> implements Callback<ListView<T>, ListCe
 				setText(null);
 				setGraphic(null);
 				this.setDisable(false);
-				this.getStyleClass().remove("dip-separator");
+				this.getStyleClass().removeAll("dip-separator");
 			} else {
 				if (item instanceof String) {
 					setText((String) item);
@@ -153,7 +153,7 @@ public class SelectionListCellFactory<T> implements Callback<ListView<T>, ListCe
 				if (this.separators.get(getIndex())) {
 					this.getStyleClass().add("dip-separator");
 				} else {
-					this.getStyleClass().remove("dip-separator");
+					this.getStyleClass().removeAll("dip-separator");
 				}
 
 				// just disabling a cell isn't good enough: in a combobox selecting
@@ -165,7 +165,7 @@ public class SelectionListCellFactory<T> implements Callback<ListView<T>, ListCe
 				if (disable) {
 					this.getStyleClass().add("dip-disabled");
 				} else {
-					this.getStyleClass().remove("dip-disabled");
+					this.getStyleClass().removeAll("dip-disabled");
 				}
 			}
 		}

@@ -115,7 +115,7 @@ public class Glyph extends Label {
 					if (get()) {
 						Glyph.this.getStyleClass().add(HOVER_EFFECT_DISABLED_STYLE);
 					} else {
-						Glyph.this.getStyleClass().remove(HOVER_EFFECT_DISABLED_STYLE);
+						Glyph.this.getStyleClass().removeAll(HOVER_EFFECT_DISABLED_STYLE);
 					}
 				}
 
@@ -150,7 +150,7 @@ public class Glyph extends Label {
 					if (get()) {
 						Glyph.this.getStyleClass().add(HOVER_EFFECT_STYLE);
 					} else {
-						Glyph.this.getStyleClass().remove(HOVER_EFFECT_STYLE);
+						Glyph.this.getStyleClass().removeAll(HOVER_EFFECT_STYLE);
 					}
 				}
 

@@ -166,7 +166,7 @@ public class XorParameter extends CompositeBase<ValueListSelection, XorParameter
 		private void updateItems() {
 			for (XorViewItem item : this.items) {
 				if (item.radio.isSelected()) {
-					item.parent.getStyleClass().remove("dip-disabled");
+					item.parent.getStyleClass().removeAll("dip-disabled");
 				} else {
 					item.parent.getStyleClass().add("dip-disabled");
 				}
