@@ -327,19 +327,21 @@ public class PipelineData {
 			for (T wrapper : pipeline.processors()) {
 				this.processors.list.add(new Processor(wrapper));
 
-				for (Map.Entry<String, InputPort> e : wrapper.processor().inputs().entrySet()) {
-					final InputPort input = e.getValue();
-					final ProcessorWrapper.PortMapEntry output = outputPortMap.get(input.connection());
-					if (output != null) {
-						this.connections.list.add(
-								new Connection(
-										input.getDataType(),
-										output.id,
-										output.port,
-										wrapper.id,
-										e.getKey()
-								)
-						);
+				if (wrapper.isAvailable()) {
+					for (Map.Entry<String, InputPort> e : wrapper.processor().inputs().entrySet()) {
+						final InputPort input = e.getValue();
+						final ProcessorWrapper.PortMapEntry output = outputPortMap.get(input.connection());
+						if (output != null) {
+							this.connections.list.add(
+									new Connection(
+											input.getDataType(),
+											output.id,
+											output.port,
+											wrapper.id,
+											e.getKey()
+									)
+							);
+						}
 					}
 				}
 			}

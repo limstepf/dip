@@ -25,7 +25,8 @@ import org.slf4j.LoggerFactory;
  * Pipeline. A prototype of a pipeline to be used in the Pipeline Editor (can
  * not be run).
  *
- * @param <T>
+ * @param <T> {@code ProcessorWrapper} or {@code RunnableProcessor} (which
+ * extends the firmer).
  */
 public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 
@@ -305,7 +306,7 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 	 * editor).
 	 */
 	public final void removeProcessor(T wrapper, boolean disconnect) {
-		if (disconnect) {
+		if (disconnect && wrapper.isAvailable()) {
 			wrapper.processor().disconnect();
 		}
 
@@ -385,12 +386,14 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 					// check if all inputs are ready yet
 					boolean isReady = true;
 
-					for (InputPort input : wrapper.processor().inputs().values()) {
-						if (input.isConnected()) {
-							final OutputPort output = input.connection();
-							final ProcessorWrapper.PortMapEntry source = portMap.get(output);
-							if (!ready.contains(source.id)) {
-								isReady = false;
+					if (wrapper.isAvailable()) {
+						for (InputPort input : wrapper.processor().inputs().values()) {
+							if (input.isConnected()) {
+								final OutputPort output = input.connection();
+								final ProcessorWrapper.PortMapEntry source = portMap.get(output);
+								if (!ready.contains(source.id)) {
+									isReady = false;
+								}
 							}
 						}
 					}

@@ -376,7 +376,11 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	 * been set/restored, and that ports are connected.
 	 */
 	protected void initProcessor() {
-		initProcessor(this.processor());
+		if (processor() == null) {
+			availableProperty.set(false);
+			return;
+		}
+		initProcessor(processor());
 	}
 
 	/**
@@ -387,10 +391,6 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	 * @param processor the processor to be initialized.
 	 */
 	protected void initProcessor(Processor processor) {
-		if (processor == null) {
-			availableProperty.set(false);
-			return;
-		}
 		if (isHostProcessor) {
 			final HostProcessor hp = (HostProcessor) processor;
 			hp.init(getHostProcessorContext());
@@ -418,6 +418,9 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	}
 
 	private void saveParameters(Processor processor) {
+		if (processor == null) {
+			return;
+		}
 		this.parameters = PersistentParameter.getPreset(processor.parameters());
 	}
 
@@ -608,6 +611,9 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 		final Map<OutputPort, PortMapEntry> map = new HashMap<>();
 
 		for (ProcessorWrapper wrapper : wrappers) {
+			if (!wrapper.isAvailable()) {
+				continue;
+			}
 			for (Map.Entry<String, OutputPort> e : wrapper.processor().outputs().entrySet()) {
 				map.put(e.getValue(), new PortMapEntry(wrapper.id, e.getKey()));
 			}
