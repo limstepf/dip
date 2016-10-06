@@ -320,6 +320,10 @@ public class EditorPane {
 	 * @param wrapper the processor to unconnect.
 	 */
 	public void removeConnections(ProcessorWrapper wrapper) {
+		if (!wrapper.isAvailable()) {
+			return;
+		}
+
 		final Set<InputPort> trash = new HashSet<>();
 
 		for (InputPort input : wrapper.processor().inputs().values()) {
@@ -519,6 +523,10 @@ public class EditorPane {
 	 * @param wrapper the processor.
 	 */
 	public void unregisterPorts(ProcessorWrapper wrapper) {
+		if (!wrapper.isAvailable()) {
+			return;
+		}
+
 		for (InputPort port : wrapper.processor().inputs().values()) {
 			ports.remove(port);
 		}
