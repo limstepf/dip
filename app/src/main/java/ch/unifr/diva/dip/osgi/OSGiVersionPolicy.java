@@ -30,11 +30,6 @@ public enum OSGiVersionPolicy {
 	 */
 	MICRO_EXACT,
 	/**
-	 * Checks whether the version {@code major.minor.micro} is available,
-	 * otherwise falls back to the latest {@code major.minor}.
-	 */
-	MICRO_LATEST_FALLBACK,
-	/**
 	 * Always requests the latest {@code major.minor} version. Micro bumped
 	 * services just recieved a bugfix or two, so it makes sense to always use
 	 * the latest micro version with fixed major, and minor part.
@@ -63,17 +58,6 @@ public enum OSGiVersionPolicy {
 		}
 
 		switch (this) {
-			case MICRO_LATEST_FALLBACK:
-				OSGiService<T> p = collection.getService(
-						version.getMajor(),
-						version.getMinor(),
-						version.getMicro()
-				);
-				if (p != null) {
-					return p;
-				}
-			// fall-through to MICRO_LATEST!
-
 			case MICRO_LATEST:
 				return collection.getService(
 						version.getMajor(),
