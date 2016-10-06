@@ -108,6 +108,10 @@ public class EditorPresenter implements Presenter {
 				this.rootLayer.getChildren().add(stageGroup);
 			}
 		}
+
+		// since we're currently not saving the expandProperty of layers, we're
+		// just going to expand all layers upon opening/building the stages.
+		expandLayers();
 	}
 
 	private void clear() {
@@ -162,6 +166,12 @@ public class EditorPresenter implements Presenter {
 			this.layersWidget.setRoot(this.rootLayer.getTreeItem());
 		}
 		return this.layersWidget;
+	}
+
+	private void expandLayers() {
+		if (this.layersWidget != null) {
+			this.layersWidget.expandAll();
+		}
 	}
 
 }

@@ -36,12 +36,23 @@ public class LayersWidget extends AbstractWidget implements Localizable {
 	}
 
 	/**
+	 * Expands all layers.
+	 */
+	public void expandAll() {
+		this.view.expandAll();
+	}
+
+	/**
 	 * Layer tree view.
 	 */
 	public static class LayerTreeView extends VBox {
 
 		private final TreeView<Layer> treeView = new TreeView<>();
 
+		/**
+		 * Creates a new LayerTreeView. The root needs to be set manually with a
+		 * call to {@code setRoot()}.
+		 */
 		public LayerTreeView() {
 			setMaxHeight(Double.MAX_VALUE);
 			VBox.setVgrow(treeView, Priority.ALWAYS);
@@ -54,8 +65,29 @@ public class LayersWidget extends AbstractWidget implements Localizable {
 			this.getChildren().addAll(treeView);
 		}
 
+		/**
+		 * Sets/updates the root layer.
+		 *
+		 * @param root the new root layer.
+		 */
 		public void setRoot(TreeItem<Layer> root) {
 			this.treeView.setRoot(root);
+		}
+
+		/**
+		 * Expands all layers.
+		 */
+		public void expandAll() {
+			expand(this.treeView.getRoot());
+		}
+
+		private void expand(TreeItem<Layer> layer) {
+			if (layer != null && !layer.isLeaf()) {
+				layer.setExpanded(true);
+				for (TreeItem<Layer> child : layer.getChildren()) {
+					expand(child);
+				}
+			}
 		}
 	}
 
