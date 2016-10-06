@@ -93,19 +93,21 @@ public abstract class ProcessorView extends BorderPane {
 		wrapper.availableProperty().addListener(availableListener);
 
 		this.inputPorts = new ArrayList<>();
-		for (Map.Entry<String, InputPort> e : wrapper.processor().inputs().entrySet()) {
-			final InputPort input = e.getValue();
-			final PortView view = new PortView(editor, e.getKey(), input);
-			editor.editorPane().registerPort(input, view);
-			inputPorts.add(view);
-		}
-
 		this.outputPorts = new ArrayList<>();
-		for (Map.Entry<String, OutputPort> e : wrapper.processor().outputs().entrySet()) {
-			final OutputPort output = e.getValue();
-			final PortView view = new PortView(editor, e.getKey(), output);
-			editor.editorPane().registerPort(output, view);
-			outputPorts.add(view);
+		if (wrapper.isAvailable()) {
+			for (Map.Entry<String, InputPort> e : wrapper.processor().inputs().entrySet()) {
+				final InputPort input = e.getValue();
+				final PortView view = new PortView(editor, e.getKey(), input);
+				editor.editorPane().registerPort(input, view);
+				inputPorts.add(view);
+			}
+
+			for (Map.Entry<String, OutputPort> e : wrapper.processor().outputs().entrySet()) {
+				final OutputPort output = e.getValue();
+				final PortView view = new PortView(editor, e.getKey(), output);
+				editor.editorPane().registerPort(output, view);
+				outputPorts.add(view);
+			}
 		}
 
 		this.selectedProperty.addListener(selectedListener);
@@ -140,7 +142,11 @@ public abstract class ProcessorView extends BorderPane {
 			pane.setMaxWidth(Double.MAX_VALUE);
 
 			final Glyph glyph = UIStrategyGUI.Glyphs.newGlyph(wrapper.glyph(), Glyph.Size.NORMAL);
-			final Label label = new Label(wrapper.processor().name());
+			final Label label = new Label(
+					wrapper.isAvailable()
+							? wrapper.processor().name()
+							: wrapper.pid()
+			);
 			final Tooltip tooltip = new Tooltip(String.format(
 					"%s\nv.%s",
 					wrapper.pid(),
@@ -468,6 +474,9 @@ public abstract class ProcessorView extends BorderPane {
 	}
 
 	protected boolean hasParameters() {
+		if (!wrapper().isAvailable()) {
+			return false;
+		}
 		return wrapper().processor().parameters().size() > 0;
 	}
 

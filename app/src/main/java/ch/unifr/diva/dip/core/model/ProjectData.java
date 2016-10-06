@@ -347,25 +347,26 @@ public class ProjectData {
 					// either the exact version, or an up-/downgraded one. If null, the service is
 					// unavailable (and needs to be manually replaced or something...)
 					final ServiceCollection<Processor> collection = handler.osgi.getProcessorCollection(processor.pid);
-					final OSGiService<Processor> service = policy.getService(collection, new Version(processor.version));
-					if (service != null) {
-						final String versionByPolicy = service.version.toString();
-						if (versionByPolicy.equals(processor.version)) {
-							// exact same version is available
-							continue;
-						} else {
-							// different version has been supplied, auto-update
-							log.info(
-									"OSGi Service {} up-/downgraded from {} to {} by version policy: {}",
-									processor.pid, processor.version, versionByPolicy, policy
-							);
-							processor.version = versionByPolicy;
-							continue;
+					if (collection != null) {
+						final OSGiService<Processor> service = policy.getService(collection, new Version(processor.version));
+						if (service != null) {
+							final String versionByPolicy = service.version.toString();
+							if (versionByPolicy.equals(processor.version)) {
+								// exact same version is available
+								continue;
+							} else {
+								// different version has been supplied, auto-update
+								log.info(
+										"OSGi Service {} up-/downgraded from {} to {} by version policy: {}",
+										processor.pid, processor.version, versionByPolicy, policy
+								);
+								processor.version = versionByPolicy;
+								continue;
+							}
 						}
-					} else {
-						// service is not available
 					}
 
+					// fall-through: service is not available
 					v.addMissingService(processor.pid, processor.version);
 				}
 			}

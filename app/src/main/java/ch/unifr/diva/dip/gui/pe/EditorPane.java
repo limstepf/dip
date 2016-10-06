@@ -293,6 +293,9 @@ public class EditorPane {
 	 * @param wrapper the processor to connect.
 	 */
 	public void setupConnections(ProcessorWrapper wrapper) {
+		if (!wrapper.isAvailable()) {
+			return;
+		}
 		for (Map.Entry<String, InputPort> port : wrapper.processor().inputs().entrySet()) {
 			final InputPort input = port.getValue();
 			if (input.isConnected()) {

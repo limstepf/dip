@@ -320,7 +320,7 @@ public class OSGiFramework {
 	 */
 	public OSGiService<Processor> getProcessor(String pid, Version version) {
 		final ServiceCollection<Processor> collection = getProcessorCollection(pid);
-		return collection.getService(version);
+		return (collection == null) ? null : collection.getService(version);
 	}
 
 	/**

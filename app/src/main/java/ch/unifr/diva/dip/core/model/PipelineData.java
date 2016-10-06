@@ -356,7 +356,7 @@ public class PipelineData {
 		public List<Integer> getProcessorIds(String pid, String version) {
 			final List<Integer> ids = new ArrayList<>();
 			for (Processor p : processors()) {
-				if (p.pid.equals(pid) && p.version.equals(version)) {
+				if (p.pid().equals(pid) && p.version().equals(version)) {
 					ids.add(p.id);
 				}
 			}
@@ -503,6 +503,30 @@ public class PipelineData {
 			this.y = wrapper.layoutYProperty().doubleValue();
 			this.editing = wrapper.isEditing();
 			this.parameters = wrapper.parameters();
+		}
+
+		/**
+		 * Safely returns the PID.
+		 *
+		 * @return the PID, or "-" as default if not specified.
+		 */
+		public String pid() {
+			if (this.pid == null) {
+				this.pid = "-";
+			}
+			return this.pid;
+		}
+
+		/**
+		 * Safely returns the version string.
+		 *
+		 * @return the version string, or "0.0.0" as default if not specified.
+		 */
+		public String version() {
+			if (this.version == null) {
+				this.version = "0.0.0";
+			}
+			return this.version;
 		}
 	}
 
