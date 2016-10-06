@@ -4,7 +4,7 @@ import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.core.model.ProjectPage;
-import ch.unifr.diva.dip.core.services.PageGenerator;
+import ch.unifr.diva.dip.core.services.RgbPage;
 import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -32,7 +32,7 @@ public abstract class HostService implements HostProcessor {
 	/**
 	 * Canonical name of the default generator processor/service.
 	 */
-	public static final String DEFAULT_GENERATOR = PageGenerator.class.getCanonicalName();
+	public static final String DEFAULT_GENERATOR = RgbPage.class.getCanonicalName();
 
 	protected final String name;
 	protected final Map<String, InputPort> inputs;
