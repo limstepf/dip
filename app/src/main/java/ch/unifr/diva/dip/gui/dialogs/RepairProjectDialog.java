@@ -585,7 +585,7 @@ public class RepairProjectDialog extends AbstractDialog {
 		}
 
 		public void apply() {
-			if (this.doIgnore()) {
+			if (doIgnore()) {
 				// ignore (PageGenerator handles non existing images just fine...)
 			} else {
 				this.page.file = this.newPath;
@@ -1216,7 +1216,7 @@ public class RepairProjectDialog extends AbstractDialog {
 
 		public PipelineData.ProcessorSwap apply() {
 			final OSGiService<Processor> p = selectedVersion();
-			if (p == null) {
+			if (p == null || doIgnore()) {
 				return null;
 			}
 			final String toPID = p.pid;
