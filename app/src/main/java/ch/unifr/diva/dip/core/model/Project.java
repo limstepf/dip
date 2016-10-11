@@ -17,12 +17,15 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.stage.Stage;
@@ -132,7 +135,7 @@ public class Project implements Modifiable, Localizable {
 			if (image.id > maxPageId) {
 				maxPageId = image.id;
 			}
-			pages.add(new ProjectPage(this, image));
+			addPage(new ProjectPage(this, image), false);
 		}
 
 		// pipelines
@@ -151,10 +154,6 @@ public class Project implements Modifiable, Localizable {
 
 		// listen to (and manage) modifiables for modifications
 		modifiedProjectProperty.addManagedProperty(pipelineManager);
-		for (ProjectPage page : pages) {
-			modifiedProjectProperty.addManagedProperty(page);
-		}
-
 	}
 
 	/**
@@ -459,11 +458,69 @@ public class Project implements Modifiable, Localizable {
 	 *
 	 * @param page the new project page.
 	 */
-	public void addPage(ProjectPage page) {
+	final public void addPage(ProjectPage page) {
+		addPage(page, true);
+	}
+
+	/**
+	 * Adds a page to the project.
+	 *
+	 * @param page the new project page.
+	 * @param setModified True to mark the project as modified, False otherwise.
+	 */
+	final public void addPage(ProjectPage page, boolean setModified) {
 		this.modifiedProjectProperty.addManagedProperty(page);
+		addToPipelineUsage(page.getPipelineId(), 1);
+		page.pipelineIdProperty().addListener(pipelineUsageListener);
 		pages.add(page);
 
-		this.modifiedProperty().set(true);
+		if (setModified) {
+			this.modifiedProperty().set(true);
+		}
+	}
+
+	// pipeline usage by pages; maps pipelineId -> usage counter
+	private final Map<Integer, IntegerProperty> pipelineUsageMap = new HashMap<>();
+	private final ChangeListener<? super Number> pipelineUsageListener = (obs, oldId, newId) -> {
+		if (oldId != null) {
+			addToPipelineUsage(oldId.intValue(), -1);
+		}
+		addToPipelineUsage(newId.intValue(), 1);
+	};
+
+	// to increment or decrement the pipeline usage counter
+	private void addToPipelineUsage(int id, int value) {
+		final IntegerProperty p = pipelineUsageProperty(id);
+		p.set(p.get() + value);
+	}
+
+	/**
+	 * The pipeline usage property. Counts the number of times a pipeline is
+	 * used by a page.
+	 *
+	 * @param id the pipeline id.
+	 * @return the pipeline usage property.
+	 */
+	public IntegerProperty pipelineUsageProperty(int id) {
+		if (!pipelineUsageMap.containsKey(id)) {
+			final IntegerProperty p = new SimpleIntegerProperty(0);
+			pipelineUsageMap.put(id, p);
+			return p;
+		}
+		return pipelineUsageMap.get(id);
+	}
+
+	/**
+	 * Returns the number of times a pipeline is used by pages.
+	 *
+	 * @param id the pipeline id.
+	 * @return the number of times a pipeline is used by pages.
+	 */
+	public int getPipelineUsage(int id) {
+		if (!pipelineUsageMap.containsKey(id)) {
+			return 0;
+		}
+		return pipelineUsageMap.get(id).get();
 	}
 
 	/**
@@ -527,6 +584,8 @@ public class Project implements Modifiable, Localizable {
 
 			// TODO: clean zip-filesystem
 			log.info("deleting page: {}", page);
+			page.pipelineIdProperty().removeListener(pipelineUsageListener);
+			addToPipelineUsage(page.getPipelineId(), -1);
 			this.modifiedProjectProperty.removeManagedProperty(page);
 			pages.remove(page);
 			this.handler.eventBus.post(

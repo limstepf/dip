@@ -39,8 +39,17 @@ import org.slf4j.LoggerFactory;
 public class PipelineEditor extends AbstractWindow implements Presenter {
 
 	private static final Logger log = LoggerFactory.getLogger(PipelineEditor.class);
+
+	/**
+	 * The radius of a wire.
+	 */
 	public static final double WIRE_RADIUS = 7.0;
+
+	/**
+	 * The port ratio. Used to draw fancy ports w.r.t. the {@code WIRE_RADIUS}.
+	 */
 	public static final double PORT_RATIO = 0.87;
+
 	protected final ApplicationHandler handler;
 	private final SplitPane splitPane = new SplitPane();
 	private final List<Parent> splitPaneComponents = new ArrayList<>();
@@ -52,6 +61,10 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 	private final List<ProcessorsWidget> processorWidgets = new ArrayList<>();
 	private final ListChangeListener<ProcessorWrapper> processorListener;
 	private final RubberBandSelector rubberBandSelector;
+
+	private final PipelinesWidget pipelinesWidget;
+	private final ProcessorsWidget hostProcessorsWidget;
+	private final ProcessorsWidget processorsWidget;
 
 	/**
 	 * Creates a pipeline editor.
@@ -120,22 +133,22 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 //		final NavigatorWidget navigator = new NavigatorWidget();
 //		navigator.bind(zoomPane);
 //		sideBar.addAuxiliaryWidget(navigator);
-		final PipelinesWidget pipelines = new PipelinesWidget(handler, this);
-		sideBar.addMainWidget(pipelines);
+		this.pipelinesWidget = new PipelinesWidget(handler, this);
+		sideBar.addMainWidget(pipelinesWidget);
 
-		final ProcessorsWidget hostProcessors = new ProcessorsWidget(
+		this.hostProcessorsWidget = new ProcessorsWidget(
 				localize("pipeline.services.host"),
 				handler.osgi.hostProcessors
 		);
-		processorWidgets.add(hostProcessors);
-		sideBar.addMainWidget(hostProcessors);
+		processorWidgets.add(hostProcessorsWidget);
+		sideBar.addMainWidget(hostProcessorsWidget);
 
-		final ProcessorsWidget processors = new ProcessorsWidget(
+		this.processorsWidget = new ProcessorsWidget(
 				localize("pipeline.services"),
 				handler.osgi.processors
 		);
-		processorWidgets.add(processors);
-		sideBar.addMainWidget(processors);
+		processorWidgets.add(processorsWidget);
+		sideBar.addMainWidget(processorsWidget);
 
 		final Pipeline firstPipeline = manager.pipelines().isEmpty()
 				? null

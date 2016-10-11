@@ -56,9 +56,9 @@ import org.slf4j.LoggerFactory;
 public class PipelinesWidget extends AbstractWidget {
 
 	private static final Logger log = LoggerFactory.getLogger(PipelinesWidget.class);
-	private final ApplicationHandler handler;
-	private final PipelineEditor editor;
-	private final View view;
+	protected final ApplicationHandler handler;
+	protected final PipelineEditor editor;
+	protected final View view;
 
 	/**
 	 * Creates a new pipelines widget.
@@ -96,7 +96,9 @@ public class PipelinesWidget extends AbstractWidget {
 	}
 
 	private void deletePipelines(List<Pipeline> pipelines) {
-		editor.pipelineManager().deletePipelines(pipelines);
+		if (!editor.pipelineManager().deletePipelines(pipelines)) {
+			return;
+		}
 
 		if (pipelines.contains(editor.selectedPipeline())) {
 			editor.selectPipeline(null);
@@ -220,6 +222,7 @@ public class PipelinesWidget extends AbstractWidget {
 			// back to listView (e.g. to delete those items) wont behave as expected...
 			return new ArrayList<>(listView.getSelectionModel().getSelectedItems());
 		}
+
 	}
 
 	/**
@@ -231,9 +234,12 @@ public class PipelinesWidget extends AbstractWidget {
 		private final ToggleGroup group;
 		private final BorderPane pane = new BorderPane();
 		private final RadioButton radioButton = new RadioButton();
+		private final VBox vbox = new VBox();
 		private final Label label = new Label();
+		private final Label usage = new Label();
 		private final Label statusLabel = new Label();
 		private static final Tooltip defaultPipelineTooltip = new Tooltip();
+		private final InvalidationListener puListener = (c) -> setUsageLabel();
 		private final InvalidationListener defaultListener = (obs) -> {
 			updateDefault();
 			this.layout();
@@ -271,8 +277,11 @@ public class PipelinesWidget extends AbstractWidget {
 			radioButton.setPadding(new Insets(0, d, 0, 0));
 			statusLabel.setPadding(new Insets(0, 0, 0, d));
 
+			usage.getStyleClass().add("dip-small");
+			vbox.getChildren().setAll(label, usage);
+
 			pane.setLeft(radioButton);
-			pane.setCenter(label);
+			pane.setCenter(vbox);
 			pane.setRight(statusLabel);
 
 			defaultPipelineTooltip.setText(localize("pipeline.default"));
@@ -320,21 +329,35 @@ public class PipelinesWidget extends AbstractWidget {
 
 			setText(null);
 			setGraphic(null);
+			if (currentPipeline != null) {
+				this.editor.applicationHandler().getProject().pipelineUsageProperty(currentPipeline.id).removeListener(puListener);
+			}
 
 			currentPipeline = item;
 
 			if (!empty && item != null) {
 				group.setUserData(currentPipeline.id);
+				this.editor.applicationHandler().getProject().pipelineUsageProperty(currentPipeline.id).addListener(puListener);
 
 				radioButton.setUserData(this.getItem().id);
 				radioButton.setToggleGroup(group);
 				radioButton.setSelected(isPipelineSelected());
 
 				label.setText(item.getName());
+				setUsageLabel();
 				updateDefault();
 
 				setGraphic(pane);
 			}
+		}
+
+		private void setUsageLabel() {
+			final int n = editor.applicationHandler().getProject().pipelineUsageProperty(currentPipeline.id).get();
+			usage.setText(
+					(n == 0) ? localize("pipeline.usage.none")
+							: (n == 1) ? localize("pipeline.usage.one")
+									: localize("pipeline.usage", n)
+			);
 		}
 
 		@Override
@@ -345,7 +368,7 @@ public class PipelinesWidget extends AbstractWidget {
 			getListView().addEventHandler(MouseEvent.MOUSE_CLICKED, onDoubleClickHandler);
 
 			final PipelineCellEditBox edit = editBox();
-			edit.init(currentPipeline, label.getText());
+			edit.init(currentPipeline, label.getText(), usage.getText());
 
 			pane.setCenter(edit);
 
@@ -379,7 +402,7 @@ public class PipelinesWidget extends AbstractWidget {
 				currentPipeline.setVersionPolicy(v);
 			}
 
-			pane.setCenter(label);
+			pane.setCenter(vbox);
 
 			// this seems to be necessary since we ommit commitEdit and just
 			// use cancelEdit. Might also be a bug, who knows...
@@ -395,6 +418,7 @@ public class PipelinesWidget extends AbstractWidget {
 
 		private final FormGridPane grid;
 		private final TextField pipelineName;
+		private final Label usageLabel;
 		private final EnumParameter layoutStrategy;
 		private final EnumParameter versionPolicy;
 
@@ -409,6 +433,8 @@ public class PipelinesWidget extends AbstractWidget {
 			this.pipelineName = new TextField();
 			VBox.setMargin(pipelineName, new Insets(0, 0, 2, 0));
 			pipelineName.setOnKeyPressed(onEnterHandler);
+			this.usageLabel = new Label();
+			this.usageLabel.getStyleClass().add("dip-small");
 
 			this.layoutStrategy = new EnumParameter(
 					L10n.getInstance().getString("pipeline.layout.strategy"),
@@ -429,7 +455,7 @@ public class PipelinesWidget extends AbstractWidget {
 			grid.addParameters(versionPolicy);
 
 			this.setSpacing(UIStrategyGUI.Stage.insets);
-			this.getChildren().setAll(pipelineName, grid);
+			this.getChildren().setAll(pipelineName, usageLabel, grid);
 		}
 
 		/**
@@ -437,11 +463,13 @@ public class PipelinesWidget extends AbstractWidget {
 		 *
 		 * @param pipeline the pipeline.
 		 * @param name the name of the pipeline.
+		 * @param usage the usage message of the pipeline.
 		 */
-		public void init(Pipeline pipeline, String name) {
+		public void init(Pipeline pipeline, String name, String usage) {
 			layoutStrategy.set(pipeline.getLayoutStrategy().name());
 			versionPolicy.set(pipeline.getVersionPolicy().name());
 			pipelineName.setText(name);
+			usageLabel.setText(usage);
 		}
 
 		/**

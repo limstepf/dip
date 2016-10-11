@@ -212,19 +212,21 @@ public class PipelineManager implements Modifiable, Localizable {
 	 * Removes a pipeline from the pipeline manager.
 	 *
 	 * @param id pipeline id of the pipeline which is to be removed.
+	 * @return True if the pipeline was deleted, False otherwise.
 	 */
-	public void deletePipeline(int id) {
-		deletePipeline(getPipeline(id));
+	public boolean deletePipeline(int id) {
+		return deletePipeline(getPipeline(id));
 	}
 
 	/**
 	 * Removes a pipeline from the pipeline manager.
 	 *
 	 * @param pipeline pipeline to be removed.
+	 * @return True if the pipeline was deleted, False otherwise.
 	 */
-	public void deletePipeline(Pipeline pipeline) {
+	public boolean deletePipeline(Pipeline pipeline) {
 		final List<Pipeline> list = Arrays.asList(pipeline);
-		deletePipelines(list);
+		return deletePipelines(list);
 	}
 
 	/**
@@ -232,9 +234,10 @@ public class PipelineManager implements Modifiable, Localizable {
 	 * will be prompted for.
 	 *
 	 * @param selection list of pipelines to be removed.
+	 * @return True if the pipelines were deleted, False otherwise.
 	 */
-	public void deletePipelines(List<Pipeline> selection) {
-		deletePipelines(selection, true);
+	public boolean deletePipelines(List<Pipeline> selection) {
+		return deletePipelines(selection, true);
 	}
 
 	/**
@@ -242,8 +245,9 @@ public class PipelineManager implements Modifiable, Localizable {
 	 *
 	 * @param selection list of pipelines to be removed.
 	 * @param confirm whether to prompt for user confirmation first.
+	 * @return True if the pipelines were deleted, False otherwise.
 	 */
-	public void deletePipelines(List<Pipeline> selection, boolean confirm) {
+	public boolean deletePipelines(List<Pipeline> selection, boolean confirm) {
 		if (confirm) {
 			final List<String> names = new ArrayList<>();
 			for (Pipeline pipeline : selection) {
@@ -256,7 +260,7 @@ public class PipelineManager implements Modifiable, Localizable {
 					break;
 				case NO:
 				case CANCEL:
-					return;
+					return false;
 			}
 		}
 
@@ -273,6 +277,8 @@ public class PipelineManager implements Modifiable, Localizable {
 				this.setDefaultPipelineId(pipelines.get(0).id);
 			}
 		}
+
+		return true;
 	}
 
 	/**
