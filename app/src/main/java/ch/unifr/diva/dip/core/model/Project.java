@@ -582,12 +582,12 @@ public class Project implements Modifiable, Localizable {
 				continue;
 			}
 
-			// TODO: clean zip-filesystem
 			log.info("deleting page: {}", page);
 			page.pipelineIdProperty().removeListener(pipelineUsageListener);
 			addToPipelineUsage(page.getPipelineId(), -1);
 			this.modifiedProjectProperty.removeManagedProperty(page);
 			pages.remove(page);
+			page.clear();
 			this.handler.eventBus.post(
 					new ProjectNotification(ProjectNotification.Type.PAGE_REMOVED, page.id)
 			);
