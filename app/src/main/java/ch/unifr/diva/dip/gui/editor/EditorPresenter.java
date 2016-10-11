@@ -19,9 +19,7 @@ import org.slf4j.LoggerFactory;
 public class EditorPresenter implements Presenter {
 
 	private static final Logger log = LoggerFactory.getLogger(EditorPresenter.class);
-
 	private final ApplicationHandler handler;
-
 	private final LayerGroup rootLayer;
 	private final ZoomPane zoomPane;
 	private final InvalidationListener onModifiedListener;
@@ -127,7 +125,9 @@ public class EditorPresenter implements Presenter {
 	}
 
 	private void onPageRemoved(int id) {
-		clear();
+		if (handler.getProject().getSelectedPageId() == id) {
+			clear();
+		}
 	}
 
 	private void onClosingProject() {
