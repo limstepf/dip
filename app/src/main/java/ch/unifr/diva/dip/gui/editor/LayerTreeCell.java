@@ -11,7 +11,6 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TreeCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 
 /**
  * Layer tree cell. Used by the LayersWidget that displays the processors of a
@@ -74,7 +73,7 @@ public class LayerTreeCell extends TreeCell<Layer> {
 			return;
 		}
 		if (isFocused() || isSelected()) {
-			glyph.setColor(Color.WHITE);
+			glyph.setColor(UIStrategyGUI.Colors.accent_inverted);
 		} else {
 			glyph.setColor(UIStrategyGUI.Colors.accent);
 		}

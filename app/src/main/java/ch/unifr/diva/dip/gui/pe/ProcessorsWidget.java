@@ -185,7 +185,7 @@ public class ProcessorsWidget extends AbstractWidget {
 		private Image getDragView() {
 			final Glyph g = UIStrategyGUI.Glyphs.newGlyph(namedGlyph, Glyph.Size.HUGE);
 			g.setBackground(Color.TRANSPARENT);
-			g.setColor(Color.WHITE);
+			g.setColor(UIStrategyGUI.Colors.accent_inverted);
 			final Scene s = new Scene(g, Color.TRANSPARENT);
 			final WritableImage image = g.snapshot(snapshotParams, null);
 			return image;
@@ -206,7 +206,7 @@ public class ProcessorsWidget extends AbstractWidget {
 
 		private void updateColor() {
 			if (isFocused() || isSelected()) {
-				glyph.setColor(Color.WHITE);
+				glyph.setColor(UIStrategyGUI.Colors.accent_inverted);
 			} else {
 				glyph.setColor(UIStrategyGUI.Colors.accent);
 			}

@@ -28,7 +28,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.paint.Color;
 import javafx.util.Callback;
 
 /**
@@ -354,7 +353,7 @@ public class DataItemListView<T extends DataItemListView.DataItem> implements Lo
 			}
 			this.currentGlyph.setColor(
 					this.selectedProperty().get()
-							? Color.WHITE
+							? UIStrategyGUI.Colors.accent_inverted
 							: UIStrategyGUI.Colors.accent
 			);
 		}

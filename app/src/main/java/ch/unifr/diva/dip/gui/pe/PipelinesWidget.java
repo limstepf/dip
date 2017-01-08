@@ -44,7 +44,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -362,7 +361,7 @@ public class PipelinesWidget extends AbstractWidget {
 			}
 			currentGlyph.setColor(
 					this.selectedProperty().get()
-							? Color.WHITE
+							? UIStrategyGUI.Colors.accent_inverted
 							: UIStrategyGUI.Colors.accent
 			);
 		}

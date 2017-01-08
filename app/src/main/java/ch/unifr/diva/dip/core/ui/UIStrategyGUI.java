@@ -115,6 +115,13 @@ public class UIStrategyGUI implements UIStrategy {
 		public static final Color accent = Color.web("0x0096C9");
 
 		/**
+		 * Inverted (or contrast) color to the highlighting/accenting color.
+		 * Used as a backup accent color in cases where the background color is
+		 * the accent color (e.g. for selected list cells).
+		 */
+		public static final Color accent_inverted = Color.WHITE;
+
+		/**
 		 * Ok status color.
 		 */
 		public static final Color ok = Color.FORESTGREEN;
