@@ -207,6 +207,8 @@ public class PagesWidget extends AbstractWidget {
 					return true;
 				}
 		);
+		// listen to (external) reassignment of the page's pipeline
+		private final InvalidationListener pipelineListener = (c) -> updatePipelineLabel();
 
 		/**
 		 * Creates a new project page cell.
@@ -253,9 +255,13 @@ public class PagesWidget extends AbstractWidget {
 			setText(null);
 			setGraphic(null);
 
+			if (currentPage != null) {
+				currentPage.pipelineIdProperty().removeListener(pipelineListener);
+			}
 			currentPage = item;
 
 			if (!empty) {
+				currentPage.pipelineIdProperty().addListener(pipelineListener);
 
 				radioButton.setUserData(this.getItem().id);
 				radioButton.setToggleGroup(group);
