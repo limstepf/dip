@@ -8,6 +8,7 @@ import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.services.Transmutable;
 import ch.unifr.diva.dip.api.ui.Glyph;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
+import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.model.ProcessorWrapper;
 import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
@@ -118,7 +119,7 @@ public abstract class ProcessorView extends BorderPane {
 		this.getStyleClass().add("dip-processor");
 		this.setBackground(Background.EMPTY);
 
-		this.head = new ProcessorHead(editor.applicationHandler().uiStrategy.getStage(), wrapper);
+		this.head = new ProcessorHead(editor.applicationHandler(), wrapper);
 	}
 
 	/**
@@ -127,6 +128,8 @@ public abstract class ProcessorView extends BorderPane {
 	 */
 	public static class ProcessorHead implements Localizable {
 
+		private final ApplicationHandler handler;
+		private final Window owner;
 		private final BorderPane pane;
 		private final HBox title;
 		private final HBox menu;
@@ -134,10 +137,12 @@ public abstract class ProcessorView extends BorderPane {
 		/**
 		 * Creates a new processor head.
 		 *
-		 * @param owner owner of dialogs that will be opened.
+		 * @param handler the application handler.
 		 * @param wrapper the processor wrapper.
 		 */
-		public ProcessorHead(Window owner, ProcessorWrapper wrapper) {
+		public ProcessorHead(ApplicationHandler handler, ProcessorWrapper wrapper) {
+			this.handler = handler;
+			this.owner = handler.uiStrategy.getStage();
 			this.pane = new BorderPane();
 			pane.setMaxWidth(Double.MAX_VALUE);
 
@@ -163,14 +168,14 @@ public abstract class ProcessorView extends BorderPane {
 			importGlyph.enableHoverEffect(true);
 			importGlyph.setTooltip(localize("preset.load"));
 			importGlyph.setOnMouseClicked((e) -> {
-				final ProcessorPresetImportDialog dialog = new ProcessorPresetImportDialog(owner, wrapper);
+				final ProcessorPresetImportDialog dialog = new ProcessorPresetImportDialog(handler, wrapper);
 				dialog.show();
 			});
 			final Glyph exportGlyph = UIStrategyGUI.Glyphs.newGlyph(EXPORT_GLYPH, Glyph.Size.NORMAL);
 			exportGlyph.enableHoverEffect(true);
 			exportGlyph.setTooltip(localize("preset.save"));
 			exportGlyph.setOnMouseClicked((e) -> {
-				final ProcessorPresetExportDialog dialog = new ProcessorPresetExportDialog(owner, wrapper);
+				final ProcessorPresetExportDialog dialog = new ProcessorPresetExportDialog(handler, wrapper);
 				dialog.show();
 			});
 			this.menu = new HBox();

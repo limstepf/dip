@@ -8,6 +8,8 @@ import ch.unifr.diva.dip.api.services.Previewable;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.utils.DipThreadPool;
 import ch.unifr.diva.dip.core.ApplicationHandler;
+import ch.unifr.diva.dip.core.model.Pipeline;
+import ch.unifr.diva.dip.core.model.ProcessorWrapper;
 import ch.unifr.diva.dip.core.model.RunnableProcessor;
 import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
@@ -19,7 +21,10 @@ import ch.unifr.diva.dip.gui.layout.ZoomSlider;
 import java.awt.Rectangle;
 import java.util.Collection;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;
@@ -54,9 +59,11 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 
 	private final ApplicationHandler handler;
 	private final RunnableProcessor runnable;
+	private final ProcessorWrapper prototype;
 	private final ProcessorView.ProcessorHead head;
 	private final ProcessorView.ParameterViewBase parameterView;
 	private final PreviewWidget previewWidget;
+	private final BooleanProperty patchedProperty;
 
 	/**
 	 * Creates a new processor parameter (and preview) window. The window can
@@ -76,10 +83,17 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 		this.handler = handler;
 		this.runnable = runnable;
 
+		final Pipeline pipelinePrototype = handler.getProject().getSelectedPage().getPipelinePrototype();
+		this.prototype = pipelinePrototype.getProcessor(runnable.id);
+
+		this.patchedProperty = new SimpleBooleanProperty();
+		this.runnable.processor().getCompositeProperty().addListener((c) -> updatePatchedProperty());
+		updatePatchedProperty();
+
 		final double b = UIStrategyGUI.Stage.insets;
 		final Insets insets = new Insets(b);
 
-		this.head = new ProcessorView.ProcessorHead(this.stage, runnable);
+		this.head = new ProcessorView.ProcessorHead(handler, runnable);
 		BorderPane.setMargin(head.getNode(), insets);
 		this.root.setTop(head.getNode());
 
@@ -96,10 +110,8 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 			this.close();
 		});
 		final Button reset = newButton(localize("reset"));
-		reset.setDisable(true);
-		reset.setOnAction((e) -> {
-			// TODO
-		});
+		reset.disableProperty().bind(Bindings.not(this.patchedProperty));
+		reset.setOnAction((e) -> resetParameters());
 		sideBox.getChildren().addAll(ok, reset);
 		this.root.setRight(sideBox);
 
@@ -132,6 +144,15 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 		}
 
 		this.setOnCloseRequest((e) -> onClose(e));
+	}
+
+	private void updatePatchedProperty() {
+		this.patchedProperty.set(!this.prototype.equalParameters(this.runnable));
+	}
+
+	private void resetParameters() {
+		this.runnable.copyParameters(this.prototype);
+		this.patchedProperty.set(false);
 	}
 
 	@Override

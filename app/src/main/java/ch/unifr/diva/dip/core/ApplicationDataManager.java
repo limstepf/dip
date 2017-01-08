@@ -171,9 +171,9 @@ public class ApplicationDataManager {
 		public final Path bundleCacheDir;
 
 		/**
-		 * Pipeline presets directory.
+		 * Presets directory.
 		 */
-		public final Path pipelinePresetsDir;
+		public final Path presetsDir;
 
 		/**
 		 * Processor presets directory.
@@ -201,12 +201,34 @@ public class ApplicationDataManager {
 			super(path);
 			this.userBundleDir = getRealDirectory(path.resolve("bundles"));
 			this.bundleCacheDir = getRealDirectory(path.resolve("felix-cache"));
-			this.pipelinePresetsDir = getRealDirectory(path.resolve("pipelines"));
-			this.processorPresetsDir = getRealDirectory(path.resolve("processors"));
+			this.presetsDir = getRealDirectory(path.resolve("presets"));
+			this.processorPresetsDir = getRealDirectory(this.presetsDir.resolve("processors"));
 			this.tmpDir = getRealDirectory(path.resolve("tmp"));
 
 			this.settingsFile = path.resolve("settings.xml");
 		}
+
+		/**
+		 * Returns the path to the preset file of a plugin (service/processor).
+		 * The file might not exist (yet).
+		 *
+		 * @param pid the pid of the service/processor.
+		 * @return a Path to the preset file of the plugin.
+		 */
+		public Path getProcessorPresetPath(String pid) {
+			return this.processorPresetsDir.resolve(pid + ".xml");
+		}
+
+		/**
+		 * Returns the path to the pipelines preset file. The file might not
+		 * exist (yet).
+		 *
+		 * @return a Path to the pipelines preset file.
+		 */
+		public Path getPipelinePresetPath() {
+			return this.presetsDir.resolve("pipelines.xml");
+		}
+
 	}
 
 	/**

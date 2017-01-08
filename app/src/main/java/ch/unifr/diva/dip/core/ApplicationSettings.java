@@ -32,18 +32,10 @@ public class ApplicationSettings {
 	);
 
 	/**
-	 * File extension filter for pipeline presets files.
+	 * File extension filter for DIP data files.
 	 */
-	public static final ExtensionFilter pipelinePresetsFileExtensionFilter = new ExtensionFilter(
-			L10n.getInstance().getString("pipeline.presets.file"),
-			"*.xml"
-	);
-
-	/**
-	 * File extension filter for processor presets files.
-	 */
-	public static final ExtensionFilter processorPresetsFileExtensionFilter = new ExtensionFilter(
-			L10n.getInstance().getString("processor.presets.file"),
+	public static final ExtensionFilter dipDataFileExtensionFilter = new ExtensionFilter(
+			L10n.getInstance().getString("file.dip.data"),
 			"*.xml"
 	);
 
