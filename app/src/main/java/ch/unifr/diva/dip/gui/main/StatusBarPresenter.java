@@ -27,8 +27,8 @@ import javafx.util.Duration;
  * StatusBar.
  *
  * This implementation has a stack for running workers and a StringProperty for
- * a simple status message. Status of running workers takes precedence, as
- * illustrated below:
+ * a simple status message. Status of running workers takes precedence (and
+ * newer workers take precedence over older ones), as illustrated below:
  *
  * <pre>
  * workers:
@@ -47,9 +47,10 @@ public class StatusBarPresenter implements Presenter {
 	private final BorderPane statusBar = new BorderPane();
 	private final Label message = new Label();
 	private final StringProperty messageProperty = new SimpleStringProperty();
-	private Transition messageTransition;
 	private final ProgressBar progress = new ProgressBar();
 	private final LinkedBlockingDeque<StatusWorkerEvent> stack = new LinkedBlockingDeque<>();
+	private Transition messageTransition;
+	private String latestMessage;
 
 	/**
 	 * Creates a {@code StatusBar}.
@@ -65,23 +66,77 @@ public class StatusBarPresenter implements Presenter {
 	}
 
 	@Subscribe
-	public void handleStatusEvent(StatusWorkerEvent event) {
-		message.textProperty().unbind();
-		progress.progressProperty().unbind();
+	public void handleStatusEvent(StatusMessageEvent event) {
+		/*
+		 * Just overwrite the last message and (re-)start the fade out transition.
+		 * The message will be visible as long as no StatusWorkerEvent is active.
+		 */
+		latestMessage = event.message;
+		messageProperty.set(event.message);
+		messageTransition = startFadeTransition(messageTransition, message);
+	}
 
+	@Subscribe
+	public void handleStatusEvent(StatusWorkerEvent event) {
+		/*
+		 * Latest worker is shown, once done we check for older workers and
+		 * bind to them if still running, or, finally, bind back to the regular
+		 * status message.
+		 */
 		stack.add(event);
+
 		final ChangeListener listener = new ChangeListener() {
 			@Override
 			public void changed(ObservableValue observable, Object oldValue, Object newValue) {
 				final Worker.State state = (Worker.State) newValue;
 				if (isDone(state)) {
 					event.worker.stateProperty().removeListener(this);
-					popStatusWorkerEvent(event);
+					removeStatusWorkerEvent(event);
 				}
 			}
 		};
+		// bind before we start listening to the worker's state
+		bindToStatusWorkerEvent(event);
 		event.worker.stateProperty().addListener(listener);
+		// small jobs may as well be already done before the listener could be
+		// attached; make sure the listener fires at least once to ensure the
+		// event will be properly cleaned up
+		listener.changed(
+				event.worker.stateProperty(),
+				event.worker.stateProperty().get(),
+				event.worker.stateProperty().get()
+		);
+	}
 
+	private void removeStatusWorkerEvent(StatusWorkerEvent event) {
+		stack.remove(event);
+
+		if (stack.isEmpty()) {
+			unbindStatusWorkerEvent(); // done, show regular msg again
+		} else {
+			final StatusWorkerEvent next = stack.peek();
+			if (isDone(next)) {
+				removeStatusWorkerEvent(next); // pop, try next
+			} else {
+				bindToStatusWorkerEvent(next); // bind to next worker
+			}
+		}
+	}
+
+	private void unbindStatusWorkerEvent() {
+		message.textProperty().unbind();
+		progress.progressProperty().unbind();
+		enableProgress(false);
+		if (latestMessage != null) {
+			message.textProperty().set(latestMessage);
+			messageTransition = startFadeTransition(messageTransition, message);
+		}
+	}
+
+	private void bindToStatusWorkerEvent(StatusWorkerEvent event) {
+		if (messageTransition != null) {
+			messageTransition.stop();
+		}
 		message.textProperty().bind(event.worker.messageProperty());
 		message.setOpacity(1.0);
 		progress.progressProperty().bind(event.worker.progressProperty());
@@ -117,33 +172,14 @@ public class StatusBarPresenter implements Presenter {
 		return t;
 	}
 
-	@Subscribe
-	public void handleStatusEvent(StatusMessageEvent event) {
-		messageProperty.set(event.message);
-		messageTransition = startFadeTransition(messageTransition, message);
-	}
-
 	/**
-	 * Removes a finished worker from the stack, binding to the next worker
-	 * still running, or back to the default message.
+	 * Checks whether the worker of a worker event is done already.
 	 *
-	 * @param event the finished worker event.
+	 * @param event the worker event.
+	 * @return True if done, False otherwise.
 	 */
-	public void popStatusWorkerEvent(StatusWorkerEvent event) {
-		stack.remove(event);
-		if (!stack.isEmpty()) {
-			final StatusWorkerEvent next = stack.peek();
-
-			if (isDone(next.worker.getState())) {
-				popStatusWorkerEvent(next);
-			} else {
-				handleStatusEvent(next);
-			}
-		} else {
-			message.textProperty().bind(messageProperty);
-			progress.progressProperty().unbind();
-			enableProgress(false);
-		}
+	private boolean isDone(StatusWorkerEvent event) {
+		return isDone(event.worker.getState());
 	}
 
 	/**
@@ -191,4 +227,5 @@ public class StatusBarPresenter implements Presenter {
 	public Parent getComponent() {
 		return statusBar;
 	}
+
 }
