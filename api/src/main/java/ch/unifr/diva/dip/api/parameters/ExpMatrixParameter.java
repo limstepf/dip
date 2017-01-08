@@ -4,6 +4,7 @@ import ch.unifr.diva.dip.api.datastructures.StringMatrix;
 import javafx.beans.InvalidationListener;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.scene.Scene;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
@@ -11,6 +12,7 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.stage.Window;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 
@@ -255,6 +257,15 @@ public class ExpMatrixParameter extends PersistentParameterBase<StringMatrix, Ex
 				for (int j = 0; j < value.columns; j++) {
 					final int index = currentLayout.index(i, j, value.rows, value.columns);
 					grid.add(textfields[index], j, i);
+				}
+			}
+
+			// a new matrix (size) requires a different sized dialog/window
+			final Scene scene = this.root.getScene();
+			if (scene != null) {
+				final Window window = this.root.getScene().getWindow();
+				if (window != null) {
+					window.sizeToScene();
 				}
 			}
 		}
