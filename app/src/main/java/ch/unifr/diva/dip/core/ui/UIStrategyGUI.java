@@ -41,6 +41,12 @@ public class UIStrategyGUI implements UIStrategy {
 	}
 
 	@Override
+	public void showError(String message, Throwable throwable) {
+		final ErrorDialog dialog = new ErrorDialog(message, throwable);
+		dialog.showAndWait();
+	}
+
+	@Override
 	public void showInformation(String message) {
 		final InformationDialog dialog = new InformationDialog(message);
 		dialog.showAndWait();

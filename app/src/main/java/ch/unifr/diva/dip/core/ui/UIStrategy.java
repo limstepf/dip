@@ -12,18 +12,42 @@ public interface UIStrategy {
 	 */
 	public enum Answer {
 
+		/**
+		 * Affirmative answer.
+		 */
 		YES,
+		/**
+		 * Negative answer.
+		 */
 		NO,
+		/**
+		 * Cancel.
+		 */
 		CANCEL
 	}
 
+	/**
+	 * Checks whether the UI has a stage.
+	 *
+	 * @return true if there is a stage, false otherwise.
+	 */
 	default boolean hasStage() {
 		return false;
 	}
 
+	/**
+	 * Sets the stage.
+	 *
+	 * @param stage the stage.
+	 */
 	default void setStage(Stage stage) {
 	}
 
+	/**
+	 * Returns the stage.
+	 *
+	 * @return the stage, or null.
+	 */
 	default Stage getStage() {
 		return null;
 	}
@@ -56,4 +80,13 @@ public interface UIStrategy {
 	 * @param throwable an exception or an error.
 	 */
 	public void showError(Throwable throwable);
+
+	/**
+	 * Shows an exception or error to the user.
+	 *
+	 * @param message custom error message.
+	 * @param throwable an exception or an error.
+	 */
+	public void showError(String message, Throwable throwable);
+
 }

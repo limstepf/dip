@@ -32,7 +32,9 @@ public class ErrorDialog extends AbstractAlert {
 		setTitle(L10n.getInstance().getString("error"));
 
 		if (throwable != null) {
-			alert.setContentText(throwable.getMessage());
+			alert.setContentText(
+					error == null ? throwable.getMessage() : error
+			);
 			final StringWriter sw = new StringWriter();
 			final PrintWriter pw = new PrintWriter(sw);
 			throwable.printStackTrace(pw);
@@ -43,6 +45,10 @@ public class ErrorDialog extends AbstractAlert {
 			textArea.setMaxWidth(Double.MAX_VALUE);
 			textArea.setMaxHeight(Double.MAX_VALUE);
 			alert.getDialogPane().setExpandableContent(textArea);
+		} else {
+			if (error != null) {
+				alert.setContentText(error);
+			}
 		}
 	}
 

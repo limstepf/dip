@@ -16,6 +16,14 @@ public class UIStrategyCLI implements UIStrategy, Localizable {
 	}
 
 	@Override
+	public void showError(String message, Throwable throwable) {
+		System.out.println(
+				localize("error") + ": " + message + "\n"
+				+ throwable.getMessage()
+		);
+	}
+
+	@Override
 	public void showInformation(String message) {
 		System.out.println(
 				localize("information") + ": "
