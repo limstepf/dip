@@ -266,6 +266,7 @@ public class RunnableProcessor extends ProcessorWrapper {
 		}
 
 		saveObjectMap();
+		this.modifiedProperty().set(false);
 	}
 
 	private void saveObjectMap() {
