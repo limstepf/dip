@@ -123,4 +123,21 @@ public abstract class Kernel<T extends Matrix> {
 	 */
 	public abstract double getValueDouble(int column, int row);
 
+	@Override
+	public int hashCode() {
+		return matrix.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final Kernel other = (Kernel) obj;
+		return matrix.equals(other.matrix);
+	}
+
 }

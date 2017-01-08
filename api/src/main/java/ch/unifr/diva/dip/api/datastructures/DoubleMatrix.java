@@ -1,5 +1,7 @@
 package ch.unifr.diva.dip.api.datastructures;
 
+import java.util.Arrays;
+import java.util.Objects;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -262,6 +264,42 @@ public class DoubleMatrix extends Matrix {
 
 		final DoubleMatrix tp = this.transpose();
 		return new DoubleMatrix(this.rows, this.columns, Layout.ROW_MAJOR_ORDER, tp.data);
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 17;
+		hash = 31 * hash + rows;
+		hash = 31 * hash + columns;
+		hash = 31 * hash + layout.hashCode();
+		hash = 31 * hash + Arrays.hashCode(data);
+		return hash;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final StringMatrix other = (StringMatrix) obj;
+		if (!Objects.equals(rows, other.rows)) {
+			return false;
+		}
+		if (!Objects.equals(columns, other.columns)) {
+			return false;
+		}
+		if (!Objects.equals(layout, other.layout)) {
+			return false;
+		}
+		for (int i = 0, n = data.length; i < n; i++) {
+			if (!Objects.equals(data[i], other.data[i])) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 }

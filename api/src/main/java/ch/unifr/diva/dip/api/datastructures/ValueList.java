@@ -53,6 +53,26 @@ public class ValueList {
 	}
 
 	@Override
+	public int hashCode() {
+		return list.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final ValueList other = (ValueList) obj;
+		if (!this.list.equals(other.list)) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
 	public String toString() {
 		return this.getClass().getSimpleName()
 				+ "@" + Integer.toHexString(this.hashCode())

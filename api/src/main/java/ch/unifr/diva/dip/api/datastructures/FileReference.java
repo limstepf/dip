@@ -69,4 +69,26 @@ public class FileReference {
 		return Paths.get(this.path);
 	}
 
+	@Override
+	public int hashCode() {
+		return path.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final FileReference other = (FileReference) obj;
+		return path.equals(other.path);
+	}
+
+	@Override
+	public String toString() {
+		return path;
+	}
+
 }

@@ -48,6 +48,31 @@ public class ValueListSelection extends ValueList {
 	}
 
 	@Override
+	public int hashCode() {
+		int hash = super.hashCode();
+		hash = 31 * hash + this.selection;
+		return hash;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final ValueListSelection other = (ValueListSelection) obj;
+		if (this.selection != other.selection) {
+			return false;
+		}
+		if (!this.list.equals(other.list)) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
 	public String toString() {
 		return this.getClass().getSimpleName()
 				+ "@" + Integer.toHexString(this.hashCode())

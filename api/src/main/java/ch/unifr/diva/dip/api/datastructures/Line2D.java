@@ -1,5 +1,6 @@
 package ch.unifr.diva.dip.api.datastructures;
 
+import java.util.Objects;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -57,6 +58,29 @@ public class Line2D {
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		return super.clone();
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 17;
+		hash = 31 * hash + end.hashCode();
+		hash = 31 * hash + start.hashCode();
+		return hash;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final Line2D other = (Line2D) obj;
+		if (!Objects.equals(end, other.end)) {
+			return false;
+		}
+		return Objects.equals(start, other.start);
 	}
 
 }

@@ -46,4 +46,22 @@ public class Polyline2D {
 		}
 		return clone;
 	}
+
+	@Override
+	public int hashCode() {
+		return points.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final Polyline2D other = (Polyline2D) obj;
+		return this.points.equals(other.points);
+	}
+
 }
