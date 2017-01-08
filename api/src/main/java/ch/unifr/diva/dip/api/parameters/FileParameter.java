@@ -2,6 +2,8 @@ package ch.unifr.diva.dip.api.parameters;
 
 import ch.unifr.diva.dip.api.datastructures.FileReference;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -50,6 +52,27 @@ public class FileParameter extends PersistentParameterBase<FileReference, FilePa
 		return new FileView(this);
 	}
 
+	protected final List<ViewHook> viewHooks = new ArrayList<>();
+
+	/**
+	 * Adds a view hook to customize the file chooser. This method is only
+	 * called if the view of the parameter is actually requested.
+	 *
+	 * @param hook hook method for a label.
+	 */
+	public void addFileChooserViewHook(ViewHook<FileChooser> hook) {
+		this.viewHooks.add(hook);
+	}
+
+	/**
+	 * Removes a view hook.
+	 *
+	 * @param hook hook method to be removed.
+	 */
+	public void removeFileChooserViewHook(ViewHook<FileChooser> hook) {
+		this.viewHooks.remove(hook);
+	}
+
 	/**
 	 * File view.
 	 */
@@ -76,7 +99,7 @@ public class FileParameter extends PersistentParameterBase<FileReference, FilePa
 		private void selectFile() {
 			final FileChooser chooser = new FileChooser();
 			chooser.setTitle(parameter.action);
-			// TODO: initial directory? Extension filters?
+			PersistentParameter.applyViewHooks(chooser, parameter.viewHooks);
 			final Stage stage = (Stage) root.getScene().getWindow();
 
 			switch (parameter.mode) {
