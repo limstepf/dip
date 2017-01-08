@@ -11,13 +11,25 @@ import javafx.scene.control.ListView;
  */
 public interface Listable {
 
+	/**
+	 * Returns the node/body of the listable cell.
+	 *
+	 * @return the node/body of the listable cell.
+	 */
 	public Parent node();
 
-	public static ListView<Listable> newListView() {
-		final ListView<Listable> listView = new ListView<>();
+	/**
+	 * Creates a new list view for listables.
+	 *
+	 * @param <T> the class of the listable.
+	 * @return a new ListView for listables.
+	 */
+	public static <T extends Listable> ListView<T> newListView() {
+		final ListView<T> listView = new ListView<>();
 		listView.setMinHeight(0);
 		listView.setMaxHeight(Double.MAX_VALUE);
-		listView.setCellFactory((ListView<Listable> param) -> new ListableCell());
+		listView.setCellFactory((ListView<T> param) -> new ListableCell<>());
 		return listView;
 	}
+
 }
