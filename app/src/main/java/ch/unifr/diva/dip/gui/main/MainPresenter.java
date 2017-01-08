@@ -261,11 +261,14 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 		return confirmed;
 	}
 
+	/**
+	 * Opens a dialog to create a new project.
+	 */
 	public void newProject() {
 		if (confirmClosingProject()) {
 			final NewProjectDialog dialog = new NewProjectDialog(
 					stage,
-					ApplicationDataManager.userDirectory()
+					handler
 			);
 			dialog.showAndWait();
 			if (dialog.isOk()) {
@@ -273,17 +276,21 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 				handler.newProject(
 						dialog.getProjectName(),
 						dialog.getProjectFile(),
-						dialog.getProcessingPipeline(),
-						dialog.getImageSet()
+						dialog.getImages(),
+						dialog.getPipelines(),
+						dialog.getDefaultPipeline()
 				);
 			}
 		}
 	}
 
+	/**
+	 * Opens a dialog to open a project.
+	 */
 	public void openProject() {
 		if (confirmClosingProject()) {
 			final FileChooser chooser = new FileChooser();
-			chooser.setInitialDirectory(ApplicationDataManager.userDirectory().toFile());
+			chooser.setInitialDirectory(handler.getRecentSaveDirectory().toFile());
 			chooser.setTitle(localize("project.open"));
 			ApplicationSettings.setProjectExtensionFilter(chooser);
 			final File file = chooser.showOpenDialog(stage);
@@ -306,12 +313,17 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 		dialog.showAndWait();
 
 		if (dialog.isOk()) {
-			handler.applyRepairsAndOpen();
+			handler.openRepairedProject();
 		}
 
 		handler.clearRepairData();
 	}
 
+	/**
+	 * Selects a project page/image.
+	 *
+	 * @param page id of the project page.
+	 */
 	public void selectProjectPage(int page) {
 		final int selected = handler.getProject().getSelectedPageId();
 		handler.getProject().selectPage(page);
@@ -325,6 +337,9 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 		}
 	}
 
+	/**
+	 * Opens a dialog to import project pages/images.
+	 */
 	public void importProjectPages() {
 		final File initialDirectory = ApplicationDataManager.userDirectory().toFile();
 		final FileChooser chooser = new FileChooser();
@@ -345,10 +360,16 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 		}
 	}
 
+	/**
+	 * Saves the current project.
+	 */
 	public void saveProject() {
 		handler.saveProject();
 	}
 
+	/**
+	 * Opens a dialog to save the project at a new location.
+	 */
 	public void saveAsProject() {
 		final FileChooser chooser = new FileChooser();
 		chooser.setInitialDirectory(ApplicationDataManager.userDirectory().toFile());

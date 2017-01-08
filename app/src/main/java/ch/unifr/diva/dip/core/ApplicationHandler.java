@@ -1,6 +1,7 @@
 package ch.unifr.diva.dip.core;
 
 import ch.unifr.diva.dip.api.utils.DipThreadPool;
+import ch.unifr.diva.dip.core.model.PipelineData;
 import ch.unifr.diva.dip.core.ui.UIStrategy;
 import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.core.model.ProjectData;
@@ -182,7 +183,17 @@ public class ApplicationHandler implements Localizable {
 		return fallback;
 	}
 
-	public void newProject(String name, Path saveFile, String pipeline, List<Path> imageSet) {
+	/**
+	 * Creates a new project.
+	 *
+	 * @param name the name of the new project.
+	 * @param saveFile path to the savefile of the new project.
+	 * @param imageSet the initial set of images/pages, or null.
+	 * @param pipelines the initial set of pipelines, or null.
+	 * @param defaultPipeline the default pipeline (an object included in the
+	 * initial set of pipelines!), or null.
+	 */
+	public void newProject(String name, Path saveFile, List<Path> imageSet, List<PipelineData.Pipeline> pipelines, PipelineData.Pipeline defaultPipeline) {
 		if (hasProject()) {
 			closeProject();
 		}
@@ -200,10 +211,18 @@ public class ApplicationHandler implements Localizable {
 				final ProjectData projectData = new ProjectData(
 						name,
 						saveFile,
-						imageSet
+						imageSet,
+						pipelines
 				);
+				final int defaultId = (defaultPipeline == null) ? -1 : defaultPipeline.id;
+				if (defaultId >= 0) {
+					for (ProjectData.Page page : projectData.getPages()) {
+						page.pipelineId = defaultId;
+					}
+				}
 
 				project = Project.newProject(projectData, ApplicationHandler.this);
+				project.save();
 
 				return null;
 			}
@@ -229,6 +248,11 @@ public class ApplicationHandler implements Localizable {
 		task.start();
 	}
 
+	/**
+	 * Opens a project.
+	 *
+	 * @param saveFile the savefile of the project.
+	 */
 	public void openProject(Path saveFile) {
 		if (hasProject()) {
 			closeProject();
@@ -327,24 +351,49 @@ public class ApplicationHandler implements Localizable {
 		});
 	}
 
+	/**
+	 * Checks whether there is temporary data of a damaged or repaired project,
+	 * or not.
+	 *
+	 * @return True if temporary data of a damaged or repaired project is
+	 * around, False otherwise.
+	 */
 	public boolean hasRepairData() {
 		return (this.projectData != null && this.projectValidation != null);
 	}
 
+	/**
+	 * Returns the temporary project data of a damaged or repaired project.
+	 *
+	 * @return temporary project data of a damaged or repaired project, or null.
+	 */
 	public ProjectData getRepairData() {
 		return this.projectData;
 	}
 
+	/**
+	 * Returns the validation result associated to the temporary project data of
+	 * a damaged or repaired project.
+	 *
+	 * @return the validation result associated to the temporary project data of
+	 * a damaged or repaired project, or null.
+	 */
 	public ProjectData.ValidationResult getRepairValidation() {
 		return this.projectValidation;
 	}
 
+	/**
+	 * Deletes repaired project data.
+	 */
 	public void clearRepairData() {
 		this.projectData = null;
 		this.projectValidation = null;
 	}
 
-	public void applyRepairsAndOpen() {
+	/**
+	 * Opens a project from the repaired project data.
+	 */
+	public void openRepairedProject() {
 		if (!hasRepairData()) {
 			return;
 		}
@@ -353,6 +402,9 @@ public class ApplicationHandler implements Localizable {
 		broadcastOpenProject();
 	}
 
+	/**
+	 * Saves the current project.
+	 */
 	public void saveProject() {
 		if (!hasProject()) {
 			return;
