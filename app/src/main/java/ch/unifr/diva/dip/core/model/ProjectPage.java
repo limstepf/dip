@@ -9,13 +9,9 @@ import ch.unifr.diva.dip.utils.IOUtils;
 import ch.unifr.diva.dip.utils.Modifiable;
 import ch.unifr.diva.dip.utils.ModifiedProperty;
 import java.awt.image.BufferedImage;
-import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -41,11 +37,10 @@ public class ProjectPage implements Modifiable, Localizable {
 	protected static final String ROOT_DIR_FORMAT = "/pages/%d/";
 
 	/**
-	 * XML file holding the page's pipeline and possibly changed/overwritten
-	 * processor parameters.
+	 * XML file containing the page's pipeline delta patch.
 	 */
-	protected final String PIPELINE_XML;
-	protected static final String PIPELINE_XML_FORMAT = "/pages/%d/pipeline.xml";
+	protected final String PIPELINE_PATCH_XML;
+	protected static final String PIPELINE_PATCH_XML_FORMAT = "/pages/%d/patch.xml";
 
 	/**
 	 * Root directory of persitent data of processors.
@@ -123,7 +118,7 @@ public class ProjectPage implements Modifiable, Localizable {
 		this.project = project;
 		this.id = page.id;
 		this.ROOT_DIR = String.format(ROOT_DIR_FORMAT, this.id);
-		this.PIPELINE_XML = String.format(PIPELINE_XML_FORMAT, this.id);
+		this.PIPELINE_PATCH_XML = String.format(PIPELINE_PATCH_XML_FORMAT, this.id);
 		this.PROCESSORS_ROOT_DIR = String.format(PROCESSORS_ROOT_DIR_FORMAT, this.id);
 		this.pipelineIdProperty = new SimpleIntegerProperty(page.pipelineId);
 		this.nameProperty = new SimpleStringProperty(page.name);
@@ -182,7 +177,7 @@ public class ProjectPage implements Modifiable, Localizable {
 	 *
 	 * @return a new/fresh pipeline.
 	 */
-	private Pipeline getPipelinePrototype() {
+	public Pipeline getPipelinePrototype() {
 		return getPipelinePrototype(getPipelineId());
 	}
 
@@ -338,96 +333,17 @@ public class ProjectPage implements Modifiable, Localizable {
 			return null;
 		}
 
-		// make sure we have a pipeline.xml file for the RunnablePipeline of the page.
-		if (!Files.exists(pipelineXml())) {
-			if (!initPipelineXml(pipelineId)) {
-				return null;
-			}
-		}
-
-		final PipelineData.Pipeline data = pipelineData();
-		if (data == null) {
-			log.error("illegal pipeline data in `pipeline.xml`: {}", this);
-			handler.uiStrategy.showError(new Throwable("illegal pipeline data in `pipeline.xml`"));
+		final Pipeline prototype = this.project().pipelineManager().getPipeline(pipelineId);
+		if (prototype == null) {
 			return null;
 		}
 
-		return new RunnablePipeline(handler, this, data);
-	}
-
-	/**
-	 * Creates the pipeline.xml file, copying from the pipeline's prototype.
-	 *
-	 * @return True if all went just fine, False in case we did not end up with
-	 * a `pipeline.xml` file.
-	 */
-	private boolean initPipelineXml(int pipelineId) {
-		final List<Pipeline> prototype = new ArrayList<>();
-		prototype.add(getPipelinePrototype(pipelineId));
-		try (OutputStream stream = new BufferedOutputStream(Files.newOutputStream(pipelineXml()))) {
-			PipelineManager.exportPipelines(prototype, stream);
-		} catch (JAXBException | IOException ex) {
-			log.error("failed to init the project page's `pipeline.xml`: {}", this, ex);
-			handler.uiStrategy.showError(ex);
-			return false;
-		}
-		return true;
-	}
-
-	/**
-	 * Saves the page's (runnable) pipeline. This overwrites the pipeline.xml
-	 * file.
-	 *
-	 * @return True if all went just fine, False in case of an error.
-	 */
-	private boolean savePipelineXml() {
-		final List<Pipeline> pipe = new ArrayList<>();
-		pipe.add(this.getPipeline());
-
-		deletePipelineXmlIfExists();
-
-		try (OutputStream stream = new BufferedOutputStream(Files.newOutputStream(pipelineXml()))) {
-			PipelineManager.exportPipelines(pipe, stream);
-		} catch (JAXBException | IOException ex) {
-			log.error("failed to save the project page's `pipeline.xml`: {}", this, ex);
-			handler.uiStrategy.showError(ex);
-			return false;
-		}
-		return true;
-	}
-
-	/**
-	 * Resets the (runnable) pipeline. This method resets all parameters
-	 * (possibly overwritten w.r.t. the pipeline's prototype) and deletes all
-	 * persistent processor data.
-	 */
-	private synchronized void resetPipeline() {
-		try {
-			if (Files.exists(processorRootDirectory())) {
-				FileFinder.deleteDirectory(processorRootDirectory());
-			}
-		} catch (IOException ex) {
-			log.error("failed to clear the project page's processor data: {}", this, ex);
-			handler.uiStrategy.showError(ex);
+		final PipelinePatch patch = pipelinePatch();
+		if (patch != null && !patch.isEmpty()) {
+			return prototype.cloneAsRunnablePipeline(this, patch);
 		}
 
-		deletePipelineXmlIfExists();
-	}
-
-	/**
-	 * Deletes the pipeline.xml file (if it exists).
-	 *
-	 * @return True if the file got deleted by this method, False otherwise
-	 * (e.g. if it did not exist).
-	 */
-	private boolean deletePipelineXmlIfExists() {
-		try {
-			return Files.deleteIfExists(pipelineXml());
-		} catch (IOException ex) {
-			log.error("failed to clear the project page's `pipeline.xml`: {}", this, ex);
-			handler.uiStrategy.showError(ex);
-		}
-		return false;
+		return prototype.cloneAsRunnablePipeline(this);
 	}
 
 	/**
@@ -454,7 +370,7 @@ public class ProjectPage implements Modifiable, Localizable {
 	 *
 	 * @return a path to the root directory of the page.
 	 */
-	private Path rootDirectory() {
+	protected Path rootDirectory() {
 		return project.zipFileSystem().getPath(ROOT_DIR);
 	}
 
@@ -464,36 +380,35 @@ public class ProjectPage implements Modifiable, Localizable {
 	 *
 	 * @return a path to the root directory of processors.
 	 */
-	private Path processorRootDirectory() {
+	protected Path processorRootDirectory() {
 		return project.zipFileSystem().getPath(PROCESSORS_ROOT_DIR);
 	}
 
 	/**
-	 * Returns a path to the pipeline XML file of the page.
+	 * Returns the path to the pipeline patch XML file of the page.
 	 *
-	 * @return a path to the pipeline XML file of the page.
+	 * @return the path to the pipeline patch XML file of the page.
 	 */
-	private Path pipelineXml() {
-		return project.zipFileSystem().getPath(PIPELINE_XML);
+	protected Path pipelinePatchXml() {
+		return project.zipFileSystem().getPath(PIPELINE_PATCH_XML);
 	}
 
 	/**
-	 * Returns the pipeline data of the RunnablePipeline encoded in the
-	 * pipeline.xml file.
+	 * Returns the pipeline patch of the page.
 	 *
-	 * @return the pipeline data,
+	 * @return the pipeline patch of the page, or null.
 	 */
-	private PipelineData.Pipeline pipelineData() {
-		try {
-			final PipelineData data = PipelineData.loadAsStream(pipelineXml());
-			if (!data.hasPrimaryPipeline()) {
-				return null;
+	private PipelinePatch pipelinePatch() {
+		if (Files.exists(pipelinePatchXml())) {
+			try {
+				final PipelinePatch patch = PipelinePatch.loadAsStream(pipelinePatchXml());
+				return patch;
+			} catch (IOException | JAXBException ex) {
+				log.error("failed to read the pipeline's patch: {}", this, ex);
+				handler.uiStrategy.showError(ex);
 			}
-			return data.primaryPipeline();
-		} catch (IOException | JAXBException ex) {
-			log.error("failed to read the project page's `pipeline.xml`: {}", this, ex);
-			handler.uiStrategy.showError(ex);
 		}
+
 		return null;
 	}
 
@@ -524,15 +439,9 @@ public class ProjectPage implements Modifiable, Localizable {
 	 * Saves the page.
 	 */
 	public synchronized void save() {
-		// TODO/CHECK: only if actually modified? (or better be save than sorry...)
-		if (getPipeline() != null) {
-			this.modifiedPageProperty.removeManagedProperty(this.pipeline);
-			if (this.getPipelineId() > 0) {
-				// TODO: refactor this mess; who's in charge here? the page or the
-				// runnable pipeline??
-				this.getPipeline().save(); // saves processor data
-				savePipelineXml(); // writes the pipeline (and proc. parameters)
-			}
+		if ((getPipeline() != null) && (getPipelineId() > 0)) {
+			getPipeline().save();
+			modifiedProperty().set(false);
 		}
 	}
 
@@ -561,4 +470,5 @@ public class ProjectPage implements Modifiable, Localizable {
 				+ ", name=" + nameProperty
 				+ "}";
 	}
+
 }

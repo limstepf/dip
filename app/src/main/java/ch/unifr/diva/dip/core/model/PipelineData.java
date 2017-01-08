@@ -3,10 +3,15 @@ package ch.unifr.diva.dip.core.model;
 import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.datatypes.DataType;
+import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.api.utils.XmlUtils;
 import ch.unifr.diva.dip.core.UserSettings;
 import ch.unifr.diva.dip.core.services.api.HostService;
+import ch.unifr.diva.dip.core.ui.Localizable;
+import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
+import ch.unifr.diva.dip.gui.pe.DataItemListView;
 import ch.unifr.diva.dip.osgi.OSGiVersionPolicy;
+import ch.unifr.diva.dip.utils.IOUtils;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,7 +21,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -25,8 +38,12 @@ import javax.xml.bind.annotation.XmlRootElement;
  * PipelineData.
  */
 @XmlRootElement(name = "pipelines")
+@XmlAccessorType(XmlAccessType.NONE)
 public class PipelineData {
 
+	/**
+	 * List of pipelines.
+	 */
 	@XmlElement(name = "pipeline")
 	public List<Pipeline> list = new ArrayList<>();
 
@@ -34,7 +51,7 @@ public class PipelineData {
 	 * Empty constructor (needed for JAXB).
 	 */
 	public PipelineData() {
-		//
+
 	}
 
 	/**
@@ -46,6 +63,50 @@ public class PipelineData {
 		for (ch.unifr.diva.dip.core.model.Pipeline pipeline : pipelines) {
 			this.list.add(new Pipeline(pipeline));
 		}
+	}
+
+	/**
+	 * Adds a pipeline to the pipeline data.
+	 *
+	 * @param pipeline the pipeline.
+	 */
+	public void addPipeline(Pipeline pipeline) {
+		this.list.add(pipeline);
+	}
+
+	/**
+	 * Adds a pipeline to the pipeline data.
+	 *
+	 * @param item the pipeline item.
+	 */
+	public void addPipeline(PipelineItem item) {
+		addPipeline(item.toPipelineData());
+	}
+
+	/**
+	 * Sets all pipelines. This replaces(!) all existing pipelines with the new
+	 * set of pipelines.
+	 *
+	 * @param pipelines the set of pipeline items.
+	 */
+	public void setPipelines(ObservableList<PipelineItem> pipelines) {
+		this.list.clear();
+		for (PipelineItem item : pipelines) {
+			addPipeline(item);
+		}
+	}
+
+	/**
+	 * Returns a list of pipeline items.
+	 *
+	 * @return a list of pipeline items.
+	 */
+	public ObservableList<PipelineItem> getPipelineItems() {
+		final ObservableList<PipelineItem> pipelines = FXCollections.observableArrayList();
+		for (Pipeline p : this.list) {
+			pipelines.add(new PipelineItem(p));
+		}
+		return pipelines;
 	}
 
 	/**
@@ -75,29 +136,6 @@ public class PipelineData {
 		final Processor processor = new Processor(-1, pid, version);
 		pipeline.processors().add(processor);
 		return pipeline;
-	}
-
-	/**
-	 * Checks whether there is exactly one pipeline encoded. This method is used
-	 * for PipelineData that encodes exactly one pipeline (e.g. a
-	 * RunnablePipeline).
-	 *
-	 * @return True if there is exactly one pipeline encoded, False otherwise.
-	 */
-	public boolean hasPrimaryPipeline() {
-		return (this.list.size() == 1);
-	}
-
-	/**
-	 * Returns the data of the first (or primary) pipeline. This method is used
-	 * for PipelineData that encodes exactly one pipeline (e.g. a
-	 * RunnablePipeline). Check with {@code hasOnePipeline()} first if there is
-	 * actually a primary pipeline.
-	 *
-	 * @return the primary pipeline.
-	 */
-	public Pipeline primaryPipeline() {
-		return this.list.get(0);
 	}
 
 	/**
@@ -382,6 +420,23 @@ public class PipelineData {
 		public List<Connection> connections() {
 			return connections.list;
 		}
+
+		/**
+		 * Patches the pipeline.
+		 *
+		 * @param patch the delta patch.
+		 */
+		public void patch(PipelinePatch patch) {
+			for (PipelinePatch.ProcessorPatch pp : patch.processors.list) {
+				final Processor p = processors.get(pp.id);
+				if (p != null) {
+					for (Map.Entry<String, Object> e : pp.parameters.entrySet()) {
+						p.parameters.put(e.getKey(), e.getValue());
+					}
+				}
+			}
+		}
+
 	}
 
 	/**
@@ -400,6 +455,22 @@ public class PipelineData {
 		 */
 		public ProcessorList() {
 		}
+
+		/**
+		 * Returns the processor data by processor id.
+		 *
+		 * @param id the id of the processor.
+		 * @return the processor data, or null if not found.
+		 */
+		public Processor get(int id) {
+			for (Processor p : list) {
+				if (p.id == id) {
+					return p;
+				}
+			}
+			return null;
+		}
+
 	}
 
 	/**
@@ -504,7 +575,11 @@ public class PipelineData {
 			this.x = wrapper.layoutXProperty().doubleValue();
 			this.y = wrapper.layoutYProperty().doubleValue();
 			this.editing = wrapper.isEditing();
-			this.parameters = wrapper.parameters();
+
+			// A deep copy of the parameters is necessary here s.t. we can easily
+			// clone pipelines by going from a Pipeline to PipelineData, and back
+			// to create a new pipeline.
+			this.parameters = IOUtils.deepClone(wrapper.parameters());
 		}
 
 		/**
@@ -609,6 +684,98 @@ public class PipelineData {
 			this.id = id;
 			this.port = port;
 		}
+	}
+
+	/**
+	 * A pipeline item. A list item pointing to a pipeline data object, or to an
+	 * instantiated pipeline.
+	 */
+	public static class PipelineItem implements Localizable, DataItemListView.DataItem {
+
+		final private ch.unifr.diva.dip.core.model.Pipeline pipeline;
+		final private PipelineData.Pipeline data;
+		final private StringProperty nameProperty;
+		final private ObjectProperty<NamedGlyph> glyphProperty;
+
+		/**
+		 * Creates a new pipeline item for a pipeline.
+		 *
+		 * @param pipeline the pipeline.
+		 */
+		public PipelineItem(ch.unifr.diva.dip.core.model.Pipeline pipeline) {
+			this(pipeline, null);
+		}
+
+		/**
+		 * Creates a new pipeline item for a pipeline data object.
+		 *
+		 * @param data the pipeline data.
+		 */
+		public PipelineItem(PipelineData.Pipeline data) {
+			this(null, data);
+		}
+
+		/**
+		 * Creates a new pipeline item.
+		 *
+		 * @param pipeline the pipeline, or null.
+		 * @param data the pipeline data, or null.
+		 */
+		private PipelineItem(ch.unifr.diva.dip.core.model.Pipeline pipeline, PipelineData.Pipeline data) {
+			this.pipeline = pipeline;
+			this.data = data;
+			this.nameProperty = new SimpleStringProperty();
+			this.glyphProperty = new SimpleObjectProperty();
+			if (isNewItem()) {
+				this.nameProperty.setValue(this.pipeline.getName());
+				this.glyphProperty.set(MaterialDesignIcons.FLOPPY);
+			} else {
+				this.nameProperty.setValue(this.data.name);
+			}
+		}
+
+		/**
+		 * Returns the name property of the pipeline item.
+		 *
+		 * @return the name property of the pipeline item.
+		 */
+		@Override
+		public StringProperty nameProperty() {
+			return nameProperty;
+		}
+
+		/**
+		 * Checks whether this pipeline item refers to a new pipeline (to be
+		 * exported/saved), or to an existing one.
+		 *
+		 * @return true if this item refers to a new pipeline, false otherwise.
+		 */
+		final public boolean isNewItem() {
+			return this.pipeline != null;
+		}
+
+		@Override
+		public ObjectProperty<NamedGlyph> glyphProperty() {
+			return this.glyphProperty;
+		}
+
+		/**
+		 * Returns the pipeline data object.
+		 *
+		 * @return the pipeline data object.
+		 */
+		public PipelineData.Pipeline toPipelineData() {
+			if (this.data != null) {
+				this.data.name = this.nameProperty.get();
+				return this.data;
+			}
+			if (this.pipeline != null) {
+				this.pipeline.setName(this.nameProperty.get());
+				return new PipelineData.Pipeline<>(this.pipeline);
+			}
+			return null;
+		}
+
 	}
 
 }

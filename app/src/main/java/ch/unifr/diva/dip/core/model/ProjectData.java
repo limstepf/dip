@@ -123,14 +123,22 @@ public class ProjectData {
 	 *
 	 * @param name name of the project.
 	 * @param saveFile the project file.
-	 * @param images list of pages/images.
+	 * @param images list of pages/images, or null.
+	 * @param pipelines list of pipelines, or null.
 	 * @throws java.io.IOException
 	 */
-	public ProjectData(String name, Path saveFile, List<Path> images) throws IOException {
+	public ProjectData(String name, Path saveFile, List<Path> images, List<PipelineData.Pipeline> pipelines) throws IOException {
 		this.name = name;
 		this.file = saveFile;
-		this.pages.selectedPage = images.isEmpty() ? -1 : 1;
-		addPages(images);
+		if (images != null) {
+			addPages(images);
+			this.pages.selectedPage = images.isEmpty() ? -1 : 1;
+		} else {
+			this.pages.selectedPage = -1;
+		}
+		if (pipelines != null) {
+			addPipelines(pipelines);
+		}
 	}
 
 	/**
@@ -179,6 +187,24 @@ public class ProjectData {
 
 	private int newPageId() {
 		return this.pages.list.size() + 1;
+	}
+
+	private void addPipelines(List<PipelineData.Pipeline> pipelines) {
+		for (PipelineData.Pipeline pipeline : pipelines) {
+			addPipeline(pipeline);
+		}
+	}
+
+	private void addPipeline(PipelineData.Pipeline pipeline) {
+		if (this.pipelines == null) {
+			this.pipelines = new PipelineData();
+		}
+		pipeline.id = newPipelineId();
+		this.pipelines.addPipeline(pipeline);
+	}
+
+	private int newPipelineId() {
+		return this.pipelines.list.size() + 1;
 	}
 
 	/**
@@ -549,15 +575,6 @@ public class ProjectData {
 				return defaultName.substring(0, i);
 			}
 			return defaultName;
-		}
-
-		/**
-		 * Returns the path to the pipeline XML file.
-		 *
-		 * @return the path to the pipeline XML file.
-		 */
-		public String pipelineXmlPath() {
-			return String.format(ProjectPage.PIPELINE_XML_FORMAT, id);
 		}
 
 		@Override

@@ -16,12 +16,14 @@ import ch.unifr.diva.dip.api.utils.ReflectionUtils;
 import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import ch.unifr.diva.dip.osgi.OSGiService;
+import ch.unifr.diva.dip.utils.IOUtils;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -198,6 +200,7 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 		return editingProperty().get();
 	}
 
+	// TODO: rename parameter values?!
 	public Map<String, Object> parameters() {
 		saveParameters(this.processor);
 		return this.parameters;
@@ -573,10 +576,138 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	@Override
 	public String toString() {
 		return this.getClass().getSimpleName()
+				+ "@" + Integer.toHexString(this.hashCode())
 				+ "{"
 				+ "id=" + id
 				+ ", pid=" + pid
 				+ "}";
+	}
+
+	/**
+	 * Copies the parameters of another processor. This deep-copies all
+	 * parameters from the given processor.
+	 *
+	 * @param <T> processor class.
+	 * @param p the processor to copy the parameters from.
+	 */
+	public <T extends ProcessorWrapper> void copyParameters(T p) {
+		copyParameters(p.processor().parameters());
+	}
+
+	/**
+	 * Sets/copies the parameters. This method deep-copies all given parameters
+	 * to this processor.
+	 *
+	 * @param p the parameter map to be copied.
+	 */
+	public void copyParameters(Map<String, Parameter> p) {
+		final Map<String, Parameter> q = this.processor().parameters();
+		final List<String> secondPass = new ArrayList<>();
+
+		for (Map.Entry<String, Parameter> e : p.entrySet()) {
+			final String key = e.getKey();
+			if (e.getValue().isPersistent()) {
+				if (q.containsKey(key) && q.get(key).isPersistent()) {
+					copyParameterValue(e.getValue(), q.get(key));
+				} else {
+					secondPass.add(key);
+				}
+			}
+		}
+		// do a second pass for parameters that couldn't be set the first time.
+		// this might be needed for parameters with side-effects w.r.t. the
+		// current set of parameters (e.g. setting a such a "master"-parameter
+		// could enable dependent parameters that weren't present during the
+		// first pass)
+		for (String key : secondPass) {
+			final Parameter pp = p.get(key);
+			if (pp.isPersistent() && q.containsKey(key) && q.get(key).isPersistent()) {
+				copyParameterValue(pp, q.get(key));
+			}
+		}
+		// ...arguably this could be nested s.t. any number of passes might be
+		// needed. But screw that; parameters with dependent child-parameters
+		// simply need to be always exposed/present BY DESIGN.
+	}
+
+	/**
+	 * Sets/copies the parameters. This method deep-copies all given parameters
+	 * to this processor.
+	 *
+	 * @param parameters the new parameters.
+	 */
+	public void setParameters(Map<String, Object> parameters) {
+		final Map<String, Parameter> q = this.processor().parameters();
+		for (Map.Entry<String, Object> e : parameters.entrySet()) {
+			final String key = e.getKey();
+			if (q.containsKey(key)) {
+				final Parameter p = q.get(key);
+				if (p.isPersistent()) {
+					final PersistentParameter pp = (PersistentParameter) p;
+					pp.set(IOUtils.deepClone(e.getValue()));
+				}
+			}
+		}
+	}
+
+	private void copyParameterValue(Parameter from, Parameter to) {
+		final PersistentParameter p = (PersistentParameter) to;
+		final PersistentParameter q = (PersistentParameter) from;
+		p.set(IOUtils.deepClone(q.get()));
+	}
+
+	/**
+	 * Checks whether the parameters of a processor are all equal to the
+	 * parameters of this one.
+	 *
+	 * @param <T> class of the processor.
+	 * @param p a processor.
+	 * @return true if the parameters are equal, false otherwise.
+	 */
+	public <T extends ProcessorWrapper> boolean equalParameters(T p) {
+		return equalParameters(this, p);
+	}
+
+	/**
+	 * Checks whether two processors have equal parameters.
+	 *
+	 * @param <T> class of the processor.
+	 * @param p a processor.
+	 * @param q another processor.
+	 * @return true if both sets of parameters are equal, false otherwise.
+	 */
+	public static <T extends ProcessorWrapper> boolean equalParameters(T p, T q) {
+		return equalParameters(p.processor().parameters(), q.processor().parameters());
+	}
+
+	/**
+	 * Checks whether two parameter maps are equal.
+	 *
+	 * @param p a parameter map.
+	 * @param q another parameter map.
+	 * @return true if both parameter maps are equal, false otherwise.
+	 */
+	public static boolean equalParameters(Map<String, Parameter> p, Map<String, Parameter> q) {
+		if (p.size() != q.size()) {
+			return false;
+		}
+
+		for (Map.Entry<String, Parameter> e : p.entrySet()) {
+			final String key = e.getKey();
+			// we don't really care about non-persistent parameters (i.e. labels and such...)
+			if (e.getValue().isPersistent()) {
+				if (!q.containsKey(key)) {
+					return false;
+				}
+				final PersistentParameter pp = (PersistentParameter) e.getValue();
+				final PersistentParameter pq = (PersistentParameter) q.get(key);
+				if (!pp.get().equals(pq.get())) {
+					return false;
+				}
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -628,6 +759,7 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	 * processors, this mapping is needed to retrieve processor id and key of an
 	 * input port.
 	 *
+	 * @param <T>
 	 * @param wrappers list of wrapped processors.
 	 * @return map of PortMapEntry indexed by InputPort.
 	 */
@@ -676,6 +808,29 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 					+ "id=" + this.id
 					+ ",port=" + this.port
 					+ "}";
+		}
+
+		@Override
+		public int hashCode() {
+			int hash = 17;
+			hash = 31 * hash + id;
+			hash = 31 * hash + port.hashCode();
+			return hash;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (obj == null) {
+				return false;
+			}
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+			final PortMapEntry other = (PortMapEntry) obj;
+			if (this.id != other.id) {
+				return false;
+			}
+			return Objects.equals(this.port, other.port);
 		}
 	}
 

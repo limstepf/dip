@@ -431,6 +431,42 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 		return modifiedPipelineProperty;
 	}
 
+	/**
+	 * Clones/copies the pipeline. This returns a deep-copy of the pipeline.
+	 *
+	 * @return a clone of the pipeline.
+	 */
+	public Pipeline clonePipeline() {
+		final PipelineData.Pipeline data = new PipelineData.Pipeline<>(this);
+		return new Pipeline(handler, data);
+	}
+
+	/**
+	 * Clones/copies the pipeline as a {@code RunnablePipeline}. This returns a
+	 * deep-copy of the pipeline.
+	 *
+	 * @param page the project page.
+	 * @return a (runnable) clone of the pipeline.
+	 */
+	public RunnablePipeline cloneAsRunnablePipeline(ProjectPage page) {
+		final PipelineData.Pipeline data = new PipelineData.Pipeline<>(this);
+		return new RunnablePipeline(handler, page, data);
+	}
+
+	/**
+	 * Clones/copies the pipeline as a {@code RunnablePipeline} and applies a
+	 * patch. This returns a deep-copy of the pipeline.
+	 *
+	 * @param page the project page.
+	 * @param patch the patch to be applied to the cloned pipeline.
+	 * @return a (runnable) cloned and patched pipeline.
+	 */
+	public RunnablePipeline cloneAsRunnablePipeline(ProjectPage page, PipelinePatch patch) {
+		final PipelineData.Pipeline data = new PipelineData.Pipeline<>(this);
+		data.patch(patch);
+		return new RunnablePipeline(handler, page, data);
+	}
+
 	@Override
 	public String toString() {
 		return this.getClass().getSimpleName()

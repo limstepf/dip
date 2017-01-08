@@ -4,7 +4,6 @@ import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.ui.Glyph;
 import ch.unifr.diva.dip.api.ui.RadioChoiceBox;
 import ch.unifr.diva.dip.api.utils.L10n;
-import ch.unifr.diva.dip.api.utils.XmlUtils;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.model.PipelineData;
 import ch.unifr.diva.dip.core.model.ProcessorWrapper;
@@ -24,11 +23,8 @@ import ch.unifr.diva.dip.osgi.ServiceCollection;
 import ch.unifr.diva.dip.utils.FileFinderService;
 import ch.unifr.diva.dip.utils.FileFinderTask;
 import ch.unifr.diva.dip.utils.IOUtils;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -68,7 +64,6 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-import javax.xml.bind.JAXBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -176,15 +171,36 @@ public class RepairProjectDialog extends AbstractDialog {
 	 */
 	private interface RepairSection {
 
+		/**
+		 * Returns the root component of the repair section.
+		 *
+		 * @return the root component.
+		 */
 		public Parent getComponent();
 
+		/**
+		 * Returns the repaired property of the section.
+		 *
+		 * @return the repaired property.
+		 */
 		public ReadOnlyBooleanProperty repairedProperty();
 
+		/**
+		 * Checks whether the section is considered repaired, or not. Being
+		 * repaired means being in a valid state (incl. scheduled repaires that
+		 * will be applied by a call to {@code applyRepairs}), ready to proceed.
+		 *
+		 * @return True if the section is repaired, false otherwise.
+		 */
 		default boolean isRepaired() {
 			return repairedProperty().get();
 		}
 
+		/**
+		 * Applies the scheduled repairs.
+		 */
 		public void applyRepairs();
+
 	}
 
 	/**
@@ -196,7 +212,6 @@ public class RepairProjectDialog extends AbstractDialog {
 		final public static String STATE_NOT_FOUND = L10n.getInstance().getString("state.notfound");
 		final public static String STATE_MODIFIED = L10n.getInstance().getString("state.modified");
 		final public static String STATE_MOVED = L10n.getInstance().getString("state.moved");
-		//
 		final public static String STATE_UNAVAILABLE = L10n.getInstance().getString("state.unavailable");
 		final public static String STATE_UPGRADED = L10n.getInstance().getString("state.updowngraded");
 		final public static String STATE_REPLACED = L10n.getInstance().getString("state.replaced");
@@ -350,6 +365,14 @@ public class RepairProjectDialog extends AbstractDialog {
 		protected final BooleanProperty repairedProperty = new SimpleBooleanProperty(false);
 		protected final ChangeListener repairedListener = (obs, a, b) -> updateRepairedProperty();
 
+		/**
+		 * Creates a new repair section.
+		 *
+		 * @param stage the parent stage.
+		 * @param projectData the project data.
+		 * @param validation the validation result.
+		 * @param title the title of the section.
+		 */
 		public RepairSectionBase(Stage stage, ProjectData projectData, ProjectData.ValidationResult validation, String title) {
 			this.stage = stage;
 			this.projectData = projectData;
@@ -447,6 +470,14 @@ public class RepairProjectDialog extends AbstractDialog {
 		private Path newPath;
 		private String newChecksum;
 
+		/**
+		 * Creates a new invalid image line.
+		 *
+		 * @param stage the parent stage.
+		 * @param page the page data.
+		 * @param state the resource state.
+		 * @param checksum the checksum of the image.
+		 */
 		public InvalidImage(Stage stage, ProjectData.Page page, ResourceState state, String checksum) {
 			super(getTitle(page), new FormGridPane(getColumnConstraints()));
 			this.stage = stage;
@@ -611,6 +642,13 @@ public class RepairProjectDialog extends AbstractDialog {
 		private final Path finderRoot;
 		private final FileFinderService finder;
 
+		/**
+		 * Creates a new repair image section.
+		 *
+		 * @param stage the parent stage.
+		 * @param projectData the project data.
+		 * @param validation the validation result.
+		 */
 		public RepairImageSection(Stage stage, ProjectData projectData, ProjectData.ValidationResult validation) {
 			super(stage, projectData, validation, L10n.getInstance().getString("page.images.missing"));
 
@@ -826,6 +864,14 @@ public class RepairProjectDialog extends AbstractDialog {
 
 		private ServiceState state = ServiceState.UNAVAILABLE;
 
+		/**
+		 * Creates a new invalid service line.
+		 *
+		 * @param pid PID of the invalid service/processor.
+		 * @param version version of the invalid service/processor.
+		 * @param projectData the project data.
+		 * @param handler the application handler.
+		 */
 		public InvalidService(String pid, String version, ProjectData projectData, ApplicationHandler handler) {
 			super(getTitle(pid, version), new FormGridPane(getColumnConstraints()));
 			this.pid = pid;
@@ -834,23 +880,6 @@ public class RepairProjectDialog extends AbstractDialog {
 			// read all (global) pipeline prototypes
 			for (PipelineData.Pipeline<ProcessorWrapper> pipeline : projectData.pipelines()) {
 				parsePipeline(pid, pipeline, inputs, outputs);
-			}
-
-			// read all page pipelines too
-			for (ProjectData.Page page : projectData.getPages()) {
-				final String xmlPath = page.pipelineXmlPath();
-				final Path xml = projectData.zip.getPath(xmlPath);
-				if (Files.exists(xml)) {
-					try {
-						final PipelineData pd = PipelineData.loadAsStream(xml);
-						if (pd.hasPrimaryPipeline()) {
-							final PipelineData.Pipeline pipeline = pd.primaryPipeline();
-							parsePipeline(pid, pipeline, inputs, outputs);
-						}
-					} catch (IOException | JAXBException ex) {
-						log.warn("failed to read pipeline of {} at {}", page, xml, ex);
-					}
-				}
 			}
 
 			// 1) get list of available versions of the missing processor for an up-/downgrade
@@ -986,7 +1015,6 @@ public class RepairProjectDialog extends AbstractDialog {
 
 		private void addPortToGrid(Map.Entry<String, String> port, ComboBox combo, int row) {
 			final Parent desc = newPortDescription(port.getKey(), port.getValue());
-//			final Label map = new Label(localize("map.to"));
 			final HLine map = new HLine();
 			final ArrowHead head = new ArrowHead();
 			map.addArrowHead(head);
@@ -1247,6 +1275,14 @@ public class RepairProjectDialog extends AbstractDialog {
 
 		private final List<InvalidService> items = new ArrayList<>();
 
+		/**
+		 * Creates a new repair service section.
+		 *
+		 * @param handler the application handler.
+		 * @param stage the parent stage.
+		 * @param projectData the project data.
+		 * @param validation the validation result.
+		 */
 		public RepairServiceSection(ApplicationHandler handler, Stage stage, ProjectData projectData, ProjectData.ValidationResult validation) {
 			super(stage, projectData, validation, L10n.getInstance().getString("pipeline.services.missing"));
 
@@ -1288,27 +1324,8 @@ public class RepairProjectDialog extends AbstractDialog {
 				projectData.pipelines.swapProcessor(swap);
 			}
 
-			// apply to all page pipelines too
-			for (ProjectData.Page page : projectData.getPages()) {
-				final String xmlPath = page.pipelineXmlPath();
-				final Path xml = projectData.zip.getPath(xmlPath);
-				if (Files.exists(xml)) {
-					try {
-						final PipelineData pd = PipelineData.loadAsStream(xml);
-						if (pd.hasPrimaryPipeline()) {
-							for (PipelineData.ProcessorSwap swap : swaps) {
-								pd.swapProcessor(swap);
-							}
-							Files.delete(xml);
-							try (OutputStream stream = new BufferedOutputStream(Files.newOutputStream(xml))) {
-								XmlUtils.marshal(pd, stream);
-							}
-						}
-					} catch (IOException | JAXBException ex) {
-						log.warn("failed to read pipeline of {} at {}", page, xml, ex);
-					}
-				}
-			}
+			// pipeline patches don't need to be updated, since processors
+			// are referred to by id only. Parameters might be garbage now though...
 		}
 	}
 

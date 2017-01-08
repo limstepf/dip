@@ -7,6 +7,7 @@ import ch.unifr.diva.dip.eventbus.events.ProjectNotification;
 import ch.unifr.diva.dip.utils.Modifiable;
 import ch.unifr.diva.dip.utils.ModifiedProperty;
 import ch.unifr.diva.dip.gui.pe.PipelineEditor;
+import ch.unifr.diva.dip.utils.FxUtils;
 import ch.unifr.diva.dip.utils.ZipFileSystem;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -94,6 +95,10 @@ public class Project implements Modifiable, Localizable {
 		data.zipFile = handler.dataManager.tmpFile(true);
 		final ZipFileSystem zip = ZipFileSystem.create(data.zipFile);
 
+		FxUtils.run(() -> {
+			handler.settings.recentFiles.setSaveDirectory(data.file);
+		});
+
 		try (OutputStream stream = new BufferedOutputStream(zip.getOutputStream(ProjectData.PROJECT_ROOT_XML))) {
 			data.save(stream);
 			data.zip = zip;
@@ -112,6 +117,10 @@ public class Project implements Modifiable, Localizable {
 	 * @return a project.
 	 */
 	public static Project openProject(ProjectData data, ApplicationHandler handler) {
+		FxUtils.run(() -> {
+			handler.settings.recentFiles.setSaveDirectory(data.file);
+		});
+		
 		return new Project(data, handler);
 	}
 
@@ -201,6 +210,9 @@ public class Project implements Modifiable, Localizable {
 	 */
 	public void saveAs(Path file) throws Exception {
 		this.file = file;
+		FxUtils.run(() -> {
+			this.handler.settings.recentFiles.setSaveDirectory(this.file);
+		});
 		saveInternal();
 	}
 
@@ -355,15 +367,26 @@ public class Project implements Modifiable, Localizable {
 	 * @param show True to show, False to hide the pipeline editor.
 	 */
 	public void openPipelineEditor(Stage stage, boolean show) {
+		final PipelineEditor ed = getPipelineEditor(stage);
+
+		if (show) {
+			ed.show();
+		} else {
+			ed.close();
+		}
+	}
+
+	/**
+	 * Returns the pipeline editor.
+	 *
+	 * @param stage the parent stage.
+	 * @return the pipeline editor.
+	 */
+	public PipelineEditor getPipelineEditor(Stage stage) {
 		if (pipelineEditor == null) {
 			pipelineEditor = new PipelineEditor(stage, handler, pipelineManager());
 		}
-
-		if (show) {
-			pipelineEditor.show();
-		} else {
-			pipelineEditor.close();
-		}
+		return pipelineEditor;
 	}
 
 	/**
@@ -431,6 +454,22 @@ public class Project implements Modifiable, Localizable {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Returns all pages with the specified pipeline assignment.
+	 *
+	 * @param pipelineId the pipeline id.
+	 * @return all pages that use the specified pipeline.
+	 */
+	public List<ProjectPage> getPages(int pipelineId) {
+		final List<ProjectPage> list = new ArrayList<>();
+		for (ProjectPage page : pages) {
+			if (page.getPipelineId() == pipelineId) {
+				list.add(page);
+			}
+		}
+		return list;
 	}
 
 	/**

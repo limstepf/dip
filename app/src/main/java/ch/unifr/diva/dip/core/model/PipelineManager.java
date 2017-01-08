@@ -17,7 +17,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -249,11 +251,7 @@ public class PipelineManager implements Modifiable, Localizable {
 	 */
 	public boolean deletePipelines(List<Pipeline> selection, boolean confirm) {
 		if (confirm) {
-			final List<String> names = new ArrayList<>();
-			for (Pipeline pipeline : selection) {
-				names.add(pipeline.getName());
-			}
-			final String msg = localize("delete.confirm", String.join(", ", names));
+			final String msg = formatDeletePipelineMessage(selection);
 			final Answer answer = handler.uiStrategy.getAnswer(msg);
 			switch (answer) {
 				case YES:
@@ -268,8 +266,6 @@ public class PipelineManager implements Modifiable, Localizable {
 			if (!pipelines.contains(pipeline)) {
 				continue;
 			}
-			// TODO: what about pages that used a deleted pipeline?
-			// TODO: do we need to refresh/layout the pages widget? -> event bus?
 			log.info("deleting pipeline: {}", pipeline);
 			this.modifiedPipelinesProperty.removeManagedProperty(pipeline);
 			this.pipelines.remove(pipeline);
@@ -282,32 +278,41 @@ public class PipelineManager implements Modifiable, Localizable {
 	}
 
 	/**
-	 * Imports pipelines from a file.
+	 * Returns the delete pipelines confirmation message.
 	 *
-	 * @param file pipeline file to read from.
-	 * @param indices null to import all/any pipelines, or a list of indices of
-	 * pipelines to import only.
-	 * @throws JAXBException
+	 * @param selection the selection of pipelines to be deleted.
+	 * @return the delete pipelines confirmation message.
 	 */
-	public void importPipelines(Path file, List<Integer> indices) throws JAXBException {
-		final List<Pipeline> imported = importPipelines(handler, file, newPipelineId());
+	static public String formatDeletePipelineMessage(List<Pipeline> selection) {
+		final List<String> names = new ArrayList<>();
+		for (Pipeline pipeline : selection) {
+			names.add(pipeline.getName());
+		}
+		return L10n.getInstance().getString(
+				"delete.confirm", String.join(", ", names)
+		);
+	}
 
-		if (indices == null) {
-			addAllPipelines(imported);
-			for (Pipeline pipeline : imported) {
-				levelMaxPipelineId(pipeline.id);
-			}
-		} else {
-			for (Integer i : indices) {
-				final Pipeline pipeline = imported.get(i);
-				addPipeline(pipeline);
-				levelMaxPipelineId(pipeline.id);
-			}
+	/**
+	 * Imports the given pipeline items as new pipelines into the current
+	 * project.
+	 *
+	 * @param items the pipeline items.
+	 */
+	public void importPipelines(List<PipelineData.PipelineItem> items) {
+		for (PipelineData.PipelineItem item : items) {
+			final PipelineData.Pipeline pipeline = item.toPipelineData();
+			pipeline.id = newPipelineId();
+			addPipeline(new Pipeline(handler, pipeline));
 		}
 	}
 
 	/**
 	 * Reads pipelines from a pipeline file.
+	 *
+	 * <p>
+	 * Note that this method operates on serialized {@code PipelineData} (stored
+	 * as such only internally), and not on {@code DipData}.
 	 *
 	 * @param handler application handler.
 	 * @param file the pipeline file to read from.
@@ -331,6 +336,10 @@ public class PipelineManager implements Modifiable, Localizable {
 	/**
 	 * Writes all pipelines to an output stream.
 	 *
+	 * <p>
+	 * Note that this method operates on serialized {@code PipelineData} (stored
+	 * as such only internally), and not on {@code DipData}.
+	 *
 	 * @param stream output stream to write to.
 	 * @throws JAXBException
 	 */
@@ -340,6 +349,10 @@ public class PipelineManager implements Modifiable, Localizable {
 
 	/**
 	 * Writes a list of pipelines to an output stream.
+	 *
+	 * <p>
+	 * Note that this method operates on serialized {@code PipelineData} (stored
+	 * as such only internally), and not on {@code DipData}.
 	 *
 	 * @param pipelines list of pipelines.
 	 * @param stream output stream to write to.
@@ -353,6 +366,10 @@ public class PipelineManager implements Modifiable, Localizable {
 	/**
 	 * Writes all pipelines to a pipeline file.
 	 *
+	 * <p>
+	 * Note that this method operates on serialized {@code PipelineData} (stored
+	 * as such only internally), and not on {@code DipData}.
+	 *
 	 * @param file pipeline file to write to.
 	 * @throws JAXBException
 	 */
@@ -362,6 +379,10 @@ public class PipelineManager implements Modifiable, Localizable {
 
 	/**
 	 * Writes a list of pipelines to a pipeline file.
+	 *
+	 * <p>
+	 * Note that this method operates on serialized {@code PipelineData} (stored
+	 * as such only internally), and not on {@code DipData}.
 	 *
 	 * @param pipelines list of pipelines.
 	 * @param file pipeline file to write to.
@@ -401,8 +422,22 @@ public class PipelineManager implements Modifiable, Localizable {
 	 */
 	public interface ProcessorWrapperRunnable {
 
+		/**
+		 * Executes code on a processor.
+		 *
+		 * @param wrappers the list of processors (including {@code wrapper}.
+		 * @param wrapper the processor.
+		 */
 		public void run(List<ProcessorWrapper> wrappers, ProcessorWrapper wrapper);
 
+		/**
+		 * Updates the list of processors by resetting the object. Used on
+		 * observable lists when an object changed internally, and the list
+		 * should fire a changed event.
+		 *
+		 * @param wrappers the list of processors (including {@code wrapper}.
+		 * @param wrapper the processor.
+		 */
 		public static void notify(List<ProcessorWrapper> wrappers, ProcessorWrapper wrapper) {
 			final int index = wrappers.indexOf(wrapper);
 			wrappers.set(index, wrapper);
@@ -478,6 +513,8 @@ public class PipelineManager implements Modifiable, Localizable {
 	 */
 	public static class SimplePipelineCell extends ListCell<PipelineItem> {
 
+		private PipelineItem currentItem;
+
 		@Override
 		protected void updateItem(PipelineItem item, boolean empty) {
 			super.updateItem(item, empty);
@@ -485,7 +522,10 @@ public class PipelineManager implements Modifiable, Localizable {
 			setText(null);
 			setGraphic(null);
 
+			this.disableProperty().unbind();
+
 			if (!empty) {
+				this.disableProperty().bind(item.disabledProperty());
 				setText(
 						item.label.isEmpty()
 								? PipelineItem.emptyPipeline
@@ -516,6 +556,8 @@ public class PipelineManager implements Modifiable, Localizable {
 		 */
 		public final String label;
 
+		private final BooleanProperty disabledProperty;
+
 		public PipelineItem(Pipeline pipeline) {
 			this(pipeline.id, pipeline.getName());
 		}
@@ -523,6 +565,11 @@ public class PipelineManager implements Modifiable, Localizable {
 		public PipelineItem(int id, String label) {
 			this.id = id;
 			this.label = (id > -1) ? label : "";
+			this.disabledProperty = new SimpleBooleanProperty(false);
+		}
+
+		public BooleanProperty disabledProperty() {
+			return this.disabledProperty;
 		}
 
 		@Override
