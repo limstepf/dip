@@ -13,6 +13,7 @@ import ch.unifr.diva.dip.api.parameters.ExpMatrixParameter;
 import ch.unifr.diva.dip.api.parameters.ExpParameter;
 import ch.unifr.diva.dip.api.parameters.IntegerParameter;
 import ch.unifr.diva.dip.api.parameters.TextParameter;
+import ch.unifr.diva.dip.api.parameters.TransientFacadeParameter;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.services.ProcessorBase;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
@@ -116,6 +117,9 @@ public class MatrixEditor extends ProcessorBase {
 				modFill
 		);
 		console.setHorizontalSpacing(3, 8);
+		// the console should appear as transient parameter, s.t. it doesn't affect
+		// equals/hashCode of the (top) parameter.
+		final TransientFacadeParameter consoleFacade = new TransientFacadeParameter(console);
 
 		final CompositeGrid mat = new CompositeGrid(
 				"Matrix",
@@ -124,7 +128,7 @@ public class MatrixEditor extends ProcessorBase {
 				this.matrix,
 				new EmptyParameter(),
 				new EmptyParameter(),
-				console
+				consoleFacade
 		);
 		mat.setColumnConstraints(3);
 		mat.setVerticalSpacing(10);
