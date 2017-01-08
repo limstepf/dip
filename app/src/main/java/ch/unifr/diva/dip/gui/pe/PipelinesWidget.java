@@ -1,6 +1,7 @@
 package ch.unifr.diva.dip.gui.pe;
 
 import ch.unifr.diva.dip.api.parameters.EnumParameter;
+import ch.unifr.diva.dip.api.ui.Glyph;
 import ch.unifr.diva.dip.api.ui.KeyEventHandler;
 import ch.unifr.diva.dip.api.ui.MouseEventHandler;
 import ch.unifr.diva.dip.api.ui.MouseEventHandler.ClickCount;
@@ -11,6 +12,7 @@ import ch.unifr.diva.dip.core.model.PipelineLayoutStrategy;
 import ch.unifr.diva.dip.core.model.ProjectPage;
 import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
+import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
 import ch.unifr.diva.dip.gui.AbstractWidget;
 import ch.unifr.diva.dip.gui.layout.DraggableListCell;
 import ch.unifr.diva.dip.gui.layout.FormGridPane;
@@ -42,6 +44,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,6 +91,11 @@ public class PipelinesWidget extends AbstractWidget {
 	}
 
 	private void selectDefaultPipeline(Pipeline pipeline) {
+		// toggle if already selected
+		if (editor.pipelineManager().getDefaultPipelineId() == pipeline.id) {
+			editor.pipelineManager().setDefaultPipelineId(-1);
+			return;
+		}
 		editor.pipelineManager().setDefaultPipelineId(pipeline.id);
 	}
 
@@ -116,7 +124,6 @@ public class PipelinesWidget extends AbstractWidget {
 				return; // cancelled
 			}
 		}
-
 
 		// deselect if selected pipeline got deleted
 		if (pipelines.contains(editor.selectedPipeline())) {
@@ -248,7 +255,6 @@ public class PipelinesWidget extends AbstractWidget {
 		private final VBox vbox = new VBox();
 		private final Label label = new Label();
 		private final Label usage = new Label();
-		private final Label statusLabel = new Label();
 		private static final Tooltip defaultPipelineTooltip = new Tooltip();
 		private final InvalidationListener puListener = (c) -> setUsageLabel();
 		private final InvalidationListener defaultListener = (obs) -> {
@@ -270,6 +276,7 @@ public class PipelinesWidget extends AbstractWidget {
 				}
 		);
 		private Pipeline currentPipeline;
+		private Glyph currentGlyph;
 
 		/**
 		 * Creates a new pipeline cell.
@@ -284,16 +291,13 @@ public class PipelinesWidget extends AbstractWidget {
 			label.setAlignment(Pos.CENTER_LEFT);
 			label.setMaxWidth(Double.MAX_VALUE);
 
-			final int d = UIStrategyGUI.Stage.insets;
-			radioButton.setPadding(new Insets(0, d, 0, 0));
-			statusLabel.setPadding(new Insets(0, 0, 0, d));
+			radioButton.setPadding(new Insets(0, UIStrategyGUI.Stage.insets, 0, 0));
 
 			usage.getStyleClass().add("dip-small");
 			vbox.getChildren().setAll(label, usage);
 
 			pane.setLeft(radioButton);
 			pane.setCenter(vbox);
-			pane.setRight(statusLabel);
 
 			defaultPipelineTooltip.setText(localize("pipeline.default"));
 			editor.pipelineManager().defaultPipelineIdProperty().addListener(defaultListener);
@@ -325,13 +329,42 @@ public class PipelinesWidget extends AbstractWidget {
 
 		private void updateDefault() {
 			if (isDefaultPipeline()) {
-				statusLabel.setText(localize("pipeline.default.abbrev"));
-
-				statusLabel.setTooltip(defaultPipelineTooltip);
+				pane.setRight(getDefaultPipelineGlyph());
+				updateGlyphColor();
 			} else {
-				statusLabel.setText("");
-				statusLabel.setTooltip(null);
+				pane.setRight(null);
+				currentGlyph = null;
+				this.selectedProperty().removeListener(glyphListener);
 			}
+		}
+
+		private Glyph getDefaultPipelineGlyph() {
+			if (currentGlyph == null) {
+				currentGlyph = UIStrategyGUI.Glyphs.newGlyph(
+						MaterialDesignIcons.CROWN,
+						Glyph.Size.NORMAL
+				);
+				currentGlyph.setTooltip(defaultPipelineTooltip);
+				currentGlyph.setPadding(new Insets(0, 0, 0, UIStrategyGUI.Stage.insets));
+				this.selectedProperty().addListener(glyphListener);
+			}
+			return currentGlyph;
+		}
+
+		// selection listener to alter glyph color
+		private final InvalidationListener glyphListener = (c) -> {
+			updateGlyphColor();
+		};
+
+		private void updateGlyphColor() {
+			if (currentGlyph == null) {
+				return;
+			}
+			currentGlyph.setColor(
+					this.selectedProperty().get()
+							? Color.WHITE
+							: UIStrategyGUI.Colors.accent
+			);
 		}
 
 		@Override
@@ -382,6 +415,7 @@ public class PipelinesWidget extends AbstractWidget {
 			edit.init(currentPipeline, label.getText(), usage.getText());
 
 			pane.setCenter(edit);
+			pane.setRight(null);
 
 			// this seems to be necessary since we ommit commitEdit and just
 			// use cancelEdit. Might also be a bug, who knows...
@@ -414,6 +448,7 @@ public class PipelinesWidget extends AbstractWidget {
 			}
 
 			pane.setCenter(vbox);
+			pane.setRight(currentGlyph);
 
 			// this seems to be necessary since we ommit commitEdit and just
 			// use cancelEdit. Might also be a bug, who knows...
