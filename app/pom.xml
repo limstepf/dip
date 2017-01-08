@@ -94,6 +94,11 @@
 			<groupId>net.objecthunter</groupId>
 			<artifactId>exp4j</artifactId>
 		</dependency>
+		
+		<dependency>
+			<groupId>uk.com.robust-it</groupId>
+			<artifactId>cloning</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

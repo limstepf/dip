@@ -1,5 +1,6 @@
 package ch.unifr.diva.dip.utils;
 
+import com.rits.cloning.Cloner;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -21,8 +22,23 @@ import java.util.Random;
  */
 public class IOUtils {
 
+	// cloner is thread safe. One instance can be used by multiple threads
+	// at the same time.
+	private final static Cloner cloner = new Cloner();
+
 	private IOUtils() {
 		/* nope :) */
+	}
+
+	/**
+	 * Deep clones {@code obj}.
+	 *
+	 * @param <T> the type of {@code obj}.
+	 * @param obj the object to be deep-cloned.
+	 * @return a deep-clone (or deep-copy) of {@code obj}.
+	 */
+	public static <T> T deepClone(final T obj) {
+		return cloner.deepClone(obj);
 	}
 
 	/**

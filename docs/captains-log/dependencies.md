@@ -19,6 +19,15 @@ See:
 
 
 
+Cloning
+-------
+Small cloning library that can (deep-) clone ANY Java object.
+
+See:
+* [https://github.com/kostaskougios/cloning](https://github.com/kostaskougios/cloning)
+
+
+
 exp4j 
 -----
 exp4j is capable of evaluating expressions and functions in the real domain. It's a small (40KB) library without any external dependencies, that implements Dijkstra's Shunting Yard Algorithm.
