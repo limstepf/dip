@@ -2,18 +2,24 @@ package ch.unifr.diva.dip.core;
 
 import ch.unifr.diva.dip.utils.FxUtils;
 import ch.unifr.diva.dip.api.utils.XmlUtils;
+import ch.unifr.diva.dip.api.utils.jaxb.PathAdapter;
 import ch.unifr.diva.dip.core.model.PipelineLayoutStrategy;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import ch.unifr.diva.dip.gui.layout.ZoomPane;
 import ch.unifr.diva.dip.gui.pe.ConnectionView;
 import ch.unifr.diva.dip.osgi.OSGiVersionPolicy;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * User settings. As oppposed to the ApplicationSettings the UserSettings are
@@ -22,11 +28,13 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @see ApplicationSettings
  */
 @XmlRootElement(name = "settings")
+@XmlAccessorType(XmlAccessType.NONE)
 public class UserSettings {
 
 	/**
 	 * User locale.
 	 */
+	@XmlElement
 	public Locale locale = new Locale();
 
 	/**
@@ -66,11 +74,13 @@ public class UserSettings {
 	/**
 	 * Main primary stage settings.
 	 */
+	@XmlElement
 	public PrimaryStage primaryStage = new PrimaryStage();
 
 	/**
 	 * Pipeline editor stage settings.
 	 */
+	@XmlElement
 	public PrimaryStage pipelineStage = new PrimaryStage();
 
 	/**
@@ -195,6 +205,7 @@ public class UserSettings {
 	/**
 	 * General (pixel) editor settings.
 	 */
+	@XmlElement
 	public Editor editor = new Editor();
 
 	/**
@@ -214,6 +225,7 @@ public class UserSettings {
 	/**
 	 * General pipeline editor settings.
 	 */
+	@XmlElement
 	public PipelineEditor pipelineEditor = new PipelineEditor();
 
 	/**
@@ -272,6 +284,7 @@ public class UserSettings {
 	/**
 	 * OSGi framework settings.
 	 */
+	@XmlElement
 	public OSGi osgi = new OSGi();
 
 	/**
@@ -285,6 +298,127 @@ public class UserSettings {
 		 */
 		@XmlAttribute
 		public OSGiVersionPolicy versionPolicy = OSGiVersionPolicy.getDefault();
+
+	}
+
+	/**
+	 * Recently accessed files.
+	 */
+	@XmlElement
+	public RecentFiles recentFiles = new RecentFiles();
+
+	/**
+	 * Object to hold recently accessed files.
+	 */
+	@XmlRootElement
+	@XmlAccessorType(XmlAccessType.NONE)
+	public static class RecentFiles {
+
+		/**
+		 * The most recently accessed directory for DIP save files.
+		 */
+		@XmlElement
+		@XmlJavaTypeAdapter(PathAdapter.class)
+		public Path dipSaveDirectory = null;
+
+		/**
+		 * Savely returns the most recently accessed DIP save directory.
+		 *
+		 * @return a path to the most recently accessed DIP save directory
+		 * (guaranteed to exist), or null.
+		 */
+		public Path getSaveDirectory() {
+			if (dipSaveDirectory != null && !Files.exists(dipSaveDirectory)) {
+				dipSaveDirectory = null;
+			}
+			return dipSaveDirectory;
+		}
+
+		/**
+		 * Updates the most recently accessed DIP save directory.
+		 *
+		 * @param file a path to the most recently accessed DIP save file,
+		 * directory, or null.
+		 */
+		public void setSaveDirectory(Path file) {
+			if (file == null) {
+				dipSaveDirectory = null;
+			} else {
+				if (Files.isDirectory(file)) {
+					dipSaveDirectory = file;
+				} else {
+					dipSaveDirectory = file.getParent();
+				}
+			}
+		}
+
+		/**
+		 * The most recently accessed DIP data directory. Unlike
+		 * {@code dipDataFile} this path isn't set back to null after accessing
+		 * a DIP data file located in the user directory, s.t. the custom
+		 * directory is remembered upon trying to load a custom DIP data file
+		 * again.
+		 */
+		@XmlElement
+		@XmlJavaTypeAdapter(PathAdapter.class)
+		public Path dipDataDirectory = null;
+
+		/**
+		 * Savely returns the most recently accessed DIP data directory.
+		 *
+		 * @return a path to the most recently accessed DIP data directory
+		 * (guaranteed to exist), or null.
+		 */
+		public Path getDataDirectory() {
+			if (dipDataDirectory != null && !Files.exists(dipDataDirectory)) {
+				dipDataDirectory = null;
+			}
+			return dipDataDirectory;
+		}
+
+		/**
+		 * The most recently accessed DIP data file. A DIP data file stores
+		 * processor presets and pipelines. This path should only be set if the
+		 * file accessed last is located outside of the user directory (i.e. not
+		 * one of the application's default files to store such things; if
+		 * that's the case, this path should be set to {@code null}).
+		 */
+		@XmlElement
+		@XmlJavaTypeAdapter(PathAdapter.class)
+		public Path dipDataFile = null;
+
+		/**
+		 * Savely returns the most recently accessed DIP data file.
+		 *
+		 * @return a path to the most recently accessed DIP data file
+		 * (guaranteed to exist), or null.
+		 */
+		public Path getDataFile() {
+			if (dipDataFile != null && !Files.exists(dipDataFile)) {
+				dipDataFile = null;
+			}
+			return dipDataFile;
+		}
+
+		/**
+		 * Updates the most recently accessed DIP data file and directory.
+		 *
+		 * @param file the most recently accessed DIP data file, directory, or
+		 * null.
+		 */
+		public void setDataFile(Path file) {
+			if (file == null || !Files.exists(file)) {
+				dipDataFile = null;
+			} else {
+				if (Files.isDirectory(file)) {
+					dipDataFile = null;
+					dipDataDirectory = file;
+				} else {
+					dipDataFile = file;
+					dipDataDirectory = file.getParent();
+				}
+			}
+		}
 
 	}
 
