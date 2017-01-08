@@ -14,6 +14,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 /**
  * I/O utilities.
@@ -124,6 +130,39 @@ public class IOUtils {
 		}
 
 		return "";
+	}
+
+	/**
+	 * Returns the root element of an XML document.
+	 *
+	 * @param file path to some file.
+	 * @return the root element of an XML document, or null.
+	 */
+	public static Element getRootElement(Path file) {
+		if (Files.exists(file)) {
+			try (InputStream is = Files.newInputStream(file)) {
+				return getRootElement(is);
+			} catch (IOException ex) {
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Returns the root element of an XML document.
+	 *
+	 * @param is input stream of some file.
+	 * @return the root element of an XML document, or null.
+	 */
+	public static Element getRootElement(InputStream is) {
+		try {
+			final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			final DocumentBuilder builder = factory.newDocumentBuilder();
+			final Document doc = builder.parse(is);
+			return doc.getDocumentElement();
+		} catch (ParserConfigurationException | SAXException | IOException ex) {
+			return null;
+		}
 	}
 
 	/**
