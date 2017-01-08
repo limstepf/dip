@@ -3,15 +3,19 @@ package ch.unifr.diva.dip.core.model;
 import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.services.Processor;
+import ch.unifr.diva.dip.api.services.Transmutable;
 import ch.unifr.diva.dip.core.ApplicationHandler;
+import ch.unifr.diva.dip.core.model.ProcessorWrapper.PortMapEntry;
 import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.osgi.OSGiVersionPolicy;
 import ch.unifr.diva.dip.utils.Modifiable;
 import ch.unifr.diva.dip.utils.ModifiedProperty;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -150,6 +154,33 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 	}
 
 	/**
+	 * Returns the name of the pipeline.
+	 *
+	 * @return the name of the pipeline.
+	 */
+	public String getName() {
+		return name().get();
+	}
+
+	/**
+	 * Sets the name of the pipeline.
+	 *
+	 * @param name the name of the pipeline.
+	 */
+	public void setName(String name) {
+		name().set(name);
+	}
+
+	/**
+	 * Returns the name of the pipeline.
+	 *
+	 * @return name of the pipeline.
+	 */
+	public StringProperty name() {
+		return name;
+	}
+
+	/**
 	 * Returns the layout strategy property.
 	 *
 	 * @return the layout strategy property.
@@ -203,12 +234,92 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 		this.versionPolicyProperty.set(policy);
 	}
 
+	private final Map<OutputPort, ProcessorWrapper.PortMapEntry> outputPortMap = new HashMap<>();
+	private final Map<InputPort, ProcessorWrapper.PortMapEntry> inputPortMap = new HashMap<>();
+
 	/**
-	 * An observable list of all processors in the pipeline.
+	 * Returns the output port map. Ports are stupid on do not know anything
+	 * about the processor they belong to. That's why we need a port map,
+	 * mapping the port to a {@code PortMapEntry} which allows us to retrieve
+	 * the processor id and the port-key of the port.
+	 *
+	 * @return the output port map.
+	 */
+	public Map<OutputPort, ProcessorWrapper.PortMapEntry> outputPortMap() {
+		return this.outputPortMap;
+	}
+
+	/**
+	 * Returns the input port map. Ports are stupid on do not know anything
+	 * about the processor they belong to. That's why we need a port map,
+	 * mapping the port to a {@code PortMapEntry} which allows us to retrieve
+	 * the processor id and the port-key of the port.
+	 *
+	 * @return the input port map.
+	 */
+	public Map<InputPort, ProcessorWrapper.PortMapEntry> inputPortMap() {
+		return this.inputPortMap;
+	}
+
+	// transmutable processors might change ports later on, so we need to listen.
+	// Removed ports are left in the map (technically they're just hidden/
+	// deactivated anyways).
+	protected final Map<T, InvalidationListener> transmutableListeners = new HashMap<>();
+
+	protected InvalidationListener newTransmutableListener(T p) {
+		return (c) -> registerPorts(p);
+	}
+
+	protected void addTransmutableListener(T p) {
+		if (p.processor() instanceof Transmutable) {
+			final Transmutable t = (Transmutable) p.processor();
+			final InvalidationListener listener = newTransmutableListener(p);
+			this.transmutableListeners.put(p, listener);
+			t.transmuteProperty().addListener(listener);
+		}
+	}
+
+	protected void removeTransmutableListener(T p) {
+		if (p.processor() instanceof Transmutable) {
+			final Transmutable t = (Transmutable) p.processor();
+			final InvalidationListener listener = this.transmutableListeners.get(p);
+			t.transmuteProperty().addListener(listener);
+		}
+	}
+
+	protected void registerPorts(T p) {
+		for (Map.Entry<String, InputPort> e : p.processor().inputs().entrySet()) {
+			this.inputPortMap.put(e.getValue(), new PortMapEntry(p.id, e.getKey()));
+		}
+		for (Map.Entry<String, OutputPort> e : p.processor().outputs().entrySet()) {
+			this.outputPortMap.put(e.getValue(), new PortMapEntry(p.id, e.getKey()));
+		}
+	}
+
+	protected void unregisterPorts(T p) {
+		for (InputPort port : p.processor().inputs().values()) {
+			this.inputPortMap.remove(port);
+		}
+		for (OutputPort port : p.processor().outputs().values()) {
+			this.outputPortMap.remove(port);
+		}
+	}
+
+	/**
+	 * An observable list of all processors in the pipeline. This is supposed to
+	 * be a readonly(!) observable list, so do not modify it directly. Use
+	 * {@code addProcessor} and {@code removeProcessor} instead.
 	 *
 	 * @return an observable list of processors.
 	 */
 	public ObservableList<T> processors() {
+		/*
+		 * Not sure if multiple listeners listening to the same property are
+		 * fired in order, but if so, we could use a ListChangeListener and
+		 * do all the bookkeeping/updating of the portmaps there (as first ones
+		 * to execute, s.t. following have an uptodate portmap) and users
+		 * could just modify the processors list directly.
+		 */
 		return processors;
 	}
 
@@ -229,37 +340,21 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 	}
 
 	/**
-	 * Returns the name of the pipeline.
+	 * Returns the next id for a new processor.
 	 *
-	 * @return the name of the pipeline.
+	 * @return a new processor id.
 	 */
-	public String getName() {
-		return name().get();
-	}
-
-	/**
-	 * Sets the name of the pipeline.
-	 *
-	 * @param name the name of the pipeline.
-	 */
-	public void setName(String name) {
-		name().set(name);
-	}
-
-	/**
-	 * Returns the name of the pipeline.
-	 *
-	 * @return name of the pipeline.
-	 */
-	public StringProperty name() {
-		return name;
-	}
-
 	protected final int newProcessorId() {
 		maxProcessorId++;
 		return maxProcessorId;
 	}
 
+	/**
+	 * Updates {@code maxProcessorId}. This is done to assure new processor ids
+	 * are unique.
+	 *
+	 * @param id the largest processor id in the current/loaded pipeline.
+	 */
 	protected final void levelMaxProcessorId(int id) {
 		if (id > maxProcessorId) {
 			maxProcessorId = id;
@@ -282,6 +377,9 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 	}
 
 	protected final void addProcessor(T wrapper) {
+		addTransmutableListener(wrapper);
+		registerPorts(wrapper);
+		this.dirtyStages = true;
 		this.modifiedPipelineProperty.addManagedProperty(wrapper);
 		processors.add(wrapper);
 	}
@@ -311,8 +409,22 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 		}
 
 		this.modifiedPipelineProperty.removeManagedProperty(wrapper);
+		this.dirtyStages = true;
+		removeTransmutableListener(wrapper);
+		unregisterPorts(wrapper);
 		processors.remove(wrapper);
 	}
+
+	// so far added and removed processors set the dirty bit to true, but that's
+	// not really enough: we also need to update the stages if connections change!
+	// On the bright side: this shouldn't ever happen with runnable pipelines, so
+	// we're good for now, since that's the only place where we use the stages,
+	// but technically we should listen to all ports too.
+	//
+	// ...and hence the method stages() is (only) defined/exposed on
+	// RunnablePipeline and not here.
+	protected volatile boolean dirtyStages = true;
+	protected volatile PipelineStages<RunnableProcessor> stages;
 
 	@Override
 	public ModifiedProperty modifiedProperty() {
@@ -322,6 +434,7 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 	@Override
 	public String toString() {
 		return this.getClass().getSimpleName()
+				+ "@" + Integer.toHexString(this.hashCode())
 				+ "{"
 				+ "id=" + id
 				+ ", name=" + name.get()
