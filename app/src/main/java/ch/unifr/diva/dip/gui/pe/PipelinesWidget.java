@@ -6,19 +6,15 @@ import ch.unifr.diva.dip.api.ui.MouseEventHandler;
 import ch.unifr.diva.dip.api.ui.MouseEventHandler.ClickCount;
 import ch.unifr.diva.dip.api.utils.L10n;
 import ch.unifr.diva.dip.core.ApplicationHandler;
-import ch.unifr.diva.dip.core.ApplicationSettings;
 import ch.unifr.diva.dip.core.model.Pipeline;
 import ch.unifr.diva.dip.core.model.PipelineLayoutStrategy;
 import ch.unifr.diva.dip.core.model.ProjectPage;
-import ch.unifr.diva.dip.core.model.PipelineManager;
 import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import ch.unifr.diva.dip.gui.AbstractWidget;
-import ch.unifr.diva.dip.gui.dialogs.ErrorDialog;
 import ch.unifr.diva.dip.gui.layout.DraggableListCell;
 import ch.unifr.diva.dip.gui.layout.FormGridPane;
 import ch.unifr.diva.dip.osgi.OSGiVersionPolicy;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,8 +42,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
-import javax.xml.bind.JAXBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -140,17 +134,6 @@ public class PipelinesWidget extends AbstractWidget {
 			final int usage = this.handler.getProject().getPipelineUsage(p.id);
 			if (usage > 0) {
 				inUse.add(p);
-	private void importPipelines() {
-		final FileChooser chooser = newFileChooser(localize("pipeline.import"));
-		final File file = chooser.showOpenDialog(editor.stage());
-		if (file != null) {
-			try {
-				// TODO: offer dialog to select what pipelines to import...
-				this.editor.pipelineManager().importPipelines(file.toPath(), null);
-			} catch (JAXBException ex) {
-				log.error("failed to import piplines: {}", file, ex);
-				final ErrorDialog dialog = new ErrorDialog(ex);
-				dialog.showAndWait();
 			}
 		}
 		return inUse;
@@ -161,32 +144,19 @@ public class PipelinesWidget extends AbstractWidget {
 		for (ProjectPage page : this.handler.getProject().pages()) {
 			if (pipelineIds.contains(page.getPipelineId())) {
 				pages.add(page);
-	private void exportPipelines(List<Pipeline> pipelines) {
-		final FileChooser chooser = newFileChooser(localize("pipeline.export"));
-		final File file = chooser.showSaveDialog(editor.stage());
-		if (file != null) {
-			try {
-				PipelineManager.exportPipelines(pipelines, file.toPath());
-			} catch (JAXBException ex) {
-				log.error("failed to export piplines to: {}", file, ex);
-				final ErrorDialog dialog = new ErrorDialog(ex);
-				dialog.showAndWait();
 			}
 		}
 		return pages;
 	}
 
-	private FileChooser newFileChooser(String title) {
-		final FileChooser chooser = new FileChooser();
-		chooser.setTitle(title);
-		chooser.setInitialDirectory(
-				handler.dataManager.appDataDir.pipelinePresetsDir.toFile()
-		);
-		ApplicationSettings.setExtensionFilter(
-				chooser,
-				ApplicationSettings.pipelinePresetsFileExtensionFilter
-		);
-		return chooser;
+	private void importPipelines() {
+		final PipelineImportDialog dialog = new PipelineImportDialog(handler);
+		dialog.show();
+	}
+
+	private void exportPipelines(List<Pipeline> pipelines) {
+		final PipelineExportDialog dialog = new PipelineExportDialog(handler, pipelines);
+		dialog.show();
 	}
 
 	/**
