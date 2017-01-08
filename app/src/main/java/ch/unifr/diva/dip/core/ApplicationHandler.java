@@ -127,6 +127,61 @@ public class ApplicationHandler implements Localizable {
 		this.eventBus = eventBus;
 	}
 
+	/**
+	 * Returns the most recently used DIP save directory. A DIP save directory
+	 * is a directory where DIP project files have been stored (or accessed).
+	 *
+	 * @return the most recently used DIP save directory, or the user directory
+	 * as a fallback.
+	 */
+	public Path getRecentSaveDirectory() {
+		if (settings.recentFiles.getSaveDirectory() != null) {
+			return settings.recentFiles.getSaveDirectory();
+		}
+		return ApplicationDataManager.userDirectory();
+	}
+
+	/**
+	 * Returns the most recently accessed DIP data directory. A DIP data
+	 * directory is a directory where DIP data files (holding presets and/or
+	 * pipelines) have been stored (or accessed).
+	 *
+	 * @return the most recently accessed DIP data directory, or the user
+	 * directory as a fallback.
+	 */
+	public Path getRecentDataDirectory() {
+		if (settings.recentFiles.getDataDirectory() != null) {
+			return settings.recentFiles.getDataDirectory();
+		}
+		return ApplicationDataManager.userDirectory();
+	}
+
+	/**
+	 * Returns the most recently accessed DIP data file. A DIP data file holds
+	 * presets and/or pipelines.
+	 *
+	 * @return the most recently accessed DIP data file, or null.
+	 */
+	public Path getRecentDataFile() {
+		return getRecentDataFile(null);
+	}
+
+	/**
+	 * Returns the most recently accessed DIP data file. A DIP data file holds
+	 * presets and/or pipelines.
+	 *
+	 * @param fallback a fallback file (or null) to be returned in case there is
+	 * no recently accessed DIP data file.
+	 * @return the most recently accessed DIP data file, or the given fallback
+	 * file.
+	 */
+	public Path getRecentDataFile(Path fallback) {
+		if (settings.recentFiles.getDataFile() != null) {
+			return settings.recentFiles.getDataFile();
+		}
+		return fallback;
+	}
+
 	public void newProject(String name, Path saveFile, String pipeline, List<Path> imageSet) {
 		if (hasProject()) {
 			closeProject();
