@@ -3,7 +3,6 @@ package ch.unifr.diva.dip.core.services.api;
 import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
-import ch.unifr.diva.dip.core.model.ProjectPage;
 import ch.unifr.diva.dip.core.services.RgbPage;
 import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
 import java.util.Collections;
@@ -17,7 +16,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class HostService implements HostProcessor {
 
-	protected static final org.slf4j.Logger log = LoggerFactory.getLogger(ProjectPage.class);
+	protected static final org.slf4j.Logger log = LoggerFactory.getLogger(HostService.class);
 
 	/**
 	 * Package to look for host processors/services.

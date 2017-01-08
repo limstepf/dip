@@ -170,7 +170,7 @@ public class PipelinesWidget extends AbstractWidget {
 	 */
 	public static class View extends VBox implements Localizable {
 
-		private static final org.slf4j.Logger log = LoggerFactory.getLogger(PipelineEditor.class);
+		private static final org.slf4j.Logger log = LoggerFactory.getLogger(PipelinesWidget.View.class);
 
 		private final PipelinesWidget widget;
 		protected final ListView<Pipeline> listView = new ListView<>();

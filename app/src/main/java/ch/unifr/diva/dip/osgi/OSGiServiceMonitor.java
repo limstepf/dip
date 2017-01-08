@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  */
 public class OSGiServiceMonitor<T> implements ServiceMonitor<T> {
 
-	private static final Logger log = LoggerFactory.getLogger(HostServiceMonitor.class);
+	private static final Logger log = LoggerFactory.getLogger(OSGiServiceMonitor.class);
 
 	private final ObservableMap<String, OSGiServiceCollection<T>> services;
 	private final ObservableList<OSGiServiceCollection<T>> collections;
