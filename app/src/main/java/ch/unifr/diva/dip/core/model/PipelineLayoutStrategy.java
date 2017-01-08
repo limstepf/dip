@@ -63,6 +63,9 @@ public enum PipelineLayoutStrategy {
 						for (ProcessorView view : processors) {
 							view.setLayoutX(x);
 							view.setLayoutY(y);
+
+							doLayout(view);
+
 							if (view.getWidth() > width) {
 								width = view.getWidth();
 							}
@@ -108,6 +111,9 @@ public enum PipelineLayoutStrategy {
 						for (ProcessorView view : processors) {
 							view.setLayoutX(x);
 							view.setLayoutY(y);
+
+							doLayout(view);
+
 							if (view.getHeight() > height) {
 								height = view.getHeight();
 							}
@@ -126,6 +132,18 @@ public enum PipelineLayoutStrategy {
 					return new ProcessorViewTopDown(editor, wrapper);
 				}
 			};
+
+	/**
+	 * Does/fixes the layout of a processor view. This is needed s.t. we can
+	 * reliably calculate with the position and bounds of already placed
+	 * processor views.
+	 *
+	 * @param view the placed processor view.
+	 */
+	private static void doLayout(ProcessorView view) {
+		view.applyCss();
+		view.layout();
+	}
 
 	private static final double hspace = 55.0;
 	private static final double vspace = 34.0;
