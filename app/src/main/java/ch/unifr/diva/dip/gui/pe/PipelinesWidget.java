@@ -9,6 +9,7 @@ import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.ApplicationSettings;
 import ch.unifr.diva.dip.core.model.Pipeline;
 import ch.unifr.diva.dip.core.model.PipelineLayoutStrategy;
+import ch.unifr.diva.dip.core.model.ProjectPage;
 import ch.unifr.diva.dip.core.model.PipelineManager;
 import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
@@ -20,6 +21,7 @@ import ch.unifr.diva.dip.osgi.OSGiVersionPolicy;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -96,15 +98,48 @@ public class PipelinesWidget extends AbstractWidget {
 	}
 
 	private void deletePipelines(List<Pipeline> pipelines) {
-		if (!editor.pipelineManager().deletePipelines(pipelines)) {
-			return;
+		final List<Integer> ids = getPipelineIds(pipelines);
+		final List<Pipeline> inUse = getPipelinesStillInUse(pipelines);
+		if (inUse.isEmpty()) {
+			// no pipeline is in use by a page, no problem
+			if (!editor.pipelineManager().deletePipelines(pipelines)) {
+				return;
+			}
+		} else {
+			// we can't delete pipelines still in use
+			final List<ProjectPage> pages = getPagesStillInUse(ids);
+			final DeletePipelineDialog dialog = new DeletePipelineDialog(
+					this.handler,
+					pages,
+					inUse,
+					ids
+			);
+			dialog.showAndWait();
+			if (dialog.isOk() && dialog.isValid()) {
+				dialog.repair(); // fix offending pages first
+				editor.pipelineManager().deletePipelines(pipelines, false);
+			} else {
+				return; // cancelled
+			}
 		}
 
+
+		// deselect if selected pipeline got deleted
 		if (pipelines.contains(editor.selectedPipeline())) {
 			editor.selectPipeline(null);
 		}
 	}
 
+	private List<Integer> getPipelineIds(List<Pipeline> pipelines) {
+		return pipelines.stream().map((p) -> p.id).collect(Collectors.toList());
+	}
+
+	private List<Pipeline> getPipelinesStillInUse(List<Pipeline> pipelines) {
+		final List<Pipeline> inUse = new ArrayList<>();
+		for (Pipeline p : pipelines) {
+			final int usage = this.handler.getProject().getPipelineUsage(p.id);
+			if (usage > 0) {
+				inUse.add(p);
 	private void importPipelines() {
 		final FileChooser chooser = newFileChooser(localize("pipeline.import"));
 		final File file = chooser.showOpenDialog(editor.stage());
@@ -118,9 +153,14 @@ public class PipelinesWidget extends AbstractWidget {
 				dialog.showAndWait();
 			}
 		}
-		view.layout();
+		return inUse;
 	}
 
+	private List<ProjectPage> getPagesStillInUse(List<Integer> pipelineIds) {
+		final List<ProjectPage> pages = new ArrayList<>();
+		for (ProjectPage page : this.handler.getProject().pages()) {
+			if (pipelineIds.contains(page.getPipelineId())) {
+				pages.add(page);
 	private void exportPipelines(List<Pipeline> pipelines) {
 		final FileChooser chooser = newFileChooser(localize("pipeline.export"));
 		final File file = chooser.showSaveDialog(editor.stage());
@@ -133,6 +173,7 @@ public class PipelinesWidget extends AbstractWidget {
 				dialog.showAndWait();
 			}
 		}
+		return pages;
 	}
 
 	private FileChooser newFileChooser(String title) {
