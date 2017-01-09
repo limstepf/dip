@@ -1,6 +1,8 @@
 package ch.unifr.diva.dip.core;
 
 import ch.unifr.diva.dip.utils.DecoratedPath;
+import ch.unifr.diva.dip.utils.FileFinder;
+import ch.unifr.diva.dip.utils.FileFinderOption;
 import static ch.unifr.diva.dip.utils.IOUtils.getRealDirectory;
 import java.io.File;
 import java.io.IOException;
@@ -8,12 +10,21 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Application Data Manager. The Data Manager uses {@code DecoratedPath}s s.t.
  * directories can be extended by its files.
  */
 public class ApplicationDataManager {
+
+	private static final Logger log = LoggerFactory.getLogger(ApplicationDataManager.class);
 
 	/**
 	 * Current working directory. Directory from where the applicatino has been
@@ -172,7 +183,12 @@ public class ApplicationDataManager {
 		/**
 		 * Directory for temporary files (scratch space).
 		 */
-		public final Path tmpDir; //TODO: auto. clean-up at start/exit
+		public final Path tmpDir;
+
+		/**
+		 * Directory for log files.
+		 */
+		public final Path logDir;
 
 		/**
 		 * Application settings file. This file doesn't necessarily exist (yet).
@@ -193,6 +209,7 @@ public class ApplicationDataManager {
 			this.presetsDir = getRealDirectory(path.resolve("presets"));
 			this.processorPresetsDir = getRealDirectory(this.presetsDir.resolve("processors"));
 			this.tmpDir = getRealDirectory(path.resolve("tmp"));
+			this.logDir = getRealDirectory(path.resolve("log"));
 
 			this.settingsFile = path.resolve("settings.xml");
 		}
@@ -216,6 +233,45 @@ public class ApplicationDataManager {
 		 */
 		public Path getPipelinePresetPath() {
 			return this.presetsDir.resolve("pipelines.xml");
+		}
+
+		/**
+		 * Deletes all files in the temporary directory.
+		 */
+		public void deleteTemporaryFiles() {
+			final FileFinder finder = new FileFinder("*.*");
+			try {
+				finder.walkFileTree(tmpDir, FileFinderOption.NONRECURSIVE);
+				for (File file : finder.getFiles()) {
+					if (file.isFile()) {
+						file.delete();
+					}
+				}
+			} catch (IOException ex) {
+				log.warn("failed to clean up temporary files in: {}", tmpDir, ex);
+			}
+		}
+
+		/**
+		 * Deletes all files in the log directory that are older than a week.
+		 */
+		public void deleteLogFiles() {
+			final FileFinder finder = new FileFinder("*.*");
+			try {
+				finder.walkFileTree(logDir, FileFinderOption.NONRECURSIVE);
+				final List<File> files = finder.getFiles();
+				if (files.size() > 0) {
+					final LocalDateTime ts = LocalDateTime.now().minusWeeks(1);
+					for (File file : finder.getFiles()) {
+						final Instant inst = new Date(file.lastModified()).toInstant();
+						if (ts.compareTo(LocalDateTime.ofInstant(inst, ZoneId.systemDefault())) > 0) {
+							file.delete();
+						}
+					}
+				}
+			} catch (IOException ex) {
+				log.warn("failed to clean up log files in: {}", logDir, ex);
+			}
 		}
 
 	}

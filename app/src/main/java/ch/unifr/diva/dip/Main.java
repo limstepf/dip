@@ -39,6 +39,7 @@ public class Main {
 		}
 
 		// close application resources
+		context.cleanup();
 		context.close();
 
 		// shutdown

@@ -7,6 +7,8 @@ import ch.qos.logback.classic.filter.ThresholdFilter;
 import ch.qos.logback.core.ConsoleAppender;
 import ch.qos.logback.core.FileAppender;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import org.slf4j.ILoggerFactory;
 
 /**
@@ -50,9 +52,14 @@ public enum LogBackConfig {
 				@Override
 				public void config(LoggerContext loggerContext, ApplicationDataManager dataManager) {
 					// configure file appender
-					// TODO: use RollingFileAppender and a TimeBasedRollingPolicy, or
-					// manually delete (too large) log files at startup of the app?
-					final Path logFile = dataManager.appDataDir.resolve("dip.log");
+					final Path logFile = dataManager.appDataDir.logDir.resolve(
+							String.format(
+									"dip_%s.log",
+									LocalDateTime.now().format(
+											DateTimeFormatter.ofPattern("yyyy-MM-dd")
+									)
+							)
+					);
 					final FileAppender fileAppender = newFileAppender(
 							loggerContext,
 							"main",

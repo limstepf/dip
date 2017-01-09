@@ -175,6 +175,16 @@ public class ApplicationContext {
 	}
 
 	/**
+	 * Performs cleanup before closing the application. Removes temporary files
+	 * or outdated logs, and what not. A call to this method is optional and can
+	 * be ommitted in tests and similar scenarios.
+	 */
+	public void cleanup() {
+		dataManager.appDataDir.deleteTemporaryFiles();
+		dataManager.appDataDir.deleteLogFiles();
+	}
+
+	/**
 	 * Close open application resources ({@literal e.g.} the OSGi framework).
 	 */
 	public void close() {
