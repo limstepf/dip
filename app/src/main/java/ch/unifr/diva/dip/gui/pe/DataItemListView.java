@@ -16,6 +16,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
@@ -156,11 +157,25 @@ public class DataItemListView<T extends DataItemListView.DataItem> implements Lo
 	 * @return the menu item.
 	 */
 	public MenuItem getDeleteItemMenuItem(String label) {
-		final MenuItem item = new MenuItem(localize("delete.selected", label.toLowerCase()));
-		item.disableProperty().bind(Bindings.not(hasSelectionProperty));
-		item.setOnAction((e) -> {
+		return getDeleteItemMenuItem(label, (e) -> {
 			getItems().removeAll(getSelectedItems());
 		});
+	}
+
+	/**
+	 * Creates a delete item(s) menu item with a custom event handler. The
+	 * returned menu item still needs to be added manually to the context menu!
+	 *
+	 * @param label the label of an item. Should be lowercase and catch the
+	 * singular and plural case (e.g. "item(s)").
+	 * @param handler a custom event handler. Needs to take care of the removal
+	 * of currently selected items.
+	 * @return the menu item.
+	 */
+	public MenuItem getDeleteItemMenuItem(String label, EventHandler<ActionEvent> handler) {
+		final MenuItem item = new MenuItem(localize("delete.selected", label.toLowerCase()));
+		item.disableProperty().bind(Bindings.not(hasSelectionProperty));
+		item.setOnAction(handler);
 		return item;
 	}
 
