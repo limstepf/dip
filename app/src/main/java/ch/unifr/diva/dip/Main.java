@@ -2,6 +2,7 @@ package ch.unifr.diva.dip;
 
 import ch.unifr.diva.dip.core.ApplicationContext;
 import ch.unifr.diva.dip.core.ApplicationSettings;
+import ch.unifr.diva.dip.core.LogBackConfig;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -21,10 +22,12 @@ public class Main {
 	private static Map<String, List<String>> params;
 
 	public static void main(String[] args) {
-		welcome(args);
-
-		context = new ApplicationContext(ApplicationSettings.appDataDirName);
 		params = parseArgs(args);
+		context = new ApplicationContext(
+				ApplicationSettings.appDataDirName,
+				LogBackConfig.DEFAULT_LOGBACK
+		);
+		welcome(args);
 
 		if (params.containsKey("b")) {
 			// run with command-line interface (CLI) only

@@ -58,9 +58,10 @@ public class ApplicationContext {
 	 *
 	 * @param appDataDirName Directory name for the application data (somewhere
 	 * in user-land). Should start with a period to make it a hidden directory.
+	 * @param logBackConfig a LOGBack configuration.
 	 */
-	public ApplicationContext(String appDataDirName) {
-		this(ApplicationDataManager.userDirectory(), appDataDirName);
+	public ApplicationContext(String appDataDirName, LogBackConfig logBackConfig) {
+		this(ApplicationDataManager.userDirectory(), appDataDirName, logBackConfig);
 	}
 
 	/**
@@ -76,6 +77,23 @@ public class ApplicationContext {
 	 * in user-land). Should start with a period to make it a hidden directory.
 	 */
 	public ApplicationContext(Path parent, String appDataDirName) {
+		this(parent, appDataDirName, LogBackConfig.DEFAULT_LOGBACK);
+	}
+
+	/**
+	 * ApplicationContext constructor. While the constructor itself doesn't
+	 * throw, some of its components might, in which case the exceptions are
+	 * wrapped together with an error message in an {@code Error} instance. An
+	 * {@code ApplicationContext} instance is *not* valid in case the list of
+	 * errors isn't empty!
+	 *
+	 * @param parent Parent directory of the {@code appDataDirName} directory.
+	 * This is usually the user's home directory.
+	 * @param appDataDirName Directory name for the application data (somewhere
+	 * in user-land). Should start with a period to make it a hidden directory.
+	 * @param logBackConfig a LOGBack configuration.
+	 */
+	public ApplicationContext(Path parent, String appDataDirName, LogBackConfig logBackConfig) {
 		// init data manager/filesystem
 		ApplicationDataManager tmpDataManager = null;
 		try {
@@ -87,6 +105,18 @@ public class ApplicationContext {
 			);
 		}
 		dataManager = tmpDataManager;
+
+		// logger configuration
+		logBackConfig.config(
+				LoggerFactory.getILoggerFactory(),
+				dataManager
+		);
+
+		// log data manager main directories, now that the logger is configured.
+		log.info("Current working directory: {}", dataManager.workingDir);
+		log.info("Application directory: {}", dataManager.appDir);
+		log.info("User directory: {}", dataManager.userDir);
+		log.info("Application data directory: {}", dataManager.appDir);
 
 		// init thread pools/executor services
 		threadPool = new DipThreadPool();

@@ -8,8 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Application Data Manager. The Data Manager uses {@code DecoratedPath}s s.t.
@@ -17,13 +15,11 @@ import org.slf4j.LoggerFactory;
  */
 public class ApplicationDataManager {
 
-	private static final Logger log = LoggerFactory.getLogger(ApplicationDataManager.class);
-
 	/**
 	 * Current working directory. Directory from where the applicatino has been
 	 * started.
 	 */
-	private final Path workingDir;
+	public final Path workingDir;
 
 	/**
 	 * User directory. Save to write to independent of platform. There might be
@@ -35,7 +31,7 @@ public class ApplicationDataManager {
 	 * integration tests), hence we don't expose it as such (i.e. private). Use
 	 * {@code ApplicationDataManager.userDirectory()} instead.
 	 */
-	private final Path userDir;
+	public final Path userDir;
 
 	/**
 	 * Application directory. The directory where the application executable is
@@ -77,24 +73,17 @@ public class ApplicationDataManager {
 	 * has to shut down in case this constructor throws.
 	 */
 	public ApplicationDataManager(Path parent, String appDataDirName) throws IOException {
-		workingDir = Paths.get(System.getProperty("user.dir")).toRealPath();
-		log.info("Current working directory: {}", workingDir);
-
 		final String jar = ApplicationDataManager.class.getProtectionDomain()
 				.getCodeSource().getLocation().getPath();
 
+		workingDir = Paths.get(System.getProperty("user.dir")).toRealPath();
 		appDir = new ApplicationDirectory(
 				Paths.get(new File(jar).getParent()).toRealPath()
 		);
-		log.info("Application directory: {}", appDir);
-
 		userDir = parent.toRealPath();
-		log.info("User directory: {}", userDir);
-
 		appDataDir = new ApplicationDataDirectory(
 				getRealDirectory(userDir.resolve(appDataDirName))
 		);
-		log.info("Application data directory: {}", appDir);
 	}
 
 	/**
