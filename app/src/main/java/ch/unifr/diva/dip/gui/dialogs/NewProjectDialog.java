@@ -126,7 +126,16 @@ public class NewProjectDialog extends AbstractDialog {
 		setDefaultPipeline.setOnAction((e) -> onSetDefaultPipeline());
 		final MenuItem importPipelines = new MenuItem(localize("pipeline.import"));
 		importPipelines.setOnAction((e) -> onImportPipelines());
-		final MenuItem deletePipelines = pipelines.getDeleteItemMenuItem(localize("pipeline.any"));
+		final MenuItem deletePipelines = pipelines.getDeleteItemMenuItem(
+				localize("pipeline.any"),
+				(e) -> {
+					final List<PipelineData.PipelineItem> selection = pipelines.getSelectedItems();
+					if (selection.contains(defaultPipeline)) {
+						defaultPipeline = null;
+					}
+					pipelines.getItems().removeAll(selection);
+				}
+		);
 		pipelines.addMenuItem(setDefaultPipeline);
 		pipelines.addMenuItem(importPipelines);
 		pipelines.addMenuItem(deletePipelines);
