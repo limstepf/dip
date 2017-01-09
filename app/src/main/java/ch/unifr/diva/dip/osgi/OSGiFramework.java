@@ -200,7 +200,7 @@ public class OSGiFramework {
 				final Bundle bundle = context.installBundle(file.toUri().toString());
 				final BundleStartLevel bsl = bundle.adapt(BundleStartLevel.class);
 				bsl.setStartLevel(defaultBundleStartLevel);
-				log.info("installing OSGi bundle: {}", bundle.getSymbolicName());
+				log.debug("installing OSGi bundle: {}", bundle.getSymbolicName());
 				bundles.add(bundle);
 			} catch (BundleException ex) {
 				log.warn("error installing OSGi bundle: {}", file.toString(), ex);
@@ -217,7 +217,7 @@ public class OSGiFramework {
 	private void startBundles(List<Bundle> bundles) {
 		for (Bundle bundle : bundles) {
 			try {
-				log.info("starting OSGi bundle: {}", bundle.getSymbolicName());
+				log.debug("starting OSGi bundle: {}", bundle.getSymbolicName());
 				bundle.start();
 			} catch (BundleException ex) {
 				log.warn("error starting OSGi bundle: {}", bundle.getSymbolicName(), ex);

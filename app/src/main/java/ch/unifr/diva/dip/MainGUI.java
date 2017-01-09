@@ -89,7 +89,7 @@ public class MainGUI extends Application {
 		// auto-save user settings on exit
 		UserSettings.saveStage(primaryStage, context.settings.primaryStage);
 
-		log.info(
+		log.debug(
 				"saving user settings: {}",
 				context.dataManager.appDataDir.settingsFile
 		);

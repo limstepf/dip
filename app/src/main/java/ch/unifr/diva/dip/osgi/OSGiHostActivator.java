@@ -19,15 +19,12 @@ public class OSGiHostActivator implements BundleActivator {
 
 	@Override
 	public void start(BundleContext context) throws Exception {
-		log.info("start");
-//		Dictionary props = new Hashtable();
-//		props.put("service.pid", "ch.unifr.diva.ProcessorSource");
-//		context.registerService(Processor.class.getName(), new ProcessorSource(), props);
+		log.debug("start");
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		log.info("stop");
+		log.debug("stop");
 	}
 
 }

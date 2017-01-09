@@ -40,7 +40,7 @@ public class Main {
 
 		// shutdown
 		context.waitForStop();
-		log.info("kthxbai.");
+		log.info("kthxbai.\n");
 		System.exit(0);
 	}
 
