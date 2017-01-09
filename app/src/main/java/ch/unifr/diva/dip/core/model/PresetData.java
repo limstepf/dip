@@ -219,7 +219,7 @@ public class PresetData {
 					wrapper.pid,
 					toPresetVersion(wrapper.version),
 					name,
-					wrapper.parameters() // no deep copy needed
+					wrapper.getParameterValues() // no deep copy needed
 			);
 		}
 

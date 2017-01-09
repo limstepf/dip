@@ -200,8 +200,12 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 		return editingProperty().get();
 	}
 
-	// TODO: rename parameter values?!
-	public Map<String, Object> parameters() {
+	/**
+	 * Returns the values of all parameters of the processor.
+	 *
+	 * @return the values of the parameters.
+	 */
+	public Map<String, Object> getParameterValues() {
 		saveParameters(this.processor);
 		return this.parameters;
 	}

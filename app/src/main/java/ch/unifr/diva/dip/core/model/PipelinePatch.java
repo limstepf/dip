@@ -267,10 +267,10 @@ public class PipelinePatch {
 
 			final ProcessorPatch p = new ProcessorPatch(a.id);
 
-			for (Map.Entry<String, Object> e : a.parameters().entrySet()) {
+			for (Map.Entry<String, Object> e : a.getParameterValues().entrySet()) {
 				final String key = e.getKey();
-				if (b.parameters().containsKey(key)) {
-					final Object obj = b.parameters().get(key);
+				if (b.getParameterValues().containsKey(key)) {
+					final Object obj = b.getParameterValues().get(key);
 					if (!e.getValue().equals(obj)) {
 						p.put(key, obj);
 					}

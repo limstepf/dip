@@ -579,7 +579,7 @@ public class PipelineData {
 			// A deep copy of the parameters is necessary here s.t. we can easily
 			// clone pipelines by going from a Pipeline to PipelineData, and back
 			// to create a new pipeline.
-			this.parameters = IOUtils.deepClone(wrapper.parameters());
+			this.parameters = IOUtils.deepClone(wrapper.getParameterValues());
 		}
 
 		/**
