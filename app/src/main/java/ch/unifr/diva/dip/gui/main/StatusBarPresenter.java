@@ -50,7 +50,6 @@ public class StatusBarPresenter implements Presenter {
 	private final ProgressBar progress = new ProgressBar();
 	private final LinkedBlockingDeque<StatusWorkerEvent> stack = new LinkedBlockingDeque<>();
 	private Transition messageTransition;
-	private String latestMessage;
 
 	/**
 	 * Creates a {@code StatusBar}.
@@ -71,7 +70,7 @@ public class StatusBarPresenter implements Presenter {
 		 * Just overwrite the last message and (re-)start the fade out transition.
 		 * The message will be visible as long as no StatusWorkerEvent is active.
 		 */
-		latestMessage = event.message;
+		message.textProperty().bind(messageProperty);
 		messageProperty.set(event.message);
 		messageTransition = startFadeTransition(messageTransition, message);
 	}
@@ -125,12 +124,9 @@ public class StatusBarPresenter implements Presenter {
 
 	private void unbindStatusWorkerEvent() {
 		message.textProperty().unbind();
+		messageTransition = startFadeTransition(messageTransition, message);
 		progress.progressProperty().unbind();
 		enableProgress(false);
-		if (latestMessage != null) {
-			message.textProperty().set(latestMessage);
-			messageTransition = startFadeTransition(messageTransition, message);
-		}
 	}
 
 	private void bindToStatusWorkerEvent(StatusWorkerEvent event) {
