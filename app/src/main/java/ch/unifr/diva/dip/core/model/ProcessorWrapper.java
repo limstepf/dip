@@ -398,11 +398,15 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	 * @param processor the processor to be initialized.
 	 */
 	protected void initProcessor(Processor processor) {
-		if (isHostProcessor) {
-			final HostProcessor hp = (HostProcessor) processor;
-			hp.init(getHostProcessorContext());
-		} else {
-			processor.init(getProcessorContext());
+		try {
+			if (isHostProcessor) {
+				final HostProcessor hp = (HostProcessor) processor;
+				hp.init(getHostProcessorContext());
+			} else {
+				processor.init(getProcessorContext());
+			}
+		} catch (Exception ex) {
+			log.warn("failed to initialize the processor: {}", processor, ex);
 		}
 	}
 

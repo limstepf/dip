@@ -36,11 +36,15 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Window;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Processor view base class.
  */
 public abstract class ProcessorView extends BorderPane {
+
+	protected static final Logger log = LoggerFactory.getLogger(ProcessorView.class);
 
 	/**
 	 * Data format of a node in the pane of the pipeline editor. A node is the
@@ -98,16 +102,24 @@ public abstract class ProcessorView extends BorderPane {
 		if (wrapper.isAvailable()) {
 			for (Map.Entry<String, InputPort> e : wrapper.processor().inputs().entrySet()) {
 				final InputPort input = e.getValue();
-				final PortView view = new PortView(editor, e.getKey(), input);
-				editor.editorPane().registerPort(input, view);
-				inputPorts.add(view);
+				if (input != null) {
+					final PortView view = new PortView(editor, e.getKey(), input);
+					editor.editorPane().registerPort(input, view);
+					inputPorts.add(view);
+				} else {
+					log.warn("invalid input port: {}", e.getKey());
+				}
 			}
 
 			for (Map.Entry<String, OutputPort> e : wrapper.processor().outputs().entrySet()) {
 				final OutputPort output = e.getValue();
-				final PortView view = new PortView(editor, e.getKey(), output);
-				editor.editorPane().registerPort(output, view);
-				outputPorts.add(view);
+				if (output != null) {
+					final PortView view = new PortView(editor, e.getKey(), output);
+					editor.editorPane().registerPort(output, view);
+					outputPorts.add(view);
+				} else {
+					log.warn("invalid output port: {}", e.getKey());
+				}
 			}
 		}
 
