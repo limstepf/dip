@@ -1,6 +1,5 @@
 package ch.unifr.diva.dip.gui.pe;
 
-import ch.unifr.diva.dip.api.components.ActiveInputPort;
 import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.ProcessorContext;
 import ch.unifr.diva.dip.api.parameters.EnumParameter;
@@ -21,6 +20,7 @@ import ch.unifr.diva.dip.gui.layout.ZoomSlider;
 import java.awt.Rectangle;
 import java.util.Collection;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
@@ -63,6 +63,7 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 	private final ProcessorView.ProcessorHead head;
 	private final ProcessorView.ParameterViewBase parameterView;
 	private final PreviewWidget previewWidget;
+	private final InvalidationListener valueListener;
 	private final BooleanProperty patchedProperty;
 
 	/**
@@ -124,20 +125,17 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 
 		if (previewContext.isValid()) {
 			this.previewWidget = new PreviewWidget(handler, previewContext);
+			this.valueListener = (c) -> previewWidget.onParamChanged();
 			this.root.setLeft(this.previewWidget.getNode());
 
 			// listen to input changes
 			final Collection<InputPort> inputs = runnable.processor().inputs().values();
 			for (InputPort input : inputs) {
-				if (input instanceof ActiveInputPort) {
-					final ActiveInputPort a = (ActiveInputPort) input;
-					a.valueChangedProperty().addListener((c) -> {
-						previewWidget.onParamChanged();
-					});
-				}
+				input.valueChangedProperty().addListener(valueListener);
 			}
 		} else {
 			this.previewWidget = null;
+			this.valueListener = null;
 			final Region spacer = new Region();
 			spacer.setPrefWidth(b * 2);
 			this.root.setLeft(spacer);
@@ -162,6 +160,12 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 	}
 
 	private void onClose(WindowEvent e) {
+		if (this.valueListener != null) {
+			final Collection<InputPort> inputs = runnable.processor().inputs().values();
+			for (InputPort input : inputs) {
+				input.valueChangedProperty().removeListener(valueListener);
+			}
+		}
 		if (this.previewWidget != null) {
 			this.previewWidget.close();
 		}

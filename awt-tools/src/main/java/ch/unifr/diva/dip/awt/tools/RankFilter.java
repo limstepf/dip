@@ -1,6 +1,5 @@
 package ch.unifr.diva.dip.awt.tools;
 
-import ch.unifr.diva.dip.api.components.ActiveInputPort;
 import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.components.ProcessorContext;
@@ -42,7 +41,7 @@ public class RankFilter extends ProcessableBase implements Transmutable, Preview
 	private final static String MATRIX_FILE = "ranked.bmat";
 
 	private final InputPort<BufferedImage> input;
-	private final ActiveInputPort<BooleanMatrix> mask;
+	private final InputPort<BooleanMatrix> mask;
 	private final OutputPort<BufferedImage> output;
 
 	private final EnumParameter padderOption;
@@ -75,7 +74,7 @@ public class RankFilter extends ProcessableBase implements Transmutable, Preview
 		this.parameters.put("mask", this.maskOption);
 
 		this.input = new InputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImage(), true);
-		this.mask = new ActiveInputPort(new ch.unifr.diva.dip.api.datatypes.BooleanMatrix(), false);
+		this.mask = new InputPort(new ch.unifr.diva.dip.api.datatypes.BooleanMatrix(), false);
 		enableAllInputs();
 
 		this.output = new OutputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImage());

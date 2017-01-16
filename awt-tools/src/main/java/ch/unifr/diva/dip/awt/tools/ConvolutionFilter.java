@@ -1,6 +1,5 @@
 package ch.unifr.diva.dip.awt.tools;
 
-import ch.unifr.diva.dip.api.components.ActiveInputPort;
 import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.components.Port;
@@ -66,21 +65,21 @@ public class ConvolutionFilter extends ProcessableBase implements Transmutable, 
 	private static class KernelInput<T extends Matrix> {
 
 		private final String postfix;
-		public final ActiveInputPort<T> kernel;
-		public final ActiveInputPort<T> rowVector;
-		public final ActiveInputPort<T> columnVector;
+		public final InputPort<T> kernel;
+		public final InputPort<T> rowVector;
+		public final InputPort<T> columnVector;
 
 		public KernelInput(Class<T> clazz) {
 			if (clazz.equals(DoubleMatrix.class)) {
 				this.postfix = "d";
-				this.kernel = new ActiveInputPort<>(new ch.unifr.diva.dip.api.datatypes.DoubleMatrix(), false);
-				this.rowVector = new ActiveInputPort<>(new ch.unifr.diva.dip.api.datatypes.DoubleMatrix(), false);
-				this.columnVector = new ActiveInputPort<>(new ch.unifr.diva.dip.api.datatypes.DoubleMatrix(), false);
+				this.kernel = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.DoubleMatrix(), false);
+				this.rowVector = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.DoubleMatrix(), false);
+				this.columnVector = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.DoubleMatrix(), false);
 			} else {
 				this.postfix = "f";
-				this.kernel = new ActiveInputPort<>(new ch.unifr.diva.dip.api.datatypes.FloatMatrix(), false);
-				this.rowVector = new ActiveInputPort<>(new ch.unifr.diva.dip.api.datatypes.FloatMatrix(), false);
-				this.columnVector = new ActiveInputPort<>(new ch.unifr.diva.dip.api.datatypes.FloatMatrix(), false);
+				this.kernel = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.FloatMatrix(), false);
+				this.rowVector = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.FloatMatrix(), false);
+				this.columnVector = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.FloatMatrix(), false);
 			}
 		}
 
