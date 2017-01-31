@@ -1,5 +1,6 @@
 package ch.unifr.diva.dip.api.parameters;
 
+import ch.unifr.diva.dip.api.ui.PersistentToggleButtonGroup;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
@@ -65,7 +66,7 @@ public class BooleanParameter extends PersistentParameterBase<Boolean, BooleanPa
 	 */
 	public static class BooleanView extends PersistentParameterBase.ParameterViewBase<BooleanParameter, Boolean, HBox> {
 
-		private final ToggleGroup group = new ToggleGroup();
+		private final ToggleGroup group = new PersistentToggleButtonGroup();
 		private final ToggleButton on;
 		private final ToggleButton off;
 
@@ -87,6 +88,9 @@ public class BooleanParameter extends PersistentParameterBase<Boolean, BooleanPa
 		}
 
 		protected final Boolean get() {
+			if (group.getSelectedToggle() == null) {
+				return Boolean.FALSE;
+			}
 			return group.getSelectedToggle().equals(on);
 		}
 
