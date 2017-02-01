@@ -46,6 +46,14 @@ public interface EditorLayer {
 	public void setVisible(boolean visible);
 
 	/**
+	 * Repaints the layer. This method should be called after tools have modified
+	 * the content of a layer pane (e.g. after drawing a stroke on a canvas), to
+	 * get the views (navigator widget, NN overlay) to update themselves. This
+	 * also marks the project as dirty (s.t. the project needs to be saved).
+	 */
+	public void repaint();
+
+	/**
 	 * Reverses the order of children. Layers/TreeItems in the TreeView grow
 	 * bottom-up, so either loops populating a parent need to be written
 	 * backwards, or this helper method can be called afterwards to get the

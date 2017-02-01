@@ -7,6 +7,9 @@ package ch.unifr.diva.dip.gui.editor;
  */
 public class LayerEvent {
 
+	/**
+	 * Layer event types.
+	 */
 	public enum Type {
 
 		/**
@@ -14,6 +17,13 @@ public class LayerEvent {
 		 * also fired if the visibility of a layer changes.
 		 */
 		MODIFIED,
+		/**
+		 * A layer pane got modified. This event is manually triggered (from a
+		 * layer user) after the content of a layer pane has been modified. As
+		 * such, it acts like a {@code MODIFIED} event (to bubble up to the root
+		 * layer and trigger the modified property).
+		 */
+		MODIFIED_PANE,
 		/**
 		 * The children of a layer group got modified, or the hide group status
 		 * changed. Notifies the parent layer group to rebuild it's tree.
@@ -43,8 +53,16 @@ public class LayerEvent {
 		REACTIVATE;
 	}
 
+	/**
+	 * Type of the layer event.
+	 */
 	public final Type type;
 
+	/**
+	 * Creates a new layer event.
+	 *
+	 * @param type type of the layer event.
+	 */
 	public LayerEvent(Type type) {
 		this.type = type;
 	}

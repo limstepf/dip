@@ -8,6 +8,7 @@ import ch.unifr.diva.dip.core.model.Pipeline;
 import ch.unifr.diva.dip.core.model.PipelineManager;
 import ch.unifr.diva.dip.core.model.ProcessorWrapper;
 import ch.unifr.diva.dip.gui.Presenter;
+import ch.unifr.diva.dip.gui.editor.NavigatorWidget;
 import ch.unifr.diva.dip.gui.layout.AbstractWindow;
 import ch.unifr.diva.dip.gui.layout.RubberBandSelector;
 import ch.unifr.diva.dip.gui.layout.ZoomPane;
@@ -71,23 +72,24 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 	 *
 	 * @param owner owner of the pipeline editor's window.
 	 * @param handler the application handler.
-	 * @param manager the pipeline manager.
 	 */
-	public PipelineEditor(Window owner, ApplicationHandler handler, PipelineManager manager) {
+	public PipelineEditor(Window owner, ApplicationHandler handler) {
 		super(owner);
 		setTitle(localize("pipeline.editor"));
 
 		this.handler = handler;
-		this.manager = manager;
+		this.manager = handler.getProject().pipelineManager();
 		this.editorPane = new EditorPane(this);
 
 		this.zoomPane = new ZoomPane(handler.discardingThreadPool, editorPane.getComponent());
+		zoomPane.getStyleClass().add("dip-editor");
 		zoomPane.bindMinDimensions(editorPane.pane());
+		zoomPane.bindStage(stage);
 
 		this.rubberBandSelector = new RubberBandSelector<>(this.editorPane.pane(), ProcessorView.class);
 		this.rubberBandSelector.enable(true);
 		this.rubberBandSelector.suppressIfNotDefaultCursor(true);
-		// don't turn this into a lambda expression. For some reason this won't work...
+		// don't turn this into a lambda expression. For some reason (generics!) this won't work...
 		this.rubberBandSelector.selection().addListener(new SetChangeListener<ProcessorView>() {
 			@Override
 			public void onChanged(SetChangeListener.Change<? extends ProcessorView> c) {
@@ -128,11 +130,8 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 		};
 
 		this.sideBar = new SideBarPresenter();
-		// TODO: navigatorWidget needs to listen to dimension changes of the
-		// zoomPane content and update its snapshot accordingly!
-//		final NavigatorWidget navigator = new NavigatorWidget();
-//		navigator.bind(zoomPane);
-//		sideBar.addAuxiliaryWidget(navigator);
+		final NavigatorWidget navigator = new NavigatorWidget(this.zoomPane);
+		sideBar.addAuxiliaryWidget(navigator);
 		this.pipelinesWidget = new PipelinesWidget(handler, this);
 		sideBar.addMainWidget(pipelinesWidget);
 
@@ -207,12 +206,18 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 	public void show() {
 		UserSettings.restoreStage(this.stage, handler.settings.pipelineStage);
 		super.show();
+		repaint();
 	}
 
 	@Override
 	public void showAndWait() {
 		UserSettings.restoreStage(this.stage, handler.settings.pipelineStage);
 		super.showAndWait();
+		repaint();
+	}
+
+	protected final void repaint() {
+		this.zoomPane.fireContentChange();
 	}
 
 	/**

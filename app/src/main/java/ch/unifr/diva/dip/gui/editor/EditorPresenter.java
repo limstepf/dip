@@ -2,13 +2,13 @@ package ch.unifr.diva.dip.gui.editor;
 
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.model.Pipeline;
+import ch.unifr.diva.dip.core.model.Project;
 import ch.unifr.diva.dip.core.model.ProjectPage;
 import ch.unifr.diva.dip.core.model.RunnableProcessor;
 import ch.unifr.diva.dip.eventbus.events.ProjectNotification;
 import ch.unifr.diva.dip.gui.Presenter;
 import ch.unifr.diva.dip.gui.layout.ZoomPane;
 import com.google.common.eventbus.Subscribe;
-import javafx.beans.InvalidationListener;
 import javafx.scene.Parent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +22,6 @@ public class EditorPresenter implements Presenter {
 	private final ApplicationHandler handler;
 	private final LayerGroup rootLayer;
 	private final ZoomPane zoomPane;
-	private final InvalidationListener onModifiedListener;
 	private NavigatorWidget navigatorWidget;
 	private LayersWidget layersWidget;
 
@@ -36,14 +35,29 @@ public class EditorPresenter implements Presenter {
 
 		this.rootLayer = new LayerGroup();
 		this.zoomPane = new ZoomPane(handler.discardingThreadPool, this.rootLayer.getComponent());
-		this.zoomPane.getStyleClass().add("dip-editor");
-		this.zoomPane.setInterpolation(
+		zoomPane.getStyleClass().add("dip-editor");
+		zoomPane.setInterpolation(
 				ZoomPane.Interpolation.get(handler.settings.editor.interpolation)
 		);
-		this.onModifiedListener = (c) -> {
-			this.zoomPane.fireContentChange();
-		};
-		this.rootLayer.onModifiedProperty().addListener(this.onModifiedListener);
+		zoomPane.bindStage(handler.uiStrategy.getStage());
+		// repaint listener
+		this.rootLayer.onModifiedProperty().addListener((e) -> this.zoomPane.fireContentChange());
+		// content modification listener (not all repaints are due to content modifications)
+		this.rootLayer.onModifiedContentProperty().addListener((e) -> {
+			final Project project = this.handler.getProject();
+			if (project != null) {
+				this.handler.getProject().setModified(true);
+			}
+		});
+	}
+
+	/**
+	 * Returns the zoom pane of the editor.
+	 *
+	 * @return the zoom pane.
+	 */
+	public ZoomPane getZoomPane() {
+		return this.zoomPane;
 	}
 
 	@Override
@@ -116,8 +130,6 @@ public class EditorPresenter implements Presenter {
 		this.rootLayer.clear();
 	}
 
-// TODO: monitor processors in runnable pipelines too!
-// -> listen to page.getPipeline().processors()
 	private void onPageModified() {
 		clear();
 		buildStages();
@@ -162,7 +174,7 @@ public class EditorPresenter implements Presenter {
 	 */
 	public LayersWidget layersWidget() {
 		if (this.layersWidget == null) {
-			this.layersWidget = new LayersWidget();
+			this.layersWidget = new LayersWidget(handler);
 			this.layersWidget.setRoot(this.rootLayer.getTreeItem());
 		}
 		return this.layersWidget;

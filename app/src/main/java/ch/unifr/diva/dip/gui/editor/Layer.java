@@ -26,11 +26,23 @@ public interface Layer {
 	/**
 	 * The modified property. Fires everytime some change has been made to some
 	 * layer in the layer tree, but only fires on the root layer(!), otherwise
-	 * the modified event just bubbles up.
+	 * the modified event just bubbles up. This property is used to know when to
+	 * redraw/update related views (e.g. snapshots for a navigator widget).
 	 *
 	 * @return the modified property.
 	 */
 	ReadOnlyBooleanProperty onModifiedProperty();
+
+	/**
+	 * The modified content property. Fires right after the
+	 * {@code onModifiedProperty} (if it does) to signal that some content in
+	 * some pane of some layer got modified, s.t. the project can be marked as
+	 * dirty. This does not happen for changes to the layer-/structure itself
+	 * (e.g. toggling visibility of a layer).
+	 *
+	 * @return the modified content property.
+	 */
+	ReadOnlyBooleanProperty onModifiedContentProperty();
 
 	/**
 	 * The parent property.
@@ -133,6 +145,16 @@ public interface Layer {
 	 * instead of directly calling {@code getName()}.
 	 */
 	public String getHiddenName();
+
+	/**
+	 * Returns the processor id of the processor owning this layer. A layer is
+	 * considered owned by (or linked to) a processor, if it either is directly
+	 * owned by/assigned to a processor, or a parent-layer has that kind of a
+	 * relationship.
+	 *
+	 * @return the processor id of the processor owning this layer, or -1.
+	 */
+	public int getOwnerProcessorId();
 
 	/**
 	 * Sets the glyph of the layer.

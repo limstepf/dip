@@ -69,11 +69,8 @@ public class LayerPane extends LayerBase implements EditorLayerPane {
 	public void fireEvent(LayerEvent event) {
 		switch (event.type) {
 			case MODIFIED:
-				if (this.getParent() == null) {
-					this.onRootLayerEvent(event);
-				} else {
-					this.getParent().fireEvent(event);
-				}
+			case MODIFIED_PANE:
+				handleModified(event);
 				break;
 
 			case DEACTIVATE:

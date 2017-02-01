@@ -86,7 +86,7 @@ public class RunnableProcessor extends ProcessorWrapper {
 		);
 
 		this.objectMap = initObjectMap();
-		this.layer = new LayerGroup();
+		this.layer = new LayerGroup(processor.id);
 	}
 
 	@Override
@@ -241,6 +241,25 @@ public class RunnableProcessor extends ProcessorWrapper {
 		public Node getComponent() {
 			return vbox;
 		}
+
+		/**
+		 * Returns the parent processor of this layer extension.
+		 *
+		 * @return the parent processor.
+		 */
+		public RunnableProcessor getProcessor() {
+			return runnable;
+		}
+
+		@Override
+		public String toString() {
+			return this.getClass().getSimpleName()
+					+ "{"
+					+ "processor=" + runnable
+					+ ", status=" + status.getText()
+					+ "}";
+		}
+
 	}
 
 	private ObjectMapData initObjectMap() {

@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import javafx.beans.InvalidationListener;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
@@ -43,6 +44,7 @@ public class EditorPane {
 	private final Map<ProcessorWrapper, ProcessorView> processorViews = new HashMap<>();
 	private final Map<InputPort, ConnectionView> connections = new HashMap<>();
 	private final Map<Port, PortView> ports = new HashMap<>();
+	private final InvalidationListener repaintListener;
 
 	/**
 	 * Creates a new editor pane.
@@ -58,6 +60,9 @@ public class EditorPane {
 		FxUtils.expandInRegion(this.pane);
 
 		setupDraggable();
+
+		this.repaintListener = (e) -> editor.repaint();
+		pane.getChildren().addListener(this.repaintListener);
 	}
 
 	/**
@@ -265,6 +270,7 @@ public class EditorPane {
 	 */
 	public void setSelectedPort(OutputPort output) {
 		this.selectedPort = output;
+		editor.repaint();
 	}
 
 	/**
@@ -632,6 +638,7 @@ public class EditorPane {
 				this.editor.selectedPipeline(),
 				this.processorViewMap()
 		);
+		editor.repaint();
 	}
 
 	private void setupDraggable() {

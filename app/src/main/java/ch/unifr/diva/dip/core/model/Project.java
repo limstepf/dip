@@ -120,7 +120,7 @@ public class Project implements Modifiable, Localizable {
 		FxUtils.run(() -> {
 			handler.settings.recentFiles.setSaveDirectory(data.file);
 		});
-		
+
 		return new Project(data, handler);
 	}
 
@@ -394,7 +394,7 @@ public class Project implements Modifiable, Localizable {
 	 */
 	public PipelineEditor getPipelineEditor(Stage stage) {
 		if (pipelineEditor == null) {
-			pipelineEditor = new PipelineEditor(stage, handler, pipelineManager());
+			pipelineEditor = new PipelineEditor(stage, handler);
 		}
 		return pipelineEditor;
 	}

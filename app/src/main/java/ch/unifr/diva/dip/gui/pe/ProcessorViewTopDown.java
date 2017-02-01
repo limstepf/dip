@@ -65,6 +65,7 @@ public class ProcessorViewTopDown extends ProcessorView {
 				infoPane.setCenter(closedView.node());
 			}
 		}
+		repaint();
 	}
 
 }

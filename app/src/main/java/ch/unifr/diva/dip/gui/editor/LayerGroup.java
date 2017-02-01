@@ -56,30 +56,53 @@ public class LayerGroup extends LayerBase implements EditorLayerGroup {
 	private final ListChangeListener<? super Layer> listListener;
 
 	/**
-	 * Creates a new, unnamed layer group.
+	 * Creates a new, unnamed and unowned layer group.
 	 */
 	public LayerGroup() {
-		this("");
+		this("", -1);
 	}
 
 	/**
-	 * Creates a new layer group.
+	 * Creates a new, unnamed layer group.
+	 *
+	 * @param ownerProcessorId the processor id of the processor owning this
+	 * layer, or -1.
+	 */
+	public LayerGroup(int ownerProcessorId) {
+		this("", ownerProcessorId);
+	}
+
+	/**
+	 * Creates a new, unowned layer group.
 	 *
 	 * @param name the name of the layer group.
 	 */
 	public LayerGroup(String name) {
-		this(name, true, true);
+		this(name, -1);
 	}
 
 	/**
 	 * Creates a new layer group.
 	 *
 	 * @param name the name of the layer group.
+	 * @param ownerProcessorId the processor id of the processor owning this
+	 * layer, or -1.
+	 */
+	public LayerGroup(String name, int ownerProcessorId) {
+		this(name, ownerProcessorId, true, true);
+	}
+
+	/**
+	 * Creates a new layer group.
+	 *
+	 * @param name the name of the layer group.
+	 * @param ownerProcessorId the processor id of the processor owning this
+	 * layer, or -1.
 	 * @param visible direct/the layer's own visibility of the layer group.
 	 * @param passiveVisible indirect/inherited visibility of the layer group.
 	 */
-	public LayerGroup(String name, boolean visible, boolean passiveVisible) {
-		super(name, visible, passiveVisible);
+	public LayerGroup(String name, int ownerProcessorId, boolean visible, boolean passiveVisible) {
+		super(name, ownerProcessorId, visible, passiveVisible);
 
 		this.listListener = (ListChangeListener.Change<? extends Layer> c) -> {
 			// adhoc modification of group and tree is a bit tricky, so we just
@@ -101,7 +124,7 @@ public class LayerGroup extends LayerBase implements EditorLayerGroup {
 					}
 				}
 			}
-			// ... and simply build group and treee from scratch after some modification.
+			// ... and simply build group and tree from scratch after some modification.
 			// Given tree indices are reversed and things a bit more complicated due
 			// to possible hideGroup, this is probably not too bad anyways...
 			setAll();
@@ -113,7 +136,7 @@ public class LayerGroup extends LayerBase implements EditorLayerGroup {
 	private void setAll() {
 		// indexing in tree is reveresed for bottom-up layers. Number of children
 		// may differ due to hideGroup feature, but m isn't necessarily equal or
-		// larger to n, since an a hidden group that is empty doesn't add any
+		// larger to n, since a hidden group that is empty doesn't add any
 		// children at all (not even the empty layer group).
 		//	group:  0,     1, ..., n-2, n-1
 		//	tree:   m-1, m-2, ...,   1,   0
@@ -140,8 +163,8 @@ public class LayerGroup extends LayerBase implements EditorLayerGroup {
 		final boolean wasHideGroup = this.isHideGroup();
 		this.updateHideGroup();
 
-		// TODO: can't we find a better invariant? It's a bit tricky to know if the parent
-		// group switches hideGroup if set to AUTO...
+		// can't we find a better invariant? It's a bit tricky to know if the
+		// parent group switches hideGroup if set to AUTO...
 		if ((getParent() != null
 				&& !getParent().getHideGroupMode().equals(LayerGroup.HideGroupMode.NEVER))
 				|| wasHideGroup != isHideGroup()) {
@@ -296,11 +319,8 @@ public class LayerGroup extends LayerBase implements EditorLayerGroup {
 	public void fireEvent(LayerEvent event) {
 		switch (event.type) {
 			case MODIFIED:
-				if (this.getParent() == null) {
-					this.onRootLayerEvent(event);
-				} else {
-					this.getParent().fireEvent(event);
-				}
+			case MODIFIED_PANE:
+				handleModified(event);
 				break;
 
 			case MODIFIED_TREE:

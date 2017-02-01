@@ -31,6 +31,7 @@ public abstract class LayerBase implements Layer, EditorLayer {
 	protected static final org.slf4j.Logger log = LoggerFactory.getLogger(LayerBase.class);
 
 	protected static LayerEvent MODIFIED_EVENT = new LayerEvent(LayerEvent.Type.MODIFIED);
+	protected static LayerEvent MODIFIED_PANE_EVENT = new LayerEvent(LayerEvent.Type.MODIFIED_PANE);
 	protected static LayerEvent MODIFIED_TREE_EVENT = new LayerEvent(LayerEvent.Type.MODIFIED_TREE);
 	protected static LayerEvent MODIFIED_EMPTY_EVENT = new LayerEvent(LayerEvent.Type.MODIFIED_EMPTY);
 	protected static LayerEvent DEACTIVATE_EVENT = new LayerEvent(LayerEvent.Type.DEACTIVATE);
@@ -38,6 +39,7 @@ public abstract class LayerBase implements Layer, EditorLayer {
 	protected static LayerEvent REACTIVATE_EVENT = new LayerEvent(LayerEvent.Type.REACTIVATE);
 
 	protected final TreeItem<Layer> treeItem;
+	protected final int ownerProcessorId;
 	protected ObjectProperty<LayerGroup> parentProperty;
 	protected final StringProperty nameProperty;
 	protected NamedGlyph glyph;
@@ -46,7 +48,6 @@ public abstract class LayerBase implements Layer, EditorLayer {
 		this.onVisibileChanged(newValue);
 	};
 	protected final BooleanProperty passiveVisibleProperty;
-	protected final BooleanProperty onModifiedProperty;
 	protected final List<LayerExtension> layerExtensions;
 
 	/**
@@ -57,13 +58,26 @@ public abstract class LayerBase implements Layer, EditorLayer {
 	 * @param passiveVisible indirect/inherited visibility of the layer.
 	 */
 	public LayerBase(String name, boolean visible, boolean passiveVisible) {
+		this(name, -1, visible, passiveVisible);
+	}
+
+	/**
+	 * Creates a new layer.
+	 *
+	 * @param name the name of the layer.
+	 * @param ownerProcessorId the processor id of the processor owning this
+	 * layer, or -1.
+	 * @param visible direct/the layer's own visibility of the layer.
+	 * @param passiveVisible indirect/inherited visibility of the layer.
+	 */
+	public LayerBase(String name, int ownerProcessorId, boolean visible, boolean passiveVisible) {
 		this.treeItem = new TreeItem<>(this);
 		this.parentProperty = new SimpleObjectProperty<>(null);
 		this.nameProperty = new SimpleStringProperty(name);
+		this.ownerProcessorId = ownerProcessorId;
 		this.visibleProperty = new SimpleBooleanProperty(visible);
 		this.visibleProperty.addListener(visibleListener);
 		this.passiveVisibleProperty = new SimpleBooleanProperty(passiveVisible);
-		this.onModifiedProperty = new SimpleBooleanProperty(false);
 		this.layerExtensions = new ArrayList<>();
 	}
 
@@ -84,11 +98,20 @@ public abstract class LayerBase implements Layer, EditorLayer {
 
 	protected abstract void onVisibileChanged(boolean visible);
 
-	protected void onRootLayerEvent(LayerEvent event) {
-		switch (event.type) {
-			case MODIFIED:
-				this.setModifiedProperty();
-				break;
+	protected void handleModified(LayerEvent event) {
+		// modified events bubble up to the root layer
+		if (this.getParent() == null) {
+			switch (event.type) {
+				case MODIFIED:
+					this.setModifiedProperty();
+					break;
+				case MODIFIED_PANE:
+					this.setModifiedProperty();
+					this.setModifiedContentProperty();
+					break;
+			}
+		} else {
+			this.getParent().fireEvent(event);
 		}
 	}
 
@@ -116,13 +139,45 @@ public abstract class LayerBase implements Layer, EditorLayer {
 		return extensions;
 	}
 
+	/*
+	 * modified property fires for changes to the layer-/structure itself
+	 * (e.g. toggling visibility), and for manual repaints alike.
+	 */
+	protected BooleanProperty onModifiedProperty;
+
 	@Override
-	public ReadOnlyBooleanProperty onModifiedProperty() {
+	public BooleanProperty onModifiedProperty() {
+		if (this.onModifiedProperty == null) {
+			this.onModifiedProperty = new SimpleBooleanProperty(false);
+		}
 		return this.onModifiedProperty;
 	}
 
 	protected void setModifiedProperty() {
-		this.onModifiedProperty.set(!this.onModifiedProperty.get());
+		this.onModifiedProperty().set(!this.onModifiedProperty().get());
+	}
+
+	/*
+	 * modified content property fires for manually requested repaints
+	 * only in order to mark the project as dirty.
+	 */
+	protected BooleanProperty onModifiedContentProperty;
+
+	@Override
+	public BooleanProperty onModifiedContentProperty() {
+		if (this.onModifiedContentProperty == null) {
+			this.onModifiedContentProperty = new SimpleBooleanProperty(false);
+		}
+		return this.onModifiedContentProperty;
+	}
+
+	protected void setModifiedContentProperty() {
+		this.onModifiedContentProperty().set(!this.onModifiedContentProperty().get());
+	}
+
+	@Override
+	public void repaint() {
+		fireEvent(MODIFIED_PANE_EVENT);
 	}
 
 	@Override
@@ -199,6 +254,21 @@ public abstract class LayerBase implements Layer, EditorLayer {
 		}
 
 		return String.format("%s: %s", this.getParent().getHiddenName(), this.getName());
+	}
+
+	@Override
+	public int getOwnerProcessorId() {
+		// check for direct ownership first
+		if (this.ownerProcessorId >= 0) {
+			return this.ownerProcessorId;
+		}
+		// check of some parent layer is owned by some processor
+		final LayerGroup parent = getParent();
+		if (parent != null) {
+			return parent.getOwnerProcessorId();
+		}
+		// not owned by a processor
+		return -1;
 	}
 
 	@Override

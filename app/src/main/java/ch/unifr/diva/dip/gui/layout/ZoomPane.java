@@ -22,9 +22,11 @@ import javafx.scene.SnapshotParameters;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.transform.Scale;
+import javafx.stage.Stage;
 
 /**
  * ZoomPane is a ScrollPane that can scale its contents.
@@ -103,6 +105,7 @@ public class ZoomPane extends ScrollPane {
 		this.setMinHeight(0);
 		this.setMaxWidth(Double.MAX_VALUE);
 		this.setMaxHeight(Double.MAX_VALUE);
+		this.setBackground(Background.EMPTY);
 
 		scalingGroup.getChildren().addAll(scalingPane);
 
@@ -118,6 +121,8 @@ public class ZoomPane extends ScrollPane {
 		contentProperty.addListener(contentListener);
 		this.hvalueProperty().addListener(redrawListener);
 		this.vvalueProperty().addListener(redrawListener);
+
+		this.viewportBoundsProperty().addListener((e) -> fireContentChange());
 	}
 
 	private final ChangeListener<Number> zoomListener = (ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
@@ -521,6 +526,15 @@ public class ZoomPane extends ScrollPane {
 	}
 
 	/**
+	 * Returns the (unzoomed) content pane.
+	 *
+	 * @return the content pane.
+	 */
+	public StackPane getContentPane() {
+		return this.contentPane;
+	}
+
+	/**
 	 * Returns the (unscaled/unzoomed) bounds of the zooming content.
 	 *
 	 * @return original bounds of the zooming content.
@@ -552,13 +566,13 @@ public class ZoomPane extends ScrollPane {
 	 * Modifies the zoomContentProperty in order to fire a "content changed"
 	 * event to all subscribed listeners.
 	 */
-	public void fireContentChange() {
+	public final void fireContentChange() {
 		contentProperty.set(!contentProperty.get());
 	}
 
 	/**
 	 * The zoom content property. This property changes whenever the content of
-	 * the zoom pane have change.
+	 * the zoom pane has changed.
 	 *
 	 * @return the zoom content property.
 	 */
@@ -614,7 +628,7 @@ public class ZoomPane extends ScrollPane {
 	}
 
 	/**
-	 * Unbinds a region's minWidth and maxHeight from listening to the viewport.
+	 * Unbinds a region's minWidth and minHeight from listening to the viewport.
 	 *
 	 * @param region the region to unbind.
 	 */
@@ -623,6 +637,25 @@ public class ZoomPane extends ScrollPane {
 		if (listener != null) {
 			this.viewportBoundsProperty().removeListener(listener);
 		}
+	}
+
+	/**
+	 * Binds a stage to the zoom pane, to listen to the maximized property of
+	 * the stage.
+	 *
+	 * @param stage the stage.
+	 */
+	public void bindStage(Stage stage) {
+		stage.maximizedProperty().addListener(contentListener);
+	}
+
+	/**
+	 * Unbinds a stage from the zoom pane.
+	 *
+	 * @param stage the stage.
+	 */
+	public void unbindStage(Stage stage) {
+		stage.maximizedProperty().removeListener(contentListener);
 	}
 
 	/**

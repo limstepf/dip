@@ -62,6 +62,7 @@ public class ProcessorViewLeftRight extends ProcessorView {
 				infoPane.setCenter(closedView.node());
 			}
 		}
+		repaint();
 	}
 
 }

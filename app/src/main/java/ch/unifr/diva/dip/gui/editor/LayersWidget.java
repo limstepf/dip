@@ -1,6 +1,9 @@
 package ch.unifr.diva.dip.gui.editor;
 
+import ch.unifr.diva.dip.core.ApplicationHandler;
+import ch.unifr.diva.dip.core.model.RunnableProcessor.ProcessorLayerExtension;
 import ch.unifr.diva.dip.core.ui.Localizable;
+import ch.unifr.diva.dip.eventbus.events.ProcessorNotification;
 import ch.unifr.diva.dip.gui.AbstractWidget;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -13,17 +16,47 @@ import javafx.scene.layout.VBox;
  */
 public class LayersWidget extends AbstractWidget implements Localizable {
 
+	private final ApplicationHandler handler;
 	private final LayerTreeView view;
 
 	/**
 	 * Creates a new layers widget.
+	 *
+	 * @param handler the application handler.
 	 */
-	public LayersWidget() {
+	public LayersWidget(ApplicationHandler handler) {
 		super();
 
+		this.handler = handler;
 		this.view = new LayerTreeView();
 		setWidget(this.view);
 		setTitle(localize("pipeline"));
+
+		// listen if a layer owned by a processor has been selected, thereby
+		// selecting that processor (e.g. to display its associated tools).
+		this.view.treeView.getSelectionModel().selectedItemProperty().addListener((e) -> {
+			final TreeItem<Layer> item = this.view.treeView.getSelectionModel().getSelectedItem();
+			final int owner;
+			if (item == null) {
+				owner = -1;
+			} else {
+				final Layer layer = item.getValue();
+				owner = layer.getOwnerProcessorId();
+			}
+			if (owner >= 0) {
+				// send notification that the layer of a processor (and thereby the
+				// processor itself) has been selected
+				handler.eventBus.post(
+						new ProcessorNotification(ProcessorNotification.Type.SELECTED, owner)
+				);
+			} else {
+				// send notification that no layer of a processor is selected any
+				// longer
+				handler.eventBus.post(
+						new ProcessorNotification(ProcessorNotification.Type.SELECTED, -1)
+				);
+			}
+		});
 	}
 
 	/**

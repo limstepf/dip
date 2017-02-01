@@ -251,20 +251,25 @@ public abstract class ProcessorView extends BorderPane {
 	protected final BooleanProperty editingProperty = new SimpleBooleanProperty(false);
 
 	final InvalidationListener editingListener = (observable) -> {
-		if (editingProperty.get()) {
-			if (!parameterView().getChildren().isEmpty()) {
-				wrapper().editingProperty().set(true);
-				showParameters(true);
+			if (editingProperty.get()) {
+				if (!parameterView().getChildren().isEmpty()) {
+					wrapper().editingProperty().set(true);
+					showParameters(true);
+				}
+			} else {
+				wrapper().editingProperty().set(false);
+				if (this.parameterView != null) {
+					showParameters(false);
+				}
 			}
-		} else {
-			wrapper().editingProperty().set(false);
-			if (this.parameterView != null) {
-				showParameters(false);
-			}
-		}
 
-		updatePorts();
-	};
+			updatePorts();
+			repaint();
+		};
+
+	protected void repaint() {
+		editor.repaint();
+	}
 
 	protected ClosedParameterView closedParameterView() {
 		if (!this.hasParameters()) {
@@ -278,7 +283,7 @@ public abstract class ProcessorView extends BorderPane {
 		return this.closedParameterView;
 	}
 
-	protected ParameterView parameterView() {
+	protected final ParameterView parameterView() {
 		if (this.parameterView == null) {
 			this.parameterView = newParameterView();
 		}
@@ -306,7 +311,7 @@ public abstract class ProcessorView extends BorderPane {
 		updatePorts();
 	};
 
-	protected void updatePorts() {
+	protected final void updatePorts() {
 		for (PortView v : this.inputPorts) {
 			v.updateCenter();
 		}
@@ -376,7 +381,7 @@ public abstract class ProcessorView extends BorderPane {
 		return this.editor;
 	}
 
-	public ProcessorWrapper wrapper() {
+	public final ProcessorWrapper wrapper() {
 		return this.wrapper;
 	}
 
@@ -452,6 +457,8 @@ public abstract class ProcessorView extends BorderPane {
 			editor.selection().clear();
 			moveNode(this, dx, dy);
 		}
+
+		repaint();
 	}
 
 	protected void findMinimalNodes(Set<Node> nodes) {
@@ -501,6 +508,7 @@ public abstract class ProcessorView extends BorderPane {
 	protected abstract ParameterView newParameterView();
 
 	// add/remove parameterView from main/info pane
+	// needs to be overritten and call repaint() at the end
 	protected void showParameters(boolean show) {
 		head.showMenu(show);
 	}
