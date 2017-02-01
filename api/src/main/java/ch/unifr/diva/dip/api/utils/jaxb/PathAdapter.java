@@ -1,4 +1,3 @@
-
 package ch.unifr.diva.dip.api.utils.jaxb;
 
 import java.nio.file.Path;
@@ -8,7 +7,7 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 /**
  * Path adapter for JAXB.
  */
-public class PathAdapter extends XmlAdapter<String,Path> {
+public class PathAdapter extends XmlAdapter<String, Path> {
 
 	@Override
 	public Path unmarshal(String value) throws Exception {

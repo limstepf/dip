@@ -1,4 +1,3 @@
-
 package ch.unifr.diva.dip.api.utils.jaxb;
 
 import java.awt.Image;
@@ -7,10 +6,9 @@ import javafx.embed.swing.SwingFXUtils;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
- * JavaFX image adapter for JAXB.
- * Converts to awt.image and stores it in Base64.
+ * JavaFX image adapter for JAXB. Converts to awt.image and stores it in Base64.
  */
-public class ImageAdapter extends XmlAdapter<Image,javafx.scene.image.Image> {
+public class ImageAdapter extends XmlAdapter<Image, javafx.scene.image.Image> {
 
 	@Override
 	public javafx.scene.image.Image unmarshal(Image value) throws Exception {

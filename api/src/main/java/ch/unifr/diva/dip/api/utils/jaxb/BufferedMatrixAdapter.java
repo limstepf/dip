@@ -1,4 +1,3 @@
-
 package ch.unifr.diva.dip.api.utils.jaxb;
 
 import ch.unifr.diva.dip.api.datastructures.BufferedMatrixContainer;
@@ -8,7 +7,7 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 /**
  * BufferedMatrix adapter.
  */
-public class BufferedMatrixAdapter extends XmlAdapter<BufferedMatrixContainer,BufferedMatrix> {
+public class BufferedMatrixAdapter extends XmlAdapter<BufferedMatrixContainer, BufferedMatrix> {
 
 	@Override
 	public BufferedMatrix unmarshal(BufferedMatrixContainer value) throws Exception {
