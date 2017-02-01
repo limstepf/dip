@@ -207,7 +207,6 @@ public abstract class DataItemDialogBase<T extends DataItemListView.DataItem> ex
 	 * @return a DIP data object.
 	 */
 	protected DipData loadDipData(Path file) {
-		System.out.println("loadDipData> " + file);
 		if (file != null && Files.exists(file)) {
 			try {
 				return DipData.load(file);
