@@ -251,6 +251,16 @@ public class Project implements Modifiable, Localizable {
 		Files.copy(zipFile, file, StandardCopyOption.REPLACE_EXISTING);
 		zip = ZipFileSystem.open(zipFile);
 
+		// context switch for all open processors (we need to update all refs/
+		// paths to the reopened zip filesystem.
+		final ProjectPage currentPage = getSelectedPage();
+		if (currentPage != null) {
+			final RunnablePipeline currentPipeline = currentPage.getPipeline();
+			if (currentPipeline != null) {
+				currentPipeline.contextSwitch();
+			}
+		}
+
 		// mark project (and managed modifiables) as clean/unmodified
 		modifiedProjectProperty.set(false);
 	}

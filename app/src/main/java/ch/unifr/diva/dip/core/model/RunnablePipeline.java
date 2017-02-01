@@ -88,6 +88,15 @@ public class RunnablePipeline extends Pipeline<RunnableProcessor> {
 		this.modifiedProperty().set(false);
 	}
 
+	/**
+	 * Switches/updates the context on all processors in the pipeline.
+	 */
+	public void contextSwitch() {
+		for (RunnableProcessor p : processors()) {
+			p.switchContext(false);
+		}
+	}
+
 	private boolean savePipelinePatch() {
 		deletePipelinePatchIfExists();
 

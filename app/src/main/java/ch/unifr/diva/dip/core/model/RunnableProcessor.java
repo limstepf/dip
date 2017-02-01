@@ -265,6 +265,7 @@ public class RunnableProcessor extends ProcessorWrapper {
 			return; // there is no pipeline anymore
 		}
 
+		switchContext(true);
 		saveObjectMap();
 		this.modifiedProperty().set(false);
 	}
@@ -283,6 +284,27 @@ public class RunnableProcessor extends ProcessorWrapper {
 		} catch (JAXBException | IOException ex) {
 			log.error("failed to save the processor's data map: {}", this, ex);
 			handler.uiStrategy.showError(ex);
+		}
+	}
+
+	/**
+	 * Passes a new context to the processor. This is necessary for open pages
+	 * <ul>
+	 * <li>before we switch to another page, s.t. the processor can save its
+	 * state, and</li>
+	 * <li>after a project got saved in order to update references to the newly
+	 * opened zip file system.</li>
+	 * </ul>
+	 *
+	 * @param saveRequired if True the state of the processor needs to be saved
+	 * (since we're about to close the page with the pipeline containing this
+	 * processor), otherwise only the processor context needs to be updated
+	 * (since references/paths might have changed; e.g. after saving the
+	 * project), while saving the processor's state is not required.
+	 */
+	public void switchContext(boolean saveRequired) {
+		if (processor.canEdit()) {
+			processor.asEditableProcessor().onContextSwitch(getProcessorContext(), saveRequired);
 		}
 	}
 
