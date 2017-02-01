@@ -182,8 +182,40 @@ public interface PersistentParameter<T> extends Parameter<T> {
 	 * @param hooks the view hooks to be applied to the node.
 	 */
 	public static <T, S extends ViewHook<T>> void applyViewHooks(T node, List<S> hooks) {
+		applyViewHooks(node, hooks, null);
+	}
+
+	/**
+	 * Applies a list of view hooks to a list of fx nodes.
+	 *
+	 * @param <T> class of the node.
+	 * @param <S> class of the view hook.
+	 * @param nodes the nodes.
+	 * @param hooks the view hooks to be applied to the node.
+	 * @param lastHook a last view hook, or null.
+	 */
+	public static <T, S extends ViewHook<T>> void applyViewHooks(List<T> nodes, List<S> hooks, S lastHook) {
+		for (T node : nodes) {
+			applyViewHooks(node, hooks, lastHook);
+		}
+	}
+
+	/**
+	 * Applies a list of view hooks to the given fx node.
+	 *
+	 * @param <T> class of the node.
+	 * @param <S> class of the view hook.
+	 * @param node the node.
+	 * @param hooks the view hooks to be applied to the node.
+	 * @param lastHook a last view hook, or null.
+	 */
+	public static <T, S extends ViewHook<T>> void applyViewHooks(T node, List<S> hooks, S lastHook) {
 		for (ViewHook<T> hook : hooks) {
 			applyViewHook(node, hook);
 		}
+		if (lastHook != null) {
+			applyViewHook(node, lastHook);
+		}
 	}
+
 }
