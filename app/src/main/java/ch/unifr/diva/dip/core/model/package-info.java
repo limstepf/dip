@@ -25,13 +25,15 @@
 	@XmlJavaTypeAdapter(value = ImageAdapter.class, type = javafx.scene.image.Image.class),
 	@XmlJavaTypeAdapter(value = IntegerPropertyAdapter.class, type = IntegerProperty.class),
 	@XmlJavaTypeAdapter(value = PathAdapter.class, type = java.nio.file.Path.class),
-	@XmlJavaTypeAdapter(value = StringPropertyAdapter.class, type = StringProperty.class)
+	@XmlJavaTypeAdapter(value = StringPropertyAdapter.class, type = StringProperty.class),
+	@XmlJavaTypeAdapter(value = ColorAdapter.class, type = Color.class)
 })
 package ch.unifr.diva.dip.core.model;
 
 import ch.unifr.diva.dip.api.utils.jaxb.BooleanPropertyAdapter;
 import ch.unifr.diva.dip.api.utils.jaxb.BufferedMatrixAdapter;
 import ch.unifr.diva.dip.api.utils.jaxb.BufferedImageAdapter;
+import ch.unifr.diva.dip.api.utils.jaxb.ColorAdapter;
 import ch.unifr.diva.dip.api.utils.jaxb.DoublePropertyAdapter;
 import ch.unifr.diva.dip.api.utils.jaxb.ImageAdapter;
 import ch.unifr.diva.dip.api.utils.jaxb.IntegerPropertyAdapter;
@@ -41,6 +43,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.paint.Color;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapters;
 
