@@ -71,4 +71,31 @@ public class ProcessorContext {
 		}
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append(this.getClass().getSimpleName());
+		sb.append('@');
+		sb.append(Integer.toHexString(this.hashCode()));
+		sb.append("{directory=");
+		sb.append(this.directory);
+		sb.append(", objects=[");
+		final int n = objects.size();
+		int i = 0;
+		for (Map.Entry<String, Object> e : objects.entrySet()) {
+			i++;
+			sb.append(e.getKey());
+			sb.append('=');
+			sb.append(e.getValue());
+			if (i < n) {
+				sb.append(", ");
+			}
+		}
+		sb.append("], layer=");
+		sb.append(this.layer);
+		sb.append('}');
+		return sb.toString();
+	}
+
 }
