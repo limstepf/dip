@@ -506,4 +506,81 @@ public interface Processor {
 		return (this instanceof Resetable);
 	}
 
+	/**
+	 * Checks whether the processor has manual editing functionality.
+	 *
+	 * @return True if the processor has manual editing functionality, False
+	 * otherwise.
+	 */
+	default boolean canEdit() {
+		return (this instanceof Editable);
+	}
+
+	/**
+	 * Checks whether this is a hybrid processor with processing and manual
+	 * editing functionality.
+	 *
+	 * @return True if this is a hybrid processor, False otherwise.
+	 */
+	default boolean isHybrid() {
+		return canEdit() && canProcess();
+	}
+
+	/**
+	 * Checks whether the processor has manual editing tools, or not.
+	 *
+	 * @return True if the processor has manual editing tools, false otherwise.
+	 */
+	default boolean hasTools() {
+		if (!(this instanceof Editable)) {
+			return false;
+		}
+		final Editable editable = (Editable) this;
+		return !editable.tools().isEmpty();
+	}
+
+	/**
+	 * Returns the processor as resetable processor. Make sure this processor
+	 * {@code canReset()} first.
+	 *
+	 * @param <T> class of a resetable processor.
+	 * @return a resetable processor.
+	 */
+	default <T extends Processor & Resetable> T asResetableProcessor() {
+		return (T) this;
+	}
+
+	/**
+	 * Returns the processor as processable processor. Make sure this processor
+	 * {@code canProcess()} first.
+	 *
+	 * @param <T> class of a processable processor.
+	 * @return a processable processor.
+	 */
+	default <T extends Processor & Processable> T asProcessableProcessor() {
+		return (T) this;
+	}
+
+	/**
+	 * Returns the processor as editable processor. Make sure this processor
+	 * {@code canEdit()} first.
+	 *
+	 * @param <T> class of an editable processor.
+	 * @return an editable processor.
+	 */
+	default <T extends Processor & Editable> T asEditableProcessor() {
+		return (T) this;
+	}
+
+	/**
+	 * Returns the processor as hybrid processor. Make sure this processor
+	 * {@code canProcess()} and {@code canEdit()} first.
+	 *
+	 * @param <T> class of a processable and editable processor.
+	 * @return a processable and editable processor.
+	 */
+	default <T extends Processor & Processable & Editable> T asHybridProcessor() {
+		return (T) this;
+	}
+
 }

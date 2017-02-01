@@ -11,4 +11,9 @@ public abstract class ProcessableBase extends ProcessorBase implements Processab
 		super(name);
 	}
 
+	/*
+	 * HybridProcessorBase extends from EditableBase, not from ProcessableBase.
+	 * So we might wanna have anything that's implemented here also (duplicated)
+	 * over in HybridProcessorBase.
+	 */
 }
