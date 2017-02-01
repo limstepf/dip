@@ -16,7 +16,7 @@ import javafx.scene.text.Text;
  * field, once initialized), so the text/message can be easily changed at
  * runtime, nevertheless.
  */
-public class TextParameter extends TransientParameterBase {
+public class TextParameter extends TransientParameterBase implements SingleRowParameter {
 
 	protected final StringProperty textProperty;
 
@@ -80,6 +80,11 @@ public class TextParameter extends TransientParameterBase {
 		this.viewHooks.remove(hook);
 	}
 
+	@Override
+	public void initSingleRowView() {
+		// looking good...
+	}
+
 	/**
 	 * Text view.
 	 */
@@ -87,6 +92,11 @@ public class TextParameter extends TransientParameterBase {
 
 		private final Text text;
 
+		/**
+		 * Creates a new text view.
+		 *
+		 * @param parameter the text parameter.
+		 */
 		public TextView(TextParameter parameter) {
 			this.text = new Text();
 			this.text.textProperty().bind(parameter.textProperty);

@@ -11,7 +11,7 @@ import javafx.scene.control.Button;
  * A button as parameter. This is a transient parameter (for display purposes
  * only). Nothing gets saved.
  */
-public class ButtonParameter extends TransientParameterBase<ButtonParameter.ButtonView> {
+public class ButtonParameter extends TransientParameterBase<ButtonParameter.ButtonView> implements SingleRowParameter {
 
 	private final String label;
 	private EventHandler<ActionEvent> onAction;
@@ -77,6 +77,15 @@ public class ButtonParameter extends TransientParameterBase<ButtonParameter.Butt
 		this.viewHooks.remove(hook);
 	}
 
+	protected PersistentParameter.ViewHook<Button> singleRowViewHook = null;
+
+	@Override
+	public void initSingleRowView() {
+		singleRowViewHook = (b) -> {
+			b.getStyleClass().add("dip-small");
+		};
+	}
+
 	/**
 	 * A button view.
 	 */
@@ -84,14 +93,28 @@ public class ButtonParameter extends TransientParameterBase<ButtonParameter.Butt
 
 		private final Button button;
 
+		/**
+		 * Creates a new button view.
+		 *
+		 * @param parameter the button parameter.
+		 */
 		public ButtonView(ButtonParameter parameter) {
 			this.button = new Button(parameter.label);
 			if (parameter.onAction != null) {
 				setOnAction(parameter.onAction);
 			}
-			PersistentParameter.applyViewHooks(this.button, parameter.viewHooks);
+			PersistentParameter.applyViewHooks(
+					this.button,
+					parameter.viewHooks,
+					parameter.singleRowViewHook
+			);
 		}
 
+		/**
+		 * Sets the on action event handler of the button.
+		 *
+		 * @param onAction the event handler.
+		 */
 		public final void setOnAction(EventHandler<ActionEvent> onAction) {
 			this.button.setOnAction(onAction);
 		}
@@ -100,6 +123,7 @@ public class ButtonParameter extends TransientParameterBase<ButtonParameter.Butt
 		public Node node() {
 			return button;
 		}
+
 	}
 
 }

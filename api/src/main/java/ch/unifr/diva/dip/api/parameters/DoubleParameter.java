@@ -8,7 +8,7 @@ import javafx.scene.control.TextField;
 /**
  * A Double parameter.
  */
-public class DoubleParameter extends PersistentParameterBase<Double, DoubleParameter.DoubleView> {
+public class DoubleParameter extends PersistentParameterBase<Double, DoubleParameter.DoubleView> implements SingleRowParameter<Double> {
 
 	protected final double minValue;
 	protected final double maxValue;
@@ -83,6 +83,15 @@ public class DoubleParameter extends PersistentParameterBase<Double, DoubleParam
 		this.viewHooks.remove(hook);
 	}
 
+	protected ViewHook<TextField> singleRowViewHook = null;
+
+	@Override
+	public void initSingleRowView() {
+		singleRowViewHook = (t) -> {
+			t.getStyleClass().add("dip-small");
+		};
+	}
+
 	/**
 	 * Simple Double view with a TextField.
 	 */
@@ -90,13 +99,22 @@ public class DoubleParameter extends PersistentParameterBase<Double, DoubleParam
 
 		protected final NumberValidationTooltip<Double> validator = new NumberValidationTooltip<>();
 
+		/**
+		 * Creates a new double view.
+		 *
+		 * @param parameter the double parameter.
+		 */
 		public DoubleView(DoubleParameter parameter) {
 			super(parameter, new TextField());
 			set(parameter.get());
 
 			root.getStyleClass().add("dip-text-input");
 			root.setTooltip(validator);
-			PersistentParameter.applyViewHooks(root, parameter.viewHooks);
+			PersistentParameter.applyViewHooks(
+					root,
+					parameter.viewHooks,
+					parameter.singleRowViewHook
+			);
 			root.textProperty().addListener((obs) -> {
 				final Double number = get();
 				validator.setOutOfRange(number, parameter.minValue, parameter.maxValue);
@@ -123,6 +141,7 @@ public class DoubleParameter extends PersistentParameterBase<Double, DoubleParam
 		public final void set(Double value) {
 			root.setText(String.format("%f", value));
 		}
+
 	}
 
 }

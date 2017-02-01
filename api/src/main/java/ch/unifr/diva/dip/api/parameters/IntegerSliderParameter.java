@@ -11,7 +11,7 @@ import javafx.scene.layout.BorderPane;
 /**
  * Integer slider parameter.
  */
-public class IntegerSliderParameter extends PersistentParameterBase<Integer, IntegerSliderParameter.IntegerSliderView> {
+public class IntegerSliderParameter extends PersistentParameterBase<Integer, IntegerSliderParameter.IntegerSliderView> implements SingleRowParameter<Integer> {
 
 	protected final int minValue;
 	protected final int maxValue;
@@ -92,6 +92,17 @@ public class IntegerSliderParameter extends PersistentParameterBase<Integer, Int
 		this.sliderViewHooks.remove(hook);
 	}
 
+	protected ViewHook<Slider> singleRowHook = null;
+
+	@Override
+	public void initSingleRowView() {
+		singleRowHook = (s) -> {
+			s.getStyleClass().add("dip-small");
+			s.setShowTickLabels(false);
+			s.setShowTickMarks(true);
+		};
+	}
+
 	/**
 	 * Integer view with a Slider.
 	 */
@@ -100,6 +111,11 @@ public class IntegerSliderParameter extends PersistentParameterBase<Integer, Int
 		private final Slider slider = new Slider();
 		private final Tooltip tooltip = new Tooltip();
 
+		/**
+		 * Creates a new integer slider view.
+		 *
+		 * @param parameter the integer slider parameter.
+		 */
 		public IntegerSliderView(IntegerSliderParameter parameter) {
 			super(parameter, new BorderPane());
 			set(parameter.get());
@@ -127,7 +143,11 @@ public class IntegerSliderParameter extends PersistentParameterBase<Integer, Int
 				root.setRight(node);
 			}
 
-			PersistentParameter.applyViewHooks(slider, parameter.sliderViewHooks);
+			PersistentParameter.applyViewHooks(
+					slider,
+					parameter.sliderViewHooks,
+					parameter.singleRowHook
+			);
 
 			slider.valueProperty().addListener((obs) -> {
 				final int v = get();
@@ -144,6 +164,7 @@ public class IntegerSliderParameter extends PersistentParameterBase<Integer, Int
 		public final void set(Integer value) {
 			slider.setValue(value);
 		}
+
 	}
 
 }

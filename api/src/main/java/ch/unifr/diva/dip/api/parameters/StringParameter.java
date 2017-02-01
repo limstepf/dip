@@ -7,7 +7,7 @@ import javafx.scene.control.TextField;
 /**
  * String parameter.
  */
-public class StringParameter extends PersistentParameterBase<String, StringParameter.StringView> {
+public class StringParameter extends PersistentParameterBase<String, StringParameter.StringView> implements SingleRowParameter<String> {
 
 	/**
 	 * Creates a new, empty string parameter.
@@ -54,6 +54,15 @@ public class StringParameter extends PersistentParameterBase<String, StringParam
 		this.viewHooks.remove(hook);
 	}
 
+	protected ViewHook<TextField> singleRowViewHook = null;
+
+	@Override
+	public void initSingleRowView() {
+		singleRowViewHook = (t) -> {
+			t.getStyleClass().add("dip-small");
+		};
+	}
+
 	/**
 	 * Simple String view with a TextField.
 	 */
@@ -63,7 +72,11 @@ public class StringParameter extends PersistentParameterBase<String, StringParam
 			super(parameter, new TextField());
 			set(parameter.get());
 
-			PersistentParameter.applyViewHooks(root, parameter.viewHooks);
+			PersistentParameter.applyViewHooks(
+					root,
+					parameter.viewHooks,
+					parameter.singleRowViewHook
+			);
 			root.textProperty().addListener((obs) -> {
 				parameter.valueProperty.set(get());
 			});

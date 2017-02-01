@@ -12,7 +12,7 @@ import javafx.scene.control.ComboBox;
  *
  * @see OptionParameter
  */
-public class EnumParameter extends PersistentParameterBase<String, EnumParameter.EnumView> {
+public class EnumParameter extends PersistentParameterBase<String, EnumParameter.EnumView> implements SingleRowParameter<String> {
 
 	final List<String> options;
 	final List<String> labels;
@@ -181,18 +181,36 @@ public class EnumParameter extends PersistentParameterBase<String, EnumParameter
 		this.comboBoxViewHooks.remove(hook);
 	}
 
+	protected ViewHook<ComboBox> singleRowViewHook = null;
+
+	@Override
+	public void initSingleRowView() {
+		singleRowViewHook = (c) -> {
+			c.getStyleClass().add("dip-small");
+		};
+	}
+
 	/**
 	 * Enum view with a ComboBox.
 	 */
 	public static class EnumView extends PersistentParameterBase.ParameterViewBase<EnumParameter, String, ComboBox> {
 
+		/**
+		 * Creates a new enum view.
+		 *
+		 * @param parameter the enum parameter.
+		 */
 		public EnumView(EnumParameter parameter) {
 			super(parameter, new ComboBox());
 
 			root.setMaxWidth(Double.MAX_VALUE);
 			root.getItems().addAll(parameter.labels);
 			set(parameter.get());
-			PersistentParameter.applyViewHooks(root, parameter.comboBoxViewHooks);
+			PersistentParameter.applyViewHooks(
+					root,
+					parameter.comboBoxViewHooks,
+					parameter.singleRowViewHook
+			);
 			root.valueProperty().addListener((obs) -> {
 				parameter.valueProperty.set(get());
 			});
@@ -213,6 +231,7 @@ public class EnumParameter extends PersistentParameterBase<String, EnumParameter
 			final int index = parameter.options.indexOf(value);
 			root.getSelectionModel().select(index);
 		}
+
 	}
 
 	/**

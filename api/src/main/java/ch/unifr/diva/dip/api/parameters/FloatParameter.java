@@ -8,7 +8,7 @@ import javafx.scene.control.TextField;
 /**
  * Float parameter.
  */
-public class FloatParameter extends PersistentParameterBase<Float, FloatParameter.FloatView> {
+public class FloatParameter extends PersistentParameterBase<Float, FloatParameter.FloatView> implements SingleRowParameter<Float> {
 
 	protected final float minValue;
 	protected final float maxValue;
@@ -83,6 +83,15 @@ public class FloatParameter extends PersistentParameterBase<Float, FloatParamete
 		this.viewHooks.remove(hook);
 	}
 
+	protected ViewHook<TextField> singleRowViewHook = null;
+
+	@Override
+	public void initSingleRowView() {
+		singleRowViewHook = (t) -> {
+			t.getStyleClass().add("dip-small");
+		};
+	}
+
 	/**
 	 * Simple Float view with a TextField.
 	 */
@@ -90,13 +99,22 @@ public class FloatParameter extends PersistentParameterBase<Float, FloatParamete
 
 		protected final NumberValidationTooltip<Float> validator = new NumberValidationTooltip<>();
 
+		/**
+		 * Creates a new float view.
+		 *
+		 * @param parameter the float parameter.
+		 */
 		public FloatView(FloatParameter parameter) {
 			super(parameter, new TextField());
 			set(parameter.get());
 
 			root.getStyleClass().add("dip-text-input");
 			root.setTooltip(validator);
-			PersistentParameter.applyViewHooks(root, parameter.viewHooks);
+			PersistentParameter.applyViewHooks(
+					root,
+					parameter.viewHooks,
+					parameter.singleRowViewHook
+			);
 			root.textProperty().addListener((obs) -> {
 				final Float number = get();
 				validator.setOutOfRange(number, parameter.minValue, parameter.maxValue);
@@ -123,6 +141,7 @@ public class FloatParameter extends PersistentParameterBase<Float, FloatParamete
 		public final void set(Float value) {
 			root.setText(String.format("%f", value));
 		}
+
 	}
 
 }

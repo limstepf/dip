@@ -8,7 +8,7 @@ import javafx.scene.control.TextField;
 /**
  * Integer parameter.
  */
-public class IntegerParameter extends PersistentParameterBase<Integer, IntegerParameter.IntegerView> {
+public class IntegerParameter extends PersistentParameterBase<Integer, IntegerParameter.IntegerView> implements SingleRowParameter<Integer> {
 
 	protected final int minValue;
 	protected final int maxValue;
@@ -68,6 +68,11 @@ public class IntegerParameter extends PersistentParameterBase<Integer, IntegerPa
 	 * Adds a view hook to customize the textfield. This method is only called
 	 * if the view of the parameter is actually requested.
 	 *
+	 * <p>
+	 * A nice way to adjust the width of the textfield is by supplying a view
+	 * hook with a {@code t.setStyle("-fx-pref-column-count: 3;"); } bit.
+	 *
+	 *
 	 * @param hook hook method for a label.
 	 */
 	public void addTextFieldViewHook(ViewHook<TextField> hook) {
@@ -83,6 +88,15 @@ public class IntegerParameter extends PersistentParameterBase<Integer, IntegerPa
 		this.viewHooks.remove(hook);
 	}
 
+	protected ViewHook<TextField> singleRowViewHook = null;
+
+	@Override
+	public void initSingleRowView() {
+		singleRowViewHook = (t) -> {
+			t.getStyleClass().add("dip-small");
+		};
+	}
+
 	/**
 	 * Simple Integer view with a TextField.
 	 */
@@ -90,13 +104,22 @@ public class IntegerParameter extends PersistentParameterBase<Integer, IntegerPa
 
 		protected final NumberValidationTooltip<Integer> validator = new NumberValidationTooltip<>();
 
+		/**
+		 * Creates a new integer view.
+		 *
+		 * @param parameter the integer parameter.
+		 */
 		public IntegerView(IntegerParameter parameter) {
 			super(parameter, new TextField());
 			set(parameter.get());
 
 			root.getStyleClass().add("dip-text-input");
 			root.setTooltip(validator);
-			PersistentParameter.applyViewHooks(root, parameter.viewHooks);
+			PersistentParameter.applyViewHooks(
+					root,
+					parameter.viewHooks,
+					parameter.singleRowViewHook
+			);
 			root.textProperty().addListener((obs) -> {
 				final Integer number = get();
 				validator.setOutOfRange(number, parameter.minValue, parameter.maxValue);
@@ -123,6 +146,7 @@ public class IntegerParameter extends PersistentParameterBase<Integer, IntegerPa
 		public final void set(Integer value) {
 			root.setText(String.format("%d", value));
 		}
+
 	}
 
 }

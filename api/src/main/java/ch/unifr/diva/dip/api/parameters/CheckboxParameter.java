@@ -5,7 +5,7 @@ import javafx.scene.control.CheckBox;
 /**
  * A boolean parameter in form of a checkbox.
  */
-public class CheckboxParameter extends PersistentParameterBase<Boolean, CheckboxParameter.CheckboxView> {
+public class CheckboxParameter extends PersistentParameterBase<Boolean, CheckboxParameter.CheckboxView> implements SingleRowParameter<Boolean> {
 
 	protected final String checkboxLabel;
 
@@ -55,11 +55,21 @@ public class CheckboxParameter extends PersistentParameterBase<Boolean, Checkbox
 		return new CheckboxView(this);
 	}
 
+	@Override
+	public void initSingleRowView() {
+		// looking good...
+	}
+
 	/**
 	 * Checkbox view.
 	 */
 	public static class CheckboxView extends PersistentParameterBase.ParameterViewBase<CheckboxParameter, Boolean, CheckBox> {
 
+		/**
+		 * Creates a new checkbox view.
+		 *
+		 * @param parameter the checkbox parameter.
+		 */
 		public CheckboxView(CheckboxParameter parameter) {
 			super(parameter, newCheckBox(parameter.checkboxLabel));
 
@@ -85,6 +95,7 @@ public class CheckboxParameter extends PersistentParameterBase<Boolean, Checkbox
 		public final void set(Boolean value) {
 			this.root.setSelected(value);
 		}
+
 	}
 
 }

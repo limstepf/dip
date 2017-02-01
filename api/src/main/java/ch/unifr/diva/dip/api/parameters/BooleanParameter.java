@@ -1,6 +1,10 @@
 package ch.unifr.diva.dip.api.parameters;
 
 import ch.unifr.diva.dip.api.ui.PersistentToggleButtonGroup;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import javafx.geometry.Pos;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
@@ -8,7 +12,7 @@ import javafx.scene.layout.HBox;
 /**
  * A Boolean parameter.
  */
-public class BooleanParameter extends PersistentParameterBase<Boolean, BooleanParameter.BooleanView> {
+public class BooleanParameter extends PersistentParameterBase<Boolean, BooleanParameter.BooleanView> implements SingleRowParameter<Boolean> {
 
 	protected String trueLabel;
 	protected String falseLabel;
@@ -61,6 +65,35 @@ public class BooleanParameter extends PersistentParameterBase<Boolean, BooleanPa
 		return new BooleanView(this);
 	}
 
+	protected final List<ViewHook<ToggleButton>> toggleButtonViewHooks = new ArrayList<>();
+
+	/**
+	 * Adds a view hook to customize all toggle buttons.
+	 *
+	 * @param hook the view hook.
+	 */
+	public void addToggleButtonViewHook(ViewHook<ToggleButton> hook) {
+		this.toggleButtonViewHooks.add(hook);
+	}
+
+	/**
+	 * Removes a view hook.
+	 *
+	 * @param hook the view hook.
+	 */
+	public void removeToggleButtonViewHook(ViewHook<ToggleButton> hook) {
+		this.toggleButtonViewHooks.remove(hook);
+	}
+
+	protected ViewHook<ToggleButton> singleRowViewHook = null;
+
+	@Override
+	public void initSingleRowView() {
+		singleRowViewHook = (b) -> {
+			b.getStyleClass().add("dip-small");
+		};
+	}
+
 	/**
 	 * Boolean view with a ToggleGroup of two ToggleButtons.
 	 */
@@ -70,14 +103,26 @@ public class BooleanParameter extends PersistentParameterBase<Boolean, BooleanPa
 		private final ToggleButton on;
 		private final ToggleButton off;
 
+		/**
+		 * Creates a new boolean view.
+		 *
+		 * @param parameter the boolean parameter.
+		 */
 		public BooleanView(BooleanParameter parameter) {
 			super(parameter, new HBox());
 
 			on = new ToggleButton(parameter.trueLabel);
 			off = new ToggleButton(parameter.falseLabel);
 
+			PersistentParameter.applyViewHooks(
+					Arrays.asList(on, off),
+					parameter.toggleButtonViewHooks,
+					parameter.singleRowViewHook
+			);
+
 			on.setToggleGroup(group);
 			off.setToggleGroup(group);
+			root.setAlignment(Pos.CENTER);
 			root.getChildren().addAll(off, on);
 
 			set(parameter.get());

@@ -13,7 +13,7 @@ import javafx.scene.control.ComboBox;
  *
  * @see EnumParameter
  */
-public class OptionParameter extends PersistentParameterBase<Integer, OptionParameter.OptionView> {
+public class OptionParameter extends PersistentParameterBase<Integer, OptionParameter.OptionView> implements SingleRowParameter<Integer> {
 
 	protected final List<String> options;
 
@@ -56,17 +56,35 @@ public class OptionParameter extends PersistentParameterBase<Integer, OptionPara
 		this.comboBoxViewHooks.remove(hook);
 	}
 
+	protected ViewHook<ComboBox> singleRowViewHook = null;
+
+	@Override
+	public void initSingleRowView() {
+		singleRowViewHook = (c) -> {
+			c.getStyleClass().add("dip-small");
+		};
+	}
+
 	/**
 	 * Option view with a ComboBox.
 	 */
 	public static class OptionView extends PersistentParameterBase.ParameterViewBase<OptionParameter, Integer, ComboBox> {
 
+		/**
+		 * Creates a new option view.
+		 *
+		 * @param parameter the option parameter.
+		 */
 		public OptionView(OptionParameter parameter) {
 			super(parameter, new ComboBox());
 			root.setMaxWidth(Double.MAX_VALUE);
 			root.getItems().addAll(parameter.options);
 			set(parameter.get());
-			PersistentParameter.applyViewHooks(root, parameter.comboBoxViewHooks);
+			PersistentParameter.applyViewHooks(
+					root,
+					parameter.comboBoxViewHooks,
+					parameter.singleRowViewHook
+			);
 			root.valueProperty().addListener((obs) -> {
 				parameter.valueProperty.set(get());
 			});
@@ -80,6 +98,7 @@ public class OptionParameter extends PersistentParameterBase<Integer, OptionPara
 		public final void set(Integer value) {
 			root.getSelectionModel().select((int) value);
 		}
+
 	}
 
 }

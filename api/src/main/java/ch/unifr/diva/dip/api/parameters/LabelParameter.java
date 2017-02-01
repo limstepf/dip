@@ -9,7 +9,7 @@ import javafx.scene.control.Label;
  * A label as parameter. This is a transient parameter (for display purposes
  * only). Nothing gets saved.
  */
-public class LabelParameter extends TransientParameterBase {
+public class LabelParameter extends TransientParameterBase implements SingleRowParameter {
 
 	protected final String label;
 
@@ -48,6 +48,11 @@ public class LabelParameter extends TransientParameterBase {
 		this.viewHooks.remove(hook);
 	}
 
+	@Override
+	public void initSingleRowView() {
+		// looking good...
+	}
+
 	/**
 	 * A label view.
 	 */
@@ -55,6 +60,11 @@ public class LabelParameter extends TransientParameterBase {
 
 		private final Label label;
 
+		/**
+		 * Creates a new label view.
+		 *
+		 * @param parameter the label parameter.
+		 */
 		public LabelView(LabelParameter parameter) {
 			this.label = new Label(parameter.label);
 			this.label.getStyleClass().add("dip-small");
@@ -65,6 +75,7 @@ public class LabelParameter extends TransientParameterBase {
 		public Node node() {
 			return label;
 		}
+
 	}
 
 }

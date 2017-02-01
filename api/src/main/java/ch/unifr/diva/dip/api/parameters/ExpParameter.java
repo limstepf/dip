@@ -59,7 +59,7 @@ import net.objecthunter.exp4j.ExpressionBuilder;
  *
  * @see net.objecthunter.exp4j
  */
-public class ExpParameter extends PersistentParameterBase<String, ExpParameter.ExpView> {
+public class ExpParameter extends PersistentParameterBase<String, ExpParameter.ExpView> implements SingleRowParameter<String> {
 
 	// TODO: this could be extended to support expressions with variables, e.g.
 	// a function that gets x and y pixel coordinates, or another that takes
@@ -149,6 +149,15 @@ public class ExpParameter extends PersistentParameterBase<String, ExpParameter.E
 		this.viewHooks.remove(hook);
 	}
 
+	protected ViewHook<TextField> singleRowViewHook = null;
+
+	@Override
+	public void initSingleRowView() {
+		singleRowViewHook = (t) -> {
+			t.getStyleClass().add("dip-small");
+		};
+	}
+
 	/**
 	 * Expression view.
 	 */
@@ -156,13 +165,22 @@ public class ExpParameter extends PersistentParameterBase<String, ExpParameter.E
 
 		protected final Tooltip tooltip = new Tooltip();
 
+		/**
+		 * Creates a new expression view.
+		 *
+		 * @param parameter the expression parameter.
+		 */
 		public ExpView(ExpParameter parameter) {
 			super(parameter, new TextField());
 			set(parameter.get());
 
 			root.getStyleClass().add("dip-text-input");
 			root.setTooltip(tooltip);
-			PersistentParameter.applyViewHooks(root, parameter.viewHooks);
+			PersistentParameter.applyViewHooks(
+					root,
+					parameter.viewHooks,
+					parameter.singleRowViewHook
+			);
 			root.textProperty().addListener((obs) -> {
 				final String expression = get();
 
@@ -179,6 +197,9 @@ public class ExpParameter extends PersistentParameterBase<String, ExpParameter.E
 			updateTooltip();
 		}
 
+		/**
+		 * Updates the tooltip displaying the expression's value.
+		 */
 		public final void updateTooltip() {
 			final String msg;
 			if (parameter.tooltipFormat != null) {
@@ -197,6 +218,7 @@ public class ExpParameter extends PersistentParameterBase<String, ExpParameter.E
 		public final void set(String value) {
 			root.setText(value);
 		}
+
 	}
 
 }
