@@ -104,7 +104,7 @@ public abstract class ProcessorBase implements Processor {
 	 *
 	 * @param context the processor context.
 	 */
-	protected void resetLayer(ProcessorContext context) {
+	public static void resetLayer(ProcessorContext context) {
 		context.layer.clear();
 	}
 
@@ -116,7 +116,7 @@ public abstract class ProcessorBase implements Processor {
 	 * @param bufferedImage the image to be displayed in the {@code LayerPane}.
 	 * @return the added {@code LayerPane}.
 	 */
-	protected EditorLayerPane provideImageLayer(ProcessorContext context, BufferedImage bufferedImage) {
+	public static EditorLayerPane provideImageLayer(ProcessorContext context, BufferedImage bufferedImage) {
 		return provideImageLayer(context, bufferedImage, "");
 	}
 
@@ -129,7 +129,7 @@ public abstract class ProcessorBase implements Processor {
 	 * @param name the name of the layer.
 	 * @return the added {@code LayerPane}.
 	 */
-	protected EditorLayerPane provideImageLayer(ProcessorContext context, BufferedImage bufferedImage, String name) {
+	public static EditorLayerPane provideImageLayer(ProcessorContext context, BufferedImage bufferedImage, String name) {
 		final Image image = SwingFXUtils.toFXImage(bufferedImage, null);
 		return provideImageLayer(context, image, name);
 	}
@@ -142,7 +142,7 @@ public abstract class ProcessorBase implements Processor {
 	 * @param image the image to be displayed in the {@code LayerPane}.
 	 * @return the added {@code LayerPane}.
 	 */
-	protected EditorLayerPane provideImageLayer(ProcessorContext context, Image image) {
+	public static EditorLayerPane provideImageLayer(ProcessorContext context, Image image) {
 		return provideImageLayer(context, image, "");
 	}
 
@@ -155,7 +155,7 @@ public abstract class ProcessorBase implements Processor {
 	 * @param name the name of the layer.
 	 * @return the added {@code LayerPane}.
 	 */
-	protected EditorLayerPane provideImageLayer(ProcessorContext context, Image image, String name) {
+	public static EditorLayerPane provideImageLayer(ProcessorContext context, Image image, String name) {
 		final EditorLayerPane layer = context.layer.newLayerPane(name);
 		layer.add(new ImageView(image));
 		return layer;
@@ -331,8 +331,9 @@ public abstract class ProcessorBase implements Processor {
 	 * @param format the format (or extension) of the image (e.g. "PNG").
 	 * @param image the image.
 	 */
-	protected void writeBufferedImage(ProcessorContext context, String filename, String format, BufferedImage image) {
+	public static void writeBufferedImage(ProcessorContext context, String filename, String format, BufferedImage image) {
 		final Path file = context.directory.resolve(filename);
+		deleteFile(file);
 
 		try (OutputStream os = Files.newOutputStream(file)) {
 			ImageIO.write(image, format, os);
@@ -348,7 +349,7 @@ public abstract class ProcessorBase implements Processor {
 	 * @param filename the filename of the image.
 	 * @return the image, or null.
 	 */
-	protected BufferedImage readBufferedImage(ProcessorContext context, String filename) {
+	public static BufferedImage readBufferedImage(ProcessorContext context, String filename) {
 		final Path file = context.directory.resolve(filename);
 
 		if (Files.exists(file)) {
@@ -369,8 +370,9 @@ public abstract class ProcessorBase implements Processor {
 	 * @param filename the filename of the image/matrix.
 	 * @param mat the image/matrix.
 	 */
-	protected void writeBufferedMatrix(ProcessorContext context, String filename, BufferedMatrix mat) {
+	public static void writeBufferedMatrix(ProcessorContext context, String filename, BufferedMatrix mat) {
 		final Path file = context.directory.resolve(filename);
+		deleteFile(file);
 
 		/*
 		 We can't close the output stream here! Neither explicitly, nor by means
@@ -413,7 +415,7 @@ public abstract class ProcessorBase implements Processor {
 	 * @param filename the filename of the image/matrix.
 	 * @return the image/matrix, or null.
 	 */
-	protected BufferedMatrix readBufferedMatrix(ProcessorContext context, String filename) {
+	public static BufferedMatrix readBufferedMatrix(ProcessorContext context, String filename) {
 		final Path file = context.directory.resolve(filename);
 
 		if (Files.exists(file)) {
@@ -435,8 +437,9 @@ public abstract class ProcessorBase implements Processor {
 	 * @param format the format (or extension) of the image (e.g. "PNG").
 	 * @param image the image.
 	 */
-	protected void writeImage(ProcessorContext context, String filename, String format, Image image) {
+	public static void writeImage(ProcessorContext context, String filename, String format, Image image) {
 		final Path file = context.directory.resolve(filename);
+		deleteFile(file);
 
 		try (OutputStream os = Files.newOutputStream(file)) {
 			ImageIO.write(SwingFXUtils.fromFXImage(image, null), format, os);
@@ -452,7 +455,7 @@ public abstract class ProcessorBase implements Processor {
 	 * @param filename the filename of the image.
 	 * @return the image, or null.
 	 */
-	protected Image readImage(ProcessorContext context, String filename) {
+	public static Image readImage(ProcessorContext context, String filename) {
 		final Path file = context.directory.resolve(filename);
 
 		if (Files.exists(file)) {
@@ -471,13 +474,25 @@ public abstract class ProcessorBase implements Processor {
 	 *
 	 * @param context the processor context.
 	 * @param filename the filename of the file.
+	 * @return True if the file was deleted by this method, false otherwise.
 	 */
-	protected void deleteFile(ProcessorContext context, String filename) {
+	public static boolean deleteFile(ProcessorContext context, String filename) {
 		final Path file = context.directory.resolve(filename);
+		return deleteFile(file);
+	}
+
+	/**
+	 * Removes a file (if it exists).
+	 *
+	 * @param file the file.
+	 * @return True if the file was deleted by this method, false otherwise.
+	 */
+	public static boolean deleteFile(Path file) {
 		try {
-			Files.deleteIfExists(file);
+			return Files.deleteIfExists(file);
 		} catch (IOException ex) {
 			log.error("failed to remove processor file: {}", file, ex);
+			return false;
 		}
 	}
 
@@ -493,7 +508,7 @@ public abstract class ProcessorBase implements Processor {
 	 * @param ports a collection of optional ports.
 	 * @return True if the port is connected, False otherwise.
 	 */
-	protected boolean xorIsConnected(Collection<? extends Port> ports) {
+	public static boolean xorIsConnected(Collection<? extends Port> ports) {
 		for (Port port : ports) {
 			if (port.isConnected()) {
 				return true; // no need to check that there aren't more connections...
