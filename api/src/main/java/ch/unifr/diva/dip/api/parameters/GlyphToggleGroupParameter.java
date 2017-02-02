@@ -93,7 +93,7 @@ public class GlyphToggleGroupParameter<T> extends PersistentParameterBase<T, Gly
 			set((T) parameter.get()); // cast due to type erasure, should be save enough...
 
 			toggle.selectedProperty().addListener(
-					(e) -> parameter.valueProperty.set(get())
+					(e) -> parameter.setLocal(get())
 			);
 		}
 

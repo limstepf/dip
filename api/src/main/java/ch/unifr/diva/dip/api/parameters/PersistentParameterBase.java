@@ -1,7 +1,7 @@
 package ch.unifr.diva.dip.api.parameters;
 
 import ch.unifr.diva.dip.api.utils.ParentObjectProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.scene.Node;
 
 /**
@@ -24,15 +24,62 @@ public abstract class PersistentParameterBase<T, V extends PersistentParameter.V
 	protected final String label;
 	protected final T defaultValue;
 	protected final ParentObjectProperty<T> valueProperty;
+	private boolean changeIsLocal;
 
+	/**
+	 * Creates a new persistent parameter base.
+	 *
+	 * @param label the label of the parameter.
+	 * @param defaultValue the default value.
+	 */
 	public PersistentParameterBase(String label, T defaultValue) {
 		this(label, defaultValue, defaultValue);
 	}
 
+	/**
+	 * Creates a new persistent parameter base.
+	 *
+	 * @param label the label of the parameter.
+	 * @param defaultValue the default value.
+	 * @param initialValue the initial value.
+	 */
 	public PersistentParameterBase(String label, T defaultValue, T initialValue) {
 		this.label = label;
 		this.defaultValue = defaultValue;
-		this.valueProperty = new ParentObjectProperty(initialValue);
+		this.valueProperty = new ParentObjectProperty<T>(initialValue) {
+			@Override
+			public void set(T value) {
+				super.set(filterValueProperty(value));
+
+				if (!changeIsLocal && view != null) {
+					view.set(get());
+				}
+
+				onValuePropertySet();
+			}
+		};
+	}
+
+	/**
+	 * A filter applied before setting the value property. As is, this is just a
+	 * pass-through, but can be overwritten if needed (e.g. to validate the new
+	 * value first).
+	 *
+	 * @param value the new value.
+	 * @return the new, filtered value.
+	 */
+	protected T filterValueProperty(T value) {
+		return value;
+	}
+
+	/**
+	 * Hook method that gets called after the value property has been
+	 * set/updated. In case the {@code filterValueProperty} method is used to
+	 * disable some listeners first, this method can be overwritten to re-enable
+	 * them (or whatever). As is this method does nothing.
+	 */
+	protected void onValuePropertySet() {
+
 	}
 
 	@Override
@@ -53,13 +100,21 @@ public abstract class PersistentParameterBase<T, V extends PersistentParameter.V
 	@Override
 	public void set(T value) {
 		this.valueProperty.set(value);
-		if (view != null) {
-			view.set(value);
-		}
+	}
+
+	/**
+	 * Set method to be used by the views to update the parameter.
+	 *
+	 * @param value the new value.
+	 */
+	protected void setLocal(T value) {
+		this.changeIsLocal = true;
+		this.valueProperty.set(value);
+		this.changeIsLocal = false;
 	}
 
 	@Override
-	public ReadOnlyObjectProperty<T> property() {
+	public ObjectProperty<T> property() {
 		return this.valueProperty;
 	}
 
@@ -71,6 +126,11 @@ public abstract class PersistentParameterBase<T, V extends PersistentParameter.V
 		}
 	}
 
+	/**
+	 * Creates a new instance of a persistent parameter view.
+	 *
+	 * @return a new instance of a persistent parameter view.
+	 */
 	protected abstract V newViewInstance();
 
 	@Override
@@ -91,9 +151,22 @@ public abstract class PersistentParameterBase<T, V extends PersistentParameter.V
 	 */
 	public static abstract class ParameterViewBase<P extends PersistentParameter<T>, T, N extends Node> implements PersistentParameter.View<T> {
 
+		/**
+		 * The parameter.
+		 */
 		protected final P parameter;
+
+		/**
+		 * The root node of the view.
+		 */
 		protected final N root;
 
+		/**
+		 * Creates a new parameter view base.
+		 *
+		 * @param parameter the parameter.
+		 * @param root the root node of the view.
+		 */
 		public ParameterViewBase(P parameter, N root) {
 			this.parameter = parameter;
 			this.root = root;
@@ -108,5 +181,7 @@ public abstract class PersistentParameterBase<T, V extends PersistentParameter.V
 		public Node node() {
 			return this.root;
 		}
+
 	}
+
 }

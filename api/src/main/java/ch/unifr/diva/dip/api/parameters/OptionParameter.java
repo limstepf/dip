@@ -86,7 +86,7 @@ public class OptionParameter extends PersistentParameterBase<Integer, OptionPara
 					parameter.singleRowViewHook
 			);
 			root.valueProperty().addListener((obs) -> {
-				parameter.valueProperty.set(get());
+				parameter.setLocal(get());
 			});
 		}
 

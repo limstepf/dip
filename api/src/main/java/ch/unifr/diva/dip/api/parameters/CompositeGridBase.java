@@ -273,6 +273,11 @@ public abstract class CompositeGridBase<T> extends CompositeBase<T, CompositeGri
 	 */
 	public static class GridView<P extends CompositeGridBase<T>, T> extends PersistentParameterBase.ParameterViewBase<P, T, GridPane> {
 
+		/**
+		 * Creates a new grid view.
+		 *
+		 * @param parameter the composite grid parameter.
+		 */
 		public GridView(P parameter) {
 			super(parameter, new GridPane());
 
@@ -358,6 +363,7 @@ public abstract class CompositeGridBase<T> extends CompositeBase<T, CompositeGri
 		public final void set(T value) {
 			parameter.updateChildValues(value);
 		}
+
 	}
 
 }

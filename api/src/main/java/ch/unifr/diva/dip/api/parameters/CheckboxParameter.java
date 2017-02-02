@@ -76,7 +76,7 @@ public class CheckboxParameter extends PersistentParameterBase<Boolean, Checkbox
 			set(parameter.get());
 
 			this.root.selectedProperty().addListener((obs) -> {
-				parameter.valueProperty.set(get());
+				parameter.setLocal(get());
 			});
 		}
 

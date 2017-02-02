@@ -68,6 +68,11 @@ public class StringParameter extends PersistentParameterBase<String, StringParam
 	 */
 	public static class StringView extends PersistentParameterBase.ParameterViewBase<StringParameter, String, TextField> {
 
+		/**
+		 * Creates a new string parameter view.
+		 *
+		 * @param parameter the string parameter.
+		 */
 		public StringView(StringParameter parameter) {
 			super(parameter, new TextField());
 			set(parameter.get());
@@ -78,7 +83,7 @@ public class StringParameter extends PersistentParameterBase<String, StringParam
 					parameter.singleRowViewHook
 			);
 			root.textProperty().addListener((obs) -> {
-				parameter.valueProperty.set(get());
+				parameter.setLocal(get());
 			});
 		}
 

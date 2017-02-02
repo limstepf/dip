@@ -191,7 +191,7 @@ public class ExpParameter extends PersistentParameterBase<String, ExpParameter.E
 				}
 
 				updateTooltip();
-				parameter.valueProperty.set(expression);
+				parameter.setLocal(expression);
 			});
 
 			updateTooltip();

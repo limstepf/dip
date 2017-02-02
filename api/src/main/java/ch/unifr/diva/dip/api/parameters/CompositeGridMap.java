@@ -90,7 +90,7 @@ public class CompositeGridMap extends CompositeGridBase<ValueMap> {
 		final String key = this.persistentKeys.get(index);
 		final ValueMap v = get();
 		v.map.put(key, this.persistentChildren.get(index).get());
-		this.valueProperty.set(v);
+		this.setLocal(v);
 	}
 
 	@Override
@@ -118,7 +118,7 @@ public class CompositeGridMap extends CompositeGridBase<ValueMap> {
 	}
 
 	@Override
-	public void set(ValueMap value) {
+	protected ValueMap filterValueProperty(ValueMap value) {
 		enableChildListeners(false);
 
 		// value can't be trusted (might have invalid/outdated, or worse: missing keys)
@@ -131,16 +131,11 @@ public class CompositeGridMap extends CompositeGridBase<ValueMap> {
 		}
 
 		final boolean invalidate = this.valueProperty.get().equals(v);
-		this.valueProperty.set(v);
 		if (invalidate) {
 			this.valueProperty.invalidate();
 		}
 
-		if (view != null) {
-			view.set(v);
-		}
-
-		enableChildListeners(true);
+		return v;
 	}
 
 }

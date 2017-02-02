@@ -125,7 +125,7 @@ public class FloatParameter extends PersistentParameterBase<Float, FloatParamete
 				}
 
 				root.pseudoClassStateChanged(PersistentParameter.ALERT, false);
-				parameter.valueProperty.set(number);
+				parameter.setLocal(number);
 			});
 		}
 

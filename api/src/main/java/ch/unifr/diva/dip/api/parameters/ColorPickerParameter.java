@@ -190,7 +190,7 @@ public class ColorPickerParameter extends PersistentParameterBase<FxColor, Color
 			set(parameter.get());
 
 			picker.colorProperty().addListener(
-					(e) -> parameter.valueProperty.set(get())
+					(e) -> parameter.setLocal(get())
 			);
 		}
 

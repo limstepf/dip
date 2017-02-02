@@ -3,7 +3,7 @@ package ch.unifr.diva.dip.api.parameters;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.css.PseudoClass;
 
 /**
@@ -51,12 +51,19 @@ public interface PersistentParameter<T> extends Parameter<T> {
 	 *
 	 * @return a read-only property.
 	 */
-	public ReadOnlyObjectProperty<T> property();
+	public ObjectProperty<T> property();
 
 	/**
 	 * A view of a persistent parameter.
 	 *
-	 * @param <T>
+	 * <p>
+	 * Note that the view must update the value of the parameter by a call to
+	 * {@code parameter.setLocal(T v)} instead of using the
+	 * {@code parameter.set(T v)} method, or the {@code valueProperty} directly
+	 * (or face a stack overflow since the parameter will in turn update the
+	 * view, which in turn will update the parameter, ...).
+	 *
+	 * @param <T> type of the value of the parameter.
 	 */
 	public interface View<T> extends Parameter.View<T> {
 

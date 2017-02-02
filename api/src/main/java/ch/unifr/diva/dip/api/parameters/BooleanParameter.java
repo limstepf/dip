@@ -128,7 +128,7 @@ public class BooleanParameter extends PersistentParameterBase<Boolean, BooleanPa
 			set(parameter.get());
 
 			group.selectedToggleProperty().addListener((obs) -> {
-				parameter.valueProperty.set(get());
+				parameter.setLocal(get());
 			});
 		}
 

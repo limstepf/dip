@@ -125,7 +125,7 @@ public class DoubleParameter extends PersistentParameterBase<Double, DoubleParam
 				}
 
 				root.pseudoClassStateChanged(PersistentParameter.ALERT, false);
-				parameter.valueProperty.set(number);
+				parameter.setLocal(number);
 			});
 		}
 

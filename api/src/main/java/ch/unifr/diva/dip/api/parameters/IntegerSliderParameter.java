@@ -152,7 +152,7 @@ public class IntegerSliderParameter extends PersistentParameterBase<Integer, Int
 			slider.valueProperty().addListener((obs) -> {
 				final int v = get();
 				tooltip.setText(String.format("%d", v));
-				parameter.valueProperty.set(v);
+				parameter.setLocal(v);
 			});
 		}
 

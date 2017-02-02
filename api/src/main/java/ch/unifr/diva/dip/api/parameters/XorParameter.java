@@ -88,7 +88,7 @@ public class XorParameter extends CompositeBase<ValueListSelection, XorParameter
 	}
 
 	@Override
-	public void set(ValueListSelection value) {
+	protected ValueListSelection filterValueProperty(ValueListSelection value) {
 		enableChildListeners(false);
 
 		for (int i = 0; i < this.children.size(); i++) {
@@ -100,16 +100,11 @@ public class XorParameter extends CompositeBase<ValueListSelection, XorParameter
 		}
 
 		final boolean invalidate = this.valueProperty.get().equals(value);
-		this.valueProperty.set(value);
 		if (invalidate) {
 			this.valueProperty.invalidate();
 		}
 
-		if (view != null) {
-			view.set(value);
-		}
-
-		enableChildListeners(true);
+		return value;
 	}
 
 	@Override
@@ -124,10 +119,29 @@ public class XorParameter extends CompositeBase<ValueListSelection, XorParameter
 	 */
 	public static class XorViewItem<T extends Parameter.View> {
 
+		/**
+		 * The view of the item.
+		 */
 		public final T view;
+
+		/**
+		 * The radio button of the item.
+		 */
 		public final RadioButton radio;
+
+		/**
+		 * The parent node.
+		 */
 		public final Parent parent;
 
+		/**
+		 * Creates a new XOR view item/option.
+		 *
+		 * @param index the index in the toggle group.
+		 * @param parameter the parameter.
+		 * @param parent the parent node.
+		 * @param toggleGroup the toggle group.
+		 */
 		public XorViewItem(int index, Parameter parameter, Parent parent, ToggleGroup toggleGroup) {
 			this.view = (T) parameter.view();
 			this.radio = new RadioButton();
@@ -142,10 +156,14 @@ public class XorParameter extends CompositeBase<ValueListSelection, XorParameter
 	 */
 	public static class XorView extends PersistentParameterBase.ParameterViewBase<XorParameter, ValueListSelection, VBox> {
 
-		// TODO: implement XorGridView?
 		private final ToggleGroup toggleGroup = new ToggleGroup();
 		private final List<XorViewItem> items;
 
+		/**
+		 * Creates a new XOR view.
+		 *
+		 * @param parameter the XOR parameter.
+		 */
 		public XorView(XorParameter parameter) {
 			super(parameter, new VBox());
 
@@ -223,6 +241,7 @@ public class XorParameter extends CompositeBase<ValueListSelection, XorParameter
 			}
 			this.items.get(value.selection).radio.setSelected(true);
 		}
+
 	}
 
 }

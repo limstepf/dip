@@ -11,7 +11,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 /**
- * A File parameter.
+ * A file parameter.
  */
 public class FileParameter extends PersistentParameterBase<FileReference, FileParameter.FileView> {
 
@@ -19,7 +19,7 @@ public class FileParameter extends PersistentParameterBase<FileReference, FilePa
 	protected final Mode mode;
 
 	/**
-	 * FileParameter mode.
+	 * File parameter mode.
 	 */
 	public enum Mode {
 
@@ -74,7 +74,7 @@ public class FileParameter extends PersistentParameterBase<FileReference, FilePa
 	}
 
 	/**
-	 * File view.
+	 * File parameter view.
 	 */
 	public static class FileView extends PersistentParameterBase.ParameterViewBase<FileParameter, FileReference, HBox> {
 
@@ -82,6 +82,11 @@ public class FileParameter extends PersistentParameterBase<FileReference, FilePa
 		protected final Button button = new Button();
 		protected FileReference file;
 
+		/**
+		 * Creates a new file view.
+		 *
+		 * @param parameter the file parameter.
+		 */
 		public FileView(FileParameter parameter) {
 			super(parameter, new HBox());
 			set(parameter.get());
@@ -112,7 +117,7 @@ public class FileParameter extends PersistentParameterBase<FileReference, FilePa
 					break;
 			}
 
-			parameter.valueProperty.set(get());
+			parameter.setLocal(get());
 		}
 
 		protected final FileReference get() {
@@ -142,6 +147,7 @@ public class FileParameter extends PersistentParameterBase<FileReference, FilePa
 			updateText();
 			// TODO: verify and warn (file exists/doesnt)
 		}
+
 	}
 
 }

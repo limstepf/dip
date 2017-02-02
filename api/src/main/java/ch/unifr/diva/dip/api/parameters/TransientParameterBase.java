@@ -11,6 +11,9 @@ public abstract class TransientParameterBase<T extends Parameter.View> implement
 	protected T view;
 	protected boolean isHidden;
 
+	/**
+	 * Creates a new transient parameter base.
+	 */
 	public TransientParameterBase() {
 
 	}

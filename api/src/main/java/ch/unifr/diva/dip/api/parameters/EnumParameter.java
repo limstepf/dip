@@ -212,7 +212,7 @@ public class EnumParameter extends PersistentParameterBase<String, EnumParameter
 					parameter.singleRowViewHook
 			);
 			root.valueProperty().addListener((obs) -> {
-				parameter.valueProperty.set(get());
+				parameter.setLocal(get());
 			});
 
 			// this fixes some weird layout bug, where the combobox get's sized

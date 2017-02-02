@@ -89,7 +89,7 @@ public class CompositeGrid extends CompositeGridBase<ValueList> {
 	protected void updateValue(int index) {
 		final ValueList v = get();
 		v.list.set(index, this.persistentChildren.get(index).get());
-		this.valueProperty.set(v);
+		this.setLocal(v);
 	}
 
 	@Override
@@ -119,7 +119,7 @@ public class CompositeGrid extends CompositeGridBase<ValueList> {
 	}
 
 	@Override
-	public void set(ValueList value) {
+	protected ValueList filterValueProperty(ValueList value) {
 		enableChildListeners(false);
 
 		final ValueList v = get();
@@ -134,16 +134,11 @@ public class CompositeGrid extends CompositeGridBase<ValueList> {
 		}
 
 		final boolean invalidate = this.valueProperty.get().equals(v);
-		this.valueProperty.set(v);
 		if (invalidate) {
 			this.valueProperty.invalidate();
 		}
 
-		if (view != null) {
-			view.set(v);
-		}
-
-		enableChildListeners(true);
+		return v;
 	}
 
 }

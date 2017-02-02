@@ -133,14 +133,6 @@ public class ExpMatrixParameter extends PersistentParameterBase<StringMatrix, Ex
 	}
 
 	@Override
-	public void set(StringMatrix value) {
-		this.valueProperty.set(value);
-		if (view != null) {
-			view.set(value);
-		}
-	}
-
-	@Override
 	protected StringMatrixView newViewInstance() {
 		return new StringMatrixView(this);
 	}
@@ -164,6 +156,11 @@ public class ExpMatrixParameter extends PersistentParameterBase<StringMatrix, Ex
 		protected int currentColumns = -1;
 		protected boolean enabledListeners = true;
 
+		/**
+		 * Creates a new expression matrix view.
+		 *
+		 * @param parameter the expression matrix parameter.
+		 */
 		public StringMatrixView(ExpMatrixParameter parameter) {
 			super(parameter, new BorderPane());
 
@@ -332,6 +329,7 @@ public class ExpMatrixParameter extends PersistentParameterBase<StringMatrix, Ex
 				setValues(value);
 			}
 		}
+
 	}
 
 }

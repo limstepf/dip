@@ -130,7 +130,7 @@ public class IntegerParameter extends PersistentParameterBase<Integer, IntegerPa
 				}
 
 				root.pseudoClassStateChanged(PersistentParameter.ALERT, false);
-				parameter.valueProperty.set(number);
+				parameter.setLocal(number);
 			});
 		}
 
