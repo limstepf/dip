@@ -1,7 +1,6 @@
 package ch.unifr.diva.dip.gui.editor;
 
 import ch.unifr.diva.dip.core.ApplicationHandler;
-import ch.unifr.diva.dip.core.model.RunnableProcessor.ProcessorLayerExtension;
 import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.eventbus.events.ProcessorNotification;
 import ch.unifr.diva.dip.gui.AbstractWidget;
