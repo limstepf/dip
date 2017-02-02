@@ -11,21 +11,35 @@ import javafx.scene.control.SplitPane;
 public interface MainView extends View {
 
 	/**
-	 * Returns the statusBarProperty.
+	 * The statusBarProperty.
 	 *
 	 * @return the statusBarProperty.
 	 */
 	public ObjectProperty<Node> statusBarProperty();
 
 	/**
-	 * Returns the menuBarProperty.
+	 * The menuBarProperty.
 	 *
 	 * @return the menuBarProperty.
 	 */
 	public ObjectProperty<Node> menuBarProperty();
 
 	/**
-	 * Returns the SplitPane.
+	 * The toolBarProperty.
+	 *
+	 * @return the toolBarProperty.
+	 */
+	public ObjectProperty<Node> toolBarProperty();
+
+	/**
+	 * The optionsBarProperty.
+	 *
+	 * @return the optionsBarProperty.
+	 */
+	public ObjectProperty<Node> optionsBarProperty();
+
+	/**
+	 * The SplitPane.
 	 *
 	 * @return the SplitPane.
 	 */

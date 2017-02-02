@@ -2,14 +2,21 @@ package ch.unifr.diva.dip.core;
 
 import ch.unifr.diva.dip.utils.FxUtils;
 import ch.unifr.diva.dip.api.utils.XmlUtils;
+import ch.unifr.diva.dip.api.utils.jaxb.BooleanPropertyAdapter;
 import ch.unifr.diva.dip.api.utils.jaxb.PathAdapter;
+import ch.unifr.diva.dip.api.utils.jaxb.StringPropertyAdapter;
 import ch.unifr.diva.dip.core.model.PipelineLayoutStrategy;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import ch.unifr.diva.dip.gui.layout.ZoomPane;
+import ch.unifr.diva.dip.gui.VisibilityMode;
 import ch.unifr.diva.dip.gui.pe.ConnectionView;
 import ch.unifr.diva.dip.osgi.OSGiVersionPolicy;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
@@ -120,10 +127,39 @@ public class UserSettings {
 		public boolean maximized = false;
 
 		/**
+		 * Whether or not the sidebar is shown. This is a property to bind to
+		 * bidirectionally for controls, or to listen to for the presenter.
+		 */
+		@XmlAttribute
+		@XmlJavaTypeAdapter(BooleanPropertyAdapter.class)
+		public BooleanProperty sideBarVisibility = new SimpleBooleanProperty(true);
+
+		/**
 		 * The position of the side bar divider.
 		 */
 		@XmlAttribute
 		public double sideBarDivider = 0.75;
+
+		/**
+		 * The toolbar visibility mode. This is a property to bind to
+		 * bidirectionally for controls, or to listen to for the presenter.
+		 */
+		@XmlAttribute
+		@XmlJavaTypeAdapter(StringPropertyAdapter.class)
+		public StringProperty toolBarVisibility = new SimpleStringProperty(
+				VisibilityMode.getDefault().name()
+		);
+
+		/**
+		 * The options bar visibility mode. This is a property to bind to
+		 * bidirectionally for controls, or to listen to for the presenter.
+		 */
+		@XmlAttribute
+		@XmlJavaTypeAdapter(StringPropertyAdapter.class)
+		public StringProperty optionsBarVisibility = new SimpleStringProperty(
+				VisibilityMode.getDefault().name()
+		);
+
 	}
 
 	/**

@@ -1,5 +1,7 @@
 package ch.unifr.diva.dip.gui.main;
 
+import ch.unifr.diva.dip.gui.VisibilityMode;
+import ch.unifr.diva.dip.api.ui.ToggleGroupValue;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.eventbus.EventBus;
@@ -14,12 +16,13 @@ import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.input.KeyCombination;
 import javafx.stage.Stage;
 
 /**
- * Main Menu.
+ * The main menu bar of the application.
  */
 public class MenuBarPresenter implements Presenter, Localizable {
 
@@ -29,6 +32,12 @@ public class MenuBarPresenter implements Presenter, Localizable {
 	private final MenuBar menuBar;
 	private final Menu fileMenu, editMenu, viewMenu, toolsMenu, helpMenu;
 
+	/**
+	 * Creates a new main menu bar.
+	 *
+	 * @param handler the application handler.
+	 * @param stage the stage.
+	 */
 	public MenuBarPresenter(ApplicationHandler handler, Stage stage) {
 		this.handler = handler;
 		this.eventBus = handler.eventBus;
@@ -123,16 +132,31 @@ public class MenuBarPresenter implements Presenter, Localizable {
 	private Menu getViewMenu() {
 		final Menu menu = new Menu(localize("view"));
 		final CheckMenuItem viewSideBar = new CheckMenuItem(localize("view.sidebar"));
-		viewSideBar.setSelected(true);
-		viewSideBar.setOnAction(e -> {
-			eventBus.post(new ApplicationRequest(
-					viewSideBar.isSelected()
-							? ApplicationRequest.Type.SHOW_SIDEBAR
-							: ApplicationRequest.Type.HIDE_SIDEBAR
-			));
-		});
+		viewSideBar.selectedProperty().bindBidirectional(handler.settings.primaryStage.sideBarVisibility);
 
-		menu.getItems().addAll(viewSideBar);
+		final Menu viewToolBar = new Menu(localize("view.toolbar"));
+		final ToggleGroupValue toolBarGroup = new ToggleGroupValue();
+		for (VisibilityMode mode : VisibilityMode.values()) {
+			final RadioMenuItem item = new RadioMenuItem(mode.label());
+			toolBarGroup.add(item, mode.name());
+			viewToolBar.getItems().add(item);
+		}
+		toolBarGroup.valueProperty().bindBidirectional(handler.settings.primaryStage.toolBarVisibility);
+
+		final Menu viewOptionsBar = new Menu(localize("view.optionsbar"));
+		final ToggleGroupValue optionsBarGroup = new ToggleGroupValue();
+		for (VisibilityMode mode : VisibilityMode.values()) {
+			final RadioMenuItem item = new RadioMenuItem(mode.label());
+			optionsBarGroup.add(item, mode.name());
+			viewOptionsBar.getItems().add(item);
+		}
+		optionsBarGroup.valueProperty().bindBidirectional(handler.settings.primaryStage.optionsBarVisibility);
+
+		menu.getItems().addAll(
+				viewSideBar,
+				viewToolBar,
+				viewOptionsBar
+		);
 		return menu;
 	}
 

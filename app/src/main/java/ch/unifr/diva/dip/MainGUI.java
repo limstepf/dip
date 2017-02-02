@@ -16,6 +16,7 @@ import ch.unifr.diva.dip.gui.main.MenuBarPresenter;
 import ch.unifr.diva.dip.gui.main.StatusBarPresenter;
 import ch.unifr.diva.dip.gui.main.PagesWidget;
 import ch.unifr.diva.dip.gui.main.SideBarPresenter;
+import ch.unifr.diva.dip.gui.main.ToolBarPresenter;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
@@ -66,6 +67,10 @@ public class MainGUI extends Application {
 		sideBar.addMainWidget(pages);
 		sideBar.addMainWidget(editor.layersWidget());
 
+		// toolbar
+		final ToolBarPresenter toolBar = new ToolBarPresenter(handler, editor);
+		eventBus.register(toolBar);
+
 		final MainView view = new MainViewImpl();
 
 		// setup main presenter
@@ -76,7 +81,9 @@ public class MainGUI extends Application {
 				editor,
 				menuBar,
 				statusBar,
-				sideBar
+				sideBar,
+				toolBar,
+				toolBar.getOptionsBar()
 		);
 		eventBus.register(presenter);
 

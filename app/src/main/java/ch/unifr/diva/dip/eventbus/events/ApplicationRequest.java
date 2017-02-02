@@ -11,14 +11,6 @@ public class ApplicationRequest {
 	public enum Type {
 
 		/**
-		 * Request to show the sidebar.
-		 */
-		SHOW_SIDEBAR,
-		/**
-		 * Request to hide the sidebar.
-		 */
-		HIDE_SIDEBAR,
-		/**
 		 * Request to open the pipeline editor.
 		 */
 		OPEN_PIPELINE_EDITOR,

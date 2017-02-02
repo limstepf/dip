@@ -143,6 +143,12 @@ public class UIStrategyGUI implements UIStrategy {
 	public static class Animation {
 
 		/**
+		 * Time in milliseconds to delay popping in/up nodes. E.g. a context
+		 * menu while holding the mouse button down.
+		 */
+		public static final int delayDuration = 320;
+
+		/**
 		 * Time in milliseconds to display auto-disappearing nodes.
 		 */
 		public static final int displayDuration = 5500;

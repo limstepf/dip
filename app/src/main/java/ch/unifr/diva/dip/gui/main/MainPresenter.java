@@ -49,6 +49,8 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 	private final Presenter statusBar;
 	private final EditorPresenter editor;
 	private final Presenter sideBar;
+	private final Presenter toolBar;
+	private final Presenter optionsBar;
 
 	private final List<Parent> splitPaneComponents = new ArrayList<>();
 
@@ -62,6 +64,8 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 	 * @param menuBar the menu bar.
 	 * @param statusBar the status bar.
 	 * @param sideBar the side bar.
+	 * @param toolBar the tool bar.
+	 * @param optionsBar the options bar.
 	 */
 	public MainPresenter(
 			ApplicationHandler handler,
@@ -70,7 +74,9 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 			EditorPresenter editor,
 			Presenter menuBar,
 			Presenter statusBar,
-			Presenter sideBar
+			Presenter sideBar,
+			Presenter toolBar,
+			Presenter optionsBar
 	) {
 		super(view);
 		this.handler = handler;
@@ -80,6 +86,8 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 		this.statusBar = statusBar;
 		this.editor = editor;
 		this.sideBar = sideBar;
+		this.toolBar = toolBar;
+		this.optionsBar = optionsBar;
 
 		this.scene = new Scene(this.view.getComponent());
 		initView();
@@ -98,9 +106,18 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 	private void initView() {
 		view.menuBarProperty().set(menuBar.getComponent());
 		view.statusBarProperty().set(statusBar.getComponent());
+		view.toolBarProperty().set(toolBar.getComponent());
+		view.optionsBarProperty().set(optionsBar.getComponent());
 		splitPaneComponents.add(editor.getComponent());
-		splitPaneComponents.add(sideBar.getComponent());
+		if (handler.settings.primaryStage.sideBarVisibility.get()) {
+			splitPaneComponents.add(sideBar.getComponent());
+		}
 		updateSplitPaneComponents();
+		handler.settings.primaryStage.sideBarVisibility.addListener((c) -> {
+			showSideBar(
+					handler.settings.primaryStage.sideBarVisibility.get()
+			);
+		});
 
 		// resize editor and not the sideBar upon resizing the scene/window
 		SplitPane.setResizableWithParent(sideBar.getComponent(), false);
@@ -113,7 +130,7 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 
 	}
 
-	private void showSidebar(boolean show) {
+	private void showSideBar(boolean show) {
 		if (show) {
 			if (!splitPaneComponents.contains(sideBar.getComponent())) {
 				splitPaneComponents.add(sideBar.getComponent());
@@ -157,12 +174,6 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 	@Subscribe
 	public void applicationRequest(ApplicationRequest event) {
 		switch (event.type) {
-			case SHOW_SIDEBAR:
-				showSidebar(true);
-				break;
-			case HIDE_SIDEBAR:
-				showSidebar(false);
-				break;
 			case OPEN_PIPELINE_EDITOR:
 				openPipelineEditor(true);
 				break;

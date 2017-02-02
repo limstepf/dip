@@ -7,6 +7,7 @@
 	-dip-faint: derive(-fx-dark-text-color, 111%);
 	-dip-accent-faint: -fx-faint-focus-color;
 	-dip-accent-highlight: derive(-fx-accent, 67%);
+	-dip-accent-inverted: white;
 	-dip-alert: #FF0000;
 	-dip-alert-faint: #FF000022;
 	-dip-alert-highlight: derive(-dip-alert, 67%);
@@ -40,6 +41,10 @@
 	30px		2.5em
 	45px		3.75em
 */
+
+.tooltip {
+	-fx-font-size: 10px;
+}
 
 .dip-disabled {
 	-fx-opacity: 0.4;
@@ -106,6 +111,17 @@
     -fx-border-insets: 0 0 1 0;
 }
 
+.dip-menuitem .dip-glyph {
+	-fx-fill: -fx-accent;
+	-fx-text-fill: -fx-accent;
+}
+
+.dip-menuitem:focused .dip-glyph {
+	-fx-fill: -dip-accent-inverted;
+	-fx-text-fill: -dip-accent-inverted;
+}
+
+
 .dip-form-grid-pane {
 	-fx-hgap: 1.25em;
 	-fx-vgap: 0.416em;
@@ -134,7 +150,9 @@
 	-fx-background-color: transparent;
 }
 
-.dip-side-bar {
+.dip-options-bar,
+.dip-side-bar,
+.dip-tool-bar {
 	-fx-background-color: -fx-base;
 }
 
