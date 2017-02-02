@@ -1024,7 +1024,7 @@ public class ColorPicker {
 		slider.setMinorTickCount(2);
 		slider.setShowTickLabels(false);
 		slider.setShowTickMarks(true);
-		slider.setSnapToTicks(true);
+		slider.setSnapToTicks(false);
 		slider.setBlockIncrement(1);
 		return slider;
 	}
