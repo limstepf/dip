@@ -8,6 +8,7 @@ import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.AnchorPane;
@@ -131,6 +132,59 @@ public class FxUtils {
 		}
 
 		return -1;
+	}
+
+	/**
+	 * Computes the intersection of two rectangles. Returns a new
+	 * {@code Rectangle2D} that represents the intersection of the two
+	 * rectangles. If the two rectangles do not intersect, the result will be an
+	 * empty rectangle.
+	 *
+	 * @param r the first rectangle.
+	 * @param t the second rectangle.
+	 * @return the largest rectangle contained in both given rectangles, or an
+	 * empty rectangle if they do not intersect.
+	 */
+	public static Rectangle2D intersection(Rectangle2D r, Rectangle2D t) {
+		double tx1 = t.getMinX();
+		double ty1 = t.getMinY();
+		double rx1 = r.getMinX();
+		double ry1 = r.getMinY();
+		double tx2 = t.getMaxX();
+		double ty2 = t.getMaxY();
+		double rx2 = r.getMaxX();
+		double ry2 = r.getMaxY();
+		if (tx1 < rx1) {
+			tx1 = rx1;
+		}
+		if (ty1 < ry1) {
+			ty1 = ry1;
+		}
+		if (tx2 > rx2) {
+			tx2 = rx2;
+		}
+		if (ty2 > ry2) {
+			ty2 = ry2;
+		}
+		tx2 -= tx1;
+		ty2 -= ty1;
+
+		if (tx2 <= 0 || ty2 <= 0) {
+			return new Rectangle2D(tx1, ty2, 0, 0);
+		}
+
+		return new Rectangle2D(tx1, ty1, tx2, ty2);
+	}
+
+	/**
+	 * Determines whether the rectangle is empty. When the {@code Rectangle2D}
+	 * is empty, it encloses no area.
+	 *
+	 * @param r the rectangle.
+	 * @return True if the rectangle is empty, false otherwise.
+	 */
+	public static boolean isEmpty(Rectangle2D r) {
+		return (r.getWidth() <= 0 || r.getHeight() <= 0);
 	}
 
 }
