@@ -7,8 +7,8 @@ import ch.unifr.diva.dip.api.utils.jaxb.PathAdapter;
 import ch.unifr.diva.dip.api.utils.jaxb.StringPropertyAdapter;
 import ch.unifr.diva.dip.core.model.PipelineLayoutStrategy;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
-import ch.unifr.diva.dip.gui.layout.ZoomPane;
 import ch.unifr.diva.dip.gui.VisibilityMode;
+import ch.unifr.diva.dip.gui.layout.Zoomable;
 import ch.unifr.diva.dip.gui.pe.ConnectionView;
 import ch.unifr.diva.dip.osgi.OSGiVersionPolicy;
 import java.nio.file.Files;
@@ -254,7 +254,7 @@ public class UserSettings {
 		 * The interpolation method/algorithm to be used by the main editor.
 		 */
 		@XmlAttribute
-		public String interpolation = ZoomPane.Interpolation.BILINEAR.name();
+		public String interpolation = Zoomable.Interpolation.BILINEAR.name();
 
 	}
 

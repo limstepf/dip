@@ -7,8 +7,11 @@ import ch.unifr.diva.dip.core.model.ProjectPage;
 import ch.unifr.diva.dip.core.model.RunnableProcessor;
 import ch.unifr.diva.dip.eventbus.events.ProjectNotification;
 import ch.unifr.diva.dip.gui.Presenter;
-import ch.unifr.diva.dip.gui.layout.ZoomPane;
+import ch.unifr.diva.dip.gui.layout.Pannable;
+import ch.unifr.diva.dip.gui.layout.ZoomPaneBresenham;
+import ch.unifr.diva.dip.gui.layout.Zoomable;
 import com.google.common.eventbus.Subscribe;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +24,7 @@ public class EditorPresenter implements Presenter {
 	private static final Logger log = LoggerFactory.getLogger(EditorPresenter.class);
 	private final ApplicationHandler handler;
 	private final LayerGroup rootLayer;
-	private final ZoomPane zoomPane;
+	private final ZoomPaneBresenham zoomPane;
 	private NavigatorWidget navigatorWidget;
 	private LayersWidget layersWidget;
 
@@ -34,12 +37,14 @@ public class EditorPresenter implements Presenter {
 		this.handler = handler;
 
 		this.rootLayer = new LayerGroup();
-		this.zoomPane = new ZoomPane(handler.discardingThreadPool, this.rootLayer.getComponent());
+		this.zoomPane = new ZoomPaneBresenham(handler.discardingThreadPool);
+		zoomPane.setContent(this.rootLayer.getComponent());
 		zoomPane.getStyleClass().add("dip-editor");
 		zoomPane.setInterpolation(
-				ZoomPane.Interpolation.get(handler.settings.editor.interpolation)
+				Zoomable.Interpolation.get(handler.settings.editor.interpolation)
 		);
-		zoomPane.bindStage(handler.uiStrategy.getStage());
+		zoomPane.setPaddingMethod(Pannable.Padding.VIEWPORT);
+
 		// repaint listener
 		this.rootLayer.onModifiedProperty().addListener((e) -> this.zoomPane.fireContentChange());
 		// content modification listener (not all repaints are due to content modifications)
@@ -56,13 +61,13 @@ public class EditorPresenter implements Presenter {
 	 *
 	 * @return the zoom pane.
 	 */
-	public ZoomPane getZoomPane() {
+	public ZoomPaneBresenham getZoomPane() {
 		return this.zoomPane;
 	}
 
 	@Override
 	public Parent getComponent() {
-		return this.zoomPane;
+		return this.zoomPane.getNode();
 	}
 
 	@Subscribe
@@ -105,6 +110,9 @@ public class EditorPresenter implements Presenter {
 
 		// build stage and processor layers
 		buildStages();
+
+		// TODO: save and restore zoom and position (centered pixel) for all pages
+		zoomPane.moveToPos(Pos.TOP_LEFT, 50);
 	}
 
 	private void buildStages() {
@@ -151,7 +159,7 @@ public class EditorPresenter implements Presenter {
 	 *
 	 * @param type the interpolation type.
 	 */
-	public void setInterpolation(ZoomPane.Interpolation type) {
+	public void setInterpolation(Zoomable.Interpolation type) {
 		this.zoomPane.setInterpolation(type);
 	}
 

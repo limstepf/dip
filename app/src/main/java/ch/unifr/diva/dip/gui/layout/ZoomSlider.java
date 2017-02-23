@@ -13,62 +13,66 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Priority;
 
 /**
- * Zoom slider. Adjusts the zoom of a {@code ZoomPane}.
+ * Zoom slider. Adjusts the zoom of a {@code Zoomable}.
  */
 public class ZoomSlider {
 
-	private final ZoomPane zoomPane;
-	private final Lane lane = new Lane();
-	private final TextField zoom = new TextField();
-	private final Slider slider = new Slider();
+	protected final Zoomable zoomable;
 
-	private final EventHandler<KeyEvent> zoomHandler;
-	private final ChangeListener<Number> sliderListener;
-	private final ChangeListener<Number> zoomListener;
-	private boolean propagate = true;
+	protected final Lane lane;
+	protected final TextField text;
+	protected final Slider slider;
+
+	protected final EventHandler<KeyEvent> zoomHandler;
+	protected final ChangeListener<Number> sliderListener;
+	protected final ChangeListener<Number> zoomListener;
+
+	protected boolean changeIsLocal;
 
 	/**
 	 * Creates a new zoom slider.
 	 *
-	 * @param zoomPane the zoom pane to be controlled.
+	 * @param zoomable the {@code Zoomable} to control.
 	 */
-	public ZoomSlider(ZoomPane zoomPane) {
-		this.zoomPane = zoomPane;
+	public ZoomSlider(Zoomable zoomable) {
+		this.zoomable = zoomable;
 
-		zoom.setPrefWidth(62.5);
-		zoom.setAlignment(Pos.CENTER_RIGHT);
-		zoomHandler = new KeyEventHandler(
+		this.zoomHandler = new KeyEventHandler(
 				KeyCode.ENTER,
 				(e) -> {
-					zoomPane.setZoom(getZoomValueFromTextField());
+					zoomable.setZoom(getZoomValueFromTextField());
 					return true;
 				}
 		);
-		zoom.setOnKeyPressed(zoomHandler);
+		this.text = new TextField();
+		text.setPrefWidth(62.5);
+		text.setAlignment(Pos.CENTER_RIGHT);
+		text.setOnKeyPressed(zoomHandler);
 
+		this.sliderListener = (ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+			if (!changeIsLocal) {
+				zoomable.setZoom(sliderToZoomVal(newValue.doubleValue()));
+			}
+		};
+		this.slider = new Slider();
 		final double one = zoomValToSlider(1);
-		slider.setMin(zoomValToSlider(zoomPane.minZoomValue() * 0.01));
-		slider.setMax(zoomValToSlider(zoomPane.maxZoomValue() * 0.01));
+		slider.setMin(zoomValToSlider(zoomable.getZoomMin() * 0.01));
+		slider.setMax(zoomValToSlider(zoomable.getZoomMax() * 0.01));
 		slider.setValue(one);
 		slider.setBlockIncrement(one * 0.05);
 		slider.setMinorTickCount(4);
 		slider.setMajorTickUnit(one);
-		sliderListener = (ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
-			if (!propagate) {
-				return;
-			}
-			zoomPane.setZoom(sliderToZoomVal(newValue.doubleValue()));
-		};
 		slider.valueProperty().addListener(sliderListener);
-		sliderListener.changed(null, 0, zoomValToSlider(zoomPane.getZoom()));
+		sliderListener.changed(null, 0, zoomValToSlider(zoomable.getZoom()));
 
-		zoomListener = (ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+		this.zoomListener = (ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
 			setZoomValue(newValue.doubleValue());
 		};
-		zoomPane.zoomProperty().addListener(zoomListener);
-		zoomListener.changed(null, 0, zoomPane.getZoom());
+		zoomable.zoomProperty().addListener(zoomListener);
+		zoomListener.changed(null, 0, zoomable.getZoom());
 
-		lane.add(zoom);
+		this.lane = new Lane();
+		lane.add(text);
 		lane.add(slider, Priority.ALWAYS);
 	}
 
@@ -79,7 +83,7 @@ public class ZoomSlider {
 	 * @return the {@code TextField}.
 	 */
 	public TextField getTextField() {
-		return zoom;
+		return text;
 	}
 
 	/**
@@ -108,7 +112,7 @@ public class ZoomSlider {
 	 */
 	final public void setZoomValue(double value) {
 		slider.valueProperty().setValue(zoomValToSlider(value));
-		zoom.setText(String.format("%.1f%%", value * 100));
+		text.setText(String.format("%.1f%%", value * 100));
 	}
 
 	/**
@@ -118,21 +122,21 @@ public class ZoomSlider {
 	 * @param value the new zoom value.
 	 */
 	final public void updateZoomValue(double value) {
-		propagate = false;
+		changeIsLocal = true;
 		slider.valueProperty().setValue(zoomValToSlider(value));
-		zoom.setText(String.format("%.1f%%", value * 100));
-		propagate = true;
+		text.setText(String.format("%.1f%%", value * 100));
+		changeIsLocal = false;
 	}
 
-	private double getZoomValueFromTextField() {
-		return 0.01 * Double.parseDouble(zoom.getText().replace("%", ""));
+	protected final double getZoomValueFromTextField() {
+		return 0.01 * Double.parseDouble(text.getText().replace("%", ""));
 	}
 
-	private static double sliderToZoomVal(double value) {
+	protected static double sliderToZoomVal(double value) {
 		return Math.pow(10, value) - 1;
 	}
 
-	private static double zoomValToSlider(double value) {
+	protected static double zoomValToSlider(double value) {
 		return Math.log10(value + 1);
 	}
 

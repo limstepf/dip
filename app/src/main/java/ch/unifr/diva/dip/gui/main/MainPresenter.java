@@ -16,7 +16,7 @@ import ch.unifr.diva.dip.gui.dialogs.ErrorDialog;
 import ch.unifr.diva.dip.gui.dialogs.NewProjectDialog;
 import ch.unifr.diva.dip.gui.dialogs.RepairProjectDialog;
 import ch.unifr.diva.dip.gui.editor.EditorPresenter;
-import ch.unifr.diva.dip.gui.layout.ZoomPane;
+import ch.unifr.diva.dip.gui.layout.Zoomable;
 import com.google.common.eventbus.Subscribe;
 import java.io.File;
 import java.io.IOException;
@@ -182,7 +182,7 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 				break;
 			case EDITOR_INTERPOLATION:
 				this.editor.setInterpolation(
-						ZoomPane.Interpolation.get(this.handler.settings.editor.interpolation)
+						Zoomable.Interpolation.get(this.handler.settings.editor.interpolation)
 				);
 				break;
 			case EXIT:

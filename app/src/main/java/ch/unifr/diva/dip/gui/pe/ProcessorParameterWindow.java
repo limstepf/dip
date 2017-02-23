@@ -15,8 +15,10 @@ import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import ch.unifr.diva.dip.gui.Presenter;
 import ch.unifr.diva.dip.gui.layout.AbstractWindow;
 import ch.unifr.diva.dip.gui.layout.Lane;
-import ch.unifr.diva.dip.gui.layout.ZoomPane;
+import ch.unifr.diva.dip.gui.layout.Pannable;
+import ch.unifr.diva.dip.gui.layout.ZoomPaneBresenham;
 import ch.unifr.diva.dip.gui.layout.ZoomSlider;
+import ch.unifr.diva.dip.gui.layout.Zoomable;
 import java.awt.Rectangle;
 import java.util.Collection;
 import javafx.application.Platform;
@@ -29,6 +31,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -236,7 +239,7 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 		private final DipThreadPool threadPool;
 		private final PreviewContext previewContext;
 		private final VBox vbox;
-		private final ZoomPane zoomPane;
+		private final ZoomPaneBresenham zoomPane;
 		private final ZoomSlider zoomSlider;
 		private final Slider opacitySlider;
 		private final EnumParameter blendMode;
@@ -263,16 +266,16 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 //			this.threadPool = handler.discardingThreadPool;
 			this.threadPool = DipThreadPool.newDiscardingThreadPool("dip-preview-pool", 1, 1);
 			this.previewContext = previewContext;
-			this.zoomPane = new ZoomPane(handler.discardingThreadPool);
+			this.zoomPane = new ZoomPaneBresenham(handler.discardingThreadPool);
 			zoomPane.setInterpolation(
-					ZoomPane.Interpolation.get(handler.settings.editor.interpolation)
+					Zoomable.Interpolation.get(handler.settings.editor.interpolation)
 			);
-			zoomPane.setMinWidth(128);
-			zoomPane.setMinHeight(128);
-			zoomPane.setPrefWidth(256);
-			zoomPane.setPrefHeight(256);
-			zoomPane.setMaxWidth(512);
-			zoomPane.setMaxHeight(512);
+			zoomPane.getNode().setMinWidth(128);
+			zoomPane.getNode().setMinHeight(128);
+			zoomPane.getNode().setPrefWidth(256);
+			zoomPane.getNode().setPrefHeight(256);
+			zoomPane.getNode().setMaxWidth(512);
+			zoomPane.getNode().setMaxHeight(512);
 
 			this.scrollListener = (ObservableValue<? extends Object> observable, Object oldValue, Object newValue) -> {
 				update();
@@ -296,7 +299,7 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 			this.previewSubImage = new ImageView();
 			this.previewPane = new Pane();
 			previewPane.getChildren().setAll(previewSource, previewSubImage);
-			zoomPane.setZoomContent(previewPane);
+			zoomPane.setContent(previewPane);
 
 			this.zoomSlider = new ZoomSlider(zoomPane);
 			this.opacitySlider = new Slider(0, 1, 1);
@@ -331,7 +334,7 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 			final double b = UIStrategyGUI.Stage.insets;
 			vbox.setPadding(new Insets(b, b * 5, b, b));
 			vbox.setSpacing(b);
-			vbox.getChildren().addAll(zoomPane, gridPane);
+			vbox.getChildren().addAll(zoomPane.getNode(), gridPane);
 
 			// TODO/VERIFY: what about transmutable procs? Would they change params?
 			// Should we re-listen? Or should transmutable procs that actually do
@@ -347,12 +350,12 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 			// bounds of the vbox (call to layout is required to update bounds of
 			// the zoompane).
 			vbox.layout();
-			final Bounds content = zoomPane.getContentBoundsZoomed();
+			final Bounds content = zoomPane.getScaledContentBounds();
 
-			if (content.getWidth() > zoomPane.getWidth()) {
+			if (content.getWidth() > zoomPane.getNode().getWidth()) {
 				zoomPane.setHvalue(.5);
 			}
-			if (content.getHeight() > zoomPane.getHeight()) {
+			if (content.getHeight() > zoomPane.getNode().getHeight()) {
 				zoomPane.setVvalue(.5);
 			}
 		}
@@ -371,77 +374,29 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 		}
 
 		final protected void update() {
-			/*
-			 * There are two cases to consider (for each axis individually):
-			 *
-			 * 1) scrollableWidth/Height is strictly positive, so the region covers
-			 * the viewport scaled to the source image with according offsets, or
-			 * 2) scrollableWidth/Height is negative/zero, so the region covers
-			 * the full source image (with zero offset).
-			 *
-			 * And some extra care must be taken with "rounding" to nicely cover
-			 * the whole viewport with the preview image, or we have some ugly
-			 * 1-2px stripes where the preview source is still visible... hence
-			 * the {@code + 1.5} below.
-			 */
-			final double invZoom = 1.0 / zoomPane.getZoom();
-			final Bounds viewport = zoomPane.getViewportBounds();
-			final int regionWidth;
-			final int regionOffsetX;
-			final int regionHeight;
-			final int regionOffsetY;
-
-			final double scrollableWidth = zoomPane.scrollableWidth();
-			if (scrollableWidth > 0) {
-				final double scrollOffsetX = zoomPane.scrollOffsetX();
-				regionOffsetX = (int) (invZoom * scrollOffsetX);
-				final int x = (int) (viewport.getWidth() * invZoom + 1.5);
-				final int endX = regionOffsetX + x;
-				if (endX > previewSourceWidth) {
-					regionWidth = x - (endX - previewSourceWidth);
-				} else {
-					regionWidth = x;
-				}
-			} else {
-				regionOffsetX = 0;
-				regionWidth = previewSourceWidth;
-			}
-
-			final double scrollableHeight = zoomPane.scrollableHeight();
-			if (scrollableHeight > 0) {
-				final double scrollOffsetY = zoomPane.scrollOffsetY();
-				regionOffsetY = (int) (invZoom * scrollOffsetY);
-				final int y = (int) (viewport.getHeight() * invZoom + 1.5);
-				final int endY = regionOffsetY + y;
-				if (endY > previewSourceHeight) {
-					regionHeight = y - (endY - previewSourceHeight);
-				} else {
-					regionHeight = y;
-				}
-			} else {
-				regionOffsetY = 0;
-				regionHeight = previewSourceHeight;
-			}
-			final Rectangle region = new Rectangle(
-					regionOffsetX,
-					regionOffsetY,
-					regionWidth,
-					regionHeight
-			);
-
-			if (region.width > 0 && region.height > 0) {
+			final Pannable.VisibleRegion visibleRegion = zoomPane.getVisibleRegion();
+			if (!visibleRegion.isEmpty()) {
+				/*
+				 * request an extra pixel, or we might see an unprocessed 1 pixel
+				 * stripe to the right and/or bottom.
+				 */
+				final Rectangle region = visibleRegion.getUnscaledVisibleRectangle(
+						previewSourceWidth, previewSourceHeight, 1
+				);
 				final Runnable run = () -> {
-					final Image preview = previewContext.previewable.preview(previewContext.context, region);
+					final Image preview = previewContext.previewable.preview(
+							previewContext.context,
+							region
+					);
 					if (preview != null) {
 						Platform.runLater(() -> {
 							previewSubImage.setImage(preview);
-							previewSubImage.setLayoutX(regionOffsetX);
-							previewSubImage.setLayoutY(regionOffsetY);
+							previewSubImage.setLayoutX(region.x);
+							previewSubImage.setLayoutY(region.y);
 							zoomPane.fireContentChange();
 						});
 					}
 				};
-
 				this.threadPool.getExecutorService().submit(run);
 			}
 		}

@@ -1,7 +1,7 @@
 package ch.unifr.diva.dip.gui.editor;
 
 import ch.unifr.diva.dip.gui.AbstractWidget;
-import ch.unifr.diva.dip.gui.layout.ZoomPane;
+import ch.unifr.diva.dip.gui.layout.Pannable;
 import ch.unifr.diva.dip.gui.layout.ZoomSlider;
 import javafx.beans.InvalidationListener;
 import javafx.beans.value.ChangeListener;
@@ -22,189 +22,95 @@ import javafx.scene.shape.StrokeType;
 import javafx.scene.transform.Scale;
 
 /**
- * The NavigatorWidget binds to the graphical editor.
+ * A navigator widget for pannable components.
+ *
+ * @param <T> class of the pannable.
  */
-public class NavigatorWidget extends AbstractWidget {
+public class NavigatorWidget<T extends Pannable> extends AbstractWidget {
 
-	private static double MIN_ZOOM_VALUE = 0; // 1 := 100%
-	private static double MAX_ZOOM_VALUE = 4800;
-	private final View view;
-	private final ZoomPane master;
-
-	private final InvalidationListener contentListener;
-	private final ChangeListener<Object> scrollListener;
-	private final EventHandler<MouseEvent> viewportDownEvent;
-	private final EventHandler<MouseEvent> viewportDragEvent;
+	protected final T pannable;
+	protected final NavigatorWidgetView view;
+	protected final InvalidationListener contentChangedListener;
+	protected final ChangeListener<Object> viewportListener;
+	protected final EventHandler<MouseEvent> viewportDownEvent;
+	protected final EventHandler<MouseEvent> viewportDragEvent;
 
 	/**
-	 * NavigatorWidget constructor.
+	 * Creates a new navigator widget.
 	 *
-	 * @param zoomPane the master ZoomPane to bind to.
+	 * @param pannable the pannable to control.
 	 */
-	public NavigatorWidget(ZoomPane zoomPane) {
+	public NavigatorWidget(T pannable) {
 		super();
+		this.pannable = pannable;
+		this.view = new NavigatorWidgetView(this.pannable);
 
-		master = zoomPane;
-		view = new View(master);
-
-		contentListener = (observable) -> {
-			view.setDisableViewport(!master.hasZoomContent());
-			updateSnapshot();
+		this.contentChangedListener = (e) -> {
+			view.setDisableViewport(pannable.isEmpty());
+			view.updateSnapshot();
 		};
-
-		scrollListener = (ObservableValue<? extends Object> observable, Object oldValue, Object newValue) -> {
-			updateViewport();
+		this.viewportListener = (ObservableValue<? extends Object> observable, Object oldValue, Object newValue) -> {
+			view.updateViewport();
 		};
-
-		viewportDownEvent = (e) -> onViewportDownEvent(e);
-		viewportDragEvent = (e) -> onViewportDragEvent(e);
+		this.viewportDownEvent = (e) -> view.onViewportDown(e);
+		this.viewportDragEvent = (e) -> view.onViewportDrag(e);
 
 		setWidget(view);
 		setTitle(localize("widget.navigator"));
 
-		bind(zoomPane);
-		updateSnapshot();
+		bind(pannable);
+		view.updateSnapshot();
 	}
 
-	private static double sliderToZoomVal(double v) {
-		return Math.pow(10, v) - 1;
-	}
+	private void bind(T pannable) {
+		this.pannable.contentChangedProperty().addListener(contentChangedListener);
+		this.pannable.hvalueProperty().addListener(viewportListener);
+		this.pannable.vvalueProperty().addListener(viewportListener);
+		this.pannable.widthProperty().addListener(viewportListener);
+		this.pannable.heightProperty().addListener(viewportListener);
+		this.pannable.needsLayoutProperty().addListener(viewportListener);
 
-	private static double zoomValToSlider(double v) {
-		return Math.log10(v + 1);
-	}
-
-	private void onViewportDownEvent(MouseEvent e) {
-		view.viewport.getScene().setCursor(Cursor.CLOSED_HAND);
-		view.x = e.getSceneX();
-		view.y = e.getSceneY();
-		view.h = master.getHvalue();
-		view.v = master.getVvalue();
-	}
-
-	private void onViewportDragEvent(MouseEvent e) {
-		final double offsetX = e.getSceneX() - view.x;
-		final double offsetY = e.getSceneY() - view.y;
-		final Bounds viewport = master.getViewportBounds();
-		final Bounds zoomed = master.getContentBoundsZoomed();
-
-		final double scrollableWidth = zoomed.getWidth() - viewport.getWidth();
-		final double scrollableHeight = zoomed.getHeight() - viewport.getHeight();
-
-		final double invScale = 1 / view.scale;
-		final double scaleFactor = invScale * master.getZoom();
-
-		final double hmin = master.getHmin();
-		final double hmax = master.getHmax();
-		final double hrange = hmax - hmin;
-		final double hppx = hrange / scrollableWidth;
-		double w = (offsetX * scaleFactor * hppx) + view.h;
-
-		if (w < hmin) { // snap to bounds!
-			w = hmin;
-		} else if (w > hmax) {
-			w = hmax;
-		}
-
-		final double vmin = master.getVmin();
-		final double vmax = master.getVmax();
-		final double vrange = vmax - vmin;
-		final double vppx = vrange / scrollableHeight;
-		double h = (offsetY * scaleFactor * vppx) + view.v;
-
-		if (h < vmin) {
-			h = vmin;
-		} else if (h > vmax) {
-			h = vmax;
-		}
-
-		master.updateViewportPosition(w, h);
-	}
-
-	/**
-	 * Binds the NavigatorWidget to a ZoomPane.
-	 *
-	 * @param zoomPane the master ZoomPane.
-	 */
-	private void bind(ZoomPane zoomPane) {
-		master.zoomContentProperty().addListener(contentListener);
-		master.hvalueProperty().addListener(scrollListener);
-		master.vvalueProperty().addListener(scrollListener);
-		master.widthProperty().addListener(scrollListener);
-		master.heightProperty().addListener(scrollListener);
-		master.needsLayoutProperty().addListener(scrollListener);
 		view.viewport.setOnMousePressed(viewportDownEvent);
 		view.viewport.setOnMouseDragged(viewportDragEvent);
-		contentListener.invalidated(null);
-	}
 
-	private void updateSnapshot() {
-		final Bounds page = master.getContentBounds();
-		view.scale = Math.min(
-				view.pane.getWidth() / page.getWidth(),
-				view.pane.getHeight() / page.getHeight()
-		);
-		view.snapshotScaleTransform.setX(view.scale);
-		view.snapshotScaleTransform.setY(view.scale);
-		final WritableImage snapshot = master.snapshot(view.snapshotParams);
-		view.snapshot.setImage(snapshot);
-
-		updateViewport();
-	}
-
-	private void updateViewport() {
-		final Bounds viewport = master.getViewportBounds();
-		final Bounds zoomed = master.getContentBoundsZoomed();
-		final double invZoom = 1.0 / master.getZoom();
-		final double scaleFactor = invZoom * view.scale;
-
-		final double scrollableWidth = zoomed.getWidth() - viewport.getWidth();
-		final double scrollableHeight = zoomed.getHeight() - viewport.getHeight();
-
-		if (scrollableWidth <= 0) {
-			view.viewport.setWidth(view.pane.getWidth());
-			view.viewport.setX(0);
-		} else {
-			view.viewport.setWidth(viewport.getWidth() * scaleFactor);
-			final double hScroll = master.getHvalue() * (master.getHmax() - master.getHmin());
-			final double hOffset = hScroll * (zoomed.getWidth() - viewport.getWidth());
-			view.viewport.setX(hOffset * scaleFactor);
-		}
-
-		if (scrollableHeight <= 0) {
-			view.viewport.setHeight(view.pane.getHeight());
-			view.viewport.setY(0);
-		} else {
-			view.viewport.setHeight(viewport.getHeight() * scaleFactor);
-			final double vScroll = master.getVvalue() * (master.getVmax() - master.getVmin());
-			final double vOffset = vScroll * (zoomed.getHeight() - viewport.getHeight());
-			view.viewport.setY(vOffset * scaleFactor);
-		}
+		contentChangedListener.invalidated(null);
 	}
 
 	/**
-	 * Navigator widget view.
+	 * The navigator widget view.
+	 *
+	 * @param <T> class of the pannable.
 	 */
-	public static class View extends VBox {
+	public static class NavigatorWidgetView<T extends Pannable> extends VBox {
 
-		private final ImageView snapshot = new ImageView();
-		private final Pane pane = new Pane();
-		private final Rectangle viewport = new Rectangle();
-		private final ZoomSlider zoomSlider;
+		protected final T pannable;
+		protected final Pane pane;
+		protected final ImageView snapshot;
+		protected final Scale snapshotScaleTransform;
+		protected final SnapshotParameters snapshotParams;
+		protected final Rectangle viewport;
+		protected final ZoomSlider zoomSlider;
 
-		private final SnapshotParameters snapshotParams = new SnapshotParameters();
-		private final Scale snapshotScaleTransform = new Scale(1.0, 1.0);
+		protected boolean mouseInViewport;
+		protected double scale = 1;
+		protected double x;
+		protected double y;
+		protected double h;
+		protected double v;
 
-		private boolean mouseInViewport;
-		private double scale = 1;
-		private double x;
-		private double y;
-		private double h;
-		private double v;
+		/**
+		 * Creates a new navigator widget view.
+		 *
+		 * @param pannable the pannable to control.
+		 */
+		public NavigatorWidgetView(T pannable) {
+			this.pannable = pannable;
+			this.snapshot = new ImageView();
+			this.snapshotScaleTransform = new Scale(1.0, 1.0);
+			this.snapshotParams = new SnapshotParameters();
+			snapshotParams.setTransform(snapshotScaleTransform);
 
-		public View(ZoomPane master) {
-			zoomSlider = new ZoomSlider(master);
-
+			this.viewport = new Rectangle();
 			viewport.setFill(Color.TRANSPARENT);
 			viewport.getStyleClass().add("dip-viewport");
 			viewport.setStyle("-fx-stroke: -fx-accent;");
@@ -226,12 +132,14 @@ public class NavigatorWidget extends AbstractWidget {
 				);
 			});
 
+			this.pane = new Pane();
 			pane.setPrefHeight(120);
 			pane.getChildren().addAll(snapshot, viewport);
 
-			snapshotParams.setTransform(snapshotScaleTransform);
+			this.zoomSlider = new ZoomSlider(pannable);
 
-			this.getChildren().addAll(pane,
+			this.getChildren().addAll(
+					pane,
 					new Separator(),
 					zoomSlider.getNode()
 			);
@@ -241,6 +149,97 @@ public class NavigatorWidget extends AbstractWidget {
 			viewport.setDisable(disable);
 			viewport.setOpacity(disable ? 0 : 1);
 		}
+
+		protected void updateSnapshot() {
+			final Bounds contentBounds = pannable.getContentBounds();
+			scale = Math.min(
+					pane.getWidth() / contentBounds.getWidth(),
+					pane.getHeight() / contentBounds.getHeight()
+			);
+			snapshotScaleTransform.setX(scale);
+			snapshotScaleTransform.setY(scale);
+			final WritableImage image = pannable.getContentPane().snapshot(snapshotParams, null);
+			snapshot.setImage(image);
+
+			updateViewport();
+		}
+
+		protected void updateViewport() {
+			final Pannable.VisibleRegion visibleRegion = pannable.getVisibleRegion();
+			final double scaleFactor = scale / visibleRegion.zoom;
+
+			if (visibleRegion.isEmpty()) {
+				if (!viewport.isDisable()) {
+					setDisableViewport(true);
+				}
+			} else {
+				if (viewport.isDisable()) {
+					setDisableViewport(false);
+				}
+
+				if (visibleRegion.scrollableWidth <= 0) {
+					viewport.setWidth(pane.getWidth());
+					viewport.setX(0);
+				} else {
+					viewport.setWidth(visibleRegion.getScaledWidth() * scaleFactor);
+					viewport.setX(visibleRegion.getScaledOffsetX() * scaleFactor);
+				}
+
+				if (visibleRegion.scrollableHeight <= 0) {
+					viewport.setHeight(pane.getHeight());
+					viewport.setY(0);
+				} else {
+					viewport.setHeight(visibleRegion.getScaledHeight() * scaleFactor);
+					viewport.setY(visibleRegion.getScaledOffsetY() * scaleFactor);
+				}
+			}
+		}
+
+		protected void onViewportDown(MouseEvent e) {
+			viewport.getScene().setCursor(Cursor.CLOSED_HAND);
+			x = e.getSceneX();
+			y = e.getSceneY();
+			h = pannable.getHvalue();
+			v = pannable.getVvalue();
+		}
+
+		protected void onViewportDrag(MouseEvent e) {
+			final double offsetX = e.getSceneX() - x;
+			final double offsetY = e.getSceneY() - y;
+			final Bounds viewportBounds = pannable.getViewportBounds();
+			final Bounds scaledBounds = pannable.getScaledContentBounds();
+			final double scrollableWidth = scaledBounds.getWidth() - viewportBounds.getWidth();
+			final double scrollableHeight = scaledBounds.getHeight() - viewportBounds.getHeight();
+			final double invScale = 1 / scale;
+			final double scaleFactor = invScale * pannable.getZoom();
+
+			final double hmin = pannable.getHmin();
+			final double hmax = pannable.getHmax();
+			final double hrange = pannable.getHrangeReal();
+			final double hppx = hrange / scrollableWidth;
+			double hpos = (offsetX * scaleFactor * hppx) + h;
+
+			if (hpos < hmin) {
+				hpos = hmin;
+			} else if (hpos > hmax) {
+				hpos = hmax;
+			}
+
+			final double vmin = pannable.getVmin();
+			final double vmax = pannable.getVmax();
+			final double vrange = pannable.getVrangeReal();
+			final double vppx = vrange / scrollableHeight;
+			double vpos = (offsetY * scaleFactor * vppx) + v;
+
+			if (vpos < vmin) {
+				vpos = vmin;
+			} else if (hpos > vmax) {
+				vpos = vmax;
+			}
+
+			pannable.setViewportPosition(hpos, vpos);
+		}
+
 	}
 
 }

@@ -11,7 +11,7 @@ import ch.unifr.diva.dip.gui.Presenter;
 import ch.unifr.diva.dip.gui.editor.NavigatorWidget;
 import ch.unifr.diva.dip.gui.layout.AbstractWindow;
 import ch.unifr.diva.dip.gui.layout.RubberBandSelector;
-import ch.unifr.diva.dip.gui.layout.ZoomPane;
+import ch.unifr.diva.dip.gui.layout.ZoomPaneSimple;
 import ch.unifr.diva.dip.gui.main.SideBarPresenter;
 import ch.unifr.diva.dip.utils.IOUtils;
 import java.util.ArrayList;
@@ -23,6 +23,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
+import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -54,7 +55,7 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 	protected final ApplicationHandler handler;
 	private final SplitPane splitPane = new SplitPane();
 	private final List<Parent> splitPaneComponents = new ArrayList<>();
-	private final ZoomPane zoomPane;
+	private final ZoomPaneSimple zoomPane;
 	private final EditorPane editorPane;
 	private final SideBarPresenter sideBar;
 	private final PipelineManager manager;
@@ -81,10 +82,11 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 		this.manager = handler.getProject().pipelineManager();
 		this.editorPane = new EditorPane(this);
 
-		this.zoomPane = new ZoomPane(handler.discardingThreadPool, editorPane.getComponent());
+		this.zoomPane = new ZoomPaneSimple();
+		zoomPane.setContent(editorPane.getComponent());
 		zoomPane.getStyleClass().add("dip-editor");
-		zoomPane.bindMinDimensions(editorPane.pane());
-		zoomPane.bindStage(stage);
+		zoomPane.setAlignment(Pos.TOP_LEFT);
+		zoomPane.expandInViewport(editorPane.pane());
 
 		this.rubberBandSelector = new RubberBandSelector<>(this.editorPane.pane(), ProcessorView.class);
 		this.rubberBandSelector.enable(true);
@@ -156,7 +158,7 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 
 		root.setCenter(splitPane);
 
-		splitPaneComponents.add(zoomPane);
+		splitPaneComponents.add(zoomPane.getNode());
 		splitPaneComponents.add(sideBar.getComponent());
 		updateSplitPaneComponents();
 

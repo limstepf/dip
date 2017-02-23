@@ -14,7 +14,7 @@ import ch.unifr.diva.dip.gui.Presenter;
 import ch.unifr.diva.dip.gui.layout.AbstractWindow;
 import ch.unifr.diva.dip.gui.layout.FormGridPane;
 import ch.unifr.diva.dip.gui.layout.Lane;
-import ch.unifr.diva.dip.gui.layout.ZoomPane;
+import ch.unifr.diva.dip.gui.layout.Zoomable;
 import ch.unifr.diva.dip.gui.pe.ConnectionView;
 import ch.unifr.diva.dip.osgi.OSGiVersionPolicy;
 import java.util.ArrayList;
@@ -148,7 +148,7 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 				if (this.parameter == null) {
 					this.parameter = new EnumParameter(
 							localize("interpolation"),
-							ZoomPane.Interpolation.class,
+							Zoomable.Interpolation.class,
 							handler.settings.editor.interpolation
 					);
 				}
