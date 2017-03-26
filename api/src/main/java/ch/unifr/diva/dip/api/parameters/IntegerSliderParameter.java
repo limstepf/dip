@@ -6,6 +6,9 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.BorderPane;
 
 /**
@@ -154,6 +157,32 @@ public class IntegerSliderParameter extends PersistentParameterBase<Integer, Int
 				tooltip.setText(String.format("%d", v));
 				parameter.setLocal(v);
 			});
+
+			slider.addEventHandler(KeyEvent.KEY_PRESSED, (e) -> {
+				final KeyCode k = e.getCode();
+				if (k == KeyCode.UP || k == KeyCode.RIGHT) {
+					increment();
+					e.consume();
+				} else if (k == KeyCode.DOWN || k == KeyCode.LEFT) {
+					decrement();
+					e.consume();
+				}
+			});
+			slider.addEventHandler(ScrollEvent.SCROLL, (e) -> {
+				if (e.getDeltaY() > 0) {
+					increment();
+				} else if (e.getDeltaY() < 0) {
+					decrement();
+				}
+			});
+		}
+
+		protected final void increment() {
+			parameter.set(parameter.get() + 1);
+		}
+
+		protected final void decrement() {
+			parameter.set(parameter.get() - 1);
 		}
 
 		protected final Integer get() {

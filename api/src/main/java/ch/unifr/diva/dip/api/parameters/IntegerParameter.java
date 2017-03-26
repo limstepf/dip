@@ -4,6 +4,9 @@ import ch.unifr.diva.dip.api.ui.NumberValidationTooltip;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.ScrollEvent;
 
 /**
  * Integer parameter.
@@ -115,11 +118,13 @@ public class IntegerParameter extends PersistentParameterBase<Integer, IntegerPa
 
 			root.getStyleClass().add("dip-text-input");
 			root.setTooltip(validator);
+			
 			PersistentParameter.applyViewHooks(
 					root,
 					parameter.viewHooks,
 					parameter.singleRowViewHook
 			);
+
 			root.textProperty().addListener((obs) -> {
 				final Integer number = get();
 				validator.setOutOfRange(number, parameter.minValue, parameter.maxValue);
@@ -132,6 +137,29 @@ public class IntegerParameter extends PersistentParameterBase<Integer, IntegerPa
 				root.pseudoClassStateChanged(PersistentParameter.ALERT, false);
 				parameter.setLocal(number);
 			});
+
+			root.addEventHandler(KeyEvent.KEY_PRESSED, (e) -> {
+				if (e.getCode() == KeyCode.UP) {
+					increment();
+				} else if (e.getCode() == KeyCode.DOWN) {
+					decrement();
+				}
+			});
+			root.addEventHandler(ScrollEvent.SCROLL, (e) -> {
+				if (e.getDeltaY() > 0) {
+					increment();
+				} else if (e.getDeltaY() < 0) {
+					decrement();
+				}
+			});
+		}
+
+		protected final void increment() {
+			parameter.set(parameter.get() + 1);
+		}
+
+		protected final void decrement() {
+			parameter.set(parameter.get() - 1);
 		}
 
 		protected final Integer get() {
