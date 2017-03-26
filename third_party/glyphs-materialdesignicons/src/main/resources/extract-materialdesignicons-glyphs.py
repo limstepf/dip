@@ -13,10 +13,10 @@ inputFile = './materialdesignicons.css'
 outputFile = './extract-materialdesignicons-glyphs.java'
 
 
-# regex pattern to parse font-awesome.css line by line using
+# regex pattern to parse materialdesignicons.css line by line using
 # match (i.e. from the beginning of the line!)
 glyphPattern = re.compile('\.mdi-([\w-]*):before')
-unicodePattern = re.compile(' *content: "\\\\F(.*)"')
+unicodePattern = re.compile('\s*content: "\\\\([a-zA-Z].*)"')
 
 # put named glyphs into the dictionary. Multiple names can map
 # to the same unicode char.
@@ -44,9 +44,9 @@ def writeGlyphs(glyphs, out):
     last = len(glyphs)
     for key in sorted(glyphs):
         file.write(
-            '\t{0}(\'\\uf{1}\')'.format(
+            '\t{0}(\'\\u{1}\')'.format(
                 getSafeKey(key).upper(), 
-                glyphs[key].upper()
+                glyphs[key].lower()
             )
         )
         i += 1
