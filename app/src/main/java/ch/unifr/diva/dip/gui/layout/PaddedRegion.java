@@ -9,6 +9,7 @@ import javafx.event.Event;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 
 /**
@@ -40,6 +41,13 @@ import javafx.scene.layout.Region;
  * For example an event to the top-left of the content region (assuming there is
  * some top-left padding) will have negative x and y-coordinates, and one to the
  * bottom-right x and y-coordinates will exceed the size of the content region.
+ *
+ * <p>
+ * {@code MOUSE_ENTERED} and {@code MOUSE_EXITED} events for the padded region
+ * are redispatched to the redispatch node, whose own entered and exited events
+ * are suppressed/consumed. The effect of this is that entered and exited events
+ * fire already upon entering/exiting the padded region, but not a second time
+ * for entering/exiting the inner redispatch node.
  */
 public class PaddedRegion extends Region {
 
@@ -58,13 +66,32 @@ public class PaddedRegion extends Region {
 	public PaddedRegion(Node content) {
 		super();
 
-		// re-dispatch events in the padded region for the redispatch target
+		// redispatch event filter
 		addEventFilter(Event.ANY, (e) -> {
+			final Node node = getRedispatchTarget();
+			if (node == null) {
+				return;
+			}
+
 			if (this.equals(e.getTarget())) {
-				final Node node = getRedispatchTarget();
-				if (node != null) {
-					final Event copy = e.copyFor(node, node);
-					node.fireEvent(copy);
+				// redispatch events for the padded region (i.e. this) to the
+				// redispatch target (node)
+				final Event copy = e.copyFor(node, node);
+				node.fireEvent(copy);
+				e.consume();
+			} else if (node.equals(e.getTarget())) {
+				// swallow the entered-/exited target events, that is, the entered/
+				// exited events for the redispatch target wont fire. If we wouldn't
+				// do this, we'd end up with two sets of entered/exited events on
+				// the redispatch target: one for entering/exiting the padded region
+				// (redispatched), and a second time for entering/exiting the re-
+				// dispatch target inside the padded region.
+				//
+				// N.B. the difference between the MOUSE_X and MOUSE_X_TARGET events
+				// is that the latter are delivered to the parent node of the target
+				// before the MOUSE_X is delivered to the child (i.e. the target).
+				if (e.getEventType().equals(MouseEvent.MOUSE_ENTERED_TARGET)
+						|| e.getEventType().equals(MouseEvent.MOUSE_EXITED_TARGET)) {
 					e.consume();
 				}
 			}
