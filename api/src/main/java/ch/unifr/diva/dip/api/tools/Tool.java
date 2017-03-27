@@ -103,4 +103,20 @@ public interface Tool {
 		return (MultiTool) this;
 	}
 
+	/**
+	 * Hook method called by the host application upon selecting/activating the
+	 * tool. Typically used to initialize the layer overlay.
+	 */
+	default void onSelected() {
+
+	}
+
+	/**
+	 * Hook method called by the host application upon deselecting/deactivating
+	 * the tool. Typically used to clear the layer overlay.
+	 */
+	default void onDeselected() {
+
+	}
+
 }

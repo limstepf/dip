@@ -122,4 +122,14 @@ public class MultiTool implements Tool {
 		return this.options;
 	}
 
+	@Override
+	public void onSelected() {
+		getSelectedTool().onSelected();
+	}
+
+	@Override
+	public void onDeselected() {
+		getSelectedTool().onDeselected();
+	}
+
 }
