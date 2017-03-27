@@ -6,7 +6,7 @@ package ch.unifr.diva.dip.eventbus.events;
 public class ApplicationRequest {
 
 	/**
-	 * Type of the ApplicationRequest.
+	 * Type of the application request.
 	 */
 	public enum Type {
 
@@ -27,6 +27,10 @@ public class ApplicationRequest {
 		 */
 		EXIT
 	}
+
+	/**
+	 * Type of this application request.
+	 */
 	public final Type type;
 
 	/**
@@ -45,4 +49,5 @@ public class ApplicationRequest {
 				+ "type=" + type.name()
 				+ "}";
 	}
+
 }
