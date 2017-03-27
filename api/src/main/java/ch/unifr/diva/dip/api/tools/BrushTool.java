@@ -1,13 +1,17 @@
 package ch.unifr.diva.dip.api.tools;
 
 import ch.unifr.diva.dip.api.components.EditorLayerOverlay;
+import ch.unifr.diva.dip.api.parameters.GlyphToggleGroupParameter;
+import ch.unifr.diva.dip.api.parameters.IntegerParameter;
+import ch.unifr.diva.dip.api.parameters.IntegerSliderParameter;
 import ch.unifr.diva.dip.api.tools.brush.Brush;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
+import ch.unifr.diva.dip.api.utils.L10n;
+import java.util.Arrays;
+import java.util.List;
 import javafx.beans.InvalidationListener;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.input.MouseEvent;
 
@@ -30,14 +34,17 @@ import javafx.scene.input.MouseEvent;
 public abstract class BrushTool<T extends Brush> extends SimpleTool {
 
 	protected final InvalidationListener zoomListener;
-	protected final InvalidationListener strokeWidthListener;
 	protected EditorLayerOverlay editorOverlay;
-	protected IntegerProperty strokeWidthProperty;
+	protected final List<T> brushes;
 	protected T currentBrush;
 	protected boolean isSelected;
 	protected boolean isActive;
 	protected double lastX;
 	protected double lastY;
+
+	protected final GlyphToggleGroupParameter<Integer> brushOption;
+	protected final IntegerSliderParameter strokeWidthOption;
+	protected final IntegerParameter strokeWidthOptionInt;
 
 	/**
 	 * Creates a new brush tool. Constructor without editor overlay, since
@@ -55,37 +62,132 @@ public abstract class BrushTool<T extends Brush> extends SimpleTool {
 	 * switches of the processor, since the overlay is guaranteed to remain the
 	 * same.
 	 *
-	 * @param brush the initial brush.
 	 * @param name the name of the tool.
 	 * @param glyph the glyph of the tool.
-	 * @param strokeWidthProperty the stroke width property to listen to.
+	 * @param brushes the brushes.
 	 */
-	public BrushTool(T brush, String name, NamedGlyph glyph, ObservableValue<? extends Number> strokeWidthProperty) {
-		this(brush, name, glyph, null, strokeWidthProperty);
+	public BrushTool(String name, NamedGlyph glyph, T... brushes) {
+		this(null, name, glyph, brushes);
+	}
+
+	/**
+	 * Creates a new brush tool. Constructor without editor overlay, since
+	 * chances are we might not be able to pass this one along already at
+	 * construction time of the tool.
+	 *
+	 * <p>
+	 * Editable processors should set the editor overlay in their
+	 * {@code init(ProcessorContext context} method with a call to
+	 * {@code setEditorLayerOverlay(context.overlay)}, after checking that
+	 * {@code context} isn't null (which happens if called/used by the pipeline
+	 * editor).
+	 *
+	 * Note that it is not necessary to keep updating the overlay on context
+	 * switches of the processor, since the overlay is guaranteed to remain the
+	 * same.
+	 *
+	 * @param name the name of the tool.
+	 * @param glyph the glyph of the tool.
+	 * @param brushes the brushes.
+	 */
+	public BrushTool(String name, NamedGlyph glyph, List<T> brushes) {
+		this(null, name, glyph, brushes);
 	}
 
 	/**
 	 * Creates a new brush tool.
 	 *
-	 * @param brush the initial brush.
+	 * @param editorOverlay the editor overlay.
 	 * @param name the name of the tool.
 	 * @param glyph the glyph of the tool.
-	 * @param editorOverlay the editor overlay.
-	 * @param strokeWidthProperty the stroke width property to listen to.
+	 * @param brushes the brushes.
 	 */
-	public BrushTool(T brush, String name, NamedGlyph glyph, EditorLayerOverlay editorOverlay, ObservableValue<? extends Number> strokeWidthProperty) {
+	public BrushTool(EditorLayerOverlay editorOverlay, String name, NamedGlyph glyph, T... brushes) {
+		this(editorOverlay, name, glyph, Arrays.asList(brushes));
+	}
+
+	/**
+	 * Creates a new brush tool.
+	 *
+	 * @param editorOverlay the editor overlay.
+	 * @param name the name of the tool.
+	 * @param glyph the glyph of the tool.
+	 * @param brushes the brushes.
+	 */
+	public BrushTool(EditorLayerOverlay editorOverlay, String name, NamedGlyph glyph, List<T> brushes) {
 		super(name, glyph);
 		this.zoomListener = (c) -> updateZoom();
-		this.strokeWidthListener = (c) -> updateZoom();
 		setGesture(new DragGesture(
 				onPressedBase, onDraggedBase, onReleasedBase,
 				onEntered, onMoved, onExited
 		));
 		this.isActive = false;
-		this.strokeWidthProperty = new SimpleIntegerProperty(1);
-		setBrush(brush);
+		this.brushes = brushes;
+
+		// setup tool options
+		// TO CONSIDER: this might not scale too well with too many brushes, maybe
+		// offer a dropdown menu instead of a glyph toggle (optional/dynamic).
+		this.brushOption = new GlyphToggleGroupParameter("Brush", 0);
+		for (int i = 0; i < this.brushes.size(); i++) {
+			final T brush = this.brushes.get(i);
+			brushOption.add(i, brush.getGlyph(), brush.getName());
+		}
+		brushOption.property().addListener((c) -> setBrush(getBrush()));
+
+		this.strokeWidthOption = new IntegerSliderParameter(
+				L10n.getInstance().getString("stroke.width"),
+				1, 1, 200
+		);
+		strokeWidthOption.addSliderViewHook((s) -> {
+			s.setMajorTickUnit(100);
+			s.setMinorTickCount(4);
+			s.setSnapToTicks(false);
+			s.setPrefWidth(100);
+		});
+		this.strokeWidthOptionInt = new IntegerParameter(
+				"",
+				1, 1, 200
+		);
+		strokeWidthOptionInt.addTextFieldViewHook((t) -> {
+			t.setStyle("-fx-pref-column-count: 2;");
+			t.setAlignment(Pos.BASELINE_RIGHT);
+		});
+		strokeWidthOption.property().bindBidirectional(strokeWidthOptionInt.property());
+		strokeWidthOption.property().addListener((e) -> updateZoom());
+
+		options().put("stroke-shape", brushOption);
+		options().put("stroke-width", strokeWidthOption);
+		options().put("stroke-width-int", strokeWidthOptionInt);
+
+		setBrush(this.brushes.get(0));
 		setEditorLayerOverlay(editorOverlay);
-		setStrokeWidthProperty(strokeWidthProperty);
+	}
+
+	/**
+	 * Returns the current brush.
+	 *
+	 * @return the current brush.
+	 */
+	public final T getBrush() {
+		return brushes.get(brushOption.get());
+	}
+
+	/**
+	 * Returns the current stroke width.
+	 *
+	 * @return the stroke width.
+	 */
+	public final int getStrokeWidth() {
+		return strokeWidthOption.get();
+	}
+
+	/**
+	 * Sets the stroke width of the brush.
+	 *
+	 * @param size the stroke width.
+	 */
+	public final void setStrokeWidth(int size) {
+		strokeWidthOption.set(size);
 	}
 
 	/**
@@ -104,24 +206,6 @@ public abstract class BrushTool<T extends Brush> extends SimpleTool {
 	 */
 	protected boolean hasOverlay() {
 		return editorOverlay != null;
-	}
-
-	/**
-	 * Sets/updates the stroke width property to listen to.
-	 *
-	 * @param strokeWidthProperty the stroke width property.
-	 */
-	public final void setStrokeWidthProperty(ObservableValue<? extends Number> strokeWidthProperty) {
-		this.strokeWidthProperty.bind(strokeWidthProperty);
-	}
-
-	/**
-	 * Returns the current stroke width.
-	 *
-	 * @return the stroke width.
-	 */
-	protected int getStrokeWidth() {
-		return strokeWidthProperty.get();
 	}
 
 	/**
@@ -173,7 +257,6 @@ public abstract class BrushTool<T extends Brush> extends SimpleTool {
 		isSelected = true;
 		editorOverlay.getChildren().add(currentBrush.getCursor());
 		editorOverlay.zoomProperty().addListener(zoomListener);
-		strokeWidthProperty.addListener(strokeWidthListener);
 		updateZoom();
 		cursorProperty().set(Cursor.NONE);
 	}
@@ -182,7 +265,6 @@ public abstract class BrushTool<T extends Brush> extends SimpleTool {
 	public void onDeselected() {
 		editorOverlay.getChildren().remove(currentBrush.getCursor());
 		editorOverlay.zoomProperty().removeListener(zoomListener);
-		strokeWidthProperty.removeListener(strokeWidthListener);
 		cursorProperty().set(Cursor.DEFAULT);
 		isSelected = false;
 	}
