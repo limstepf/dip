@@ -7,8 +7,10 @@ import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.eventbus.EventBus;
 import ch.unifr.diva.dip.eventbus.events.ApplicationRequest;
 import ch.unifr.diva.dip.eventbus.events.ProjectRequest;
+import ch.unifr.diva.dip.eventbus.events.SelectionMaskRequest;
 import ch.unifr.diva.dip.gui.Presenter;
 import ch.unifr.diva.dip.gui.dialogs.AboutDialog;
+import ch.unifr.diva.dip.gui.editor.EditorPresenter;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.scene.Parent;
@@ -27,20 +29,23 @@ import javafx.stage.Stage;
 public class MenuBarPresenter implements Presenter, Localizable {
 
 	private final ApplicationHandler handler;
+	private final EditorPresenter editor;
 	private final EventBus eventBus;
 	private final Stage stage;
 	private final MenuBar menuBar;
-	private final Menu fileMenu, editMenu, viewMenu, toolsMenu, helpMenu;
+	private final Menu fileMenu, editMenu, viewMenu, toolsMenu, helpMenu, selectionMaskMenu;
 
 	/**
 	 * Creates a new main menu bar.
 	 *
 	 * @param handler the application handler.
+	 * @param editor the editor presenter.
 	 * @param stage the stage.
 	 */
-	public MenuBarPresenter(ApplicationHandler handler, Stage stage) {
+	public MenuBarPresenter(ApplicationHandler handler, EditorPresenter editor, Stage stage) {
 		this.handler = handler;
 		this.eventBus = handler.eventBus;
+		this.editor = editor;
 		this.stage = stage;
 
 		menuBar = new MenuBar();
@@ -50,9 +55,10 @@ public class MenuBarPresenter implements Presenter, Localizable {
 		viewMenu = getViewMenu();
 		toolsMenu = getToolsMenu();
 		helpMenu = getHelpMenu();
+		selectionMaskMenu = getSelectionMaskMenu();
 
 		menuBar.getMenus().addAll(
-				fileMenu, editMenu, viewMenu, toolsMenu, helpMenu
+				fileMenu, editMenu, viewMenu, toolsMenu, selectionMaskMenu, helpMenu
 		);
 	}
 
@@ -175,6 +181,45 @@ public class MenuBarPresenter implements Presenter, Localizable {
 
 		menu.getItems().addAll(pipelineEditor);
 		return menu;
+	}
+
+	private Menu getSelectionMaskMenu() {
+		final Menu menu = new Menu(localize("select"));
+		final MenuItem all = new MenuItem(localize("selection.all"));
+
+		final BooleanBinding noMask = Bindings.not(editor.hasMaskProperty());
+
+		all.setOnAction(e -> {
+			eventBus.post(new SelectionMaskRequest(SelectionMaskRequest.Type.ALL));
+		});
+		all.setAccelerator(KeyCombination.keyCombination("Ctrl+A"));
+		final MenuItem deselect = new MenuItem(localize("selection.deselect"));
+		deselect.setOnAction(e -> {
+			eventBus.post(new SelectionMaskRequest(SelectionMaskRequest.Type.DESELECT));
+		});
+		deselect.setAccelerator(KeyCombination.keyCombination("Ctrl+D"));
+		deselect.disableProperty().bind(noMask);
+		final MenuItem reselect = new MenuItem(localize("selection.reselect"));
+		reselect.setOnAction(e -> {
+			eventBus.post(new SelectionMaskRequest(SelectionMaskRequest.Type.RESELECT));
+		});
+		reselect.setAccelerator(KeyCombination.keyCombination("Shift+Ctrl+D"));
+		// to be pedantic, we should disable this also when hasMaskProperty is true
+		// but it's actually nice to be able to swap back and forth between the current
+		// and previous selection, so eh...
+		reselect.disableProperty().bind(Bindings.not(editor.hasPreviousMaskProperty()));
+		final MenuItem invert = new MenuItem(localize("selection.invert"));
+		invert.setOnAction(e -> {
+			eventBus.post(new SelectionMaskRequest(SelectionMaskRequest.Type.INVERT));
+		});
+		invert.setAccelerator(KeyCombination.keyCombination("Shift+Ctrl+I"));
+		invert.disableProperty().bind(noMask);
+		menu.getItems().addAll(
+				all, deselect, reselect, invert
+		);
+		return menu;
+
+		//closeProject.disableProperty().bind(Bindings.not(handler.hasProjectProperty()));
 	}
 
 	private Menu getHelpMenu() {

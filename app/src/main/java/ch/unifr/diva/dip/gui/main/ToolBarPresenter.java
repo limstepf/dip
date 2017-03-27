@@ -5,7 +5,6 @@ import ch.unifr.diva.dip.api.services.Editable;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.tools.GestureEventHandler;
 import ch.unifr.diva.dip.api.tools.MultiTool;
-import ch.unifr.diva.dip.api.tools.NopGesture;
 import ch.unifr.diva.dip.api.tools.SimpleTool;
 import ch.unifr.diva.dip.api.tools.Tool;
 import ch.unifr.diva.dip.api.ui.Glyph;
@@ -44,6 +43,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 /**
@@ -53,19 +53,17 @@ import javafx.util.Duration;
  */
 public class ToolBarPresenter<T extends Processor & Editable> implements Presenter {
 
-	protected final static NamedGlyph GLYPH_MOVE = MaterialDesignIcons.CURSOR_DEFAULT_OUTLINE;
 	protected final static NamedGlyph GLYPH_DEFAULT = MaterialDesignIcons.CURSOR_POINTER;
-
 	protected final static Color COLOR_SELECTED = UIStrategyGUI.Colors.accent;
 	protected final static Color COLOR_DEFAULT = UIStrategyGUI.Colors.accent_inverted;
 
 	private final ApplicationHandler handler;
+	private final Stage stage;
 	private final EditorPresenter editor;
 	private final VBox root;
+	private final List<ToolButton> globalTools;
 	private final List<ToolButton> tools;
-	private final ToolButton defaultTool;
 	private final ObjectProperty<VisibilityMode> visibilityModeProperty;
-
 	private final OptionsBar optionsBar;
 
 	private ToolButton selectedTool;
@@ -84,25 +82,14 @@ public class ToolBarPresenter<T extends Processor & Editable> implements Present
 	public ToolBarPresenter(ApplicationHandler handler, EditorPresenter editor) {
 
 		this.handler = handler;
+		this.stage = handler.uiStrategy.getStage();
 		this.editor = editor;
 		this.root = new VBox();
 		this.root.getStyleClass().add("dip-tool-bar");
 		this.optionsBar = new OptionsBar(handler);
 		this.glyphSize = Glyph.Size.MEDIUM; // TODO: settings?
+		this.globalTools = new ArrayList<>();
 		this.tools = new ArrayList<>();
-		this.defaultTool = new ToolButton(
-				this,
-				new SimpleTool(
-						"Move Tool",
-						GLYPH_MOVE,
-						new NopGesture()
-				) {
-					{
-						cursorProperty().set(Cursor.DEFAULT);
-					}
-				}
-		);
-
 		this.visibilityModeProperty = new SimpleObjectProperty<VisibilityMode>(
 				readVisibilityMode()
 		) {
@@ -123,7 +110,7 @@ public class ToolBarPresenter<T extends Processor & Editable> implements Present
 		);
 
 		if (getVisibilityMode().equals(VisibilityMode.ALWAYS)) {
-			clearToolBar();
+			rebuild();
 		}
 	}
 
@@ -144,6 +131,43 @@ public class ToolBarPresenter<T extends Processor & Editable> implements Present
 	@Override
 	public Parent getComponent() {
 		return this.root;
+	}
+
+	/**
+	 * Adds/registers global tools. Global tools are available for all
+	 * processors.
+	 *
+	 * @param tools list of global tools.
+	 * @return list of wrapped global tools (in tool buttons). Keep them around
+	 * if you whish to remove/unregister them again at some point.
+	 */
+	public List<ToolButton> addGlobalTool(Tool... tools) {
+		final List<ToolButton> tbs = new ArrayList<>();
+		for (Tool tool : tools) {
+			this.globalTools.add(newToolButton(tool));
+		}
+		rebuild();
+		return tbs;
+	}
+
+	/**
+	 * Removes/unregisters a global tool.
+	 *
+	 * @param tb the wrapped global tool to be removed.
+	 */
+	public void removeGlobalTool(ToolButton tb) {
+		if (this.globalTools.contains(tb)) {
+			this.globalTools.remove(tb);
+			rebuild();
+		}
+	}
+
+	/**
+	 * Removes/unregisters all global tools.
+	 */
+	public void clearGlobalTools() {
+		this.globalTools.clear();
+		rebuild();
 	}
 
 	/**
@@ -243,11 +267,7 @@ public class ToolBarPresenter<T extends Processor & Editable> implements Present
 
 		resetToolBar();
 		for (Tool tool : this.currentProcessor.tools()) {
-			this.tools.add(
-					tool.isMultiTool()
-							? new MultiToolButton(this, tool.asMultiTool())
-							: new ToolButton(this, tool)
-			);
+			this.tools.add(newToolButton(tool));
 		}
 		buildToolBar(mode);
 
@@ -257,8 +277,11 @@ public class ToolBarPresenter<T extends Processor & Editable> implements Present
 	// clear list + 1 default non-tool tool
 	private void resetToolBar() {
 		this.tools.clear();
-		this.tools.add(this.defaultTool);
-		setSelectedTool(this.defaultTool);
+		for (ToolButton tb : this.globalTools) {
+			this.tools.add(tb);
+		}
+		// TODO: keep global tool selected?
+		setSelectedTool((this.globalTools.size() > 0) ? this.globalTools.get(0) : null);
 	}
 
 	private void clearToolBar() {
@@ -301,7 +324,9 @@ public class ToolBarPresenter<T extends Processor & Editable> implements Present
 	}
 
 	protected void setSelectedMultiTool(ToolButton tb, MultiTool mt, SimpleTool newTool) {
-		final Tool currentTool = (this.selectedTool != null) ? this.selectedTool.tool() : null;
+		final Tool currentTool = (this.selectedTool != null)
+				? this.selectedTool.simpleTool()
+				: null;
 		if (!this.tools.contains(tb)) {
 			return;
 		}
@@ -316,6 +341,7 @@ public class ToolBarPresenter<T extends Processor & Editable> implements Present
 	private void setSelectedSimpleTool(ToolButton tb) {
 		this.selectedTool = tb;
 		this.selectedTool.setSelected(true);
+		this.selectedTool.tool.onSelected();
 	}
 
 	private void bindTool(Tool currentTool, Tool newTool) {
@@ -323,7 +349,12 @@ public class ToolBarPresenter<T extends Processor & Editable> implements Present
 		unbindTool(pane, currentTool);
 
 		for (GestureEventHandler h : newTool.getGesture().eventHandlers()) {
-			pane.addEventHandler(h.eventType, h.eventHandler);
+			if (h.isKeyEvent()) {
+//				editor.getComponent().addEventHandler(h.eventType, h.eventHandler);
+				stage.addEventHandler(h.eventType, h.eventHandler);
+			} else {
+				pane.addEventHandler(h.eventType, h.eventHandler);
+			}
 		}
 
 		editor.getZoomPane().cursorProperty().bind(newTool.cursorProperty());
@@ -339,9 +370,16 @@ public class ToolBarPresenter<T extends Processor & Editable> implements Present
 	private void unbindTool(Pane pane, Tool currentTool) {
 		if (currentTool != null) {
 			for (GestureEventHandler h : currentTool.getGesture().eventHandlers()) {
-				pane.removeEventHandler(h.eventType, h.eventHandler);
+				if (h.isKeyEvent()) {
+//					editor.getComponent().removeEventHandler(h.eventType, h.eventHandler);
+					stage.removeEventHandler(h.eventType, h.eventHandler);
+				} else {
+					pane.removeEventHandler(h.eventType, h.eventHandler);
+				}
 			}
+
 			editor.getZoomPane().cursorProperty().unbind();
+			currentTool.onDeselected();
 		}
 		editor.getZoomPane().setCursor(Cursor.DEFAULT);
 	}
@@ -359,6 +397,12 @@ public class ToolBarPresenter<T extends Processor & Editable> implements Present
 
 	private Pane getContentPane() {
 		return this.editor.getZoomPane().getContentPane();
+	}
+
+	private ToolButton newToolButton(Tool tool) {
+		return tool.isMultiTool()
+				? new MultiToolButton(this, tool.asMultiTool())
+				: new ToolButton(this, tool);
 	}
 
 	/**
@@ -429,6 +473,18 @@ public class ToolBarPresenter<T extends Processor & Editable> implements Present
 		 */
 		public T tool() {
 			return this.tool;
+		}
+
+		/**
+		 * Returns the simple tool. This is equivalent to {@code tool()} for
+		 * simple tools, but returns the selected (simple) tool for multi tools.
+		 *
+		 * @return the simple tool.
+		 */
+		public Tool simpleTool() {
+			return this.tool.isMultiTool()
+					? this.tool.asMultiTool().getSelectedTool()
+					: this.tool;
 		}
 
 		/**

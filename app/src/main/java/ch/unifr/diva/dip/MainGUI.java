@@ -55,9 +55,9 @@ public class MainGUI extends Application {
 		// init (and hook up) GUI components
 		final StatusBarPresenter statusBar = new StatusBarPresenter();
 		eventBus.register(statusBar);
-		final MenuBarPresenter menuBar = new MenuBarPresenter(handler, primaryStage);
 		final EditorPresenter editor = new EditorPresenter(handler);
 		eventBus.register(editor);
+		final MenuBarPresenter menuBar = new MenuBarPresenter(handler, editor, primaryStage);
 
 		// sidebar
 		final SideBarPresenter sideBar = new SideBarPresenter();
@@ -69,6 +69,10 @@ public class MainGUI extends Application {
 
 		// toolbar
 		final ToolBarPresenter toolBar = new ToolBarPresenter(handler, editor);
+		toolBar.addGlobalTool(
+				editor.getMoveTool(),
+				editor.getSelectionTool()
+		);
 		eventBus.register(toolBar);
 
 		final MainView view = new MainViewImpl();

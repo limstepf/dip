@@ -1,6 +1,13 @@
 package ch.unifr.diva.dip.gui.editor;
 
 import ch.unifr.diva.dip.api.components.EditorLayerOverlay;
+import ch.unifr.diva.dip.api.tools.MoveGesture;
+import ch.unifr.diva.dip.api.tools.SimpleTool;
+import ch.unifr.diva.dip.api.tools.selection.EllipticalSelectionTool;
+import ch.unifr.diva.dip.api.tools.selection.PolygonalSelectionTool;
+import ch.unifr.diva.dip.api.tools.selection.RectangularSelectionTool;
+import ch.unifr.diva.dip.api.tools.selection.SelectionMultiTool;
+import ch.unifr.diva.dip.api.tools.selection.SelectionTool;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.model.Pipeline;
 import ch.unifr.diva.dip.core.model.Project;
@@ -8,12 +15,21 @@ import ch.unifr.diva.dip.core.model.ProjectPage;
 import ch.unifr.diva.dip.core.model.RunnableProcessor;
 import ch.unifr.diva.dip.eventbus.events.ProcessorNotification;
 import ch.unifr.diva.dip.eventbus.events.ProjectNotification;
+import ch.unifr.diva.dip.eventbus.events.SelectionMaskRequest;
+import ch.unifr.diva.dip.eventbus.events.StatusMessageEvent;
+import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
 import ch.unifr.diva.dip.gui.Presenter;
 import ch.unifr.diva.dip.gui.layout.Pannable;
 import ch.unifr.diva.dip.gui.layout.ZoomPaneBresenham;
 import ch.unifr.diva.dip.gui.layout.Zoomable;
 import com.google.common.eventbus.Subscribe;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.layout.Pane;
@@ -167,10 +183,12 @@ public class EditorPresenter implements Presenter {
 		currentProcessor.layerOverlay().setZoomable(zoomPane);
 		currentProcessorOverlayNode = currentProcessor.layerOverlay().getNode();
 		overlayPane.getChildren().add(0, currentProcessorOverlayNode);
+		notifySelectionMask();
 	}
 
 	private void clear() {
 		this.rootLayer.clear();
+		clearMask();
 		resetOverlay();
 	}
 
@@ -233,6 +251,160 @@ public class EditorPresenter implements Presenter {
 	private void expandLayers() {
 		if (this.layersWidget != null) {
 			this.layersWidget.expandAll();
+		}
+	}
+
+	/*
+	 * Global tools
+	 */
+	private EditorLayerOverlay editorOverlay;
+	private SimpleTool moveTool;
+	private SelectionMultiTool selectionTool;
+	private final BooleanProperty hasMaskProperty = new SimpleBooleanProperty();
+	private final BooleanProperty hasPreviousMaskProperty = new SimpleBooleanProperty();
+
+	public ReadOnlyBooleanProperty hasMaskProperty() {
+		return this.hasMaskProperty;
+	}
+
+	public ReadOnlyBooleanProperty hasPreviousMaskProperty() {
+		return this.hasPreviousMaskProperty;
+	}
+
+	private void clearMask() {
+		if (selectionTool != null) {
+			selectionTool.removeMask();
+		}
+	}
+
+	private EditorLayerOverlay getEditorOverlay() {
+		if (editorOverlay == null) {
+			editorOverlay = new EditorLayerOverlay() {
+				@Override
+				public ReadOnlyDoubleProperty zoomProperty() {
+					return zoomPane.zoomProperty();
+				}
+
+				@Override
+				public ObservableList<Node> getChildren() {
+					return overlayPane.getChildren();
+				}
+			};
+		}
+		return editorOverlay;
+	}
+
+	public SimpleTool getMoveTool() {
+		if (moveTool == null) {
+			moveTool = new SimpleTool(
+					"Move Tool",
+					MaterialDesignIcons.CURSOR_DEFAULT_OUTLINE,
+					new MoveGesture((e) -> {
+						handler.eventBus.post(new StatusMessageEvent(
+										String.format("x: %.2f, y: %.2f", e.getX(), e.getY())
+								));
+					})
+			) {
+				{
+					cursorProperty().set(Cursor.DEFAULT);
+				}
+			};
+		}
+		return moveTool;
+	}
+
+	@Subscribe
+	public void selectionMaskRequest(SelectionMaskRequest event) {
+		switch (event.type) {
+			case ALL:
+				if (selectionTool != null) {
+					selectionTool.selectAll();
+				}
+				break;
+			case DESELECT:
+				if (selectionTool != null) {
+					selectionTool.removeMask();
+				}
+				break;
+			case INVERT:
+				if (selectionTool != null) {
+					selectionTool.invertMask();
+				}
+				break;
+			case RESELECT:
+				if (selectionTool != null) {
+					selectionTool.reselect();
+				}
+				break;
+			default:
+				log.warn("unhandled selection mask request: {}", event.type);
+				break;
+		}
+	}
+
+	public <T extends SimpleTool & SelectionTool> void initSelectionTool(T... selectionTools) {
+		if (selectionTool != null) {
+			throw new IllegalStateException(
+					"selection tool must be initialized before a call to getSelectionTool"
+			);
+		}
+		selectionTool = newSelectionTool(selectionTools);
+	}
+
+	public SelectionMultiTool getSelectionTool() {
+		if (selectionTool == null) {
+			selectionTool = newSelectionTool(
+					new RectangularSelectionTool(
+							"Rectangular selection tool",
+							MaterialDesignIcons.VECTOR_SQUARE
+					),
+					new EllipticalSelectionTool(
+							"Elliptical selection tool",
+							MaterialDesignIcons.VECTOR_CIRCLE
+					),
+					new PolygonalSelectionTool(
+							"Polygonal lasso selection tool",
+							MaterialDesignIcons.VECTOR_POLYGON
+					)
+			);
+		}
+		return selectionTool;
+	}
+
+	private <T extends SimpleTool & SelectionTool> SelectionMultiTool newSelectionTool(T... selectionTools) {
+		final SelectionMultiTool smt = new SelectionMultiTool(
+				getEditorOverlay(),
+				selectionTools
+		) {
+			@Override
+			protected void onMaskRemoved() {
+				notifySelectionMask();
+			}
+
+			@Override
+			protected void onMaskCreated() {
+				notifySelectionMask();
+			}
+		};
+		// bind properties
+		this.hasMaskProperty.bind(smt.hasMaskProperty());
+		this.hasPreviousMaskProperty.bind(smt.hasPreviousMaskProperty());
+		// set (and keep updating) clipping bounds for selection masks
+		zoomPane.contentBoundsProperty().addListener((c) -> {
+			smt.setBounds(zoomPane.contentBoundsProperty().get());
+		});
+		smt.setBounds(zoomPane.contentBoundsProperty().get());
+		return smt;
+	}
+
+	private void notifySelectionMask() {
+		if (selectionTool == null || currentProcessor == null) {
+			return;
+		}
+		if (currentProcessor.processor().canEdit()) {
+			currentProcessor.processor().asEditableProcessor().onSelectionMaskChanged(
+					selectionTool.getMask()
+			);
 		}
 	}
 

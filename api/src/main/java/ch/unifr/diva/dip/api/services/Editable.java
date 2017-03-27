@@ -5,6 +5,7 @@ import ch.unifr.diva.dip.api.parameters.SingleRowParameter;
 import ch.unifr.diva.dip.api.tools.Tool;
 import java.util.List;
 import java.util.Map;
+import javafx.scene.shape.Shape;
 
 /**
  * An editable processor offers tools to process its inputs manually.
@@ -52,5 +53,16 @@ public interface Editable extends Resetable {
 	 * project), while saving the processor's state is not required.
 	 */
 	public void onContextSwitch(ProcessorContext context, boolean saveRequired);
+
+	/**
+	 * Callback method called if the global selection mask has changed. Only gets
+	 * called for active/currently selected processors, and once as a new processor
+	 * gets selected (no matter if the mask has actually changed).
+	 *
+	 * @param selectionMask the selection mask, or null if nothing is selected.
+	 */
+	default void onSelectionMaskChanged(Shape selectionMask) {
+
+	}
 
 }
