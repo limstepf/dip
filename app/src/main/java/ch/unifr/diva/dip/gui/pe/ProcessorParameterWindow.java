@@ -376,13 +376,8 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 		final protected void update() {
 			final Pannable.VisibleRegion visibleRegion = zoomPane.getVisibleRegion();
 			if (!visibleRegion.isEmpty()) {
-				/*
-				 * request an extra pixel, or we might see an unprocessed 1 pixel
-				 * stripe to the right and/or bottom.
-				 */
-				final Rectangle region = visibleRegion.getUnscaledVisibleRectangle(
-						previewSourceWidth, previewSourceHeight, 1
-				);
+				final Pannable.SubpixelRectangle2D sourceRegion = visibleRegion.getUnscaledVisibleSubpixelRegion();
+				final Rectangle region = sourceRegion.getRectangle();
 				final Runnable run = () -> {
 					final Image preview = previewContext.previewable.preview(
 							previewContext.context,

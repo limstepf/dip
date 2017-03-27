@@ -209,6 +209,13 @@ public class FxRescaling {
 	 * Scales an image with Bresenham. Super fast nearest neighbor resampling
 	 * based on Bresenham's (line) algorithm.
 	 *
+	 * <p>
+	 * See R. Ulichney, "Bresenham -style Sealing," Proceedings of the IS&T
+	 * Annual Conference (Cambridge, Mass., 1993): 101-103. For a short paper on
+	 * this. The key idea is to fill accumulators with a fixed number of
+	 * repeating pixels up to where they overflow to know when to sample from
+	 * the next source pixel, all without multiplies during the main loop.
+	 *
 	 * @param src the source image.
 	 * @param dst the destination image.
 	 * @param srcBuffer the source buffer (to reuse), or null.
@@ -225,8 +232,6 @@ public class FxRescaling {
 		final int yr = h % newH;
 		final int xd = w / newW;
 		final int xr = w % newW;
-		int outOffset = 0;
-		int inOffset = 0;
 
 		final WritablePixelFormat format = PixelFormat.getIntArgbPreInstance();
 		if (srcBuffer == null) {
@@ -237,8 +242,11 @@ public class FxRescaling {
 			dstBuffer = new int[newW * newH];
 		}
 
-		for (int y = newH, ye = 0; y > 0; y--) {
-			for (int x = newW, xe = 0; x > 0; x--) {
+		int outOffset = 0;
+		int inOffset = 0;
+
+		for (int y = 0, ye = 0; y < newH; y++) {
+			for (int x = 0, xe = 0; x < newW; x++) {
 				dstBuffer[outOffset++] = srcBuffer[inOffset];
 				inOffset += xd;
 				xe += xr;
@@ -251,6 +259,115 @@ public class FxRescaling {
 			ye += yr;
 			if (ye >= newH) {
 				ye -= newH;
+				inOffset += w;
+			}
+		}
+
+		dst.getPixelWriter().setPixels(0, 0, newW, newH, format, dstBuffer, 0, newW);
+		return dst;
+	}
+
+	/**
+	 * Bresenham upscaling with subpixel precision. Upscaling an image in a
+	 * scroll-/zoompane is a bit more tricky since we might have to display only
+	 * part of a scaled pixel (a scaled pixel consists/gets drawn with n
+	 * repeated pixels, where n is the zoom factor).
+	 *
+	 * <pre>
+	 * Source image:
+	 *
+	 *                1 pixel
+	 *                |----|
+	 *                .    .
+	 *      a'---+----+----+----b'      a,b,c,d in double precision
+	 *      |  a |. . |. . | b  |
+	 *      +----+----+----+----+       a' = floor(a_x), floor(a_y)
+	 *      |  . |    |    | .  |       b' = ceil(a_x),  floor(a_y)
+	 *      +----+----+----+----+       c' = floor(a_x), ceil(a_y)
+	 *      |  . |    |    | .  |       d' = ceil(a_x),  ceil(a_y)
+	 *      +----+----+----+----+
+	 *      |  c | . .| . .| d  |       -> compute differences, and scale up
+	 *      c'---+----+----+----d'         to get shiftX/Y, restX/Y
+	 *
+	 *
+	 * Upscaled destination image:
+	 *
+	 *                  1 scaled pixel (n repeated pixels)
+	 *                        |--------|
+	 *                        .        .
+	 *      +--------+--------+--------+--------+ . . -          -
+	 *      |        |        |        |        |     | shiftY   |
+	 *      |   A....|......................B   | . . -          |
+	 *      |   .    |        |        |    .   |     |          |
+	 *      +--------+--------+--------+--------+     |          |
+	 *      |   .    |        |        |    .   |     |          |
+	 *      |   .    |        |        |    .   |     |          |
+	 *      |   .    |        |        |    .   |     |          |
+	 *      +--------+--------+--------+--------+     | newH     | fullH
+	 *      |   .    |        |        |    .   |     |          |
+	 *      |   .    |        |        |    .   |     |          |
+	 *      |   .    |        |        |    .   |     |          |
+	 *      +--------+--------+--------+--------+     |          |
+	 *      |   .    |        |        |    .   |     |          |
+	 *      |   C....|......................D   | . . -          |
+	 *      |        |        |        |        |     | restY    |
+	 *      +--------+--------+--------+--------+ . . -          -
+	 *      .   .                           .   .
+	 *      .   .                           .   .
+	 *      |---|-------- newW -------------|---|
+	 *      shiftX                          restX
+	 *
+	 *      |---------- virtualW -----------|
+	 *      |------------ fullW ----------------|
+	 *
+	 * </pre>
+	 *
+	 * @param src the source image.
+	 * @param dst the destination image (defining {@code newW} and
+	 * {@code newH}).
+	 * @param shiftX number of shifted repeated pixels on the x-axis.
+	 * @param restX the rest of the repeated pixels on the x-axis.
+	 * @param shiftY number of the shifted repeated pixels on the y-axis.
+	 * @param restY the rest of the repeated pixels on the y-axis.
+	 * @param srcBuffer the source buffer (to reuse), or null.
+	 * @param dstBuffer the destination buffer (to reuse), or null.
+	 * @return the destination image.
+	 */
+	public static WritableImage bresenhamUpscaling(Image src, WritableImage dst, int shiftX, int restX, int shiftY, int restY, int[] srcBuffer, int[] dstBuffer) {
+		final int h = (int) src.getHeight();
+		final int w = (int) src.getWidth();
+		final int newH = (int) dst.getHeight();
+		final int newW = (int) dst.getWidth();
+		final int yd = (restX > 0) ? -w + 1 : -w; // force 1x more xe accum. overflow with a rest
+		final int virtualW = shiftX + newW;
+		final int fullW = virtualW + restX;
+		final int fullH = shiftY + newH + restY;
+
+		final WritablePixelFormat format = PixelFormat.getIntArgbPreInstance();
+		if (srcBuffer == null) {
+			srcBuffer = new int[w * h];
+		}
+		src.getPixelReader().getPixels(0, 0, w, h, format, srcBuffer, 0, w);
+		if (dstBuffer == null) {
+			dstBuffer = new int[newW * newH];
+		}
+
+		int outOffset = 0;
+		int inOffset = 0;
+
+		for (int y = 0, ye = (y == 0) ? shiftY * h : 0; y < newH; y++) {
+			for (int x = 0, xe = (x == 0) ? shiftX * w : 0; x < newW; x++) {
+				dstBuffer[outOffset++] = srcBuffer[inOffset];
+				xe += w;
+				if (xe >= virtualW) {
+					xe -= fullW;
+					inOffset++;
+				}
+			}
+			inOffset += yd;
+			ye += h;
+			if (ye >= fullH) {
+				ye -= fullH;
 				inOffset += w;
 			}
 		}

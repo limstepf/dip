@@ -619,8 +619,8 @@ public interface Pannable extends Zoomable {
 			final Rectangle2D viewportRect = new Rectangle2D(
 					scrolledH - leftPadding,
 					scrolledV - topPadding,
-					Math.ceil(viewportBounds.getWidth()),
-					Math.ceil(viewportBounds.getHeight())
+					viewportBounds.getWidth(),
+					viewportBounds.getHeight()
 			);
 			final Rectangle2D contentRect = new Rectangle2D(
 					0,
@@ -725,31 +725,112 @@ public interface Pannable extends Zoomable {
 		}
 
 		/**
-		 * Returns the unscaled, visible rectangle. This is similar to
-		 * {@code getUnscaledVisibleRegion()} but returns a
-		 * {@code java.awt.Rectangle} and in addition snaps the coordinates to
-		 * the pixel (with the optional extra pixel(s) to guarantee some
-		 * viewport will be fully covered (i.e. the preview window)).
+		 * Returns the unscaled, visible region in subpixel precision.
 		 *
-		 * @param maxWidth maximum width of the unscaled content.
-		 * @param maxHeight maximum height of the unscaled content.
-		 * @param extra extra pixels to add to the width and height of the
-		 * rectangle, capped by {@code maxWidth} and {@code maxHeight}.
-		 * @return the unscaled, visible rectangle, possibly with some extra
-		 * pixels.
+		 * @return the unscaled, visible region in subpixel precision.
 		 */
-		public java.awt.Rectangle getUnscaledVisibleRectangle(int maxWidth, int maxHeight, int extra) {
+		public SubpixelRectangle2D getUnscaledVisibleSubpixelRegion() {
+			return new SubpixelRectangle2D(intersection, zoom);
+		}
+
+	}
+
+	/**
+	 * A subpixel rectangle data object used for upscaling with subpixel
+	 * precision.
+	 *
+	 * <pre>
+	 *                1 pixel
+	 *                |----|
+	 *                .    .
+	 *      a'---+----+----+----b'      a,b,c,d in double precision
+	 *      |  a |. . |. . | b  |
+	 *      +----+----+----+----+       a' = floor(a_x), floor(a_y)
+	 *      |  . |    |    | .  |       b' = ceil(a_x),  floor(a_y)
+	 *      +----+----+----+----+       c' = floor(a_x), ceil(a_y)
+	 *      |  . |    |    | .  |       d' = ceil(a_x),  ceil(a_y)
+	 *      +----+----+----+----+
+	 *      |  c | . .| . .| d  |       -> compute differences, and scale up
+	 *      c'---+----+----+----d'         to get shiftX/Y, restX/Y
+	 * </pre>
+	 */
+	public static class SubpixelRectangle2D {
+
+		/**
+		 * The number of shifted repeated pixels on the x-axis.
+		 */
+		public final int shiftX;
+		/**
+		 * The rest of the repeated pixels on the x-axis.
+		 */
+		public final int restX;
+		/**
+		 * The number of the shifted repeated pixels on the y-axis.
+		 */
+		public final int shiftY;
+		/**
+		 * The rest of the repeated pixels on the y-axis.
+		 */
+		public final int restY;
+		/**
+		 * The smallest X coordinate of the unscaled, visible region in integer
+		 * precision.
+		 */
+		public final int minX;
+		/**
+		 * The smallest Y coordinate of the unscaled, visible region in integer
+		 * precision.
+		 */
+		public final int minY;
+		/**
+		 * The width of the unscaled, visible region in integer precision.
+		 */
+		public final int width;
+		/**
+		 * The height of the unscaled, visible region in integer precision.
+		 */
+		public final int height;
+
+		/**
+		 * Creates a new subpixel rectangle data object.
+		 *
+		 * @param region the (intersection) region in double precision.
+		 * @param zoom the zoom.
+		 */
+		public SubpixelRectangle2D(Rectangle2D region, double zoom) {
 			final double invZoom = 1.0 / zoom;
-			final int x = (int) (intersection.getMinX() * invZoom);
-			final int y = (int) (intersection.getMinY() * invZoom);
-			final int w = (int) Math.ceil(intersection.getWidth() * invZoom) + extra;
-			final int h = (int) Math.ceil(intersection.getHeight() * invZoom) + extra;
-			return new java.awt.Rectangle(
-					x,
-					y,
-					(x + w > maxWidth) ? maxWidth - x : w,
-					(y + h > maxHeight) ? maxHeight - y : h
-			);
+			final double minxReal = region.getMinX() * invZoom;
+			final double minyReal = region.getMinY() * invZoom;
+			final double widthReal = region.getWidth() * invZoom;
+			final double heightReal = region.getHeight() * invZoom;
+			this.minX = (int) Math.floor(minxReal);
+			this.minY = (int) Math.floor(minyReal);
+			this.width = (int) Math.ceil(minxReal + widthReal) - minX;
+			this.height = (int) Math.ceil(minyReal + heightReal) - minY;
+			final double sx = minxReal - minX;
+			final double sy = minyReal - minY;
+			this.shiftX = (int) (sx * zoom);
+			this.shiftY = (int) (sy * zoom);
+			this.restX = (int) ((width - widthReal - sx) * zoom);
+			this.restY = (int) ((height - heightReal - sy) * zoom);
+		}
+
+		/**
+		 * Returns the unscaled, visible region.
+		 *
+		 * @return the unscaled, visible region.
+		 */
+		public Rectangle2D getRectangle2D() {
+			return new Rectangle2D(minX, minY, width, height);
+		}
+
+		/**
+		 * Returns the unscaled, visible region.
+		 *
+		 * @return the unscaled, visible region.
+		 */
+		public java.awt.Rectangle getRectangle() {
+			return new java.awt.Rectangle(minX, minY, width, height);
 		}
 
 	}

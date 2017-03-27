@@ -51,4 +51,28 @@ public class FxBresenham {
 		);
 	}
 
+	/**
+	 * Upscales the source image with subpixel precision.
+	 *
+	 * @see FxRescaling.bresenhamUpsacling
+	 * @param src the source image.
+	 * @param width the width of the destination image.
+	 * @param height the height of the destination image.
+	 * @param shiftX number of shifted repeated pixels on the x-axis.
+	 * @param restX the rest of the repeated pixels on the x-axis.
+	 * @param shiftY number of the shifted repeated pixels on the y-axis.
+	 * @param restY the rest of the repeated pixels on the y-axis.
+	 * @return
+	 */
+	public WritableImage zoom(Image src, int width, int height, int shiftX, int restX, int shiftY, int restY) {
+		return FxRescaling.bresenhamUpscaling(
+				src,
+				new WritableImage(width, height),
+				shiftX, restX,
+				shiftY, restY,
+				buffer.get(0, src),
+				buffer.get(1, width * height)
+		);
+	}
+
 }
