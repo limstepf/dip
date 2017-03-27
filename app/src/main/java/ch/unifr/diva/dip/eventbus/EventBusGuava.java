@@ -34,7 +34,7 @@ public class EventBusGuava implements EventBus {
 
 	@Override
 	public void post(Object event) {
-		log.info("posting event: {}", event);
+//		log.debug("posting event: {}", event);
 		eventBus.post(event);
 	}
 
