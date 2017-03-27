@@ -1,11 +1,14 @@
 package ch.unifr.diva.dip.api.services;
 
+import ch.unifr.diva.dip.api.components.ProcessorContext;
 import ch.unifr.diva.dip.api.parameters.SingleRowParameter;
 import ch.unifr.diva.dip.api.tools.Tool;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.input.MouseEvent;
 
 /**
@@ -27,6 +30,57 @@ public abstract class EditableBase extends ProcessorBase implements Editable {
 		super(name);
 		this.tools = new ArrayList<>();
 		this.options = new LinkedHashMap<>();
+	}
+
+	protected final ObjectProperty<ProcessorContext> contextProperty = new SimpleObjectProperty();
+
+	/**
+	 * The context property. Editable processor typically need to manage the
+	 * {@code ProcessorContext} s.t. its tools may access it at any time.
+	 *
+	 * <p>
+	 * The context property needs to be set/updated after creating the processor
+	 * in {@code newInstance()}, and after each context switch in the
+	 * {@code onContextSwitch()} method.
+	 *
+	 * @return the current processor context.
+	 */
+	public ObjectProperty<ProcessorContext> contextProperty() {
+		return contextProperty;
+	}
+
+	/**
+	 * Sets/updates the context.
+	 *
+	 * @param context the latest processor context.
+	 */
+	public void setContext(ProcessorContext context) {
+		contextProperty().set(context);
+	}
+
+
+	/**
+	 * Returns the current context.
+	 *
+	 * @return the current processor context.
+	 */
+	public ProcessorContext getContext() {
+		return contextProperty().get();
+	}
+
+
+	/**
+	 * Checks whether the processor context has been set.
+	 *
+	 * @return True if the processor context has been set, False otherwise.
+	 */
+	public boolean hasContext() {
+		return contextProperty.get() != null;
+	}
+
+	@Override
+	public void onContextSwitch(ProcessorContext context, boolean saveRequired) {
+		setContext(context);
 	}
 
 	@Override
