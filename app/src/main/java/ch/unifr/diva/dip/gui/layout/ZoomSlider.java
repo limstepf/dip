@@ -1,6 +1,7 @@
 package ch.unifr.diva.dip.gui.layout;
 
-import ch.unifr.diva.dip.api.ui.KeyEventHandler;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
@@ -10,6 +11,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Priority;
 
 /**
@@ -18,15 +20,12 @@ import javafx.scene.layout.Priority;
 public class ZoomSlider {
 
 	protected final Zoomable zoomable;
-
 	protected final Lane lane;
 	protected final TextField text;
 	protected final Slider slider;
-
-	protected final EventHandler<KeyEvent> zoomHandler;
+	protected final EventHandler<ScrollEvent> scrollHandler;
 	protected final ChangeListener<Number> sliderListener;
 	protected final ChangeListener<Number> zoomListener;
-
 	protected boolean changeIsLocal;
 
 	/**
@@ -37,17 +36,31 @@ public class ZoomSlider {
 	public ZoomSlider(Zoomable zoomable) {
 		this.zoomable = zoomable;
 
-		this.zoomHandler = new KeyEventHandler(
-				KeyCode.ENTER,
-				(e) -> {
-					zoomable.setZoom(getZoomValueFromTextField());
-					return true;
-				}
-		);
+		this.scrollHandler = (e) -> {
+			if (e.getDeltaY() > 0) {
+				increment();
+			} else if (e.getDeltaY() < 0) {
+				decrement();
+			}
+		};
+
 		this.text = new TextField();
 		text.setPrefWidth(62.5);
 		text.setAlignment(Pos.CENTER_RIGHT);
-		text.setOnKeyPressed(zoomHandler);
+		text.addEventHandler(ScrollEvent.SCROLL, scrollHandler);
+		text.addEventHandler(KeyEvent.KEY_PRESSED, (e) -> {
+			final KeyCode k = e.getCode();
+			if (k == KeyCode.ENTER) {
+				zoomable.setZoom(getZoomValueFromTextField());
+				e.consume();
+			} else if (k == KeyCode.UP) {
+				increment();
+				e.consume();
+			} else if (k == KeyCode.DOWN) {
+				decrement();
+				e.consume();
+			}
+		});
 
 		this.sliderListener = (ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
 			if (!changeIsLocal) {
@@ -63,6 +76,17 @@ public class ZoomSlider {
 		slider.setMinorTickCount(4);
 		slider.setMajorTickUnit(one);
 		slider.valueProperty().addListener(sliderListener);
+		slider.addEventHandler(KeyEvent.KEY_PRESSED, (e) -> {
+			final KeyCode k = e.getCode();
+			if (k == KeyCode.UP || k == KeyCode.RIGHT) {
+				increment();
+				e.consume();
+			} else if (k == KeyCode.DOWN || k == KeyCode.LEFT) {
+				decrement();
+				e.consume();
+			}
+		});
+		slider.addEventHandler(ScrollEvent.SCROLL, scrollHandler);
 		sliderListener.changed(null, 0, zoomValToSlider(zoomable.getZoom()));
 
 		this.zoomListener = (ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
@@ -74,6 +98,32 @@ public class ZoomSlider {
 		this.lane = new Lane();
 		lane.add(text);
 		lane.add(slider, Priority.ALWAYS);
+	}
+
+	/**
+	 * Increase the slider value by a bit.
+	 */
+	protected final void increment() {
+		nextVal(1);
+	}
+
+	/**
+	 * Decrease the slider value a bit.
+	 */
+	protected final void decrement() {
+		nextVal(-1);
+	}
+
+	protected final void nextVal(int sign) {
+		final double zoom = sliderToZoomVal(slider.getValue());
+		final double inc;
+		if (zoom >= 2.5) {
+			inc = 0.5;
+		} else {
+			inc = 0.05;
+		}
+		final double trunc = new BigDecimal(zoom).setScale(2, RoundingMode.HALF_UP).doubleValue();
+		setZoomValue(trunc + inc * sign);
 	}
 
 	/**

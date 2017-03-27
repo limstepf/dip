@@ -1,10 +1,12 @@
 package ch.unifr.diva.dip.gui.editor;
 
+import ch.unifr.diva.dip.api.components.EditorLayerOverlay;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.model.Pipeline;
 import ch.unifr.diva.dip.core.model.Project;
 import ch.unifr.diva.dip.core.model.ProjectPage;
 import ch.unifr.diva.dip.core.model.RunnableProcessor;
+import ch.unifr.diva.dip.eventbus.events.ProcessorNotification;
 import ch.unifr.diva.dip.eventbus.events.ProjectNotification;
 import ch.unifr.diva.dip.gui.Presenter;
 import ch.unifr.diva.dip.gui.layout.Pannable;
@@ -12,7 +14,9 @@ import ch.unifr.diva.dip.gui.layout.ZoomPaneBresenham;
 import ch.unifr.diva.dip.gui.layout.Zoomable;
 import com.google.common.eventbus.Subscribe;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.layout.Pane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +31,10 @@ public class EditorPresenter implements Presenter {
 	private final ZoomPaneBresenham zoomPane;
 	private NavigatorWidget navigatorWidget;
 	private LayersWidget layersWidget;
+	private RunnableProcessor currentProcessor = null;
+	// private overlay pane shared by global tools and processor overlays
+	private final Pane overlayPane;
+	private Node currentProcessorOverlayNode;
 
 	/**
 	 * Creates a new editor presenter.
@@ -44,6 +52,8 @@ public class EditorPresenter implements Presenter {
 				Zoomable.Interpolation.get(handler.settings.editor.interpolation)
 		);
 		zoomPane.setPaddingMethod(Pannable.Padding.VIEWPORT);
+		this.overlayPane = new Pane();
+		zoomPane.setOverlayContent(overlayPane);
 
 		// repaint listener
 		this.rootLayer.onModifiedProperty().addListener((e) -> this.zoomPane.fireContentChange());
@@ -96,6 +106,15 @@ public class EditorPresenter implements Presenter {
 		}
 	}
 
+	@Subscribe
+	public void processorNotification(ProcessorNotification event) {
+		switch (event.type) {
+			case SELECTED:
+				onProcessorSelected(event.processorId);
+				break;
+		}
+	}
+
 	private void onOpenProject() {
 		onSelectPage(handler.getProject().getSelectedPageId());
 	}
@@ -134,8 +153,31 @@ public class EditorPresenter implements Presenter {
 		expandLayers();
 	}
 
+	private void onProcessorSelected(int processorId) {
+		resetOverlay();
+
+		final Project project = handler.getProject();
+		if (project == null || processorId < 0) {
+			currentProcessor = null;
+			return;
+		}
+		final ProjectPage page = project.getSelectedPage();
+		currentProcessor = page.getPipeline().getProcessor(processorId);
+
+		currentProcessor.layerOverlay().setZoomable(zoomPane);
+		currentProcessorOverlayNode = currentProcessor.layerOverlay().getNode();
+		overlayPane.getChildren().add(0, currentProcessorOverlayNode);
+	}
+
 	private void clear() {
 		this.rootLayer.clear();
+		resetOverlay();
+	}
+
+	private void resetOverlay() {
+		if (currentProcessorOverlayNode != null) {
+			this.overlayPane.getChildren().remove(currentProcessorOverlayNode);
+		}
 	}
 
 	private void onPageModified() {

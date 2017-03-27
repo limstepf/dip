@@ -109,6 +109,14 @@ public class ZoomPaneWithOverlay extends ZoomPaneSimple {
 	}
 
 	/**
+	 * Clears the content of the zoom pane overlay.
+	 */
+	public void clearOverlayContent() {
+		this.overlayContentPane.getChildren().clear();
+		fireContentChange();
+	}
+
+	/**
 	 * Check whether the overlay pane is empty.
 	 *
 	 * @return True if the overlay pane is empty, False otherwise.

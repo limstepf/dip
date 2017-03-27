@@ -42,6 +42,14 @@ public class ProcessorContext {
 	public final EditorLayerGroup layer;
 
 	/**
+	 * The editor layer overlay. Sits on top of the layer group of the
+	 * processor, is always bilinearly interpolated (never NN), and comes with
+	 * an "infinite" area (gets clipped at some point). Primarily used for the
+	 * visualization of tools.
+	 */
+	public final EditorLayerOverlay overlay;
+
+	/**
 	 * Creates a new processor context.
 	 *
 	 * @param threadPool the application wide thread pool/executor service.
@@ -49,12 +57,14 @@ public class ProcessorContext {
 	 * processor.
 	 * @param objects the persistent map of objects of the processor.
 	 * @param layer the processor's editor layer.
+	 * @param overlay the processor's editor layer overlay.
 	 */
-	public ProcessorContext(DipThreadPool threadPool, Path directory, Map<String, Object> objects, EditorLayerGroup layer) {
+	public ProcessorContext(DipThreadPool threadPool, Path directory, Map<String, Object> objects, EditorLayerGroup layer, EditorLayerOverlay overlay) {
 		this.threadPool = threadPool;
 		this.directory = directory;
 		this.objects = objects;
 		this.layer = layer;
+		this.overlay = overlay;
 	}
 
 	/**
@@ -94,6 +104,8 @@ public class ProcessorContext {
 		}
 		sb.append("], layer=");
 		sb.append(this.layer);
+		sb.append(", overlay=");
+		sb.append(this.overlay);
 		sb.append('}');
 		return sb.toString();
 	}

@@ -12,6 +12,7 @@ import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.eventbus.events.StatusMessageEvent;
 import ch.unifr.diva.dip.gui.editor.LayerExtension;
 import ch.unifr.diva.dip.gui.editor.LayerGroup;
+import ch.unifr.diva.dip.gui.editor.LayerOverlay;
 import ch.unifr.diva.dip.gui.layout.Lane;
 import ch.unifr.diva.dip.gui.pe.ProcessorParameterWindow;
 import ch.unifr.diva.dip.utils.BackgroundTask;
@@ -52,7 +53,8 @@ public class RunnableProcessor extends ProcessorWrapper {
 	private final String PROCESSOR_DATA_DIR;
 	private final String PROCESSOR_DATA_XML;
 	private final ObjectMapData objectMap;
-	private final LayerGroup layer;
+	private final LayerGroup layerGroup;
+	private final LayerOverlay layerOverlay;
 
 	// needs to be updated manually after each interaction with the processor
 	private final ObjectProperty<Processor.State> stateProperty;
@@ -86,7 +88,8 @@ public class RunnableProcessor extends ProcessorWrapper {
 		);
 
 		this.objectMap = initObjectMap();
-		this.layer = new LayerGroup(processor.id);
+		this.layerGroup = new LayerGroup(processor.id);
+		this.layerOverlay = new LayerOverlay();
 	}
 
 	@Override
@@ -102,10 +105,10 @@ public class RunnableProcessor extends ProcessorWrapper {
 		// we overide initProcessor() rather than doing this in init() since a
 		// transmutable processor might have changed its name once being fully
 		// initialized
-		this.layer.setName(this.processor().name());
-		this.layer.setGlyph(RunnableProcessor.glyph(this.processor()));
-		this.layer.setHideGroupMode(LayerGroup.HideGroupMode.AUTO);
-		this.layer.layerExtensions().add(new ProcessorLayerExtension(this));
+		this.layerGroup.setName(this.processor().name());
+		this.layerGroup.setGlyph(RunnableProcessor.glyph(this.processor()));
+		this.layerGroup.setHideGroupMode(LayerGroup.HideGroupMode.AUTO);
+		this.layerGroup.layerExtensions().add(new ProcessorLayerExtension(this));
 		this.updateState();
 	}
 
@@ -152,7 +155,16 @@ public class RunnableProcessor extends ProcessorWrapper {
 	 * @return the layer group of the runnable processor.
 	 */
 	public LayerGroup layer() {
-		return this.layer;
+		return this.layerGroup;
+	}
+
+	/**
+	 * Retuns the layer overlay of the runnable processor.
+	 *
+	 * @return the layer overlay of the runnable processor.
+	 */
+	public LayerOverlay layerOverlay() {
+		return this.layerOverlay;
 	}
 
 	/**
@@ -425,7 +437,8 @@ public class RunnableProcessor extends ProcessorWrapper {
 		return new HostProcessorContext(
 				this.handler.threadPool,
 				this.page,
-				this.layer
+				this.layerGroup,
+				this.layerOverlay
 		);
 	}
 
@@ -435,7 +448,8 @@ public class RunnableProcessor extends ProcessorWrapper {
 				this.handler.threadPool,
 				processorDataDirectory(),
 				objectMap.objects,
-				this.layer
+				this.layerGroup,
+				this.layerOverlay
 		);
 	}
 

@@ -6,7 +6,6 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
@@ -193,15 +192,13 @@ public class ZoomPaneBresenham extends ZoomPaneWithOverlay {
 			return;
 		}
 
-		final Rectangle2D sourceRegion = visibleRegion.getUnscaledVisibleRegion();
-		nnSnaphshotParameters.setViewport(sourceRegion);
+		final Pannable.SubpixelRectangle2D sourceRegion = visibleRegion.getUnscaledVisibleSubpixelRegion();
+		nnSnaphshotParameters.setViewport(sourceRegion.getRectangle2D());
 		final WritableImage src = contentPane.snapshot(nnSnaphshotParameters, null);
 
 		/*
 		 * setting the offset here already (instead of in the runLater block below)
 		 * give's us smooth zooming; otherwise we'd see rather heavy "screen tearing".
-		 * On the downside: the nnScalingView seems to lag a bit upon changing the
-		 * bounds of the viewport, but it's not too bad. :/
 		 */
 		nnScalingView.setLayoutX(visibleRegion.getPaddedOffsetX());
 		nnScalingView.setLayoutY(visibleRegion.getPaddedOffsetY());
@@ -217,12 +214,18 @@ public class ZoomPaneBresenham extends ZoomPaneWithOverlay {
 			 */
 			final WritableImage dst = bresenham.zoom(
 					src,
-					(int) Math.ceil(visibleRegion.getScaledWidth()),
-					(int) Math.ceil(visibleRegion.getScaledHeight())
+					(int) visibleRegion.getScaledWidth(),
+					(int) visibleRegion.getScaledHeight(),
+					sourceRegion.shiftX,
+					sourceRegion.restX,
+					sourceRegion.shiftY,
+					sourceRegion.restY
 			);
+
 			Platform.runLater(() -> {
 				nnScalingView.setImage(dst);
 				nnScalingView.setVisible(true);
+				muxPane.layout();
 			});
 		};
 		threadPool.getExecutorService().submit(run);

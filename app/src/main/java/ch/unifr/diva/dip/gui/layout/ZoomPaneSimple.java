@@ -372,6 +372,14 @@ public class ZoomPaneSimple implements Pannable {
 		fireContentChange();
 	}
 
+	/**
+	 * Clears the content of the zoom pane.
+	 */
+	public void clearContent() {
+		this.contentPane.getChildren().clear();
+		fireContentChange();
+	}
+
 	@Override
 	public boolean isEmpty() {
 		return this.contentPane.getChildren().isEmpty();
