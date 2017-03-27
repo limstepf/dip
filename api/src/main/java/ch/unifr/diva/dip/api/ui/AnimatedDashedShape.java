@@ -15,6 +15,13 @@ import javafx.util.Duration;
 /**
  * A shape with an animated dashed outline (marching ants).
  *
+ * <p>
+ * Warning: as of now, the rendering performance of {@code Path}s (incl.
+ * {@code Polyline} and {@code Polygon}) is total ass. It's not even funny. See:
+ * <a href="https://bugs.openjdk.java.net/browse/JDK-8092373">https://bugs.openjdk.java.net/browse/JDK-8092373</a>.
+ * And yes, it's not the animation of the dashed pattern (marching ants) that makes
+ * things slow. It's the path.
+ *
  * @param <T> class of the shape.
  */
 public class AnimatedDashedShape<T extends Shape> {
