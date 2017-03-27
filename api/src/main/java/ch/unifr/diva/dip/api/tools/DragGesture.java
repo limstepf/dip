@@ -18,13 +18,27 @@ import javafx.scene.input.MouseEvent;
 public class DragGesture extends GestureBase<MouseEvent> {
 
 	/**
-	 * Creates a new drag gesture.
+	 * Creates a new drag gesture without (mouse) movement event handlers.
 	 *
 	 * @param onPressed the pressed handler.
 	 * @param onDragged the dragged handler.
 	 * @param onReleased the released handler.
 	 */
 	public DragGesture(EventHandler<MouseEvent> onPressed, EventHandler<MouseEvent> onDragged, EventHandler<MouseEvent> onReleased) {
+		this(onPressed, onDragged, onReleased, null, null, null);
+	}
+
+	/**
+	 * Creates a new drag gesture with (mouse) movement event handlers.
+	 *
+	 * @param onPressed the pressed handler.
+	 * @param onDragged the dragged handler.
+	 * @param onReleased the released handler.
+	 * @param onEntered the entered handler, or null.
+	 * @param onMoved the moved handler, or null.
+	 * @param onExited the exited handler, or null.
+	 */
+	public DragGesture(EventHandler<MouseEvent> onPressed, EventHandler<MouseEvent> onDragged, EventHandler<MouseEvent> onReleased, EventHandler<MouseEvent> onEntered, EventHandler<MouseEvent> onMoved, EventHandler<MouseEvent> onExited) {
 		super();
 
 		eventHandlers().add(new GestureEventHandler(
@@ -39,6 +53,8 @@ public class DragGesture extends GestureBase<MouseEvent> {
 				MouseEvent.MOUSE_RELEASED,
 				onReleased
 		));
+
+		addMouseEventHandlers(onEntered, onMoved, onExited);
 	}
 
 }
