@@ -3,6 +3,9 @@ package ch.unifr.diva.dip.gui.editor;
 import ch.unifr.diva.dip.api.components.EditorLayerOverlay;
 import ch.unifr.diva.dip.api.tools.MoveGesture;
 import ch.unifr.diva.dip.api.tools.SimpleTool;
+import ch.unifr.diva.dip.api.tools.brush.CircleShapeBrush;
+import ch.unifr.diva.dip.api.tools.brush.SquareShapeBrush;
+import ch.unifr.diva.dip.api.tools.selection.BrushSelectionTool;
 import ch.unifr.diva.dip.api.tools.selection.EllipticalSelectionTool;
 import ch.unifr.diva.dip.api.tools.selection.PolygonalSelectionTool;
 import ch.unifr.diva.dip.api.tools.selection.RectangularSelectionTool;
@@ -17,6 +20,8 @@ import ch.unifr.diva.dip.eventbus.events.ProcessorNotification;
 import ch.unifr.diva.dip.eventbus.events.ProjectNotification;
 import ch.unifr.diva.dip.eventbus.events.SelectionMaskRequest;
 import ch.unifr.diva.dip.eventbus.events.StatusMessageEvent;
+import ch.unifr.diva.dip.glyphs.FontAwesome;
+import ch.unifr.diva.dip.glyphs.IcoFont;
 import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
 import ch.unifr.diva.dip.gui.Presenter;
 import ch.unifr.diva.dip.gui.layout.Pannable;
@@ -263,10 +268,21 @@ public class EditorPresenter implements Presenter {
 	private final BooleanProperty hasMaskProperty = new SimpleBooleanProperty();
 	private final BooleanProperty hasPreviousMaskProperty = new SimpleBooleanProperty();
 
+	/**
+	 * The has (selection) mask property. Is true when a selection mask is set.
+	 *
+	 * @return the has (selection) mask property.
+	 */
 	public ReadOnlyBooleanProperty hasMaskProperty() {
 		return this.hasMaskProperty;
 	}
 
+	/**
+	 * The has previous (selection) mask property. Is true when a previously set
+	 * selection mask is stored/available.
+	 *
+	 * @return the has previous (selection) mask property.
+	 */
 	public ReadOnlyBooleanProperty hasPreviousMaskProperty() {
 		return this.hasPreviousMaskProperty;
 	}
@@ -294,6 +310,11 @@ public class EditorPresenter implements Presenter {
 		return editorOverlay;
 	}
 
+	/**
+	 * Returns the move tool.
+	 *
+	 * @return the move tool.
+	 */
 	public SimpleTool getMoveTool() {
 		if (moveTool == null) {
 			moveTool = new SimpleTool(
@@ -342,6 +363,13 @@ public class EditorPresenter implements Presenter {
 		}
 	}
 
+	/**
+	 * Initializes the available selection tools. Must be called before
+	 * retrieving the selection tool.
+	 *
+	 * @param <T> class of the selection tools.
+	 * @param selectionTools the selection tools.
+	 */
 	public <T extends SimpleTool & SelectionTool> void initSelectionTool(T... selectionTools) {
 		if (selectionTool != null) {
 			throw new IllegalStateException(
@@ -351,6 +379,11 @@ public class EditorPresenter implements Presenter {
 		selectionTool = newSelectionTool(selectionTools);
 	}
 
+	/**
+	 * Returns the selection tool.
+	 *
+	 * @return the selection tool.
+	 */
 	public SelectionMultiTool getSelectionTool() {
 		if (selectionTool == null) {
 			selectionTool = newSelectionTool(
@@ -365,6 +398,18 @@ public class EditorPresenter implements Presenter {
 					new PolygonalSelectionTool(
 							"Polygonal lasso selection tool",
 							MaterialDesignIcons.VECTOR_POLYGON
+					),
+					new BrushSelectionTool(
+							"Brush selection tool",
+							IcoFont.MARKER_ALT_3,
+							new SquareShapeBrush(
+									"Square brush",
+									FontAwesome.SQUARE
+							),
+							new CircleShapeBrush(
+									"Circle brush",
+									FontAwesome.CIRCLE
+							)
 					)
 			);
 		}
