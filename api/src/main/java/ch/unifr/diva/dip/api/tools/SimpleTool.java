@@ -7,6 +7,9 @@ import java.util.Map;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Cursor;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.shape.Ellipse;
+import javafx.scene.shape.Rectangle;
 
 /**
  * A (simple) tool.
@@ -15,9 +18,19 @@ public class SimpleTool implements Tool {
 
 	protected final String name;
 	protected final NamedGlyph glyph;
-	protected final Gesture gesture;
+	protected Gesture gesture;
 	protected final LinkedHashMap<String, SingleRowParameter> options;
 	protected final ObjectProperty<Cursor> cursorProperty;
+
+	/**
+	 * Creates a new simple tool.
+	 *
+	 * @param name the name of the tool.
+	 * @param glyph the named glyph of the tool.
+	 */
+	public SimpleTool(String name, NamedGlyph glyph) {
+		this(name, glyph, null);
+	}
 
 	/**
 	 * Creates a new simple tool.
@@ -82,6 +95,15 @@ public class SimpleTool implements Tool {
 	@Override
 	public ObjectProperty<Cursor> cursorProperty() {
 		return this.cursorProperty;
+	}
+
+	/**
+	 * Sets the gesture of the tool.
+	 *
+	 * @param gesture the gesture of the tool.
+	 */
+	protected void setGesture(Gesture gesture) {
+		this.gesture = gesture;
 	}
 
 	@Override
