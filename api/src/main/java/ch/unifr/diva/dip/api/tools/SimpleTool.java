@@ -7,9 +7,6 @@ import java.util.Map;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Cursor;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.shape.Ellipse;
-import javafx.scene.shape.Rectangle;
 
 /**
  * A (simple) tool.
