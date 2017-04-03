@@ -33,7 +33,7 @@ public class MenuBarPresenter implements Presenter, Localizable {
 	private final EventBus eventBus;
 	private final Stage stage;
 	private final MenuBar menuBar;
-	private final Menu fileMenu, editMenu, viewMenu, toolsMenu, helpMenu, selectionMaskMenu;
+	private final Menu fileMenu, editMenu, viewMenu, helpMenu, selectionMenu;
 
 	/**
 	 * Creates a new main menu bar.
@@ -52,13 +52,11 @@ public class MenuBarPresenter implements Presenter, Localizable {
 
 		fileMenu = getFileMenu();
 		editMenu = getEditMenu();
+		selectionMenu = getSelectionMenu();
 		viewMenu = getViewMenu();
-		toolsMenu = getToolsMenu();
 		helpMenu = getHelpMenu();
-		selectionMaskMenu = getSelectionMaskMenu();
 
-		menuBar.getMenus().addAll(
-				fileMenu, editMenu, viewMenu, toolsMenu, selectionMaskMenu, helpMenu
+		menuBar.getMenus().addAll(fileMenu, editMenu, selectionMenu, viewMenu, helpMenu
 		);
 	}
 
@@ -125,49 +123,6 @@ public class MenuBarPresenter implements Presenter, Localizable {
 		redo.setAccelerator(KeyCombination.keyCombination("Ctrl+Y"));
 
 		final SeparatorMenuItem sep = new SeparatorMenuItem();
-		final MenuItem settings = new MenuItem(localize("settings"));
-		settings.setOnAction(e -> {
-			eventBus.post(new ApplicationRequest(ApplicationRequest.Type.OPEN_USER_SETTINGS));
-		});
-
-		menu.getItems().addAll(undo, redo, sep, settings);
-
-		return menu;
-	}
-
-	private Menu getViewMenu() {
-		final Menu menu = new Menu(localize("view"));
-		final CheckMenuItem viewSideBar = new CheckMenuItem(localize("view.sidebar"));
-		viewSideBar.selectedProperty().bindBidirectional(handler.settings.primaryStage.sideBarVisibility);
-
-		final Menu viewToolBar = new Menu(localize("view.toolbar"));
-		final ToggleGroupValue toolBarGroup = new ToggleGroupValue();
-		for (VisibilityMode mode : VisibilityMode.values()) {
-			final RadioMenuItem item = new RadioMenuItem(mode.label());
-			toolBarGroup.add(item, mode.name());
-			viewToolBar.getItems().add(item);
-		}
-		toolBarGroup.valueProperty().bindBidirectional(handler.settings.primaryStage.toolBarVisibility);
-
-		final Menu viewOptionsBar = new Menu(localize("view.optionsbar"));
-		final ToggleGroupValue optionsBarGroup = new ToggleGroupValue();
-		for (VisibilityMode mode : VisibilityMode.values()) {
-			final RadioMenuItem item = new RadioMenuItem(mode.label());
-			optionsBarGroup.add(item, mode.name());
-			viewOptionsBar.getItems().add(item);
-		}
-		optionsBarGroup.valueProperty().bindBidirectional(handler.settings.primaryStage.optionsBarVisibility);
-
-		menu.getItems().addAll(
-				viewSideBar,
-				viewToolBar,
-				viewOptionsBar
-		);
-		return menu;
-	}
-
-	private Menu getToolsMenu() {
-		final Menu menu = new Menu(localize("tools"));
 
 		final MenuItem pipelineEditor = new MenuItem(localize("pipeline.editor"));
 		pipelineEditor.setOnAction(e -> {
@@ -179,11 +134,17 @@ public class MenuBarPresenter implements Presenter, Localizable {
 		pipelineEditor.disableProperty().bind(canOpenPipelineEditor);
 		pipelineEditor.setAccelerator(KeyCombination.keyCombination("Ctrl+P"));
 
-		menu.getItems().addAll(pipelineEditor);
+		final MenuItem settings = new MenuItem(localize("settings"));
+		settings.setOnAction(e -> {
+			eventBus.post(new ApplicationRequest(ApplicationRequest.Type.OPEN_USER_SETTINGS));
+		});
+
+		menu.getItems().addAll(undo, redo, sep, pipelineEditor, settings);
+
 		return menu;
 	}
 
-	private Menu getSelectionMaskMenu() {
+	private Menu getSelectionMenu() {
 		final Menu menu = new Menu(localize("select"));
 		final MenuItem all = new MenuItem(localize("selection.all"));
 
@@ -218,8 +179,37 @@ public class MenuBarPresenter implements Presenter, Localizable {
 				all, deselect, reselect, invert
 		);
 		return menu;
+	}
 
-		//closeProject.disableProperty().bind(Bindings.not(handler.hasProjectProperty()));
+	private Menu getViewMenu() {
+		final Menu menu = new Menu(localize("view"));
+		final CheckMenuItem viewSideBar = new CheckMenuItem(localize("view.sidebar"));
+		viewSideBar.selectedProperty().bindBidirectional(handler.settings.primaryStage.sideBarVisibility);
+
+		final Menu viewToolBar = new Menu(localize("view.toolbar"));
+		final ToggleGroupValue toolBarGroup = new ToggleGroupValue();
+		for (VisibilityMode mode : VisibilityMode.values()) {
+			final RadioMenuItem item = new RadioMenuItem(mode.label());
+			toolBarGroup.add(item, mode.name());
+			viewToolBar.getItems().add(item);
+		}
+		toolBarGroup.valueProperty().bindBidirectional(handler.settings.primaryStage.toolBarVisibility);
+
+		final Menu viewOptionsBar = new Menu(localize("view.optionsbar"));
+		final ToggleGroupValue optionsBarGroup = new ToggleGroupValue();
+		for (VisibilityMode mode : VisibilityMode.values()) {
+			final RadioMenuItem item = new RadioMenuItem(mode.label());
+			optionsBarGroup.add(item, mode.name());
+			viewOptionsBar.getItems().add(item);
+		}
+		optionsBarGroup.valueProperty().bindBidirectional(handler.settings.primaryStage.optionsBarVisibility);
+
+		menu.getItems().addAll(
+				viewSideBar,
+				viewToolBar,
+				viewOptionsBar
+		);
+		return menu;
 	}
 
 	private Menu getHelpMenu() {
