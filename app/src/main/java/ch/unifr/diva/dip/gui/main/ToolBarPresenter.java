@@ -350,7 +350,6 @@ public class ToolBarPresenter<T extends Processor & Editable> implements Present
 
 		for (GestureEventHandler h : newTool.getGesture().eventHandlers()) {
 			if (h.isKeyEvent()) {
-//				editor.getComponent().addEventHandler(h.eventType, h.eventHandler);
 				stage.addEventHandler(h.eventType, h.eventHandler);
 			} else {
 				pane.addEventHandler(h.eventType, h.eventHandler);
@@ -371,7 +370,6 @@ public class ToolBarPresenter<T extends Processor & Editable> implements Present
 		if (currentTool != null) {
 			for (GestureEventHandler h : currentTool.getGesture().eventHandlers()) {
 				if (h.isKeyEvent()) {
-//					editor.getComponent().removeEventHandler(h.eventType, h.eventHandler);
 					stage.removeEventHandler(h.eventType, h.eventHandler);
 				} else {
 					pane.removeEventHandler(h.eventType, h.eventHandler);
@@ -444,7 +442,7 @@ public class ToolBarPresenter<T extends Processor & Editable> implements Present
 			}
 		}
 
-		final protected void selectThisTool() {
+		protected void selectThisTool() {
 			this.toolBar.setSelectedTool(this);
 		}
 
@@ -506,6 +504,16 @@ public class ToolBarPresenter<T extends Processor & Editable> implements Present
 			this.isSelected = selected;
 			this.currentGlyph.enableHoverEffect(!selected);
 			this.currentGlyph.setColor(getColor());
+		}
+
+		@Override
+		public String toString() {
+			return this.getClass().getSimpleName()
+					+ "@" + Integer.toHexString(this.hashCode())
+					+ "{"
+					+ "tool=" + this.tool
+					+ ", isSelected=" + this.isSelected
+					+ "}";
 		}
 
 	}
@@ -580,6 +588,11 @@ public class ToolBarPresenter<T extends Processor & Editable> implements Present
 			);
 			poly.setFill(ToolBarPresenter.COLOR_DEFAULT);
 			return poly;
+		}
+
+		@Override
+		protected void selectThisTool() {
+			this.toolBar.setSelectedMultiTool(this, this.tool, this.tool.getSelectedTool());
 		}
 
 		protected final void onSelectSimpleTool(SimpleTool tool) {
