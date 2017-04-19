@@ -105,7 +105,7 @@ public abstract class ProcessorBase implements Processor {
 	 * @param context the processor context.
 	 */
 	public static void resetLayer(ProcessorContext context) {
-		context.layer.clear();
+		context.getLayer().clear();
 	}
 
 	/**
@@ -156,7 +156,7 @@ public abstract class ProcessorBase implements Processor {
 	 * @return the added {@code LayerPane}.
 	 */
 	public static EditorLayerPane provideImageLayer(ProcessorContext context, Image image, String name) {
-		final EditorLayerPane layer = context.layer.newLayerPane(name);
+		final EditorLayerPane layer = context.getLayer().newLayerPane(name);
 		layer.add(new ImageView(image));
 		return layer;
 	}
@@ -205,7 +205,7 @@ public abstract class ProcessorBase implements Processor {
 	 * @return the filtered image.
 	 */
 	protected BufferedImage filter(ProcessorContext context, BufferedImageOp op, BufferedImage src, BufferedImage dest) {
-		return filter(context.threadPool, op, src, dest);
+		return filter(context.getThreadPool(), op, src, dest);
 	}
 
 	/**
@@ -274,7 +274,7 @@ public abstract class ProcessorBase implements Processor {
 	 * @return optimal tile size.
 	 */
 	protected Rectangle getOptimalTileSize(ProcessorContext context, BufferedImage src) {
-		return getOptimalTileSize(context.threadPool.poolSize(), src);
+		return getOptimalTileSize(context.getThreadPool().poolSize(), src);
 	}
 
 	/**
@@ -332,7 +332,7 @@ public abstract class ProcessorBase implements Processor {
 	 * @param image the image.
 	 */
 	public static void writeBufferedImage(ProcessorContext context, String filename, String format, BufferedImage image) {
-		final Path file = context.directory.resolve(filename);
+		final Path file = context.getDirectory().resolve(filename);
 		deleteFile(file);
 
 		try (OutputStream os = Files.newOutputStream(file)) {
@@ -350,7 +350,7 @@ public abstract class ProcessorBase implements Processor {
 	 * @return the image, or null.
 	 */
 	public static BufferedImage readBufferedImage(ProcessorContext context, String filename) {
-		final Path file = context.directory.resolve(filename);
+		final Path file = context.getDirectory().resolve(filename);
 
 		if (Files.exists(file)) {
 			try (InputStream is = Files.newInputStream(file)) {
@@ -371,7 +371,7 @@ public abstract class ProcessorBase implements Processor {
 	 * @param mat the image/matrix.
 	 */
 	public static void writeBufferedMatrix(ProcessorContext context, String filename, BufferedMatrix mat) {
-		final Path file = context.directory.resolve(filename);
+		final Path file = context.getDirectory().resolve(filename);
 		deleteFile(file);
 
 		/*
@@ -416,7 +416,7 @@ public abstract class ProcessorBase implements Processor {
 	 * @return the image/matrix, or null.
 	 */
 	public static BufferedMatrix readBufferedMatrix(ProcessorContext context, String filename) {
-		final Path file = context.directory.resolve(filename);
+		final Path file = context.getDirectory().resolve(filename);
 
 		if (Files.exists(file)) {
 			try (InputStream is = Files.newInputStream(file)) {
@@ -438,7 +438,7 @@ public abstract class ProcessorBase implements Processor {
 	 * @param image the image.
 	 */
 	public static void writeImage(ProcessorContext context, String filename, String format, Image image) {
-		final Path file = context.directory.resolve(filename);
+		final Path file = context.getDirectory().resolve(filename);
 		deleteFile(file);
 
 		try (OutputStream os = Files.newOutputStream(file)) {
@@ -456,7 +456,7 @@ public abstract class ProcessorBase implements Processor {
 	 * @return the image, or null.
 	 */
 	public static Image readImage(ProcessorContext context, String filename) {
-		final Path file = context.directory.resolve(filename);
+		final Path file = context.getDirectory().resolve(filename);
 
 		if (Files.exists(file)) {
 			try (InputStream is = Files.newInputStream(file)) {
@@ -477,7 +477,7 @@ public abstract class ProcessorBase implements Processor {
 	 * @return True if the file was deleted by this method, false otherwise.
 	 */
 	public static boolean deleteFile(ProcessorContext context, String filename) {
-		final Path file = context.directory.resolve(filename);
+		final Path file = context.getDirectory().resolve(filename);
 		return deleteFile(file);
 	}
 

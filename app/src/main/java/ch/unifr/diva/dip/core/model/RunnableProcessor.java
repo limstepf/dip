@@ -444,7 +444,7 @@ public class RunnableProcessor extends ProcessorWrapper {
 
 	@Override
 	protected ProcessorContext newProcessorContext() {
-		return new ProcessorContext(
+		return new RunnableProcessorContext(
 				this.handler.threadPool,
 				processorDataDirectory(),
 				objectMap.objects,

@@ -52,12 +52,12 @@ public class LayerDemo extends ProcessableBase {
 	public void init(ProcessorContext context) {
 		if (context != null) {
 			if (context.hasKeys("points", "lines", "width", "height")) {
-				final int width = (int) context.objects.get("width");
-				final int height = (int) context.objects.get("height");
+				final int width = (int) context.getObjects().get("width");
+				final int height = (int) context.getObjects().get("height");
 				// custom classes (with their own @XmlRootElement annotation) need
 				// to be wrapped in a JaxbList to be marshalled to xml!
-				final JaxbList<Point2D> pointSet = (JaxbList<Point2D>) context.objects.get("points");
-				final JaxbList<Line2D> lineSet = (JaxbList<Line2D>) context.objects.get("lines");
+				final JaxbList<Point2D> pointSet = (JaxbList<Point2D>) context.getObjects().get("points");
+				final JaxbList<Line2D> lineSet = (JaxbList<Line2D>) context.getObjects().get("lines");
 
 				this.points = null; // make sure to get new layers
 				this.lines = null;
@@ -74,7 +74,7 @@ public class LayerDemo extends ProcessableBase {
 
 	private EditorLayerGroup getPointsLayer(ProcessorContext context) {
 		if (this.points == null) {
-			this.points = context.layer.newLayerGroup("points");
+			this.points = context.getLayer().newLayerGroup("points");
 		}
 		return this.points;
 	}
@@ -83,7 +83,7 @@ public class LayerDemo extends ProcessableBase {
 
 	private EditorLayerGroup getLinesLayer(ProcessorContext context) {
 		if (this.lines == null) {
-			this.lines = context.layer.newLayerGroup("lines");
+			this.lines = context.getLayer().newLayerGroup("lines");
 		}
 		return this.lines;
 	}
@@ -94,12 +94,12 @@ public class LayerDemo extends ProcessableBase {
 		final List<Point2D> pointSet = new ArrayList<>();
 		final List<Line2D> lineSet = new ArrayList<>();
 
-		final EditorLayerGroup root = context.layer;
+		final EditorLayerGroup root = context.getLayer();
 
 		final int height = input.getValue().getHeight();
 		final int width = input.getValue().getWidth();
-		context.objects.put("width", width);
-		context.objects.put("height", height);
+		context.getObjects().put("width", width);
+		context.getObjects().put("height", height);
 		final int dx = 100;
 		final double r = 2;
 
@@ -111,13 +111,13 @@ public class LayerDemo extends ProcessableBase {
 		drawPoints(getPointsLayer(context), pointSet, width, height);
 		// custom classes (with their own @XmlRootElement annotation) need
 		// to be wrapped in a JaxbList to be marshalled to xml!
-		context.objects.put("points", new JaxbList(pointSet));
+		context.getObjects().put("points", new JaxbList(pointSet));
 
 		for (int y = dx; y < height; y = y + dx) {
 			lineSet.add(new Line2D(0, y, width, y));
 		}
 		drawLines(getLinesLayer(context), lineSet, width, height);
-		context.objects.put("lines", new JaxbList(lineSet));
+		context.getObjects().put("lines", new JaxbList(lineSet));
 
 		this.points_out.setOutput(pointSet);
 		this.lines_out.setOutput(lineSet);
@@ -169,8 +169,8 @@ public class LayerDemo extends ProcessableBase {
 		this.points_out.setOutput(null);
 		this.lines_out.setOutput(null);
 
-		context.objects.clear();
-		context.layer.clear();
+		context.getObjects().clear();
+		context.getLayer().clear();
 	}
 
 	private static Color getColor(int x, double maxX, int y, double maxY) {

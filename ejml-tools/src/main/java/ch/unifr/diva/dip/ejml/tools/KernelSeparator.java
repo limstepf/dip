@@ -193,8 +193,8 @@ public class KernelSeparator extends ProcessableBase implements Transmutable {
 		final Kernel.Precision precision = getKernelPrecision();
 
 		if (precision.equals(Kernel.Precision.DOUBLE)) {
-			final DoubleMatrix rowVector = (DoubleMatrix) context.objects.get("row-vector-double");
-			final DoubleMatrix columnVector = (DoubleMatrix) context.objects.get("column-vector-double");
+			final DoubleMatrix rowVector = (DoubleMatrix) context.getObjects().get("row-vector-double");
+			final DoubleMatrix columnVector = (DoubleMatrix) context.getObjects().get("column-vector-double");
 
 			if (rowVector != null && columnVector != null) {
 				this.output_double_row.setOutput(rowVector);
@@ -202,8 +202,8 @@ public class KernelSeparator extends ProcessableBase implements Transmutable {
 				return true;
 			}
 		} else {
-			final FloatMatrix rowVector = (FloatMatrix) context.objects.get("row-vector-float");
-			final FloatMatrix columnVector = (FloatMatrix) context.objects.get("column-vector-float");
+			final FloatMatrix rowVector = (FloatMatrix) context.getObjects().get("row-vector-float");
+			final FloatMatrix columnVector = (FloatMatrix) context.getObjects().get("column-vector-float");
 
 			if (rowVector != null && columnVector != null) {
 				this.output_float_row.setOutput(rowVector);
@@ -292,16 +292,16 @@ public class KernelSeparator extends ProcessableBase implements Transmutable {
 					final DoubleMatrix columnVector = new DoubleMatrix(column.getNumElements(), 1);
 					copyMatrixData(column, columnVector);
 
-					context.objects.put("row-vector-double", rowVector);
-					context.objects.put("column-vector-double", columnVector);
+					context.getObjects().put("row-vector-double", rowVector);
+					context.getObjects().put("column-vector-double", columnVector);
 				} else {
 					final FloatMatrix rowVector = new FloatMatrix(1, row.getNumElements());
 					copyMatrixData(row, rowVector);
 					final FloatMatrix columnVector = new FloatMatrix(column.getNumElements(), 1);
 					copyMatrixData(column, columnVector);
 
-					context.objects.put("row-vector-float", rowVector);
-					context.objects.put("column-vector-float", columnVector);
+					context.getObjects().put("row-vector-float", rowVector);
+					context.getObjects().put("column-vector-float", columnVector);
 				}
 
 				restoreOutputs(context);

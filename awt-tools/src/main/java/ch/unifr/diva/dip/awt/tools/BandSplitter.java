@@ -155,13 +155,13 @@ public class BandSplitter extends ProcessableBase implements Transmutable {
 
 	@Override
 	public void init(ProcessorContext context) {
-		if (context == null || context.objects.get("isBufferedMatrix") == null) {
+		if (context == null || context.getObjects().get("isBufferedMatrix") == null) {
 			inputCallback();
 			attachInputListeners();
 			return;
 		}
 
-		final boolean isBufferedMatrix = (boolean) context.objects.get("isBufferedMatrix");
+		final boolean isBufferedMatrix = (boolean) context.getObjects().get("isBufferedMatrix");
 
 		// restore bands
 		for (OutputBand band : this.outputBands) {
@@ -397,7 +397,7 @@ public class BandSplitter extends ProcessableBase implements Transmutable {
 		final boolean provideAll = this.processAllBands.get();
 		final boolean isBufferedMatrix = src instanceof BufferedMatrix;
 		// remember type s.t. we can restore the saved file more easily
-		context.objects.put("isBufferedMatrix", isBufferedMatrix);
+		context.getObjects().put("isBufferedMatrix", isBufferedMatrix);
 
 		final boolean[] processBand = new boolean[numBands];
 		final BufferedImage[] images = new BufferedImage[numBands];
@@ -514,7 +514,7 @@ public class BandSplitter extends ProcessableBase implements Transmutable {
 		}
 		resetOutputs();
 		resetLayer(context);
-		context.objects.clear();
+		context.getObjects().clear();
 	}
 
 	@Override
