@@ -78,14 +78,14 @@ public class FxUtils {
 	 * @throws Exception
 	 */
 	public static <T> T runFutureTask(final Callable<T> callable) throws Exception {
-		final FutureTask query = new FutureTask(callable);
+		final FutureTask<T> query = new FutureTask(callable);
 		final T value;
 
 		if (Platform.isFxApplicationThread()) {
 			value = callable.call();
 		} else {
 			Platform.runLater(query);
-			value = (T) query.get();
+			value = query.get();
 		}
 
 		return value;
