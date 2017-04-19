@@ -32,6 +32,7 @@
 		<!-- OSGi bundles (plugins) -->
 		<module>awt-tools</module>
 		<module>fx-tools</module>
+		<module>fx-paint</module>
 		<module>ejml-tools</module>
 
 	</modules>
