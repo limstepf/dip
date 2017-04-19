@@ -2,7 +2,7 @@ package ch.unifr.diva.dip.gui.pe;
 
 import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
-import ch.unifr.diva.dip.utils.FxUtils;
+import ch.unifr.diva.dip.api.utils.FxUtils;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;

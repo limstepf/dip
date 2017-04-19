@@ -2,7 +2,7 @@ package ch.unifr.diva.dip.gui.main;
 
 import ch.unifr.diva.dip.gui.Presenter;
 import ch.unifr.diva.dip.gui.Widget;
-import ch.unifr.diva.dip.utils.FxUtils;
+import ch.unifr.diva.dip.api.utils.FxUtils;
 import javafx.scene.Parent;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;

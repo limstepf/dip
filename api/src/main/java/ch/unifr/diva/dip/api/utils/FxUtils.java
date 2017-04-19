@@ -1,4 +1,4 @@
-package ch.unifr.diva.dip.utils;
+package ch.unifr.diva.dip.api.utils;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;

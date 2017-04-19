@@ -1,6 +1,6 @@
 package ch.unifr.diva.dip.gui.layout;
 
-import ch.unifr.diva.dip.utils.FxUtils;
+import ch.unifr.diva.dip.api.utils.FxUtils;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;

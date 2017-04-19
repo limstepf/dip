@@ -1,7 +1,7 @@
 package ch.unifr.diva.dip.osgi;
 
 import ch.unifr.diva.dip.osgi.OSGiServiceTracker.TrackerListener;
-import ch.unifr.diva.dip.utils.FxUtils;
+import ch.unifr.diva.dip.api.utils.FxUtils;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;

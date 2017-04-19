@@ -1,6 +1,6 @@
 package ch.unifr.diva.dip.core;
 
-import ch.unifr.diva.dip.utils.FxUtils;
+import ch.unifr.diva.dip.api.utils.FxUtils;
 import ch.unifr.diva.dip.api.utils.XmlUtils;
 import ch.unifr.diva.dip.api.utils.jaxb.BooleanPropertyAdapter;
 import ch.unifr.diva.dip.api.utils.jaxb.PathAdapter;

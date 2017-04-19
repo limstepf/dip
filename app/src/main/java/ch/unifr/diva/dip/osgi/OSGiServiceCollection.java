@@ -1,6 +1,6 @@
 package ch.unifr.diva.dip.osgi;
 
-import ch.unifr.diva.dip.utils.FxUtils;
+import ch.unifr.diva.dip.api.utils.FxUtils;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;

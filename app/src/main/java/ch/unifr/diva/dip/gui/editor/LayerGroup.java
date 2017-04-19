@@ -3,7 +3,7 @@ package ch.unifr.diva.dip.gui.editor;
 import ch.unifr.diva.dip.api.components.EditorLayer;
 import ch.unifr.diva.dip.api.components.EditorLayerGroup;
 import ch.unifr.diva.dip.api.components.EditorLayerPane;
-import ch.unifr.diva.dip.utils.FxUtils;
+import ch.unifr.diva.dip.api.utils.FxUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

@@ -8,7 +8,7 @@ import ch.unifr.diva.dip.eventbus.EventBus;
 import ch.unifr.diva.dip.eventbus.EventBusGuava;
 import ch.unifr.diva.dip.eventbus.events.StatusMessageEvent;
 import ch.unifr.diva.dip.eventbus.events.StatusWorkerEvent;
-import ch.unifr.diva.dip.utils.FxUtils;
+import ch.unifr.diva.dip.api.utils.FxUtils;
 import com.google.common.eventbus.Subscribe;
 import java.util.List;
 import java.util.Map;

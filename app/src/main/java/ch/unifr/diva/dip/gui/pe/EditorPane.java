@@ -7,7 +7,7 @@ import ch.unifr.diva.dip.core.model.Pipeline;
 import ch.unifr.diva.dip.core.model.ProcessorWrapper;
 import static ch.unifr.diva.dip.gui.pe.ProcessorsWidget.ProcessorListCell.OSGI_SERVICE_PROCESSOR;
 import ch.unifr.diva.dip.osgi.OSGiServiceReference;
-import ch.unifr.diva.dip.utils.FxUtils;
+import ch.unifr.diva.dip.api.utils.FxUtils;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;

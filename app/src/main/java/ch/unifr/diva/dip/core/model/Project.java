@@ -7,7 +7,7 @@ import ch.unifr.diva.dip.eventbus.events.ProjectNotification;
 import ch.unifr.diva.dip.utils.Modifiable;
 import ch.unifr.diva.dip.utils.ModifiedProperty;
 import ch.unifr.diva.dip.gui.pe.PipelineEditor;
-import ch.unifr.diva.dip.utils.FxUtils;
+import ch.unifr.diva.dip.api.utils.FxUtils;
 import ch.unifr.diva.dip.utils.ZipFileSystem;
 import java.io.BufferedOutputStream;
 import java.io.File;

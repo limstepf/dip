@@ -17,7 +17,7 @@ import ch.unifr.diva.dip.gui.layout.Lane;
 import ch.unifr.diva.dip.gui.pe.ProcessorParameterWindow;
 import ch.unifr.diva.dip.utils.BackgroundTask;
 import ch.unifr.diva.dip.utils.FileFinder;
-import ch.unifr.diva.dip.utils.FxUtils;
+import ch.unifr.diva.dip.api.utils.FxUtils;
 import ch.unifr.diva.dip.utils.IOUtils;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

@@ -1,5 +1,6 @@
 package ch.unifr.diva.dip.utils;
 
+import ch.unifr.diva.dip.api.utils.FxUtils;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
