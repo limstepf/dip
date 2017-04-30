@@ -304,8 +304,8 @@ public abstract class CompositeGridBase<T> extends CompositeBase<T, CompositeGri
 				setSpacing(
 						node,
 						(row > 0),
-						(col < width),
-						(row < numRows),
+						(col+1 < width),
+						(row+1 < numRows),
 						(col > 0)
 				);
 				if (p.isPersistent()) {
