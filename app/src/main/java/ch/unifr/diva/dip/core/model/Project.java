@@ -39,6 +39,13 @@ import org.slf4j.LoggerFactory;
 public class Project implements Modifiable, Localizable {
 
 	private static final Logger log = LoggerFactory.getLogger(Project.class);
+
+	/**
+	 * The suffix (placed after the project name) for the directory to export
+	 * project files to.
+	 */
+	public static final String EXPORT_DIRECTORY_SUFFIX = "-out";
+
 	private final ApplicationHandler handler;
 
 	/**
@@ -317,6 +324,17 @@ public class Project implements Modifiable, Localizable {
 	 */
 	public String getFilename() {
 		return file.getFileName().toString();
+	}
+
+	/**
+	 * Returns the path to the project's export directory. This directory is for
+	 * data that a processor can store publicly (i.e. not as state inside the
+	 * dip file).
+	 *
+	 * @return the path to the project's export directory.
+	 */
+	public Path getExportDirectory() {
+		return file.getParent().resolve(getFilename() + EXPORT_DIRECTORY_SUFFIX);
 	}
 
 	/**

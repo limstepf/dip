@@ -1,6 +1,8 @@
 package ch.unifr.diva.dip.api.components;
 
 import ch.unifr.diva.dip.api.utils.DipThreadPool;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
@@ -20,6 +22,13 @@ public interface ProcessorContext {
 	public DipThreadPool getThreadPool();
 
 	/**
+	 * Returns the ID of the page.
+	 *
+	 * @return the ID of the page.
+	 */
+	public int getPageId();
+
+	/**
 	 * Returns the directory dedicated for persistent data of a processor. Note
 	 * that this directory resides in a zip file system, so you can't use
 	 * {@code File} and have to use {@code Path}s instead (using
@@ -28,6 +37,81 @@ public interface ProcessorContext {
 	 * @return the directory dedicated for persistent data of a processor.
 	 */
 	public Path getDirectory();
+
+	/**
+	 * Returns the path to the processor's export directory. This directory is
+	 * for data that a processor can store publicly (i.e. not as state inside
+	 * the dip file).
+	 *
+	 * @return the path to the processor's export directory. The directory will
+	 * be created if it doesn't exist yet.
+	 * @throws IOException in case the directory could not be created.
+	 */
+	default Path getExportDirectory() throws IOException {
+		return getExportDirectory(true);
+	}
+
+	/**
+	 * Returns the path to the processor's export directory. This directory is
+	 * for data that a processor can store publicly (i.e. not as state inside
+	 * the dip file).
+	 *
+	 * @param createIfNonexistent creates the directory if nonexistent.
+	 * @return the path to the processor's export directory.
+	 * @throws IOException in case the directory could not be created.
+	 */
+	default Path getExportDirectory(boolean createIfNonexistent) throws IOException {
+		final Path exportDirectory = getExportDirectoryPath();
+		if (createIfNonexistent) {
+			Files.createDirectories(exportDirectory);
+		}
+		return exportDirectory;
+	}
+
+	/**
+	 * Returns the path to the processor's export directory without creating the
+	 * directory if it doesn't exist yet.
+	 *
+	 * @return the path to the processor's export directory.
+	 */
+	public Path getExportDirectoryPath();
+
+	/**
+	 * Returns the path to the export root directory. The export root directory
+	 * is shared by all processors of all pages/pipelines in the project. Use at
+	 * your own risk.
+	 *
+	 * @param createIfNonexistent creates the directory if nonexistent.
+	 * @return the path to the processor's export directory.
+	 * @throws IOException in case the directory could not be created.
+	 */
+	default Path getExportRootDirectory(boolean createIfNonexistent) throws IOException {
+		final Path exportRootDirectory = getExportRootDirectoryPath();
+		if (createIfNonexistent) {
+			Files.createDirectories(exportRootDirectory);
+		}
+		return exportRootDirectory;
+	}
+
+	/**
+	 * Return the path to the export root directory without creating it if it
+	 * doesn't exist yet. The export root directory is shared by all processors
+	 * of all pages/pipelines in the project. Use at your own risk.
+	 *
+	 * @return the path to the export root directory.
+	 */
+	public Path getExportRootDirectoryPath();
+
+	/**
+	 * Removes an export file (if it exists), and in addition cleans up/removes
+	 * empty export directories too. Should be called in the {@code reset()}
+	 * method of the exporting processor instead of the usual
+	 * {@code deleteFile()}.
+	 *
+	 * @param file the export file.
+	 * @return {@code true} if the file got deleted, {@code false} otherwise.
+	 */
+	public boolean deleteExportFile(Path file);
 
 	/**
 	 * Returns the processor's persistent map of objects. Any marshallable
