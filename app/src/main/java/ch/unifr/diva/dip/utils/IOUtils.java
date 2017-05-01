@@ -5,6 +5,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.DigestInputStream;
@@ -94,6 +95,37 @@ public class IOUtils {
 		}
 
 		return ret.toRealPath();
+	}
+
+	/**
+	 * Recursively removes directories if they're empty up to the given root
+	 * directory. The root directory itself will not be removed, even if empty.
+	 *
+	 * @param directory the starting directory (a file of root's subtree).
+	 * @param root the root directory.
+	 * @throws IOException probably in case the directory doesn't exist...
+	 */
+	public static void deleteDirectoryIfEmpty(Path directory, Path root) throws IOException {
+		if (Files.exists(directory) && isDirectoryEmpty(directory)) {
+			final Path parent = directory.getParent();
+			Files.delete(directory);
+			if (!parent.equals(root)) {
+				deleteDirectoryIfEmpty(parent, root);
+			}
+		}
+	}
+
+	/**
+	 * Checks whether the directory is empty, or not.
+	 *
+	 * @param directory path to the directory.
+	 * @return {@code true} if the directory is empty, {@code false} otherwise.
+	 * @throws IOException probably in case the directory doesn't exist...
+	 */
+	public static boolean isDirectoryEmpty(Path directory) throws IOException {
+		try (DirectoryStream<Path> ds = Files.newDirectoryStream(directory)) {
+			return !ds.iterator().hasNext();
+		}
 	}
 
 	/**
