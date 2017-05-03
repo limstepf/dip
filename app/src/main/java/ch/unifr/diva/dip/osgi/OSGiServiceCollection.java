@@ -17,7 +17,7 @@ import org.osgi.framework.VersionRange;
  *
  * @param <T> type/interface of the service.
  */
-public class OSGiServiceCollection<T> implements ServiceCollection<T> {
+public class OSGiServiceCollection<T> implements ServiceCollection<T>, Comparable<OSGiServiceCollection> {
 
 	private final String pid;
 	private final LinkedList<OSGiService<T>> versions;
@@ -40,6 +40,23 @@ public class OSGiServiceCollection<T> implements ServiceCollection<T> {
 	public OSGiServiceCollection(String pid) {
 		this.pid = pid;
 		this.versions = new LinkedList<>();
+	}
+
+	@Override
+	public int compareTo(OSGiServiceCollection t) {
+		return getNameFromPID().compareTo(t.getNameFromPID());
+	}
+
+	/*
+	 * Sorting by pid() directly is rather unintuitive, so we take just the last
+	 * part of it instead for comparison.
+	 */
+	private String getNameFromPID() {
+		final String[] parts = pid().split("\\.");
+		if (parts.length == 0) {
+			return pid();
+		}
+		return parts[parts.length - 1];
 	}
 
 	@Override

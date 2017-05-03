@@ -2,9 +2,11 @@ package ch.unifr.diva.dip.osgi;
 
 import ch.unifr.diva.dip.osgi.OSGiServiceTracker.TrackerListener;
 import ch.unifr.diva.dip.api.utils.FxUtils;
+import java.util.Comparator;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
+import javafx.collections.transformation.SortedList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +21,7 @@ public class OSGiServiceMonitor<T> implements ServiceMonitor<T> {
 
 	private final ObservableMap<String, OSGiServiceCollection<T>> services;
 	private final ObservableList<OSGiServiceCollection<T>> collections;
+	private final SortedList<OSGiServiceCollection<T>> sortedCollections;
 	private final ServiceTrackerListener trackerListener;
 
 	/**
@@ -29,13 +32,14 @@ public class OSGiServiceMonitor<T> implements ServiceMonitor<T> {
 	public OSGiServiceMonitor(OSGiServiceTracker<T> serviceTracker) {
 		this.services = FXCollections.observableHashMap();
 		this.collections = FXCollections.observableArrayList();
+		this.sortedCollections = this.collections.sorted(Comparator.naturalOrder());
 		this.trackerListener = new ServiceTrackerListener();
 		serviceTracker.addListener(trackerListener);
 	}
 
 	@Override
 	public ObservableList<OSGiServiceCollection<T>> getServiceCollectionList() {
-		return collections;
+		return sortedCollections;
 	}
 
 	@Override
