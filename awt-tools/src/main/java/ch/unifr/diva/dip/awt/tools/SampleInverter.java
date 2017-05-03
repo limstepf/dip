@@ -215,7 +215,7 @@ public class SampleInverter extends ProcessableBase implements Transmutable {
 		rc.setValignment(VPos.TOP);
 		cmGrid.setRowConstraints(rc);
 		this.configParam = new XorParameter(
-				"config",
+				"Input",
 				Arrays.asList(
 						bitOption,
 						byteOption,

@@ -10,6 +10,9 @@ import ch.unifr.diva.dip.api.services.ProcessableBase;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.services.ProcessorBase;
 import ch.unifr.diva.dip.api.services.Transmutable;
+import ch.unifr.diva.dip.api.ui.NamedGlyph;
+import ch.unifr.diva.dip.glyphs.IcoFont;
+import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -84,12 +87,17 @@ public class BufferedImageExporter extends ProcessableBase implements Transmutab
 				"", ImageFormat.class, DEFAULT_IMAGE_FORMAT.name()
 		);
 		final CompositeGrid grid = new CompositeGrid(
-				"file",
+				"File",
 				nameParam,
 				formatParam
 		);
 		grid.setHorizontalSpacing(5);
 		this.parameters.put("file", grid);
+	}
+
+	@Override
+	public NamedGlyph glyph() {
+		return MaterialDesignIcons.FILE_IMAGE;
 	}
 
 	private final BooleanProperty transmuteProperty = new SimpleBooleanProperty();

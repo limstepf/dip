@@ -163,7 +163,7 @@ public class ColorPortsUnit<T extends Processor & Transmutable> {
 			this.index_colors = -1;
 		}
 
-		this.config = new XorParameter("config", options);
+		this.config = new XorParameter("Input", options);
 		enableAllPorts();
 	}
 
