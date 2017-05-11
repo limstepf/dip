@@ -11,6 +11,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TreeCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 
 /**
  * Layer tree cell. Used by the LayersWidget that displays the processors of a
@@ -55,12 +56,17 @@ public class LayerTreeCell extends TreeCell<Layer> {
 			glyph = null;
 			this.focusedProperty().removeListener(glyphListener);
 			this.selectedProperty().removeListener(glyphListener);
+			if (currentItem != null) {
+				currentItem.getHiddenGlyphColorProperty().removeListener(glyphListener);
+			}
 		} else {
 			glyph = UIStrategyGUI.Glyphs.newGlyph(item.getHiddenGlyph(), Glyph.Size.MEDIUM);
 			BorderPane.setAlignment(glyph, Pos.TOP_CENTER);
 			BorderPane.setMargin(glyph, new Insets(2, UIStrategyGUI.Stage.insets, 0, -15));
+			item.getHiddenGlyphColorProperty().addListener(glyphListener);
 			this.focusedProperty().addListener(glyphListener);
 			this.selectedProperty().addListener(glyphListener);
+			updateColor();
 		}
 
 		this.pane.setLeft(glyph);
@@ -72,10 +78,11 @@ public class LayerTreeCell extends TreeCell<Layer> {
 		if (glyph == null) {
 			return;
 		}
-		if (isFocused() || isSelected()) {
+		final Color c = currentItem.getHiddenGlyphColorProperty().get();
+		if ((isFocused() || isSelected()) && UIStrategyGUI.Colors.accent.equals(c)) {
 			glyph.setColor(UIStrategyGUI.Colors.accent_inverted);
 		} else {
-			glyph.setColor(UIStrategyGUI.Colors.accent);
+			glyph.setColor(c);
 		}
 	}
 
@@ -91,8 +98,6 @@ public class LayerTreeCell extends TreeCell<Layer> {
 			pane.disableProperty().unbind();
 		}
 
-		setGlyph(item, empty);
-
 		if (!empty) {
 			currentItem = item;
 			visibleButton.visibleProperty().bind(Bindings.not(currentItem.emptyProperty()));
@@ -104,6 +109,8 @@ public class LayerTreeCell extends TreeCell<Layer> {
 
 			setGraphic(pane);
 		}
+
+		setGlyph(item, empty);
 	}
 
 }

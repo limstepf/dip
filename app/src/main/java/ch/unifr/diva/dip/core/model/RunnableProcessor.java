@@ -18,6 +18,7 @@ import ch.unifr.diva.dip.gui.pe.ProcessorParameterWindow;
 import ch.unifr.diva.dip.utils.BackgroundTask;
 import ch.unifr.diva.dip.utils.FileFinder;
 import ch.unifr.diva.dip.api.utils.FxUtils;
+import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import ch.unifr.diva.dip.utils.IOUtils;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -74,7 +75,13 @@ public class RunnableProcessor extends ProcessorWrapper {
 		this.pipeline = pipeline;
 		this.page = pipeline.page;
 		this.project = page.project();
-		this.stateProperty = new SimpleObjectProperty();
+		this.stateProperty = new SimpleObjectProperty<Processor.State>() {
+			@Override
+			public void set(Processor.State state) {
+				super.set(state);
+				updateStatusColor(state);
+			}
+		};
 
 		this.PROCESSOR_DATA_DIR = String.format(
 				ProjectPage.PROCESSOR_DATA_DIR_FORMAT,
@@ -173,13 +180,13 @@ public class RunnableProcessor extends ProcessorWrapper {
 	 */
 	public static class ProcessorLayerExtension implements LayerExtension, Localizable {
 
-		final private RunnableProcessor runnable;
-		final private VBox vbox = new VBox();
-		final private Label status = new Label();
-		final private Lane lane = new Lane();
-		private Button paramButton;
-		private Button processButton;
-		private Button resetButton;
+		private final RunnableProcessor runnable;
+		private final VBox vbox = new VBox();
+		private final Label status = new Label();
+		private final Lane lane = new Lane();
+		private final Button paramButton;
+		private final Button processButton;
+		private final Button resetButton;
 
 		/**
 		 * Creates a new processor layer extension.
@@ -207,6 +214,8 @@ public class RunnableProcessor extends ProcessorWrapper {
 				spacer.setMaxWidth(Double.MAX_VALUE);
 				HBox.setHgrow(spacer, Priority.ALWAYS);
 				lane.add(spacer);
+			} else {
+				paramButton = null;
 			}
 
 			if (runnable.processor().canProcess()) {
@@ -215,6 +224,8 @@ public class RunnableProcessor extends ProcessorWrapper {
 					this.runnable.processBackgroundTask();
 				});
 				lane.add(processButton);
+			} else {
+				processButton = null;
 			}
 
 			if (runnable.processor().canReset()) {
@@ -223,6 +234,8 @@ public class RunnableProcessor extends ProcessorWrapper {
 					this.runnable.resetBackgroundTask();
 				});
 				lane.add(resetButton);
+			} else {
+				resetButton = null;
 			}
 
 			lane.setAlignment(Pos.CENTER_RIGHT);
@@ -423,10 +436,12 @@ public class RunnableProcessor extends ProcessorWrapper {
 	protected void updateState(boolean updateDependentProcessors) {
 		if (this.processor() == null) {
 			this.stateProperty.set(Processor.State.UNAVAILABLE);
+			updateStatusColor();
 			return;
 		}
 
 		this.stateProperty.set(this.processor().state());
+		updateStatusColor();
 		if (updateDependentProcessors) {
 			final Map<InputPort, PortMapEntry> inputPortMap = this.pipeline.inputPortMap();
 
@@ -442,6 +457,37 @@ public class RunnableProcessor extends ProcessorWrapper {
 					}
 				}
 			}
+		}
+	}
+
+	private void updateStatusColor() {
+		updateStatusColor(stateProperty.get());
+	}
+
+	private void updateStatusColor(Processor.State state) {
+		switch (state) {
+			case ERROR:
+			case UNAVAILABLE:
+			case UNCONNECTED:
+				layerGroup.setGlyphColor(UIStrategyGUI.Colors.error);
+				break;
+			case WAITING:
+				layerGroup.setGlyphColor(UIStrategyGUI.Colors.waiting);
+				break;
+			case PROCESSING:
+				if (!processor().canProcess()) {
+					layerGroup.setGlyphColor(UIStrategyGUI.Colors.processingEdit);
+				} else {
+					layerGroup.setGlyphColor(UIStrategyGUI.Colors.processing);
+				}
+				break;
+			case READY:
+				if (processor().canEdit()) {
+					layerGroup.setGlyphColor(UIStrategyGUI.Colors.readyEdit);
+				} else {
+					layerGroup.setGlyphColor(UIStrategyGUI.Colors.ready);
+				}
+				break;
 		}
 	}
 

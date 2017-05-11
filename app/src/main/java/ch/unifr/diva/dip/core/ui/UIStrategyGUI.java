@@ -132,9 +132,41 @@ public class UIStrategyGUI implements UIStrategy {
 		public static final Color warning = Color.GOLD;
 
 		/**
-		 * Error status color.
+		 * Error status color. Also used for the processor states
+		 * {@code UNAVAILABLE} and {@code UNCONNECTED}.
 		 */
 		public static final Color error = Color.ORANGERED;
+
+		/**
+		 * Waiting status color. Used to indicate the processor state
+		 * {@code WAITING}.
+		 */
+		public static final Color waiting = Color.ORANGE;
+
+		/**
+		 * Processing status color. Used to indicate the processor state
+		 * {@code PROCESSING}.
+		 */
+		public static final Color processing = accent;
+
+		/**
+		 * Manual processing status color. Used to indicate the processor state
+		 * {@code PROCESSING} (manual).
+		 */
+		public static final Color processingEdit = warning;
+
+		/**
+		 * Ready status color. Used to indicate the processor state
+		 * {@code READY}.
+		 */
+		public static final Color ready = ok;
+
+		/**
+		 * Ready, but editable, status color. Used to indicate the processor
+		 * state {@code READY} (still manually editable).
+		 */
+		public static final Color readyEdit = Color.LIMEGREEN;
+
 	}
 
 	/**

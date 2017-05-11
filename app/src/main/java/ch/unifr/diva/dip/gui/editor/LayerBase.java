@@ -3,6 +3,7 @@ package ch.unifr.diva.dip.gui.editor;
 import ch.unifr.diva.dip.api.components.EditorLayer;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.api.utils.FxUtils;
+import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -16,6 +17,7 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TreeItem;
+import javafx.scene.paint.Color;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -208,6 +210,48 @@ public abstract class LayerBase implements Layer, EditorLayer {
 	@Override
 	public NamedGlyph getGlyph() {
 		return this.glyph;
+	}
+
+	private ObjectProperty<Color> glyphColorProperty; // lazily initialized
+
+	public ObjectProperty<Color> glyphColorProperty() {
+		if (glyphColorProperty == null) {
+			glyphColorProperty = new SimpleObjectProperty<>(UIStrategyGUI.Colors.processing);
+		}
+		return glyphColorProperty;
+	}
+
+	@Override
+	public void setGlyphColor(Color color) {
+		if (this.glyph == null) {
+			return;
+		}
+		glyphColorProperty().set(color);
+	}
+
+	@Override
+	public Color getGlyphColor() {
+		if (glyphColorProperty == null) {
+			return UIStrategyGUI.Colors.processing;
+		}
+		return glyphColorProperty().get();
+	}
+
+	@Override
+	public ObjectProperty<Color> getHiddenGlyphColorProperty() {
+		if (this.getParent() == null) {
+			return glyphColorProperty();
+		}
+
+		if (!this.getParent().isHideGroup()) {
+			return glyphColorProperty();
+		}
+
+		if (this.glyph == null) {
+			return this.getParent().glyphColorProperty();
+		}
+
+		return glyphColorProperty();
 	}
 
 	@Override

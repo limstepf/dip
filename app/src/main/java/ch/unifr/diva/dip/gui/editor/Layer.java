@@ -9,6 +9,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Parent;
 import javafx.scene.control.TreeItem;
+import javafx.scene.paint.Color;
 
 /**
  * Interface of (editor) layers.
@@ -171,9 +172,31 @@ public interface Layer {
 	public NamedGlyph getGlyph();
 
 	/**
+	 * Returns the "hidden" glyph color property of the layer. This is not
+	 * necessarily the layer's own property (see {@code getHiddenGlyph}).
+	 *
+	 * @return the "hidden" glyph color property.
+	 */
+	public ObjectProperty<Color> getHiddenGlyphColorProperty();
+
+	/**
+	 * Sets the color of the glyph.
+	 *
+	 * @param color the new glyph color.
+	 */
+	public void setGlyphColor(Color color);
+
+	/**
+	 * Returns the glyph color.
+	 *
+	 * @return the color of the glyph.
+	 */
+	public Color getGlyphColor();
+
+	/**
 	 * Returns the "hidden" glyph of the layer. This is not necessarily the
 	 * layer's own glyph. If the parent layer is hidden, and has a glyph, but
-	 * this layer not, the the hidden parent layer's glyph is returned.
+	 * this layer not, then the hidden parent layer's glyph is returned.
 	 *
 	 * @return the "hidden" glyph of the layer.
 	 */
