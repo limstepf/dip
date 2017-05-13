@@ -63,15 +63,15 @@ public class XmlUtils {
 
 	/**
 	 * Returns an array of all classes default JAXB contexts should know about.
-	 * This mixes the static seeAlsoClasses with the given additional class
-	 * that is actually to be unmarshalled.
+	 * This mixes the static seeAlsoClasses with the given additional class that
+	 * is actually to be unmarshalled.
 	 *
 	 * @param clazz class of the object to be unmarshalled.
 	 * @return an array of classes.
 	 */
 	private static Class[] getClasses(Class clazz) {
 		final int n = seeAlsoClasses.size();
-		final Class[] classes = new Class[n+1];
+		final Class[] classes = new Class[n + 1];
 		for (int i = 0; i < n; i++) {
 			classes[i] = seeAlsoClasses.get(i);
 		}
@@ -129,8 +129,6 @@ public class XmlUtils {
 	 * @throws JAXBException
 	 */
 	public static Unmarshaller getUnmarshaller(Class clazz) throws JAXBException {
-//		final JAXBContext c = JAXBContext.newInstance(clazz);
-//		final JAXBContext c = JAXBContext.newInstance(getClasses(clazz));
 		final JAXBContext c = getContext(clazz);
 		return c.createUnmarshaller();
 	}
@@ -167,8 +165,6 @@ public class XmlUtils {
 	 * @throws JAXBException
 	 */
 	public static Marshaller getMarshaller(Object obj) throws JAXBException {
-//		final JAXBContext c = JAXBContext.newInstance(obj.getClass());
-//		final JAXBContext c = JAXBContext.newInstance(getClasses(obj.getClass()));
 		final JAXBContext c = getContext(obj.getClass());
 		final Marshaller m = c.createMarshaller();
 		m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
