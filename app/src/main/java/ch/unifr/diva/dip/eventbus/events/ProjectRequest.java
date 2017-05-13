@@ -31,6 +31,14 @@ public class ProjectRequest {
 		 */
 		IMPORT_PAGES,
 		/**
+		 * Request to process the page(s). Send {@code -1} to process all pages.
+		 */
+		PROCESS_PAGE,
+		/**
+		 * Request to reset the page(s). Send {@code -1} to reset all pages.
+		 */
+		RESET_PAGE,
+		/**
 		 * Request to save the current project.
 		 */
 		SAVE,

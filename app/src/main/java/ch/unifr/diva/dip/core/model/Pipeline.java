@@ -38,6 +38,34 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 	protected final ApplicationHandler handler;
 
 	/**
+	 * The state of a (runnable) pipeline.
+	 */
+	public enum State {
+
+		/**
+		 * Error state. There exists a processor in the pipeline with processor
+		 * state {@code ERROR}, {@code UNAVAILABLE}, or {@code UNCONNECTED}.
+		 */
+		ERROR,
+		/**
+		 * Waiting state. All remaining processor in the pipeline with processor
+		 * state {@code PROCESSING} can not be automatically processed (i.e.
+		 * {p.canProcess() == false}).
+		 */
+		WAITING,
+		/**
+		 * Processing state. There exists a processor in the pipeline that can
+		 * be processed (automatically).
+		 */
+		PROCESSING,
+		/**
+		 * Ready state. All processors in the pipeline are in the processor
+		 * state {@code READY}.
+		 */
+		READY
+	}
+
+	/**
 	 * Pipeline id. Unique key for all pipelines in a project.
 	 */
 	public final int id;
@@ -379,9 +407,20 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 	protected final void addProcessor(T wrapper) {
 		addTransmutableListener(wrapper);
 		registerPorts(wrapper);
-		this.dirtyStages = true;
 		this.modifiedPipelineProperty.addManagedProperty(wrapper);
 		processors.add(wrapper);
+		registerProcessor(wrapper);
+	}
+
+	/**
+	 * Hook method called after a processor has been added to the pipeline. Make
+	 * sure to not already populate the pipline by calling the super
+	 * constructor, or this hook, if overwritten, won't get called.
+	 *
+	 * @param wrapper the processor.
+	 */
+	protected void registerProcessor(T wrapper) {
+
 	}
 
 	/**
@@ -409,22 +448,20 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 		}
 
 		this.modifiedPipelineProperty.removeManagedProperty(wrapper);
-		this.dirtyStages = true;
 		removeTransmutableListener(wrapper);
 		unregisterPorts(wrapper);
 		processors.remove(wrapper);
+		unregisterProcessor(wrapper);
 	}
 
-	// so far added and removed processors set the dirty bit to true, but that's
-	// not really enough: we also need to update the stages if connections change!
-	// On the bright side: this shouldn't ever happen with runnable pipelines, so
-	// we're good for now, since that's the only place where we use the stages,
-	// but technically we should listen to all ports too.
-	//
-	// ...and hence the method stages() is (only) defined/exposed on
-	// RunnablePipeline and not here.
-	protected volatile boolean dirtyStages = true;
-	protected volatile PipelineStages<RunnableProcessor> stages;
+	/**
+	 * Hook method called after a processor has been removed from the pipeline.
+	 *
+	 * @param wrapper the processor.
+	 */
+	protected void unregisterProcessor(T wrapper) {
+
+	}
 
 	@Override
 	public ModifiedProperty modifiedProperty() {

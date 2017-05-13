@@ -8,6 +8,8 @@ import ch.unifr.diva.dip.utils.Modifiable;
 import ch.unifr.diva.dip.utils.ModifiedProperty;
 import ch.unifr.diva.dip.gui.pe.PipelineEditor;
 import ch.unifr.diva.dip.api.utils.FxUtils;
+import ch.unifr.diva.dip.eventbus.events.StatusMessageEvent;
+import ch.unifr.diva.dip.utils.BackgroundTask;
 import ch.unifr.diva.dip.utils.ZipFileSystem;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -21,8 +23,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyIntegerProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -88,6 +93,7 @@ public class Project implements Modifiable, Localizable {
 	private final StringProperty projectNameProperty = new SimpleStringProperty();
 	private final ModifiedProperty modifiedProjectProperty = new ModifiedProperty();
 	private final IntegerProperty selectedPageIdProperty = new SimpleIntegerProperty(-1);
+	private final BooleanProperty canProcessSelectedPageProperty = new SimpleBooleanProperty(false);
 	private final ObservableList<ProjectPage> pages = FXCollections.observableArrayList();
 
 	/**
@@ -196,6 +202,9 @@ public class Project implements Modifiable, Localizable {
 		if (currentPage != null) {
 			currentPage.close();
 		}
+		selectedPageIdProperty.set(-1);
+		this.canProcessSelectedPageProperty.unbind();
+		this.canProcessSelectedPageProperty.set(false);
 	}
 
 	/**
@@ -427,6 +436,16 @@ public class Project implements Modifiable, Localizable {
 	}
 
 	/**
+	 * The canProcessSelectedPage property. True if the selected page can be
+	 * (further) processed.
+	 *
+	 * @return the canProcessSelectedPageProperty.
+	 */
+	public ReadOnlyBooleanProperty canProcessSelectedPageProperty() {
+		return this.canProcessSelectedPageProperty;
+	}
+
+	/**
 	 * Selects a project page by id.
 	 *
 	 * @param id an id of a project page.
@@ -442,8 +461,7 @@ public class Project implements Modifiable, Localizable {
 		if (page != null) {
 			page.open();
 			selectedPageIdProperty.set(id);
-		} else {
-			selectedPageIdProperty.set(-1);
+			this.canProcessSelectedPageProperty.bind(page.canProcessProperty());
 		}
 	}
 
@@ -671,6 +689,134 @@ public class Project implements Modifiable, Localizable {
 	protected int newPageId() {
 		maxPageId++;
 		return maxPageId;
+	}
+
+	/**
+	 * Processes the page with the given id, or all pages with {@code -1}.
+	 *
+	 * @param pageId the page id, or {@code -1}.
+	 */
+	public void processPage(int pageId) {
+		if (pageId < 0) {
+			processAllPages();
+			return;
+		}
+		processPages(Arrays.asList(getPage(pageId)));
+	}
+
+	/**
+	 * Processes all pages.
+	 */
+	public void processAllPages() {
+		processPages(pages());
+	}
+
+	private void processPages(List<ProjectPage> pages) {
+		final BackgroundTask<Void> task = new BackgroundTask<Void>(handler) {
+
+			@Override
+			protected Void call() throws Exception {
+				updateTitle(localize("processing.object", localize("pipelines")));
+				final int n = pages.size();
+				int i = 1;
+				for (ProjectPage page : pages) {
+					updateMessage(localize("processing.object", page.getName()));
+					if (i == n) {
+						updateProgress(-1, Double.NaN);
+					} else {
+						updateProgress(i++, n);
+					}
+
+					final boolean doOpen = !page.isOpened();
+					if (doOpen) {
+						page.open();
+					}
+					page.getPipeline().process();
+					runLater(() -> modifiedProperty().set(true));
+					if (doOpen) {
+						page.close();
+					}
+				}
+				return null;
+			}
+
+			@Override
+			protected void finished(BackgroundTask.Result result) {
+				runLater(() -> {
+					handler.eventBus.post(new StatusMessageEvent(
+							localize("processing.object", localize("pipelines"))
+							+ " "
+							+ localize("done")
+							+ "."
+					));
+				});
+			}
+		};
+		task.start();
+	}
+
+	/**
+	 * Resets the page with the given id, or all pages with {@code -1}.
+	 *
+	 * @param pageId the page id, or {@code -1}.
+	 */
+	public void resetPage(int pageId) {
+		if (pageId < 0) {
+			resetAllPages();
+		} else {
+			resetPages(Arrays.asList(getPage(pageId)));
+		}
+	}
+
+	/**
+	 * Resets all pages.
+	 */
+	public void resetAllPages() {
+		resetPages(pages());
+	}
+
+	private void resetPages(List<ProjectPage> pages) {
+		final BackgroundTask<Void> task = new BackgroundTask<Void>(handler) {
+
+			@Override
+			protected Void call() throws Exception {
+				updateTitle(localize("resetting.object", localize("pipelines")));
+				final int n = pages.size();
+				int i = 1;
+				for (ProjectPage page : pages) {
+					updateMessage(localize("resetting.object", page.getName()));
+					if (i == n) {
+						updateProgress(-1, Double.NaN);
+					} else {
+						updateProgress(i++, n);
+					}
+
+					final boolean doOpen = !page.isOpened();
+					if (doOpen) {
+						page.open();
+					}
+					page.getPipeline().reset(false);
+					runLater(() -> modifiedProperty().set(true));
+					if (doOpen) {
+						page.close(false);
+					}
+				}
+				return null;
+			}
+
+			@Override
+			protected void finished(BackgroundTask.Result result) {
+				runLater(() -> {
+					handler.eventBus.post(new StatusMessageEvent(
+							localize("resetting.object", localize("pipelines"))
+							+ " "
+							+ localize("done")
+							+ "."
+					));
+				});
+			}
+		};
+		task.start();
 	}
 
 	@Override

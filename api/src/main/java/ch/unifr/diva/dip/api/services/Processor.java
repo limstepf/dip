@@ -338,23 +338,12 @@ public interface Processor {
 	}
 
 	/**
-	 * Checks whether the processor is in an invalid state. Use
-	 * {@code errorMessage()} to get more information.
+	 * Checks whether the processor is in an invalid state.
 	 *
 	 * @return True if the processor is in an invalid state, False otherwise.
 	 */
 	default boolean isError() {
 		return false;
-	}
-
-	/**
-	 * Returns information about an error that has put the processor in an
-	 * invalid state.
-	 *
-	 * @return more information about an error.
-	 */
-	default String errorMessage() {
-		return L10n.getInstance().getString("unknown");
 	}
 
 	/**

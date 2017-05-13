@@ -12,8 +12,12 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import javafx.beans.InvalidationListener;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyIntegerProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -232,12 +236,14 @@ public class ProjectPage implements Modifiable, Localizable {
 
 		if (project.pipelineManager().pipelineExists(id)) {
 			this.pipelineIdProperty.set(id);
-			this.pipeline = getRunnablePipeline(id);
 		} else {
 			this.pipelineIdProperty.set(-1);
-			this.pipeline = getRunnablePipeline();
 		}
 
+		if (this.pipeline != null) {
+			close(false);
+			open();
+		}
 		handler.eventBus.post(new ProjectNotification(ProjectNotification.Type.MODIFIED));
 	}
 
@@ -264,6 +270,41 @@ public class ProjectPage implements Modifiable, Localizable {
 		return pl.getName();
 	}
 
+	private BooleanProperty canProcessProperty = new SimpleBooleanProperty(false);
+
+	/**
+	 * The canProcess property. {@code true} if the page can be (further)
+	 * processed.
+	 *
+	 * @return the canProcess property.
+	 */
+	public ReadOnlyBooleanProperty canProcessProperty() {
+		return this.canProcessProperty;
+	}
+
+	private final InvalidationListener pipelineStatusListener = (e) -> updatePipelineState();
+
+	private void updatePipelineState() {
+		boolean canProcess = false;
+		if (this.pipeline != null) {
+			switch (this.pipeline.getState()) {
+				case PROCESSING:
+					canProcess = true;
+					break;
+			}
+		}
+		this.canProcessProperty.set(canProcess);
+	}
+
+	/**
+	 * Checks whether the page is opened (resources are loaded).
+	 *
+	 * @return {@code true} if the page is opened, {@code false} otherwise.
+	 */
+	public synchronized boolean isOpened() {
+		return this.pipeline != null;
+	}
+
 	/**
 	 * Loads page resources. This method is called upon selecting this page.
 	 */
@@ -271,6 +312,48 @@ public class ProjectPage implements Modifiable, Localizable {
 		this.pipeline = getRunnablePipeline();
 		if (this.pipeline != null) {
 			this.modifiedPageProperty.addManagedProperty(this.pipeline);
+			this.pipeline.stateProperty().addListener(pipelineStatusListener);
+			updatePipelineState();
+		}
+	}
+
+	/**
+	 * Closes the page after saving and freeing page resources. This method is
+	 * called once another page is selected/opened or before the project is
+	 * closed.
+	 */
+	public synchronized void close() {
+		close(true);
+	}
+
+	/**
+	 * Closes the page and frees page resources.
+	 *
+	 * @param save whether or not the page (and its pipeline) should be saved
+	 * before closing.
+	 */
+	public synchronized void close(boolean save) {
+		if (save) {
+			save();
+		}
+
+		if (this.pipeline != null) {
+			this.pipeline.stateProperty().removeListener(pipelineStatusListener);
+			this.modifiedPageProperty.removeManagedProperty(this.pipeline);
+		}
+
+		this.image = null;
+		this.bufferedImage = null;
+		this.pipeline = null;
+	}
+
+	/**
+	 * Saves the page.
+	 */
+	public synchronized void save() {
+		if ((getPipeline() != null) && (getPipelineId() > 0)) {
+			getPipeline().save();
+			modifiedProperty().set(false);
 		}
 	}
 
@@ -421,28 +504,6 @@ public class ProjectPage implements Modifiable, Localizable {
 	private Path processorDataDirectory(int processorId) {
 		final String path = String.format(PROCESSOR_DATA_DIR_FORMAT, this.id, processorId);
 		return project.zipFileSystem().getPath(path);
-	}
-
-	/**
-	 * Frees page resources. This method is called once another page is
-	 * selected/opened or before the project is closed.
-	 */
-	public synchronized void close() {
-		save();
-
-		this.image = null;
-		this.bufferedImage = null;
-		this.pipeline = null;
-	}
-
-	/**
-	 * Saves the page.
-	 */
-	public synchronized void save() {
-		if ((getPipeline() != null) && (getPipelineId() > 0)) {
-			getPipeline().save();
-			modifiedProperty().set(false);
-		}
 	}
 
 	@Override

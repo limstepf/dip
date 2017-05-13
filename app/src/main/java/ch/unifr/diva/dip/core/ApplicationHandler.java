@@ -97,14 +97,15 @@ public class ApplicationHandler implements Localizable {
 	public final EventBus eventBus;
 
 	// open/current project
-	private volatile Project project = null;
+	private Project project = null;
 	// pointers to invalid/corrupt project data; might be fixed and still opened
-	private volatile ProjectData projectData = null;
-	private volatile ProjectData.ValidationResult projectValidation = null;
+	private ProjectData projectData = null;
+	private ProjectData.ValidationResult projectValidation = null;
 
 	private final ReadOnlyBooleanWrapper hasProjectProperty = new ReadOnlyBooleanWrapper();
 	private final ReadOnlyBooleanWrapper modifiedProjectProperty = new ReadOnlyBooleanWrapper();
 	private final ReadOnlyIntegerWrapper selectedPageProperty = new ReadOnlyIntegerWrapper();
+	private final ReadOnlyBooleanWrapper canProcessPageProperty = new ReadOnlyBooleanWrapper();
 
 	/**
 	 * ApplicationHandler constructor.
@@ -471,6 +472,7 @@ public class ApplicationHandler implements Localizable {
 		hasProjectProperty.set(true);
 		modifiedProjectProperty.bind(project.modifiedProperty().getObservableValue());
 		selectedPageProperty.bind(project.selectedPageIdProperty());
+		canProcessPageProperty.bind(project.canProcessSelectedPageProperty());
 	}
 
 	/**
@@ -490,6 +492,8 @@ public class ApplicationHandler implements Localizable {
 		modifiedProjectProperty.set(false);
 		selectedPageProperty.unbind();
 		selectedPageProperty.set(-1);
+		canProcessPageProperty.unbind();
+		canProcessPageProperty.set(false);
 
 		// broadcast: post-close
 		eventBus.post(new ProjectNotification(ProjectNotification.Type.CLOSED));
@@ -542,6 +546,16 @@ public class ApplicationHandler implements Localizable {
 	 */
 	public ReadOnlyIntegerProperty selectedPageProperty() {
 		return selectedPageProperty.getReadOnlyProperty();
+	}
+
+	/**
+	 * The canProcessPage property. {@code true} if the selected page can be
+	 * (further) processed.
+	 *
+	 * @return the canProcessPage property.
+	 */
+	public ReadOnlyBooleanProperty canProcessPageProperty() {
+		return canProcessPageProperty.getReadOnlyProperty();
 	}
 
 	/**

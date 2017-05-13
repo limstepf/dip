@@ -212,6 +212,12 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 			case IMPORT_PAGES:
 				importProjectPages();
 				break;
+			case PROCESS_PAGE:
+				processPage(event.page);
+				break;
+			case RESET_PAGE:
+				resetPage(event.page);
+				break;
 			case SAVE:
 				saveProject();
 				break;
@@ -369,6 +375,30 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Processes the page with the given id, or all pages with {@code -1}.
+	 *
+	 * @param pageId the page id, or {@code -1}.
+	 */
+	public void processPage(int pageId) {
+		if (!handler.hasProject()) {
+			return;
+		}
+		handler.getProject().processPage(pageId);
+	}
+
+	/**
+	 * Resets the page with the given id, or all pages with {@code -1}.
+	 *
+	 * @param pageId the page id, or {@code -1}.
+	 */
+	public void resetPage(int pageId) {
+		if (!handler.hasProject()) {
+			return;
+		}
+		handler.getProject().resetPage(pageId);
 	}
 
 	/**

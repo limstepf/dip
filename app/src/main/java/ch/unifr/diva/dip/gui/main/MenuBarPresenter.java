@@ -33,7 +33,8 @@ public class MenuBarPresenter implements Presenter, Localizable {
 	private final EventBus eventBus;
 	private final Stage stage;
 	private final MenuBar menuBar;
-	private final Menu fileMenu, editMenu, viewMenu, helpMenu, selectionMenu;
+	private final Menu fileMenu, editMenu, selectionMenu, processMenu, viewMenu, helpMenu;
+	private final BooleanBinding hasNoProjectBinding;
 
 	/**
 	 * Creates a new main menu bar.
@@ -48,15 +49,19 @@ public class MenuBarPresenter implements Presenter, Localizable {
 		this.editor = editor;
 		this.stage = stage;
 
+		this.hasNoProjectBinding = Bindings.not(handler.hasProjectProperty());
+
 		menuBar = new MenuBar();
 
 		fileMenu = getFileMenu();
 		editMenu = getEditMenu();
 		selectionMenu = getSelectionMenu();
+		processMenu = getProcessMenu();
 		viewMenu = getViewMenu();
 		helpMenu = getHelpMenu();
 
-		menuBar.getMenus().addAll(fileMenu, editMenu, selectionMenu, viewMenu, helpMenu
+		menuBar.getMenus().addAll(
+				fileMenu, editMenu, selectionMenu, processMenu, viewMenu, helpMenu
 		);
 	}
 
@@ -80,7 +85,7 @@ public class MenuBarPresenter implements Presenter, Localizable {
 		closeProject.setOnAction(e -> {
 			eventBus.post(new ProjectRequest(ProjectRequest.Type.CLOSE));
 		});
-		closeProject.disableProperty().bind(Bindings.not(handler.hasProjectProperty()));
+		closeProject.disableProperty().bind(hasNoProjectBinding);
 
 		final MenuItem saveProject = new MenuItem(localize("project.save"));
 		saveProject.setOnAction(e -> {
@@ -97,7 +102,7 @@ public class MenuBarPresenter implements Presenter, Localizable {
 		saveAsProject.setOnAction(e -> {
 			eventBus.post(new ProjectRequest(ProjectRequest.Type.SAVE_AS));
 		});
-		saveAsProject.disableProperty().bind(Bindings.not(handler.hasProjectProperty()));
+		saveAsProject.disableProperty().bind(hasNoProjectBinding);
 
 		final MenuItem exitApp = new MenuItem(localize("exit"));
 		exitApp.setOnAction(e -> {
@@ -128,10 +133,7 @@ public class MenuBarPresenter implements Presenter, Localizable {
 		pipelineEditor.setOnAction(e -> {
 			eventBus.post(new ApplicationRequest(ApplicationRequest.Type.OPEN_PIPELINE_EDITOR));
 		});
-		final BooleanBinding canOpenPipelineEditor = Bindings.not(
-				handler.hasProjectProperty()
-		);
-		pipelineEditor.disableProperty().bind(canOpenPipelineEditor);
+		pipelineEditor.disableProperty().bind(hasNoProjectBinding);
 		pipelineEditor.setAccelerator(KeyCombination.keyCombination("Ctrl+P"));
 
 		final MenuItem settings = new MenuItem(localize("settings"));
@@ -178,6 +180,49 @@ public class MenuBarPresenter implements Presenter, Localizable {
 		menu.getItems().addAll(
 				all, deselect, reselect, invert
 		);
+		return menu;
+	}
+
+	private Menu getProcessMenu() {
+		final Menu menu = new Menu(localize("process"));
+
+		final MenuItem processPage = new MenuItem(localize("process.page"));
+		processPage.disableProperty().bind(Bindings.not(handler.canProcessPageProperty()));
+		processPage.setOnAction(e -> {
+			eventBus.post(new ProjectRequest(
+					ProjectRequest.Type.PROCESS_PAGE,
+					handler.getProject().getSelectedPageId()
+			));
+		});
+		final MenuItem processPageAll = new MenuItem(localize("process.page.all"));
+		processPageAll.disableProperty().bind(hasNoProjectBinding);
+		processPageAll.setOnAction(e -> {
+			eventBus.post(new ProjectRequest(
+					ProjectRequest.Type.PROCESS_PAGE,
+					-1
+			));
+		});
+		final MenuItem resetPage = new MenuItem(localize("reset.page"));
+		resetPage.disableProperty().bind(hasNoProjectBinding);
+		resetPage.setOnAction(e -> {
+			eventBus.post(new ProjectRequest(
+					ProjectRequest.Type.RESET_PAGE,
+					handler.getProject().getSelectedPageId()
+			));
+		});
+		final MenuItem resetPageAll = new MenuItem(localize("reset.page.all"));
+		resetPageAll.disableProperty().bind(hasNoProjectBinding);
+		resetPageAll.setOnAction(e -> {
+			eventBus.post(new ProjectRequest(
+					ProjectRequest.Type.RESET_PAGE,
+					-1
+			));
+		});
+
+		menu.getItems().addAll(
+				processPage, processPageAll, resetPage, resetPageAll
+		);
+
 		return menu;
 	}
 

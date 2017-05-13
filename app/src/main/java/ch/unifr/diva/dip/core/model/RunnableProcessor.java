@@ -3,9 +3,7 @@ package ch.unifr.diva.dip.core.model;
 import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.ProcessorContext;
 import ch.unifr.diva.dip.api.services.Previewable;
-import ch.unifr.diva.dip.api.services.Processable;
 import ch.unifr.diva.dip.api.services.Processor;
-import ch.unifr.diva.dip.api.services.Resetable;
 import ch.unifr.diva.dip.api.utils.XmlUtils;
 import ch.unifr.diva.dip.core.services.api.HostProcessorContext;
 import ch.unifr.diva.dip.core.ui.Localizable;
@@ -20,6 +18,7 @@ import ch.unifr.diva.dip.utils.FileFinder;
 import ch.unifr.diva.dip.api.utils.FxUtils;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import ch.unifr.diva.dip.utils.IOUtils;
+import ch.unifr.diva.dip.utils.SynchronizedObjectProperty;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -29,9 +28,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Set;
-import javafx.beans.property.ObjectProperty;
+import javafx.beans.InvalidationListener;
 import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -41,6 +39,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.util.Callback;
 import javax.xml.bind.JAXBException;
 
 /**
@@ -58,7 +57,8 @@ public class RunnableProcessor extends ProcessorWrapper {
 	private final LayerOverlay layerOverlay;
 
 	// needs to be updated manually after each interaction with the processor
-	private final ObjectProperty<Processor.State> stateProperty;
+	private final SynchronizedObjectProperty<Processor.State> stateProperty;
+	private final InvalidationListener stateListener;
 
 	/**
 	 * Creates a runnable processor. As opposed to {@code ProcessorWrapper}s,
@@ -75,13 +75,9 @@ public class RunnableProcessor extends ProcessorWrapper {
 		this.pipeline = pipeline;
 		this.page = pipeline.page;
 		this.project = page.project();
-		this.stateProperty = new SimpleObjectProperty<Processor.State>() {
-			@Override
-			public void set(Processor.State state) {
-				super.set(state);
-				updateStatusColor(state);
-			}
-		};
+		this.stateProperty = new SynchronizedObjectProperty(Processor.State.WAITING);
+		this.stateListener = (e) -> updateStatusColor();
+		stateProperty.getReadOnlyProperty().addListener(stateListener);
 
 		this.PROCESSOR_DATA_DIR = String.format(
 				ProjectPage.PROCESSOR_DATA_DIR_FORMAT,
@@ -102,7 +98,7 @@ public class RunnableProcessor extends ProcessorWrapper {
 	@Override
 	public void init() {
 		super.init();
-		this.updateState();
+		updateState();
 	}
 
 	@Override
@@ -116,7 +112,7 @@ public class RunnableProcessor extends ProcessorWrapper {
 		this.layerGroup.setGlyph(RunnableProcessor.glyph(this.processor()));
 		this.layerGroup.setHideGroupMode(LayerGroup.HideGroupMode.AUTO);
 		this.layerGroup.layerExtensions().add(new ProcessorLayerExtension(this));
-		this.updateState();
+		updateState();
 	}
 
 	/**
@@ -253,6 +249,7 @@ public class RunnableProcessor extends ProcessorWrapper {
 		}
 
 		private void stateCallback() {
+			runnable.updateState();
 			status.setText(runnable.getState().label);
 			if (processButton != null) {
 				processButton.setDisable(!runnable.getState().equals(Processor.State.PROCESSING));
@@ -404,7 +401,7 @@ public class RunnableProcessor extends ProcessorWrapper {
 	 * @return a read-only stateProperty.
 	 */
 	public ReadOnlyObjectProperty<Processor.State> stateProperty() {
-		return this.stateProperty;
+		return stateProperty.getReadOnlyProperty();
 	}
 
 	/**
@@ -413,7 +410,6 @@ public class RunnableProcessor extends ProcessorWrapper {
 	 * @return the state of the processor.
 	 */
 	public Processor.State getState() {
-		updateState();
 		return this.stateProperty.get();
 	}
 
@@ -427,6 +423,27 @@ public class RunnableProcessor extends ProcessorWrapper {
 	}
 
 	/**
+	 * Appplies a callback function to all dependent processors.
+	 *
+	 * @param callback the callback function.
+	 */
+	protected void applyToDependentProcessors(Callback<RunnableProcessor, Void> callback) {
+		final Map<InputPort, ProcessorWrapper.PortMapEntry> inputPortMap = this.pipeline.inputPortMap();
+		for (Map.Entry<String, Set<InputPort>> e : processor().dependentInputs().entrySet()) {
+			final Set<InputPort> inputs = e.getValue();
+			for (InputPort input : inputs) {
+				final PortMapEntry m = inputPortMap.get(input);
+				if (m != null) {
+					final RunnableProcessor runnable = this.pipeline.getProcessor(m.id);
+					if (runnable != null) {
+						callback.call(runnable);
+					}
+				}
+			}
+		}
+	}
+
+	/**
 	 * Updates the state of the processor.
 	 *
 	 * @param updateDependentProcessors Also updates the state of (directly)
@@ -435,33 +452,21 @@ public class RunnableProcessor extends ProcessorWrapper {
 	 */
 	protected void updateState(boolean updateDependentProcessors) {
 		if (this.processor() == null) {
-			this.stateProperty.set(Processor.State.UNAVAILABLE);
-			updateStatusColor();
-			return;
-		}
+			stateProperty.set(Processor.State.UNAVAILABLE);
+		} else {
+			stateProperty.set(this.processor().state());
 
-		this.stateProperty.set(this.processor().state());
-		updateStatusColor();
-		if (updateDependentProcessors) {
-			final Map<InputPort, PortMapEntry> inputPortMap = this.pipeline.inputPortMap();
-
-			for (Map.Entry<String, Set<InputPort>> e : this.processor().dependentInputs().entrySet()) {
-				final Set<InputPort> inputs = e.getValue();
-				for (InputPort input : inputs) {
-					final PortMapEntry m = inputPortMap.get(input);
-					if (m != null) {
-						final RunnableProcessor runnable = this.pipeline.getProcessor(m.id);
-						if (runnable != null) {
-							runnable.updateState();
-						}
-					}
-				}
+			if (updateDependentProcessors) {
+				applyToDependentProcessors((p) -> {
+					p.updateState();
+					return null;
+				});
 			}
 		}
 	}
 
 	private void updateStatusColor() {
-		updateStatusColor(stateProperty.get());
+		updateStatusColor(stateProperty.getReadOnlyProperty().get());
 	}
 
 	private void updateStatusColor(Processor.State state) {
@@ -529,7 +534,7 @@ public class RunnableProcessor extends ProcessorWrapper {
 	 */
 	public void processBackgroundTask() {
 		final RunnableProcessor runnable = this;
-		BackgroundTask<Void> task = new BackgroundTask<Void>(handler) {
+		final BackgroundTask<Void> task = new BackgroundTask<Void>(handler) {
 
 			@Override
 			protected Void call() throws Exception {
@@ -544,7 +549,6 @@ public class RunnableProcessor extends ProcessorWrapper {
 			@Override
 			protected void finished(BackgroundTask.Result result) {
 				runLater(() -> {
-					runnable.updateState(true);
 					handler.eventBus.post(new StatusMessageEvent(
 							localize("processing.object", runnable.processor().name())
 							+ " "
@@ -558,8 +562,11 @@ public class RunnableProcessor extends ProcessorWrapper {
 		task.start();
 	}
 
-	// you probably wanna run this on some background/worker thread or something...
-	private void process() {
+	/**
+	 * Executes the processor. Probably should be run on some background/worker
+	 * thread, or something...
+	 */
+	protected void process() {
 		if (!this.processor().canProcess()) {
 			log.warn(
 					"Can't process. Processor doesn't implement Processable: {}",
@@ -568,12 +575,10 @@ public class RunnableProcessor extends ProcessorWrapper {
 			return;
 		}
 
-		final Processable p = (Processable) this.processor();
-		p.process(newProcessorContext());
+		processor().asProcessableProcessor().process(newProcessorContext());
 
+		this.updateState(true);
 		FxUtils.run(() -> {
-			// the method calling process (e.g. to run on background task) has
-			// to update states once done.
 			this.setModified(true);
 		});
 	}
@@ -583,7 +588,7 @@ public class RunnableProcessor extends ProcessorWrapper {
 	 */
 	public void resetBackgroundTask() {
 		final RunnableProcessor runnable = this;
-		BackgroundTask<Void> task = new BackgroundTask<Void>(handler) {
+		final BackgroundTask<Void> task = new BackgroundTask<Void>(handler) {
 
 			@Override
 			protected Void call() throws Exception {
@@ -598,7 +603,6 @@ public class RunnableProcessor extends ProcessorWrapper {
 			@Override
 			protected void finished(BackgroundTask.Result result) {
 				runLater(() -> {
-					runnable.updateState(true);
 					handler.eventBus.post(new StatusMessageEvent(
 							localize("resetting.object", runnable.processor().name())
 							+ " "
@@ -612,8 +616,11 @@ public class RunnableProcessor extends ProcessorWrapper {
 		task.start();
 	}
 
-	// you probably wanna run this on some background/worker thread or something...
-	private void reset() {
+	/**
+	 * Resets the processor. Probably should be run on some background/worker
+	 * thread, or something...
+	 */
+	protected void reset() {
 		try {
 			Files.deleteIfExists(processorDataXML());
 		} catch (IOException ex) {
@@ -633,20 +640,12 @@ public class RunnableProcessor extends ProcessorWrapper {
 			}
 		}
 
-		if (!this.processor().canReset()) {
-			log.warn(
-					"Can't process. Processor doesn't implement Processable or Editable: {}",
-					this.processor()
-			);
-			return;
+		if (this.processor().canReset()) {
+			processor().asResetableProcessor().reset(newProcessorContext());
 		}
 
-		final Resetable p = (Resetable) this.processor();
-		p.reset(newProcessorContext());
-
+		this.updateState(true);
 		FxUtils.run(() -> {
-			// the method calling process (e.g. to run on background task) has
-			// to update states once done.
 			this.setModified(true);
 		});
 	}
