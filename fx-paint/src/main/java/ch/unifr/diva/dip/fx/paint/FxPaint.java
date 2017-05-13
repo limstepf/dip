@@ -155,6 +155,8 @@ public class FxPaint extends HybridProcessorBase implements Transmutable {
 		BufferedImage image = ProcessorBase.readBufferedImage(getContext(), STORAGE_IMAGE);
 		if (image == null) {
 			image = in;
+		} else {
+			this.colorPortsUnit.setOutputs(image);
 		}
 
 		setGC(canvas.getGraphicsContext2D());
