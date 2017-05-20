@@ -40,11 +40,14 @@ public class OSGiFramework {
 	private final int watchBundleStartLevel;
 	private final Path bundleCacheDir;
 //	The bundle tracker is not needed so far, but I'll leave it here outcommented
-//  for quick activation/experimentation. Plus we might wanna use it to check if
-//  required bundles are (already) loaded, later, for head-less/batch execution...
-//	private final OSGiBundleTracker bundleTracker;
+//  for quick activation/experimentation.
+	private final OSGiBundleTracker bundleTracker;
 	private final OSGiServiceTracker<Processor> processorServiceTracker;
 	private final HostServiceTracker<Processor> processorHostServiceTracker;
+
+	public OSGiBundleTracker getBundleTracker() {
+		return this.bundleTracker;
+	}
 
 	/**
 	 * {@code Processor} service monitor. Safe to be accessed from the JavaFX
@@ -56,7 +59,7 @@ public class OSGiFramework {
 	 * {@code HostProcessor} service monitor. Safe to be accessed from the
 	 * JavaFX application thread.
 	 */
-	public final HostServiceMonitor hostProcessors;
+	public final HostServiceMonitor<Processor> hostProcessors;
 
 	/**
 	 * OSGiFramework constructor.
@@ -84,12 +87,12 @@ public class OSGiFramework {
 		this.bundleCacheDir = bundleCacheDir;
 		this.framework = createFramework(systemPackages);
 		this.context = framework.getBundleContext();
-//		this.bundleTracker = new OSGiBundleTracker(this.context);
+		this.bundleTracker = new OSGiBundleTracker(this.context);
 		this.processorServiceTracker = new OSGiServiceTracker(this.context, Processor.class);
 		this.processorHostServiceTracker = new HostServiceTracker();
 		this.processors = new OSGiServiceMonitor(processorServiceTracker);
 		this.hostProcessors = new HostServiceMonitor(processorHostServiceTracker);
-//		this.bundleTracker.open();
+		this.bundleTracker.open();
 		this.processorServiceTracker.open();
 
 		registerShutdownHook();
