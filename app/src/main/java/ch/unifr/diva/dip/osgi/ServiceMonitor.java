@@ -1,5 +1,8 @@
 package ch.unifr.diva.dip.osgi;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import org.osgi.framework.Version;
@@ -17,6 +20,19 @@ public interface ServiceMonitor<T> {
 	 * @return an observable list of service collections.
 	 */
 	public ObservableList<OSGiServiceCollection<T>> getServiceCollectionList();
+
+	/**
+	 * Returns a sorted list of all tracked service collections.
+	 *
+	 * @return a sorted list of service collections.
+	 */
+	default List<OSGiServiceCollection<T>> getSortedServiceCollectionList() {
+		final List<OSGiServiceCollection<T>> list = new ArrayList<>(getServiceCollectionList());
+		Collections.sort(list, (OSGiServiceCollection<T> t, OSGiServiceCollection<T> t1) -> {
+			return t.pid().compareTo(t1.pid());
+		});
+		return list;
+	}
 
 	/**
 	 * Returns an observable map of all tracked service collections.
