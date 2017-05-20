@@ -182,4 +182,25 @@ public interface ServiceMonitor<T> {
 		return getService(pid, version) != null;
 	}
 
+	/**
+	 * Waits for bundles to be registered. This method keeps waiting for as long
+	 * as new bundles are being registered, or until it times out. The number of
+	 * registered bundles is repolled each {@code delay} milliseconds, and keeps
+	 * repolling in case the number keeps increasing. Once that's not the case,
+	 * we repoll again {@code repeat} times (just to be sure...), meaning that
+	 * the minimum waiting time is {@code repeat * delay} even if no bundles are
+	 * being registered.
+	 *
+	 * @param repeat number of times to repoll in case the number of registered
+	 * bundles didn't increase.
+	 * @param delay polling delay in milliseconds.
+	 * @param timeout timeout in milliseconds.
+	 * @return {@code true} if all bundles have been loaded without timing out,
+	 * {@code false} otherwise.
+	 * @throws java.lang.InterruptedException
+	 */
+	default boolean waitForBundles(int repeat, long delay, long timeout) throws InterruptedException {
+		return true;
+	}
+
 }

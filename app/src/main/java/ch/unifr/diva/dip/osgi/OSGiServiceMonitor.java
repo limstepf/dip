@@ -19,6 +19,7 @@ public class OSGiServiceMonitor<T> implements ServiceMonitor<T> {
 
 	private static final Logger log = LoggerFactory.getLogger(OSGiServiceMonitor.class);
 
+	private final OSGiServiceTracker<T> serviceTracker;
 	private final ObservableMap<String, OSGiServiceCollection<T>> services;
 	private final ObservableList<OSGiServiceCollection<T>> collections;
 	private final SortedList<OSGiServiceCollection<T>> sortedCollections;
@@ -30,6 +31,7 @@ public class OSGiServiceMonitor<T> implements ServiceMonitor<T> {
 	 * @param serviceTracker the OSGi service tracker of the service to monitor.
 	 */
 	public OSGiServiceMonitor(OSGiServiceTracker<T> serviceTracker) {
+		this.serviceTracker = serviceTracker;
 		this.services = FXCollections.observableHashMap();
 		this.collections = FXCollections.observableArrayList();
 		this.sortedCollections = this.collections.sorted(Comparator.naturalOrder());
@@ -45,6 +47,11 @@ public class OSGiServiceMonitor<T> implements ServiceMonitor<T> {
 	@Override
 	public ObservableMap<String, OSGiServiceCollection<T>> getServiceCollectionMap() {
 		return services;
+	}
+
+	@Override
+	public boolean waitForBundles(int repeat, long delay, long timeout) throws InterruptedException {
+		return serviceTracker.waitForBundles(repeat, delay, timeout);
 	}
 
 	/**
