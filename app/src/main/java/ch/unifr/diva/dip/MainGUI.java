@@ -46,8 +46,8 @@ public class MainGUI extends Application {
 		this.primaryStage = primaryStage;
 		this.uiStrategy.setStage(primaryStage);
 
-		// verify that we have a valid context - or shut down.
-		if (!context.getErrors().isEmpty()) {
+		// verify that we have a valid (command) line and context - or shut down.
+		if (!CommandLineOption.hasLine() || context == null || !context.getErrors().isEmpty()) {
 			showError(context.getErrors().get(0));
 			return; // bye
 		}
@@ -93,6 +93,19 @@ public class MainGUI extends Application {
 
 		// ready, set, go...
 		presenter.show();
+
+		// TODO: open project file
+		if (CommandLineOption.FILE.hasOption()) {
+			boolean osgiTimeout = true;
+			try {
+				Thread.sleep(500);
+				osgiTimeout = !handler.osgi.processors.waitForBundles(3, 500, 10000);
+			} catch (InterruptedException ex) {
+
+			}
+		}
+
+
 	}
 
 	@Override

@@ -695,23 +695,25 @@ public class Project implements Modifiable, Localizable {
 	 * Processes the page with the given id, or all pages with {@code -1}.
 	 *
 	 * @param pageId the page id, or {@code -1}.
+	 * @return the thread doing/kicking off the job.
 	 */
-	public void processPage(int pageId) {
+	public Thread processPage(int pageId) {
 		if (pageId < 0) {
-			processAllPages();
-			return;
+			return processAllPages();
 		}
-		processPages(Arrays.asList(getPage(pageId)));
+		return processPages(Arrays.asList(getPage(pageId)));
 	}
 
 	/**
 	 * Processes all pages.
+	 *
+	 * @return the thread doing/kicking off the job.
 	 */
-	public void processAllPages() {
-		processPages(pages());
+	public Thread processAllPages() {
+		return processPages(pages());
 	}
 
-	private void processPages(List<ProjectPage> pages) {
+	private Thread processPages(List<ProjectPage> pages) {
 		final BackgroundTask<Void> task = new BackgroundTask<Void>(handler) {
 
 			@Override
@@ -752,30 +754,33 @@ public class Project implements Modifiable, Localizable {
 				});
 			}
 		};
-		task.start();
+		return task.start();
 	}
 
 	/**
 	 * Resets the page with the given id, or all pages with {@code -1}.
 	 *
 	 * @param pageId the page id, or {@code -1}.
+	 * @return the thread doing/kicking off the job.
 	 */
-	public void resetPage(int pageId) {
+	public Thread resetPage(int pageId) {
 		if (pageId < 0) {
-			resetAllPages();
+			return resetAllPages();
 		} else {
-			resetPages(Arrays.asList(getPage(pageId)));
+			return resetPages(Arrays.asList(getPage(pageId)));
 		}
 	}
 
 	/**
 	 * Resets all pages.
+	 *
+	 * @return the thread doing/kicking off the job.
 	 */
-	public void resetAllPages() {
-		resetPages(pages());
+	public Thread resetAllPages() {
+		return resetPages(pages());
 	}
 
-	private void resetPages(List<ProjectPage> pages) {
+	private Thread resetPages(List<ProjectPage> pages) {
 		final BackgroundTask<Void> task = new BackgroundTask<Void>(handler) {
 
 			@Override
@@ -816,7 +821,7 @@ public class Project implements Modifiable, Localizable {
 				});
 			}
 		};
-		task.start();
+		return task.start();
 	}
 
 	@Override

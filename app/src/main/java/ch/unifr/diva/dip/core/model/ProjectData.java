@@ -75,22 +75,14 @@ public class ProjectData {
 	@XmlTransient
 	public PipelineData pipelines;
 
+	// possible exception thrown while trying to read the pipeline file
+	@XmlTransient
+	private Exception pipelineException;
+
 	/**
 	 * The id of the default pipeline.
 	 */
 	public int defaultPipeline = -1;
-
-	/**
-	 * Returns the pipeline data list.
-	 *
-	 * @return the pipeline data list.
-	 */
-	public List<PipelineData.Pipeline> pipelines() {
-		if (pipelines == null) {
-			return null;
-		}
-		return pipelines.list;
-	}
 
 	/**
 	 * The path to the project file. Should be overwritten after reading
@@ -153,6 +145,35 @@ public class ProjectData {
 		this.defaultPipeline = project.pipelineManager().getDefaultPipelineId();
 		this.pages.selectedPage = project.getSelectedPageId();
 		addPages(project.pages());
+	}
+
+	/**
+	 * Loads the project assets. This is implicitly done while trying to verify
+	 * the project data.
+	 */
+	public void loadAssets() {
+		final Path pipelinesXml = zip.getPath(ProjectData.PROJECT_PIPELINES_XML);
+		if (zip.exists(pipelinesXml)) {
+			try {
+				this.pipelines = PipelineData.loadAsStream(pipelinesXml);
+			} catch (IOException | JAXBException ex) {
+				this.pipelineException = ex;
+			}
+		}
+	}
+
+	/**
+	 * Returns the pipeline data list. Make sure the project data has been
+	 * validated, or the assets have been manually loaded already by a call to
+	 * {@code loadAssets()}.
+	 *
+	 * @return the pipeline data list, or null if not loaded yet.
+	 */
+	public List<PipelineData.Pipeline> pipelines() {
+		if (pipelines == null) {
+			return null;
+		}
+		return pipelines.list;
 	}
 
 	// new project
@@ -325,10 +346,11 @@ public class ProjectData {
 
 	/**
 	 * Loads remaining assets and validates the project data. This method loads
-	 * remaining assets and checks the integritiy of the project data, that is,
-	 * we already know that the project's root XML is fine, so what is checked
-	 * here are mostly references to external files that could have been
-	 * modified or moved in the meantime.
+	 * remaining assets (if not already done so) and checks the integritiy of
+	 * the project data, that is, we already know that the project's root XML is
+	 * fine, so what is checked here are mostly references to external files
+	 * that could have been modified or moved in the meantime, and required OSGi
+	 * services/processors.
 	 *
 	 * @param handler the application handler.
 	 * @return validation results.
@@ -336,14 +358,13 @@ public class ProjectData {
 	public ValidationResult validate(ApplicationHandler handler) {
 		final ValidationResult v = new ValidationResult();
 
-		// load additional assets
-		Path pipelinesXml = zip.getPath(ProjectData.PROJECT_PIPELINES_XML);
-		if (zip.exists(pipelinesXml)) {
-			try {
-				pipelines = PipelineData.loadAsStream(pipelinesXml);
-			} catch (IOException | JAXBException ex) {
-				v.exceptions.add(ex);
-			}
+		// load additional assets if not already done so...
+		if (this.pipelines == null && this.pipelineException == null) {
+			loadAssets();
+		}
+
+		if (this.pipelineException != null) {
+			v.exceptions.add(this.pipelineException);
 		}
 
 		// check location and checksum of referenced image files

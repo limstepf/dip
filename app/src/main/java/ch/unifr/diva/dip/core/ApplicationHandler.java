@@ -193,8 +193,9 @@ public class ApplicationHandler implements Localizable {
 	 * @param pipelines the initial set of pipelines, or null.
 	 * @param defaultPipeline the default pipeline (an object included in the
 	 * initial set of pipelines!), or null.
+	 * @return the thread doing the job.
 	 */
-	public void newProject(String name, Path saveFile, List<Path> imageSet, List<PipelineData.Pipeline> pipelines, PipelineData.Pipeline defaultPipeline) {
+	public Thread newProject(String name, Path saveFile, List<Path> imageSet, List<PipelineData.Pipeline> pipelines, PipelineData.Pipeline defaultPipeline) {
 		if (hasProject()) {
 			closeProject();
 		}
@@ -246,15 +247,16 @@ public class ApplicationHandler implements Localizable {
 				});
 			}
 		};
-		task.start();
+		return task.start();
 	}
 
 	/**
 	 * Opens a project.
 	 *
 	 * @param saveFile the savefile of the project.
+	 * @return the thread doing the job.
 	 */
-	public void openProject(Path saveFile) {
+	public Thread openProject(Path saveFile) {
 		if (hasProject()) {
 			closeProject();
 		}
@@ -269,23 +271,7 @@ public class ApplicationHandler implements Localizable {
 				updateMessage(localize("project.open"));
 				updateProgress(-1, Double.NaN);
 
-				// tmp. working copy
-				final Path zipFile = dataManager.tmpCopy(saveFile);
-
-				final ZipFileSystem zip = ZipFileSystem.open(zipFile);
-				ProjectData projectData;
-				Exception loadingException = null;
-				try (InputStream stream = new BufferedInputStream(zip.getInputStream(ProjectData.PROJECT_ROOT_XML))) {
-					projectData = ProjectData.load(stream);
-					projectData.file = saveFile;
-					projectData.zipFile = zipFile;
-					projectData.zip = zip;
-				} catch (Exception ex) {
-					log.error("failed to unmarshall project data: {}", saveFile, ex);
-					throw (ex);
-				}
-
-				return projectData;
+				return loadProjectData(saveFile);
 			}
 
 			@Override
@@ -316,7 +302,7 @@ public class ApplicationHandler implements Localizable {
 			protected void succeeded() {
 
 				// validation comes here!
-				ProjectData.ValidationResult validation = getValue().validate(
+				final ProjectData.ValidationResult validation = getValue().validate(
 						ApplicationHandler.this
 				);
 
@@ -337,7 +323,52 @@ public class ApplicationHandler implements Localizable {
 				}
 			}
 		};
-		task.start();
+		return task.start();
+	}
+
+	/**
+	 * Opens a project given already validated project data. Used to load a
+	 * project from the command line/running headless.
+	 *
+	 * @param data the validated project data.
+	 * @return the project.
+	 */
+	public Project openProject(ProjectData data) {
+		if (hasProject()) {
+			closeProject();
+		}
+
+		project = Project.openProject(data, ApplicationHandler.this);
+		broadcastOpenProject();
+		return project;
+	}
+
+	/**
+	 * Loads project data.
+	 *
+	 * @param saveFile the savefile of the project.
+	 * @return the project data.
+	 * @throws IOException
+	 * @throws JAXBException
+	 */
+	public ProjectData loadProjectData(Path saveFile) throws IOException, JAXBException {
+		// tmp. working copy
+		final Path zipFile = dataManager.tmpCopy(saveFile);
+
+		final ZipFileSystem zip = ZipFileSystem.open(zipFile);
+		ProjectData data;
+		Exception loadingException = null;
+		try (InputStream stream = new BufferedInputStream(zip.getInputStream(ProjectData.PROJECT_ROOT_XML))) {
+			data = ProjectData.load(stream);
+			data.file = saveFile;
+			data.zipFile = zipFile;
+			data.zip = zip;
+		} catch (Exception ex) {
+			log.error("failed to unmarshall project data: {}", saveFile, ex);
+			throw (ex);
+		}
+
+		return data;
 	}
 
 	private void broadcastOpenProject() {
@@ -405,10 +436,13 @@ public class ApplicationHandler implements Localizable {
 
 	/**
 	 * Saves the current project.
+	 *
+	 * @return the thread doing the job, or {@code null} if there is no project
+	 * to be saved.
 	 */
-	public void saveProject() {
+	public Thread saveProject() {
 		if (!hasProject()) {
-			return;
+			return null;
 		}
 
 		BackgroundTask<Integer> task = new BackgroundTask<Integer>(
@@ -430,12 +464,19 @@ public class ApplicationHandler implements Localizable {
 				eventBus.post(new StatusMessageEvent(localize("project.saved")));
 			}
 		};
-		task.start();
+		return task.start();
 	}
 
-	public void saveAsProject(Path saveFile) {
+	/**
+	 * Saves the current project to a new file.
+	 *
+	 * @param saveFile path to the new save file.
+	 * @return the thread doing the job, or {@code null} if there is no project
+	 * to be saved.
+	 */
+	public Thread saveAsProject(Path saveFile) {
 		if (!hasProject()) {
-			return;
+			return null;
 		}
 
 		BackgroundTask<Integer> task = new BackgroundTask<Integer>(
@@ -457,7 +498,7 @@ public class ApplicationHandler implements Localizable {
 				eventBus.post(new StatusMessageEvent(localize("project.saved")));
 			}
 		};
-		task.start();
+		return task.start();
 	}
 
 	/**
