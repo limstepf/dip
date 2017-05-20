@@ -160,6 +160,25 @@ public class UserSettings {
 				VisibilityMode.getDefault().name()
 		);
 
+		/**
+		 * Returns a (human-readable) array of attributes.
+		 *
+		 * @return a (human-readable) array of attributes.
+		 */
+		public String[] getAttributes() {
+			return new String[]{
+				"x: " + x,
+				"y: " + y,
+				"width: " + width,
+				"height: " + height,
+				"maximized: " + maximized,
+				"sidebar-visibility: " + sideBarVisibility.get(),
+				"sidebar-divider: " + sideBarDivider,
+				"toolbar-visibility: " + toolBarVisibility.get(),
+				"optionsbar-visibility: " + optionsBarVisibility.get()
+			};
+		}
+
 	}
 
 	/**
@@ -256,6 +275,17 @@ public class UserSettings {
 		@XmlAttribute
 		public String interpolation = Zoomable.Interpolation.BILINEAR.name();
 
+		/**
+		 * Returns a (human-readable) array of attributes.
+		 *
+		 * @return a (human-readable) array of attributes.
+		 */
+		public String[] getAttributes() {
+			return new String[]{
+				"interpolation: " + interpolation
+			};
+		}
+
 	}
 
 	/**
@@ -315,6 +345,21 @@ public class UserSettings {
 		public PipelineLayoutStrategy getDefaultPipelineLayout() {
 			return PipelineLayoutStrategy.get(pipelineLayout);
 		}
+
+		/**
+		 * Returns a (human-readable) array of attributes.
+		 *
+		 * @return a (human-readable) array of attributes.
+		 */
+		public String[] getAttributes() {
+			return new String[]{
+				"connection-type: " + getDefaultConnectionType(),
+				"pipeline-layout: " + getDefaultPipelineLayout(),
+				"auto-rearrange-on-changed-layout: " + autoRearrangeOnChangedLayout,
+				"auto-rearrange-on-processor-fold: " + autoRearrangeOnProcessorFold
+			};
+		}
+
 	}
 
 	/**
@@ -334,6 +379,17 @@ public class UserSettings {
 		 */
 		@XmlAttribute
 		public OSGiVersionPolicy versionPolicy = OSGiVersionPolicy.getDefault();
+
+		/**
+		 * Returns a (human-readable) array of attributes.
+		 *
+		 * @return a (human-readable) array of attributes.
+		 */
+		public String[] getAttributes() {
+			return new String[]{
+				"version-policy: " + versionPolicy
+			};
+		}
 
 	}
 
@@ -454,6 +510,19 @@ public class UserSettings {
 					dipDataDirectory = file.getParent();
 				}
 			}
+		}
+
+		/**
+		 * Returns a (human-readable) array of attributes.
+		 *
+		 * @return a (human-readable) array of attributes.
+		 */
+		public String[] getAttributes() {
+			return new String[]{
+				"data-file: " + getDataFile(),
+				"data-directory: " + getDataDirectory(),
+				"save-directory: " + getSaveDirectory()
+			};
 		}
 
 	}
