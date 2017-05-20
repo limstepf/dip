@@ -160,4 +160,46 @@ public enum LogBackConfig {
 		config((LoggerContext) factory, dataManager);
 	}
 
+	/**
+	 * Returns a comma separated list of available LOGBack configurations.
+	 *
+	 * @return a comma separated list of available LOGBack configurations.
+	 */
+	public static String getOptionsString() {
+		final StringBuilder sb = new StringBuilder();
+		for (int i = 0, n = values().length; i < n; i++) {
+			final LogBackConfig cfg = values()[i];
+			sb.append(cfg.name());
+			if (i == (n - 2)) {
+				sb.append(", or ");
+			} else if ((i + 1) < n) {
+				sb.append(", ");
+			}
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * Returns the default LOGBack configuration.
+	 *
+	 * @return the default LOGBack configuration.
+	 */
+	public static LogBackConfig getDefault() {
+		return LogBackConfig.DEFAULT_LOGBACK;
+	}
+
+	/**
+	 * Safely returns a valid LOGBack configuration.
+	 *
+	 * @param name the name of the LOGBack configuration.
+	 * @return the requested LOGBack configuration, or the default one.
+	 */
+	public static LogBackConfig get(String name) {
+		try {
+			return LogBackConfig.valueOf(name);
+		} catch (IllegalArgumentException ex) {
+			return getDefault();
+		}
+	}
+
 }
