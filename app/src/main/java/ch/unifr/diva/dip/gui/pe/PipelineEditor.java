@@ -139,14 +139,14 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 
 		this.hostProcessorsWidget = new ProcessorsWidget(
 				localize("pipeline.services.host"),
-				handler.osgi.hostProcessors
+				handler.osgi.getHostProcessors()
 		);
 		processorWidgets.add(hostProcessorsWidget);
 		sideBar.addMainWidget(hostProcessorsWidget);
 
 		this.processorsWidget = new ProcessorsWidget(
 				localize("pipeline.services"),
-				handler.osgi.processors
+				handler.osgi.getProcessors()
 		);
 		processorWidgets.add(processorsWidget);
 		sideBar.addMainWidget(processorsWidget);

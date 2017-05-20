@@ -99,7 +99,7 @@ public class MainGUI extends Application {
 			boolean osgiTimeout = true;
 			try {
 				Thread.sleep(500);
-				osgiTimeout = !handler.osgi.processors.waitForBundles(3, 500, 10000);
+				osgiTimeout = !handler.osgi.getProcessors().waitForBundles(3, 500, 10000);
 			} catch (InterruptedException ex) {
 
 			}

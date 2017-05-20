@@ -72,7 +72,7 @@ public class PipelineManager implements Modifiable, Localizable {
 		// This is no killer-feature we absolutely need to have, still nice to have
 		// in order to update services devs are working on, without having to shutdown
 		// and start up DIP all over again...
-		this.handler.osgi.processors.getServiceCollectionList().addListener(processorListener);
+		this.handler.osgi.getProcessors().getServiceCollectionList().addListener(processorListener);
 	}
 
 	private final ListChangeListener<? super ServiceCollection<Processor>> processorListener = (ListChangeListener.Change<? extends ServiceCollection<Processor>> c) -> {

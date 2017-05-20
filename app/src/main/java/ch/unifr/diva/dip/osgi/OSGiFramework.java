@@ -39,27 +39,11 @@ public class OSGiFramework {
 	private final List<Path> bundleWatchDirs;
 	private final int watchBundleStartLevel;
 	private final Path bundleCacheDir;
-//	The bundle tracker is not needed so far, but I'll leave it here outcommented
-//  for quick activation/experimentation.
 	private final OSGiBundleTracker bundleTracker;
 	private final OSGiServiceTracker<Processor> processorServiceTracker;
 	private final HostServiceTracker<Processor> processorHostServiceTracker;
-
-	public OSGiBundleTracker getBundleTracker() {
-		return this.bundleTracker;
-	}
-
-	/**
-	 * {@code Processor} service monitor. Safe to be accessed from the JavaFX
-	 * application thread.
-	 */
-	public final OSGiServiceMonitor<Processor> processors;
-
-	/**
-	 * {@code HostProcessor} service monitor. Safe to be accessed from the
-	 * JavaFX application thread.
-	 */
-	public final HostServiceMonitor<Processor> hostProcessors;
+	private final OSGiServiceMonitor<Processor> processors;
+	private final HostServiceMonitor<Processor> hostProcessors;
 
 	/**
 	 * OSGiFramework constructor.
@@ -273,6 +257,35 @@ public class OSGiFramework {
 				}
 				return j.toString();
 		}
+	}
+
+	/**
+	 * Retuns the bundle tracker.
+	 *
+	 * @return the bundle tracker.
+	 */
+	public OSGiBundleTracker getBundleTracker() {
+		return this.bundleTracker;
+	}
+
+	/**
+	 * Return the {@code Processor} service monitor. Safe to be accessed from
+	 * the JavaFX application thread.
+	 *
+	 * @return the {@code Processor} service monitor.
+	 */
+	public OSGiServiceMonitor<Processor> getProcessors() {
+		return processors;
+	}
+
+	/**
+	 * Returns the {@code HostProcessor} service monitor. Safe to be accessed
+	 * from the JavaFX application thread.
+	 *
+	 * @return the {@code HostProcessor} service monitor.
+	 */
+	public HostServiceMonitor<Processor> getHostProcessors() {
+		return hostProcessors;
 	}
 
 	/**

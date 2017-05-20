@@ -91,7 +91,7 @@ public class MainCLI {
 		boolean osgiTimeout = true;
 		try {
 			Thread.sleep(500);
-			osgiTimeout = !handler.osgi.processors.waitForBundles(3, 500, 10000);
+			osgiTimeout = !handler.osgi.getProcessors().waitForBundles(3, 500, 10000);
 		} catch (InterruptedException ex) {
 			log.debug("interrupted while waiting for OSGi bundles to be installed", ex);
 		}
