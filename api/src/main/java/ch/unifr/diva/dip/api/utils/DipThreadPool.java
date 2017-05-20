@@ -155,6 +155,21 @@ public class DipThreadPool {
 		return this.executor;
 	}
 
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append(this.getClass().getSimpleName());
+		sb.append('@');
+		sb.append(Integer.toHexString(this.hashCode()));
+		sb.append('{');
+		sb.append("poolSize=");
+		sb.append(this.poolSize);
+		sb.append(", executor=");
+		sb.append(this.executor);
+		sb.append('}');
+		return sb.toString();
+	}
+
 	/**
 	 * DIP thread factory.
 	 */
