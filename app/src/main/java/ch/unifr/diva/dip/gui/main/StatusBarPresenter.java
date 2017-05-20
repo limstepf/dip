@@ -84,11 +84,10 @@ public class StatusBarPresenter implements Presenter {
 		 */
 		stack.add(event);
 
-		final ChangeListener listener = new ChangeListener() {
+		final ChangeListener<Worker.State> listener = new ChangeListener<Worker.State>() {
 			@Override
-			public void changed(ObservableValue observable, Object oldValue, Object newValue) {
-				final Worker.State state = (Worker.State) newValue;
-				if (isDone(state)) {
+			public void changed(ObservableValue<? extends Worker.State> observable, Worker.State oldValue, Worker.State newValue) {
+				if (isDone(newValue)) {
 					event.worker.stateProperty().removeListener(this);
 					removeStatusWorkerEvent(event);
 				}
@@ -102,8 +101,8 @@ public class StatusBarPresenter implements Presenter {
 		// event will be properly cleaned up
 		listener.changed(
 				event.worker.stateProperty(),
-				event.worker.stateProperty().get(),
-				event.worker.stateProperty().get()
+				(Worker.State) event.worker.stateProperty().get(),
+				(Worker.State) event.worker.stateProperty().get()
 		);
 	}
 
