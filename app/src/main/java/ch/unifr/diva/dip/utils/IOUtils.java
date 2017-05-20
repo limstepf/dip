@@ -33,6 +33,16 @@ public class IOUtils {
 	// at the same time.
 	private final static Cloner cloner = new Cloner();
 
+	/**
+	 * Platform dependent line separator. This just holds the system property
+	 * "line.separator" for convenience, if needed (or just use
+	 * {@code println()} a bunch of times...).
+	 *
+	 * This is a {@code "\n"} (line feed) on a UNIX style machine, and
+	 * {@code "\r\n"} (carrige return and line feed) on a Windows box, ...
+	 */
+	public final static String NL = System.getProperty("line.separator");
+
 	private IOUtils() {
 		/* nope :) */
 	}
