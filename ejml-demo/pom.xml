@@ -19,8 +19,15 @@
 	</description>
 
 	<properties>
-		<osgi.bundle.symbolicName>${project.groupId}</osgi.bundle.symbolicName>
 		<ejml.version>0.29</ejml.version>
+		<!-- use exact version, since the ejml bundle is repackaged and doesn't
+		use semantic versioning. -->
+		<ejml.version.range>[${ejml.version},${ejml.version}]</ejml.version.range>
+		<osgi.bundle.symbolicName>${project.groupId}</osgi.bundle.symbolicName>
+		<osgi.bundle.importPackage>
+			org.ejml.*;version="${ejml.version.range}",
+			*
+		</osgi.bundle.importPackage>
 	</properties>
 
 	<dependencies>
