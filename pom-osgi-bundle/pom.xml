@@ -20,6 +20,9 @@
 		<!-- the symbolic bundle name might have to be adapted to just use the
 		groupId if the artifactId is equal to the last section of groupId -->
 		<osgi.bundle.symbolicName>${project.groupId}.${project.artifactId}</osgi.bundle.symbolicName>
+		<!-- the default for this header is "*", resulting in importing all
+		referred packages. -->
+		<osgi.bundle.importPackage>*</osgi.bundle.importPackage>
 	</properties>
 
 	<dependencies>
@@ -74,10 +77,7 @@
 					<configuration>
 						<instructions>
 							<Bundle-SymbolicName>${osgi.bundle.symbolicName}</Bundle-SymbolicName>
-							<!--
-							<Embed-Dependency>artifactId[;inline=true], ...</Embed-Dependency>
-							<Embed-Transitive>true</Embed-Transitive>
-							-->
+							<Import-Package>${osgi.bundle.importPackage}</Import-Package>
 						</instructions>
 					</configuration>
 				</plugin>
