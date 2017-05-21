@@ -8,14 +8,18 @@
 		<relativePath>../pom-osgi-bundle/pom.xml</relativePath>
 	</parent>
 
-	<groupId>ch.unifr.diva.dip</groupId>
+	<groupId>org.ejml.demo</groupId>
 	<artifactId>ejml-demo</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 
 	<name>EJML Demo OSGi Bundle</name>
+	<description>
+		EMJL demo plugin.
+	</description>
 
 	<properties>
+		<osgi.bundle.symbolicName>${project.groupId}</osgi.bundle.symbolicName>
 		<ejml.version>0.29</ejml.version>
 	</properties>
 
