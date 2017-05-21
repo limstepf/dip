@@ -150,7 +150,7 @@ public class MainCLI {
 				listProjectPages(data);
 			}
 
-			// validate project data...
+			// validate and open project data...
 			if (CommandLineOption.hasAnyOption(
 					CommandLineOption.PROCESS,
 					CommandLineOption.RESET
@@ -165,41 +165,41 @@ public class MainCLI {
 				}
 
 				System.out.println();
-			}
 
-			// open project
-			System.out.println("opening project...");
-			final Project project = handler.openProject(data);
-			pauseThread();
+				// open project
+				System.out.println("opening project...");
+				final Project project = handler.openProject(data);
+				pauseThread();
 
-			// reset all pages
-			if (CommandLineOption.RESET.hasOption()) {
+				// reset all pages
+				if (CommandLineOption.RESET.hasOption()) {
+					System.out.println();
+					System.out.println("resetting project...");
+					joinThread(project.resetAllPages());
+				}
+
+				// process all apges
+				if (CommandLineOption.PROCESS.hasOption()) {
+					System.out.println();
+					System.out.println("processing project...");
+					joinThread(project.processAllPages());
+				}
+
+				// save project, unless asked to not do so...
 				System.out.println();
-				System.out.println("resetting project...");
-				joinThread(project.resetAllPages());
-			}
+				if (!CommandLineOption.DONT_SAVE.hasOption()) {
+					System.out.println("saving project...");
+					joinThread(handler.saveProject());
+					System.out.println();
+					System.out.println("closing project...");
+				} else {
+					System.out.println("closing project... (without saving)");
+				}
 
-			// process all apges
-			if (CommandLineOption.PROCESS.hasOption()) {
-				System.out.println();
-				System.out.println("processing project...");
-				joinThread(project.processAllPages());
+				// and close the project
+				handler.closeProject();
+				pauseThread();
 			}
-
-			// save project, unless asked to not do so...
-			System.out.println();
-			if (!CommandLineOption.DONT_SAVE.hasOption()) {
-				System.out.println("saving project...");
-				joinThread(handler.saveProject());
-				System.out.println();
-				System.out.println("closing project...");
-			} else {
-				System.out.println("closing project... (without saving)");
-			}
-
-			// and close the project
-			handler.closeProject();
-			pauseThread();
 		}
 
 		System.out.println();
