@@ -263,7 +263,15 @@ public class OSGiServiceTracker<T> {
 		@Override
 		public T addingService(ServiceReference reference) {
 			final OSGiService<T> service = new OSGiService(context, reference);
-			log.debug("adding service: {}", service);
+			log.debug("add service: {}", service);
+
+			if (service.serviceObject == null) {
+				log.warn(
+						"can't add service: {} with an invalid service-object: {}",
+						service, service.serviceObject
+				);
+				return null; // do not add service
+			}
 
 			final OSGiServiceCollection<T> collection;
 			synchronized (this) {
@@ -292,6 +300,15 @@ public class OSGiServiceTracker<T> {
 		@Override
 		public void modifiedService(ServiceReference reference, Object obj) {
 			final OSGiService<T> service = new OSGiService(context, reference);
+			log.debug("update service: {}", service);
+
+			if (service.serviceObject == null) {
+				log.warn(
+						"can't update service: {} with an invalid service-object: {}",
+						service, service.serviceObject
+				);
+				return; // ignore/do not update modified service
+			}
 
 			final OSGiServiceCollection<T> collection;
 			synchronized (this) {
@@ -311,6 +328,7 @@ public class OSGiServiceTracker<T> {
 		@Override
 		public void removedService(ServiceReference reference, Object obj) {
 			final OSGiService<T> service = new OSGiService(context, reference);
+			log.debug("remove service: {}", service);
 
 			final OSGiServiceCollection<T> collection;
 			synchronized (this) {
@@ -322,8 +340,6 @@ public class OSGiServiceTracker<T> {
 				context.ungetService(reference);
 				collection.remove(service);
 			}
-
-			log.debug("removed service: {}", service);
 
 			for (TrackerListener listener : listeners) {
 				listener.onRemoved(collection, service);
