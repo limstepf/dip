@@ -25,7 +25,16 @@
 		<!-- needs to be set to false in child POMs. This is set to true in here
 		s.t. this POM doesn't end up in the bundle directory itself. -->
 		<osgi.repackage.skip>true</osgi.repackage.skip>
-		<osgi.repackage.excludeTransitive>true</osgi.repackage.excludeTransitive>
+		<!-- the symbolic bundle name might have to be adapted to just use the
+		groupId if the artifactId is equal to the last section of groupId -->
+		<osgi.bundle.symbolicName>${project.groupId}.${project.artifactId}</osgi.bundle.symbolicName>
+		<osgi.bundle.version>${project.version}</osgi.bundle.version>
+		<osgi.bundle.exportPackage>*</osgi.bundle.exportPackage>
+		<osgi.bundle.embedDependency>*;scope=compile|runtime</osgi.bundle.embedDependency>
+		<osgi.bundle.embedDirectory>target/dependency</osgi.bundle.embedDirectory>
+		<osgi.bundle.embedStripGroup>true</osgi.bundle.embedStripGroup>
+		<osgi.bundle.embedTransitive>true</osgi.bundle.embedTransitive>
+		<osgi.bundle.excludeTransitive>true</osgi.bundle.excludeTransitive>
 	</properties>
 
 	<build>
@@ -37,13 +46,13 @@
 				<configuration>
 					<unpackBundle>true</unpackBundle>
 					<instructions>
-						<Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-						<Bundle-Version>${project.version}</Bundle-Version>
-						<Export-Package>*</Export-Package>
-						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-						<Embed-Directory>target/dependency</Embed-Directory>
-						<Embed-StripGroup>true</Embed-StripGroup>
-						<Embed-Transitive>true</Embed-Transitive>
+						<Bundle-SymbolicName>${osgi.bundle.symbolicName}</Bundle-SymbolicName>
+						<Bundle-Version>${osgi.bundle.version}</Bundle-Version>
+						<Export-Package>${osgi.bundle.exportPackage}</Export-Package>
+						<Embed-Dependency>${osgi.bundle.embedDependency}</Embed-Dependency>
+						<Embed-Directory>${osgi.bundle.embedDirectory}</Embed-Directory>
+						<Embed-StripGroup>${osgi.bundle.embedStripGroup}</Embed-StripGroup>
+						<Embed-Transitive>${osgi.bundle.embedTransitive}</Embed-Transitive>
 					</instructions>
 				</configuration>
 			</plugin>
@@ -70,7 +79,7 @@
 					</artifactItems>
 					<skip>${osgi.repackage.skip}</skip>
 					<outputDirectory>${app.plugin.bundledir}</outputDirectory>
-					<excludeTransitive>${osgi.repackage.excludeTransitive}</excludeTransitive>
+					<excludeTransitive>${osgi.bundle.excludeTransitive}</excludeTransitive>
 					<overWriteSnapshots>true</overWriteSnapshots>
 					<overWriteIfNewer>true</overWriteIfNewer>
 				</configuration>
