@@ -11,14 +11,12 @@ import ch.unifr.diva.dip.api.imaging.scanners.Location;
 import ch.unifr.diva.dip.api.imaging.scanners.RasterScanner;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Service;
+import org.osgi.service.component.annotations.Component;
 
 /**
  * Simple image processing demo. Colors every nth pixel red.
  */
-@Component
-@Service
+@Component(service = Processor.class)
 public class RedPixler extends ProcessableBase {
 
 	private final InputPort<BufferedImage> input;
@@ -44,7 +42,7 @@ public class RedPixler extends ProcessableBase {
 	public Processor newInstance(ProcessorContext context) {
 		return new RedPixler();
 	}
-	
+
 	@Override
 	public void init(ProcessorContext context) {
 		if (context != null) {

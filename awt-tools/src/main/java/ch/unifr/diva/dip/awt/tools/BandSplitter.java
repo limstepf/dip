@@ -22,14 +22,12 @@ import java.util.List;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Service;
+import org.osgi.service.component.annotations.Component;
 
 /**
  * Band/channel splitter.
  */
-@Component
-@Service
+@Component(service = Processor.class)
 public class BandSplitter extends ProcessableBase implements Transmutable {
 
 	private enum LayerOption {

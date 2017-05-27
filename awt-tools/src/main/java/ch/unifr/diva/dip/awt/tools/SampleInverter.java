@@ -31,15 +31,13 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.VPos;
 import javafx.scene.layout.RowConstraints;
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Service;
+import org.osgi.service.component.annotations.Component;
 
 /**
  * Inverts all samples of an image, either {@literal w.r.t.} the sample domain
  * or the range of a {@code SimpleColorModel}.
  */
-@Component
-@Service
+@Component(service = Processor.class)
 public class SampleInverter extends ProcessableBase implements Transmutable {
 
 	private final static String STORAGE_IMAGE = "inverted.png";

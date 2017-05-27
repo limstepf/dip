@@ -19,14 +19,12 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Service;
+import org.osgi.service.component.annotations.Component;
 
 /**
  * Sample rescaling filter. Scaling/gain and biasing (and clamping).
  */
-@Component
-@Service
+@Component(service = Processor.class)
 public class SampleRescaler extends ProcessableBase implements Transmutable, Previewable {
 
 	private final static String STORAGE_IMAGE = "rescaled.png";

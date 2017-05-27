@@ -16,14 +16,12 @@ import java.util.List;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Service;
+import org.osgi.service.component.annotations.Component;
 
 /**
  * Layer demo.
  */
-@Component
-@Service
+@Component(service = Processor.class)
 public class LayerDemo extends ProcessableBase {
 
 	private final InputPort<BufferedImage> input;

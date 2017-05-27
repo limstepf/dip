@@ -11,7 +11,6 @@ import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.services.ProcessorBase;
 import ch.unifr.diva.dip.api.services.Transmutable;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
-import ch.unifr.diva.dip.glyphs.IcoFont;
 import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -22,15 +21,13 @@ import java.util.Arrays;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javax.imageio.ImageIO;
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Service;
+import org.osgi.service.component.annotations.Component;
 
 /**
  * A {@code BufferedImage} exporter. Writes {@code BufferedImage}s to the
  * project's export directory.
  */
-@Component
-@Service
+@Component(service = Processor.class)
 public class BufferedImageExporter extends ProcessableBase implements Transmutable {
 
 	/**

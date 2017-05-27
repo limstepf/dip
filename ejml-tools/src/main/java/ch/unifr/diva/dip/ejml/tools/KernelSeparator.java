@@ -18,11 +18,10 @@ import java.util.Arrays;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Service;
 import org.ejml.ops.SingularOps;
 import org.ejml.simple.SimpleMatrix;
 import org.ejml.simple.SimpleSVD;
+import org.osgi.service.component.annotations.Component;
 
 /**
  * Kernel Separator. Tries to separate a kernel and output a row- and a
@@ -38,8 +37,7 @@ import org.ejml.simple.SimpleSVD;
  * the separable kernel, but row- and column-vectors only, since the convolution
  * filter is ready to go with a separable filter.
  */
-@Component
-@Service
+@Component(service = Processor.class)
 public class KernelSeparator extends ProcessableBase implements Transmutable {
 
 	private final InputPort<FloatMatrix> input_float;

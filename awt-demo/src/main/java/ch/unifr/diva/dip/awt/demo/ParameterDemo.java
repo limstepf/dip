@@ -24,15 +24,13 @@ import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Service;
+import org.osgi.service.component.annotations.Component;
 
 /**
  * Parameter demo. Also demonstrates a simple pass-through, which can be neat to
  * wire up processors in a longer chain that all need the same input.
  */
-@Component
-@Service
+@Component(service = Processor.class)
 public class ParameterDemo extends ProcessableBase {
 
 	private final InputPort<BufferedImage> input;

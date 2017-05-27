@@ -8,15 +8,13 @@ import ch.unifr.diva.dip.api.services.Processor;
 import java.awt.image.BufferedImage;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Service;
+import org.osgi.service.component.annotations.Component;
 
 /**
  * Java AWT BufferedImage converter. Converts an AWT BufferedImage into a JavaFX
  * image.
  */
-@Component
-@Service
+@Component(service = Processor.class)
 public class BufferedImageConverter extends ProcessableBase {
 
 	private final InputPort<BufferedImage> input;

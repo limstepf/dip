@@ -23,14 +23,12 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Service;
+import org.osgi.service.component.annotations.Component;
 
 /**
  * Global threshold processor.
  */
-@Component
-@Service
+@Component(service = Processor.class)
 public class GlobalThreshold extends ProcessableBase implements Transmutable, Previewable {
 
 	private final InputPort<BufferedImage> input;

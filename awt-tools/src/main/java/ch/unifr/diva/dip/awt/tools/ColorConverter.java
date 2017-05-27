@@ -19,8 +19,7 @@ import java.util.List;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Service;
+import org.osgi.service.component.annotations.Component;
 
 /**
  * Color space conversion filter. Can convert from and to all color models
@@ -28,8 +27,7 @@ import org.apache.felix.scr.annotations.Service;
  *
  * @see ch.unifr.diva.dip.api.imaging.SimpleColorModel
  */
-@Component
-@Service
+@Component(service = Processor.class)
 public class ColorConverter extends ProcessableBase implements Transmutable {
 
 	private final EnumParameter cmSrc;

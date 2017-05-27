@@ -19,8 +19,7 @@ import ch.unifr.diva.dip.api.services.ProcessorBase;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
 import javafx.beans.InvalidationListener;
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Service;
+import org.osgi.service.component.annotations.Component;
 
 /**
  * Matrix editor/generator. Manually configure and provide (small) matrices,
@@ -29,8 +28,7 @@ import org.apache.felix.scr.annotations.Service;
  * <p>
  * This plugin is not suited for larger matrices.
  */
-@Component
-@Service
+@Component(service = Processor.class)
 public class MatrixEditor extends ProcessorBase {
 
 	public static final int MAX_ROWS = 64;

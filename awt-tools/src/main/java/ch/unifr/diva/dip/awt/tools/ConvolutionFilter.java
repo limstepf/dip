@@ -32,14 +32,12 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Service;
+import org.osgi.service.component.annotations.Component;
 
 /**
  * A convolution filter.
  */
-@Component
-@Service
+@Component(service = Processor.class)
 public class ConvolutionFilter extends ProcessableBase implements Transmutable, Previewable {
 
 	private final static String IMAGE_FORMAT = "PNG";

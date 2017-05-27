@@ -40,14 +40,12 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
 import javafx.util.Callback;
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Service;
+import org.osgi.service.component.annotations.Component;
 
 /**
  * A simple JavaFX paint processor.
  */
-@Component
-@Service
+@Component(service = Processor.class)
 public class FxPaint extends HybridProcessorBase implements Transmutable {
 
 	protected final static String STORAGE_FORMAT = "PNG";

@@ -6,9 +6,8 @@ import ch.unifr.diva.dip.api.parameters.CompositeGrid;
 import ch.unifr.diva.dip.api.parameters.StringParameter;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.services.ProcessorBase;
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Service;
 import org.ejml.simple.SimpleMatrix;
+import org.osgi.service.component.annotations.Component;
 
 /**
  * EJML demo plugin. The goal here is twofold: 1) how to wrap/repackage third
@@ -44,8 +43,7 @@ import org.ejml.simple.SimpleMatrix;
  * specific versions anyways, no problem. Update manually as you see fit. There
  * can be multiple ejml bundles around at the same time with different versions.
  */
-@Component
-@Service
+@Component(service = Processor.class)
 public class EjmlDemo extends ProcessorBase {
 
 	public EjmlDemo() {
