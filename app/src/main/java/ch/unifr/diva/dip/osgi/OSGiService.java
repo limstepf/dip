@@ -17,6 +17,11 @@ import org.osgi.framework.Version;
 public class OSGiService<T> {
 
 	/**
+	 * The component name property.
+	 */
+	public final static String SERVICE_COMPONENTNAME = "component.name";
+
+	/**
 	 * The {@code ServiceReference}. May be used to examine the properties of
 	 * the service and to get the service object.
 	 */
@@ -53,15 +58,48 @@ public class OSGiService<T> {
 	public final Version version;
 
 	/**
-	 * Creates a new OSGi service object.
+	 * Creates a new OSGi service object. Make sure to have a non-null
+	 * {@code pid} and {@code serviceObject} before using/adding the service;
+	 * the service might be misconfigured (in which case checking the
+	 * {@code /OSGI-INF/<service>.xml} inside the bundle/jar might be worth a
+	 * shot...).
 	 *
 	 * @param context the bundle context.
 	 * @param serviceReference the service reference.
+	 * @throws ch.unifr.diva.dip.osgi.OSGiInvalidServiceException in case the
+	 * service is invalid/misconfigured.
 	 */
-	public OSGiService(BundleContext context, ServiceReference serviceReference) {
+	public OSGiService(BundleContext context, ServiceReference serviceReference) throws OSGiInvalidServiceException {
 		this.serviceReference = serviceReference;
 		this.serviceObject = (T) context.getService(serviceReference);
-		this.pid = (String) serviceReference.getProperty("service.pid");
+
+		if (this.serviceObject == null) {
+			throw new OSGiInvalidServiceException(String.format(
+					"Invalid/misconfigured OSGi service: invalid service object. Bundle=%s, ServiceReference=%s",
+					serviceReference.getBundle(),
+					serviceReference
+			));
+		}
+
+		/*
+		 * judging by the Declarative Services Specification in the OSGi Compendium
+		 * (Release 6), the sensible thing to do here is to take the component name
+		 * as a PID (always added by SCR, see p.324), and ignore any other properties
+		 * such as "service.pid" (which used to be added by the no longer needed
+		 * maven-scr-plugin).
+		 * The name of a component defaults to the canonical name of the class, but
+		 * may be overwritten in the @Component(name=PID) annotation.
+		 */
+		this.pid = serviceReference.getProperty(SERVICE_COMPONENTNAME).toString();
+		if (this.pid == null || this.pid.isEmpty()) {
+			throw new OSGiInvalidServiceException(String.format(
+					"Invalid/misconfigured OSGi service: the '%s' property (used as PID) is not set! Bundle=%s, ServiceReference=%s, ServiceObject=%s",
+					SERVICE_COMPONENTNAME,
+					serviceReference.getBundle(),
+					serviceReference,
+					this.serviceObject
+			));
+		}
 
 		final Bundle bundle = serviceReference.getBundle();
 		this.symbolicBundleName = bundle.getSymbolicName();

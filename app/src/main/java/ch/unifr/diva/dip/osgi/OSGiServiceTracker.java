@@ -262,16 +262,14 @@ public class OSGiServiceTracker<T> {
 
 		@Override
 		public T addingService(ServiceReference reference) {
-			final OSGiService<T> service = new OSGiService(context, reference);
-			log.debug("add service: {}", service);
-
-			if (service.serviceObject == null) {
-				log.warn(
-						"can't add service: {} with an invalid service-object: {}",
-						service, service.serviceObject
-				);
-				return null; // do not add service
+			final OSGiService<T> service;
+			try {
+				service = new OSGiService(context, reference);
+			} catch (OSGiInvalidServiceException ex) {
+				log.warn("can't add service: {}", ex.getMessage());
+				return null; // ignore/do not add modified service
 			}
+			log.debug("add service: {}", service);
 
 			final OSGiServiceCollection<T> collection;
 			synchronized (this) {
@@ -299,16 +297,14 @@ public class OSGiServiceTracker<T> {
 		 */
 		@Override
 		public void modifiedService(ServiceReference reference, Object obj) {
-			final OSGiService<T> service = new OSGiService(context, reference);
-			log.debug("update service: {}", service);
-
-			if (service.serviceObject == null) {
-				log.warn(
-						"can't update service: {} with an invalid service-object: {}",
-						service, service.serviceObject
-				);
+			final OSGiService<T> service;
+			try {
+				service = new OSGiService(context, reference);
+			} catch (OSGiInvalidServiceException ex) {
+				log.warn("can't update service: {}", ex.getMessage());
 				return; // ignore/do not update modified service
 			}
+			log.debug("update service: {}", service);
 
 			final OSGiServiceCollection<T> collection;
 			synchronized (this) {
@@ -327,7 +323,13 @@ public class OSGiServiceTracker<T> {
 
 		@Override
 		public void removedService(ServiceReference reference, Object obj) {
-			final OSGiService<T> service = new OSGiService(context, reference);
+			final OSGiService<T> service;
+			try {
+				service = new OSGiService(context, reference);
+			} catch (OSGiInvalidServiceException ex) {
+				log.warn("can't remove service: {}", ex.getMessage());
+				return; // ignore/do not remove modified service
+			}
 			log.debug("remove service: {}", service);
 
 			final OSGiServiceCollection<T> collection;
