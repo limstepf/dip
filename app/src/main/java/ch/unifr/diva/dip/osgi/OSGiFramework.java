@@ -5,7 +5,6 @@ import ch.unifr.diva.dip.utils.FileFinder;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.StringJoiner;
-import org.apache.felix.framework.util.FelixConstants;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -138,9 +136,6 @@ public class OSGiFramework {
 		config.put(Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA,
 				toCommaSeparatedString(systemPackages));
 
-		List activators = Arrays.asList(new OSGiHostActivator());
-		config.put(FelixConstants.SYSTEMBUNDLE_ACTIVATORS_PROP, activators);
-
 		// The name of the directory to watch. Several directories can be
 		// specified by using a comma-separated list.
 		config.put("felix.fileinstall.dir",
@@ -166,7 +161,7 @@ public class OSGiFramework {
 			log.error("error starting OSGi framework: ", ex);
 			throw ex;
 		}
-
+		
 		return fwk;
 	}
 
