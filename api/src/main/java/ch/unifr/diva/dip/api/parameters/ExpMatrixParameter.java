@@ -310,7 +310,7 @@ public class ExpMatrixParameter extends PersistentParameterBase<StringMatrix, Ex
 				if (exp.validate().isValid()) {
 					return true;
 				}
-			} catch (IllegalArgumentException ex) {
+			} catch (Exception ex) {
 				// invalid
 			}
 

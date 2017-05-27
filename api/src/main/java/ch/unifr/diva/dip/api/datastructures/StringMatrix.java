@@ -170,7 +170,7 @@ public class StringMatrix extends Matrix {
 			if (exp.validate().isValid()) {
 				return exp.evaluate();
 			}
-		} catch (IllegalArgumentException ex) {
+		} catch (Exception ex) {
 			// NaN it is then...
 		}
 

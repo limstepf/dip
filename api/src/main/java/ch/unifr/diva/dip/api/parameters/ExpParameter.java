@@ -107,8 +107,7 @@ public class ExpParameter extends PersistentParameterBase<String, ExpParameter.E
 				this.expressionValue = Double.NaN;
 				return false;
 			}
-		} catch (IllegalArgumentException ex) {
-			// UnknownFunctionOrVariableException is a IllegalArgumentException
+		} catch (Exception ex) {
 			this.expressionValue = Double.NaN;
 			return false;
 		}
