@@ -16,6 +16,11 @@ See:
 * [https://netbeans.org/bugzilla/show_bug.cgi?id=244404](https://netbeans.org/bugzilla/show_bug.cgi?id=244404)
 * [https://issues.apache.org/jira/browse/SUREFIRE-1028](https://issues.apache.org/jira/browse/SUREFIRE-1028)
 
+This is fixed in 2.20, but somehoe the output format got changed, and Netbeans 8.0.2 doesn't show the Test Results any longer... (should also be fixed in the nightly build, but hasn't shipped yet). So other than that, the surfire plugin could now be bumped to 2.20.
+
+See:
+* [https://netbeans.org/bugzilla/show_bug.cgi?id=257563](https://netbeans.org/bugzilla/show_bug.cgi?id=257563)
+
 
 Reporting
 ---------

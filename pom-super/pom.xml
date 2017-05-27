@@ -270,22 +270,31 @@
 						see: https://netbeans.org/bugzilla/show_bug.cgi?id=244404
 						see: https://issues.apache.org/jira/browse/SUREFIRE-1028
 
-					<version>2.19</version>
+						This is fixed in 2.20, but somehoe the output format got
+						changed, and Netbeans 8.0.2 doesn't show the Test Results
+						any longer... (should also be fixed in the nightly build,
+						but hasn't shipped yet). So other than that, the surfire
+						plugin could now be bumped to 2.20.
+						see: https://netbeans.org/bugzilla/show_bug.cgi?id=257563
 					-->
 					<version>2.18.1</version>
 					<configuration>
 						<skipTests>${testing.surefire.skip}</skipTests>
 						<testFailureIgnore>${testing.surefire.ignoreFailure}</testFailureIgnore>
 						<argLine>-Dfile.encoding=UTF-8 @{testing.surefire.argLine}</argLine>
+						<excludes>
+							<exclude>**/*$*</exclude>
+						</excludes>
+						<includes>
+							<include>**/Test*.java</include>
+							<include>**/*Test.java</include>
+						</includes>
 					</configuration>
 				</plugin>
 
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-report-plugin</artifactId>
-					<!--
-					<version>2.19</version>
-					-->
 					<version>2.18.1</version>
 					<configuration>
 						<skipSurefireReport>${reporting.surefire.skip}</skipSurefireReport>
