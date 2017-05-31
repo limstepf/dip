@@ -11,10 +11,11 @@ import javafx.scene.shape.Shape;
 public interface ShapeBrush<T extends Shape> extends Brush {
 
 	/**
+	 * Paints (or creates the shape of) a single brush stamp.
 	 *
 	 * @param e the mouse event where {@code e.getX()} and {@code e.getY()} are
 	 * the center of the single brush stamp.
-	 * @return
+	 * @return the painted shape.
 	 */
 	default T paint(MouseEvent e) {
 		return paint(e.getX(), e.getY());

@@ -54,7 +54,7 @@ public class Mask extends Kernel<BooleanMatrix> {
 	 *
 	 * @param x the X coordinate of the mask.
 	 * @param y the Y coordinate of the mask.
-	 * @return
+	 * @return the element at the specified row/column.
 	 */
 	public boolean get(int x, int y) {
 		return this.matrix.data[index(x, y)];

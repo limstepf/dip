@@ -34,7 +34,7 @@ public enum VisibilityMode {
 	/**
 	 * Return the label of the visibility mode.
 	 *
-	 * @return
+	 * @return the label of the visibility mode.
 	 */
 	public String label() {
 		return this.label;

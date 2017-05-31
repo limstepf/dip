@@ -62,7 +62,7 @@ public class FxBresenham {
 	 * @param restX the rest of the repeated pixels on the x-axis.
 	 * @param shiftY number of the shifted repeated pixels on the y-axis.
 	 * @param restY the rest of the repeated pixels on the y-axis.
-	 * @return
+	 * @return the upscaled image.
 	 */
 	public WritableImage zoom(Image src, int width, int height, int shiftX, int restX, int shiftY, int restY) {
 		return FxRescaling.bresenhamUpscaling(
