@@ -54,7 +54,7 @@
 		<reporting.javadoc.skip>false</reporting.javadoc.skip>
 		<reporting.surefire.skip>false</reporting.surefire.skip>
 		<reporting.jacoco.skip>false</reporting.jacoco.skip>
-		<reporting.checkstyle.skip>false</reporting.checkstyle.skip>
+		<reporting.checkstyle.skip>true</reporting.checkstyle.skip>
 		<reporting.fingbugs.skip>false</reporting.fingbugs.skip>
 	</properties>
 
