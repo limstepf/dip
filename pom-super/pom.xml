@@ -391,7 +391,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-javadoc-plugin</artifactId>
-					<version>2.10.3</version>
+					<version>2.10.4</version>
 					<configuration>
 						<skip>${reporting.javadoc.skip}</skip>
 						<failOnError>false</failOnError>
