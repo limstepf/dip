@@ -67,7 +67,7 @@ public class ConcurrentOpIT {
 	/**
 	 * Simple test op that increments each sample by one.
 	 */
-	public static class TestOp extends NullOp {
+	public static class TestOp extends NullOp implements TileParallelizable {
 
 		@Override
 		public BufferedImage filter(BufferedImage src, BufferedImage dst) {
