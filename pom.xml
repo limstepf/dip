@@ -25,6 +25,11 @@
 		<!-- OSGi packages (copied/repackaged dependencies) -->
 		<module>third_party</module>
 
+		<!-- OSGi bundles (libraries; used by plugins) -->
+		<module>imaging</module>
+		<module>awt-imaging</module>
+		<module>fx-imaging</module>
+
 		<!-- OSGi bundles (demo plugins) -->
 		<!--<module>awt-demo</module>-->
 		<!--<module>ejml-demo</module>-->

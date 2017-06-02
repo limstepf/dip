@@ -21,7 +21,7 @@
 @XmlJavaTypeAdapters({
 	@XmlJavaTypeAdapter(value = BooleanPropertyAdapter.class, type = BooleanProperty.class),
 	@XmlJavaTypeAdapter(value = BufferedImageAdapter.class, type = java.awt.image.BufferedImage.class),
-	@XmlJavaTypeAdapter(value = BufferedMatrixAdapter.class, type = ch.unifr.diva.dip.api.imaging.BufferedMatrix.class),
+	@XmlJavaTypeAdapter(value = BufferedMatrixAdapter.class, type = ch.unifr.diva.dip.api.datastructures.BufferedMatrix.class),
 	@XmlJavaTypeAdapter(value = DoublePropertyAdapter.class, type = DoubleProperty.class),
 	@XmlJavaTypeAdapter(value = ImageAdapter.class, type = javafx.scene.image.Image.class),
 	@XmlJavaTypeAdapter(value = IntegerPropertyAdapter.class, type = IntegerProperty.class),

@@ -8,7 +8,7 @@ import ch.unifr.diva.dip.api.utils.XmlUtils;
 import ch.unifr.diva.dip.core.UserSettings;
 import ch.unifr.diva.dip.core.services.api.HostService;
 import ch.unifr.diva.dip.core.ui.Localizable;
-import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
+import ch.unifr.diva.dip.glyphs.mdi.MaterialDesignIcons;
 import ch.unifr.diva.dip.gui.pe.DataItemListView;
 import ch.unifr.diva.dip.osgi.OSGiVersionPolicy;
 import ch.unifr.diva.dip.utils.IOUtils;

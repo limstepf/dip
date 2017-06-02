@@ -4,7 +4,7 @@ import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.core.services.RgbPage;
-import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
+import ch.unifr.diva.dip.glyphs.mdi.MaterialDesignIcons;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;

@@ -1,13 +1,9 @@
 package ch.unifr.diva.dip.awt.tools;
 
 import ch.unifr.diva.dip.api.components.OutputPort;
-import ch.unifr.diva.dip.api.components.color.ColorPort;
-import ch.unifr.diva.dip.api.components.color.OutputColorPort;
 import ch.unifr.diva.dip.api.datastructures.ValueListSelection;
 import ch.unifr.diva.dip.api.datatypes.BufferedImageBinary;
 import ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat;
-import ch.unifr.diva.dip.api.imaging.SimpleColorModel;
-import ch.unifr.diva.dip.api.imaging.ops.NullOp.SamplePrecision;
 import ch.unifr.diva.dip.api.parameters.CheckboxParameter;
 import ch.unifr.diva.dip.api.parameters.CompositeGrid;
 import ch.unifr.diva.dip.api.parameters.EmptyParameter;
@@ -18,6 +14,10 @@ import ch.unifr.diva.dip.api.parameters.LabelParameter;
 import ch.unifr.diva.dip.api.parameters.Parameter;
 import ch.unifr.diva.dip.api.parameters.TextParameter;
 import ch.unifr.diva.dip.api.parameters.XorParameter;
+import ch.unifr.diva.dip.awt.components.ColorPort;
+import ch.unifr.diva.dip.awt.components.OutputColorPort;
+import ch.unifr.diva.dip.awt.imaging.SimpleColorModel;
+import ch.unifr.diva.dip.awt.imaging.ops.NullOp.SamplePrecision;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;

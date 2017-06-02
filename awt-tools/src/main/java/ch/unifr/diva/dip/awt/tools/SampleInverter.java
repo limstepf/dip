@@ -3,23 +3,24 @@ package ch.unifr.diva.dip.awt.tools;
 import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.components.ProcessorContext;
-import ch.unifr.diva.dip.api.components.color.ColorPort;
-import ch.unifr.diva.dip.api.components.color.InputColorPort;
-import ch.unifr.diva.dip.api.components.color.OutputColorPort;
+import ch.unifr.diva.dip.api.datastructures.BufferedMatrix;
 import ch.unifr.diva.dip.api.datastructures.ValueListSelection;
-import ch.unifr.diva.dip.api.imaging.BufferedMatrix;
-import ch.unifr.diva.dip.api.imaging.SimpleColorModel;
-import ch.unifr.diva.dip.api.services.ProcessableBase;
-import ch.unifr.diva.dip.api.services.Processor;
-import ch.unifr.diva.dip.api.imaging.ops.InvertOp;
 import ch.unifr.diva.dip.api.parameters.CompositeGrid;
 import ch.unifr.diva.dip.api.parameters.EnumParameter;
 import ch.unifr.diva.dip.api.parameters.IntegerSliderParameter;
 import ch.unifr.diva.dip.api.parameters.TextParameter;
 import ch.unifr.diva.dip.api.parameters.XorParameter;
+import ch.unifr.diva.dip.api.services.ProcessableBase;
+import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.services.Transmutable;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
-import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
+import ch.unifr.diva.dip.awt.components.ColorPort;
+import ch.unifr.diva.dip.awt.components.InputColorPort;
+import ch.unifr.diva.dip.awt.components.OutputColorPort;
+import ch.unifr.diva.dip.awt.imaging.Filter;
+import ch.unifr.diva.dip.awt.imaging.SimpleColorModel;
+import ch.unifr.diva.dip.awt.imaging.ops.InvertOp;
+import ch.unifr.diva.dip.glyphs.mdi.MaterialDesignIcons;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -430,7 +431,7 @@ public class SampleInverter extends ProcessableBase implements Transmutable {
 				op = new InvertOp();
 			}
 
-			final BufferedImage invertedImage = filter(context, op, source);
+			final BufferedImage invertedImage = Filter.filter(context, op, source);
 			if (this.config.isBufferedMatrix()) {
 				writeBufferedMatrix(context, STORAGE_MAT, (BufferedMatrix) invertedImage);
 			} else {

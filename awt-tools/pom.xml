@@ -16,6 +16,18 @@
 	<name>AWT Tools OSGi Bundle</name>
 	<description>Basic toolset for Abstract Window Toolkit (AWT) image processing (i.e. java.awt.image.BufferedImage)</description>
 
+	<dependencies>
+		<dependency>
+			<groupId>ch.unifr.diva.dip</groupId>
+			<artifactId>awt-imaging</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>ch.unifr.diva.dip</groupId>
+			<artifactId>glyphs-materialdesignicons</artifactId>
+		</dependency>
+	</dependencies>
+
 	<build>
 		<plugins>
 			<plugin>

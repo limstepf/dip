@@ -1,7 +1,7 @@
 package ch.unifr.diva.dip.api.utils.jaxb;
 
 import ch.unifr.diva.dip.api.datastructures.BufferedMatrixContainer;
-import ch.unifr.diva.dip.api.imaging.BufferedMatrix;
+import ch.unifr.diva.dip.api.datastructures.BufferedMatrix;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 /**

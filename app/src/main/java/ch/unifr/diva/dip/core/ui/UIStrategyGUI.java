@@ -2,7 +2,7 @@ package ch.unifr.diva.dip.core.ui;
 
 import ch.unifr.diva.dip.api.ui.Glyph;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
-import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
+import ch.unifr.diva.dip.glyphs.mdi.MaterialDesignIcons;
 import ch.unifr.diva.dip.gui.dialogs.ConfirmationDialog;
 import ch.unifr.diva.dip.gui.dialogs.ErrorDialog;
 import ch.unifr.diva.dip.gui.dialogs.InformationDialog;

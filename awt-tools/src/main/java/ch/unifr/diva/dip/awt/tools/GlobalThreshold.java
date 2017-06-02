@@ -3,18 +3,19 @@ package ch.unifr.diva.dip.awt.tools;
 import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.components.ProcessorContext;
+import ch.unifr.diva.dip.api.datastructures.BufferedMatrix;
 import ch.unifr.diva.dip.api.datastructures.ValueListSelection;
-import ch.unifr.diva.dip.api.imaging.BufferedMatrix;
 import ch.unifr.diva.dip.api.parameters.EnumParameter;
 import ch.unifr.diva.dip.api.parameters.IntegerSliderParameter;
 import ch.unifr.diva.dip.api.parameters.XorParameter;
+import ch.unifr.diva.dip.api.services.Previewable;
 import ch.unifr.diva.dip.api.services.ProcessableBase;
 import ch.unifr.diva.dip.api.services.Processor;
-import ch.unifr.diva.dip.api.imaging.ops.GlobalThresholdOp;
-import ch.unifr.diva.dip.api.services.Previewable;
 import ch.unifr.diva.dip.api.services.Transmutable;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
-import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
+import ch.unifr.diva.dip.awt.imaging.Filter;
+import ch.unifr.diva.dip.awt.imaging.ops.GlobalThresholdOp;
+import ch.unifr.diva.dip.glyphs.mdi.MaterialDesignIcons;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
@@ -202,7 +203,7 @@ public class GlobalThreshold extends ProcessableBase implements Transmutable, Pr
 	private BufferedImage doProcess(ProcessorContext context, BufferedImage src, int band, int threshold) {
 		final GlobalThresholdOp op = new GlobalThresholdOp(band);
 		op.setThreshold(threshold);
-		return filter(context, op, src, op.createBinaryDestImage(src));
+		return Filter.filter(context, op, src, op.createBinaryDestImage(src));
 	}
 
 	private int computeThreshold(BufferedImage source, int band) {

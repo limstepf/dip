@@ -1,8 +1,6 @@
 package ch.unifr.diva.dip.api.datastructures;
 
 import ch.unifr.diva.dip.api.TestUtils.Shape;
-import ch.unifr.diva.dip.api.imaging.scanners.Location;
-import ch.unifr.diva.dip.api.imaging.scanners.RasterScanner;
 import java.util.BitSet;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -22,12 +20,16 @@ public class FloatKernelTest extends KernelTestBase {
 			// make sure we hit all coefficients once by the raster
 			final BitSet bitSet = new BitSet(length);
 
+			final int xt = kernel.bounds().x + kernel.bounds().width;
+			final int yt = kernel.bounds().y + kernel.bounds().height;
 			int sum = 0;
-			for (Location p : new RasterScanner(kernel.bounds())) {
-				final int index = kernel.index(p.col, p.row);
-				assertTrue("verfiy valid index", index < length);
-				bitSet.set(index);
-				sum += kernel.getValueFloat(p.col, p.row);
+			for (int y = kernel.bounds().y; y < yt; y++) {
+				for (int x = kernel.bounds().x; x < xt; x++) {
+					final int index = kernel.index(x, y);
+					assertTrue("verfiy valid index", index < length);
+					bitSet.set(index);
+					sum += kernel.getValueFloat(x, y);
+				}
 			}
 
 			assertEquals(s.count, bitSet.cardinality());

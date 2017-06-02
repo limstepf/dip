@@ -12,7 +12,7 @@ import ch.unifr.diva.dip.core.model.PipelineLayoutStrategy;
 import ch.unifr.diva.dip.core.model.ProjectPage;
 import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
-import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
+import ch.unifr.diva.dip.glyphs.mdi.MaterialDesignIcons;
 import ch.unifr.diva.dip.gui.AbstractWidget;
 import ch.unifr.diva.dip.gui.layout.DraggableListCell;
 import ch.unifr.diva.dip.gui.layout.FormGridPane;

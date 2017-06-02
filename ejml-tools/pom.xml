@@ -32,6 +32,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>ch.unifr.diva.dip</groupId>
+			<artifactId>glyphs-materialdesignicons</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>org.ejml</groupId>
 			<artifactId>core</artifactId>
 			<version>${ejml.version}</version>

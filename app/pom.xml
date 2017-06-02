@@ -24,6 +24,11 @@
 
 		<dependency>
 			<groupId>ch.unifr.diva.dip</groupId>
+			<artifactId>imaging</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>ch.unifr.diva.dip</groupId>
 			<artifactId>glyphs-materialdesignicons</artifactId>
 		</dependency>
 

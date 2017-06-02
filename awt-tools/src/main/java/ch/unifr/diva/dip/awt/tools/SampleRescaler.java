@@ -3,14 +3,15 @@ package ch.unifr.diva.dip.awt.tools;
 import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.components.ProcessorContext;
-import ch.unifr.diva.dip.api.imaging.BufferedMatrix;
-import ch.unifr.diva.dip.api.imaging.ops.RescaleOp;
+import ch.unifr.diva.dip.api.datastructures.BufferedMatrix;
+import ch.unifr.diva.dip.awt.imaging.ops.RescaleOp;
 import ch.unifr.diva.dip.api.parameters.CompositeGrid;
 import ch.unifr.diva.dip.api.parameters.EmptyParameter;
 import ch.unifr.diva.dip.api.services.Previewable;
 import ch.unifr.diva.dip.api.services.ProcessableBase;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.services.Transmutable;
+import ch.unifr.diva.dip.awt.imaging.Filter;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import javafx.beans.InvalidationListener;
@@ -204,7 +205,7 @@ public class SampleRescaler extends ProcessableBase implements Transmutable, Pre
 				this.rescaleUnit.getPrecision()
 		);
 
-		return filter(
+		return Filter.filter(
 				context, op, src,
 				op.createCompatibleDestImage(
 						src.getWidth(),

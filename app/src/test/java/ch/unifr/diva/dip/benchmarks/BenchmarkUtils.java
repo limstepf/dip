@@ -1,7 +1,7 @@
 package ch.unifr.diva.dip.benchmarks;
 
-import ch.unifr.diva.dip.api.imaging.scanners.Location;
-import ch.unifr.diva.dip.api.imaging.scanners.RasterScanner;
+//import ch.unifr.diva.dip.api.imaging.scanners.Location;
+//import ch.unifr.diva.dip.api.imaging.scanners.RasterScanner;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.nio.file.Path;
@@ -68,9 +68,9 @@ public class BenchmarkUtils {
 	 * @param type type of the image.
 	 * @return a random image.
 	 */
-	public static BufferedImage newRandomImage(int size, int type) {
-		return newRandomImage(size, size, type);
-	}
+//	public static BufferedImage newRandomImage(int size, int type) {
+//		return newRandomImage(size, size, type);
+//	}
 
 	/**
 	 * Creates a new BufferedImage with randomly initialized samples.
@@ -80,14 +80,14 @@ public class BenchmarkUtils {
 	 * @param type type of the image.
 	 * @return a random image.
 	 */
-	public static BufferedImage newRandomImage(int width, int height, int type) {
-		final BufferedImage image = new BufferedImage(width, height, type);
-		final WritableRaster raster = image.getRaster();
-		for (Location pt : new RasterScanner(image, true)) {
-			raster.setSample(pt.col, pt.row, pt.band, random255());
-		}
-		return image;
-	}
+//	public static BufferedImage newRandomImage(int width, int height, int type) {
+//		final BufferedImage image = new BufferedImage(width, height, type);
+//		final WritableRaster raster = image.getRaster();
+//		for (Location pt : new RasterScanner(image, true)) {
+//			raster.setSample(pt.col, pt.row, pt.band, random255());
+//		}
+//		return image;
+//	}
 
 	public static WritableImage newRandomFxImage(int size) {
 		return newRandomFxImage(size, size);
@@ -105,5 +105,5 @@ public class BenchmarkUtils {
 	public static int random255() {
 		return (int) (Math.random() * 255);
 	}
-	
+
 }

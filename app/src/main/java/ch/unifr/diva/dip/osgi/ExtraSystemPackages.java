@@ -27,11 +27,38 @@ public class ExtraSystemPackages {
 					findPackages("ch.unifr.diva.dip.api")
 			),
 			/**
+			 * Export the imaging bundle.
+			 */
+			new SystemPackageBundle(
+					"1.0.0",
+					findPackages("ch.unifr.diva.dip.imaging")
+			),
+			/**
 			 * Export glyph fonts.
 			 */
 			new SystemPackageBundle(
 					"1.0.0",
-					findPackages("ch.unifr.diva.dip.glyphs")
+					"ch.unifr.diva.dip.glyphs.fontawesome"
+			),
+			new SystemPackageBundle(
+					"1.0.0",
+					"ch.unifr.diva.dip.glyphs.icofont"
+			),
+			new SystemPackageBundle(
+					"1.0.0",
+					"ch.unifr.diva.dip.glyphs.mdi"
+			),
+			/**
+			 * Export SLF4J. Exporting the simple logging facade is enough. No
+			 * need to export the used logging framework itself.
+			 */
+			new SystemPackageBundle(
+					"1.7.25",
+					Arrays.asList(
+							"org.slf4j",
+							"org.slf4j.Logger",
+							"org.slf4j.LoggerFactory"
+					)
 			),
 			/**
 			 * Export JavaFx packages. While the Java standard library is
@@ -75,18 +102,6 @@ public class ExtraSystemPackages {
 							"javafx.util.converter",
 							"javafx.fxml"
 					)
-			),
-			/**
-			 * Export SLF4J. Exporting the simple logging facade is enough. No
-			 * need to export the used logging framework itself.
-			 */
-			new SystemPackageBundle(
-					"1.7.12",
-					Arrays.asList(
-							"org.slf4j",
-							"org.slf4j.Logger",
-							"org.slf4j.LoggerFactory"
-					)
 			)
 	);
 
@@ -121,13 +136,37 @@ public class ExtraSystemPackages {
 	 */
 	private static class SystemPackageBundle {
 
+		/**
+		 * The version of the packages.
+		 */
 		final public String version;
+
+		/**
+		 * List of canonical package names.
+		 */
 		final public List<String> packages;
 
+		/**
+		 * Creates a new system package bundle with a single class.
+		 *
+		 * @param version the version.
+		 * @param name the canonical name of the package.
+		 */
+		public SystemPackageBundle(String version, String name) {
+			this(version, Arrays.asList(name));
+		}
+
+		/**
+		 * Creates a new system package bundle.
+		 *
+		 * @param version the version.
+		 * @param packages the packages (a list of canonical package names).
+		 */
 		public SystemPackageBundle(String version, List<String> packages) {
 			this.version = version;
 			this.packages = packages;
 		}
+
 	}
 
 	/**
@@ -135,7 +174,14 @@ public class ExtraSystemPackages {
 	 */
 	public static class SystemPackage {
 
+		/**
+		 * The canonical package name.
+		 */
 		final public String pkg;
+
+		/**
+		 * The version of the package.
+		 */
 		final public String version;
 
 		/**
@@ -166,5 +212,7 @@ public class ExtraSystemPackages {
 			}
 			return pkg + ";version=" + version;
 		}
+
 	}
+
 }

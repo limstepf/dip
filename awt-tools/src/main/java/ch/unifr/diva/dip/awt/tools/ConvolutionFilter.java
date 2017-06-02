@@ -4,15 +4,13 @@ import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.components.Port;
 import ch.unifr.diva.dip.api.components.ProcessorContext;
+import ch.unifr.diva.dip.api.datastructures.BufferedMatrix;
 import ch.unifr.diva.dip.api.datastructures.DoubleKernel;
 import ch.unifr.diva.dip.api.datastructures.DoubleMatrix;
 import ch.unifr.diva.dip.api.datastructures.FloatKernel;
 import ch.unifr.diva.dip.api.datastructures.FloatMatrix;
 import ch.unifr.diva.dip.api.datastructures.Kernel;
 import ch.unifr.diva.dip.api.datastructures.Matrix;
-import ch.unifr.diva.dip.api.imaging.BufferedMatrix;
-import ch.unifr.diva.dip.api.imaging.ops.ConvolutionOp;
-import ch.unifr.diva.dip.api.imaging.padders.ImagePadder;
 import ch.unifr.diva.dip.api.parameters.CompositeGrid;
 import ch.unifr.diva.dip.api.parameters.EnumParameter;
 import ch.unifr.diva.dip.api.parameters.LabelParameter;
@@ -21,7 +19,10 @@ import ch.unifr.diva.dip.api.services.ProcessableBase;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.services.Transmutable;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
-import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
+import ch.unifr.diva.dip.awt.imaging.Filter;
+import ch.unifr.diva.dip.awt.imaging.ops.ConvolutionOp;
+import ch.unifr.diva.dip.awt.imaging.padders.ImagePadder;
+import ch.unifr.diva.dip.glyphs.mdi.MaterialDesignIcons;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.Map;
@@ -425,13 +426,13 @@ public class ConvolutionFilter extends ProcessableBase implements Transmutable, 
 		if (cfg.columnVector != null) {
 			// 2-pass convolution
 			ConvolutionOp op = getConvolutionOp(cfg.columnVector, cfg.padderType);
-			final BufferedImage tmp = filter(
+			final BufferedImage tmp = Filter.filter(
 					context, op, src,
 					getCompatibleDestImage(op, src)
 			);
 
 			op = getConvolutionOp(cfg.kernel, cfg.padderType);
-			image = filter(
+			image = Filter.filter(
 					context, op, tmp,
 					getCompatibleDestImage(op, src)
 			);
@@ -439,7 +440,7 @@ public class ConvolutionFilter extends ProcessableBase implements Transmutable, 
 			// 1-pass convolution
 			final ConvolutionOp op = getConvolutionOp(cfg.kernel, cfg.padderType);
 
-			image = filter(
+			image = Filter.filter(
 					context, op, src,
 					getCompatibleDestImage(op, src)
 			);

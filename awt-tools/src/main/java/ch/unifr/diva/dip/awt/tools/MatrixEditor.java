@@ -17,7 +17,7 @@ import ch.unifr.diva.dip.api.parameters.TransientFacadeParameter;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.services.ProcessorBase;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
-import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
+import ch.unifr.diva.dip.glyphs.mdi.MaterialDesignIcons;
 import javafx.beans.InvalidationListener;
 import org.osgi.service.component.annotations.Component;
 

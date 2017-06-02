@@ -32,21 +32,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>ch.unifr.diva.dip</groupId>
-			<artifactId>glyphs-materialdesignicons</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>ch.unifr.diva.dip</groupId>
-			<artifactId>glyphs-fontawesome</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>ch.unifr.diva.dip</groupId>
-			<artifactId>glyphs-icofont</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
@@ -61,6 +46,24 @@
 			<groupId>org.osgi</groupId>
 			<artifactId>org.osgi.compendium</artifactId>
 			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openjdk.jmh</groupId>
+			<artifactId>jmh-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openjdk.jmh</groupId>
+			<artifactId>jmh-generator-annprocess</artifactId>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
@@ -91,7 +94,7 @@
 					<executions>
 						<execution>
 							<id>copy-bundles</id>
-							<phase>package</phase>
+							<phase>install</phase>
 							<goals>
 								<goal>copy</goal>
 							</goals>

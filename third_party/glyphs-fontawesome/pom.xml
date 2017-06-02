@@ -8,8 +8,11 @@
 		<relativePath>../../pom-osgi/pom.xml</relativePath>
 	</parent>
 
-	<groupId>ch.unifr.diva.dip</groupId>
 	<artifactId>glyphs-fontawesome</artifactId>
+	<!-- This bundle is an "extra system package" loaded by the (classloader of
+	the) main APP, from where it's exposed to the embedded OSGi framework. Thus,
+	if you bump this version, the version should also be bumped in
+	{@code ch.unifr.diva.dip.osgi.ExtraSystemPackages}. -->
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 
@@ -27,7 +30,6 @@
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
-				<extensions>true</extensions>
 			</plugin>
 		</plugins>
 	</build>

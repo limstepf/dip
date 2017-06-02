@@ -99,6 +99,24 @@
 
 			<dependency>
 				<groupId>ch.unifr.diva.dip</groupId>
+				<artifactId>imaging</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>ch.unifr.diva.dip</groupId>
+				<artifactId>awt-imaging</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>ch.unifr.diva.dip</groupId>
+				<artifactId>fx-imaging</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>ch.unifr.diva.dip</groupId>
 				<artifactId>glyphs-materialdesignicons</artifactId>
 				<version>1.0.0-SNAPSHOT</version>
 			</dependency>

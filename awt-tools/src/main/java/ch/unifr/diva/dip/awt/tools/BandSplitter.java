@@ -2,19 +2,20 @@ package ch.unifr.diva.dip.awt.tools;
 
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.components.ProcessorContext;
-import ch.unifr.diva.dip.api.components.color.ColorPort;
+import ch.unifr.diva.dip.api.datastructures.BufferedMatrix;
 import ch.unifr.diva.dip.api.parameters.BooleanParameter;
 import ch.unifr.diva.dip.api.parameters.EnumParameter;
 import ch.unifr.diva.dip.api.services.ProcessableBase;
-import ch.unifr.diva.dip.api.ui.SelectionListCellFactory;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.services.Transmutable;
-import ch.unifr.diva.dip.api.imaging.BufferedMatrix;
-import ch.unifr.diva.dip.api.imaging.SimpleColorModel;
-import ch.unifr.diva.dip.api.imaging.ops.BandExtractOp;
-import ch.unifr.diva.dip.api.imaging.ops.ColorBandVisualizationOp;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
-import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
+import ch.unifr.diva.dip.api.ui.SelectionListCellFactory;
+import ch.unifr.diva.dip.awt.components.ColorPort;
+import ch.unifr.diva.dip.awt.imaging.Filter;
+import ch.unifr.diva.dip.awt.imaging.SimpleColorModel;
+import ch.unifr.diva.dip.awt.imaging.ops.BandExtractOp;
+import ch.unifr.diva.dip.awt.imaging.ops.ColorBandVisualizationOp;
+import ch.unifr.diva.dip.glyphs.mdi.MaterialDesignIcons;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.util.ArrayList;
@@ -58,7 +59,7 @@ public class BandSplitter extends ProcessableBase implements Transmutable {
 	private final List<InputColorPort> inputColors;
 
 	// extended input color ports by band labels
-	private static class InputColorPort extends ch.unifr.diva.dip.api.components.color.InputColorPort {
+	private static class InputColorPort extends ch.unifr.diva.dip.awt.components.InputColorPort {
 
 		public InputColorPort() {
 			super();
@@ -414,7 +415,7 @@ public class BandSplitter extends ProcessableBase implements Transmutable {
 		for (int i = 0; i < numBands; i++) {
 			if (processBand[i]) {
 				op.setBand(i);
-				images[i] = filter(context, op, src);
+				images[i] = Filter.filter(context, op, src);
 
 				final OutputBand band = this.outputBands.get(i);
 
@@ -454,7 +455,7 @@ public class BandSplitter extends ProcessableBase implements Transmutable {
 				for (int i = 0; i < numBands; i++) {
 					if (processBand[i]) {
 						visop.setBand(i);
-						layerImages[i] = filter(
+						layerImages[i] = Filter.filter(
 								context,
 								visop,
 								src,

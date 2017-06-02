@@ -2,7 +2,7 @@ package ch.unifr.diva.dip.core.model;
 
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.core.ui.Localizable;
-import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
+import ch.unifr.diva.dip.glyphs.mdi.MaterialDesignIcons;
 import ch.unifr.diva.dip.gui.pe.DataItemListView;
 import java.util.ArrayList;
 import java.util.HashMap;

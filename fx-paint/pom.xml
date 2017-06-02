@@ -16,6 +16,35 @@
 	<name>FX Paint OSGi Bundle</name>
 	<description>JavaFX paint processor</description>
 
+	<dependencies>
+		<dependency>
+			<groupId>ch.unifr.diva.dip</groupId>
+			<artifactId>fx-imaging</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>ch.unifr.diva.dip</groupId>
+			<artifactId>awt-imaging</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>ch.unifr.diva.dip</groupId>
+			<artifactId>glyphs-materialdesignicons</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>ch.unifr.diva.dip</groupId>
+			<artifactId>glyphs-fontawesome</artifactId>
+		</dependency>
+
+		<!--
+		<dependency>
+			<groupId>ch.unifr.diva.dip</groupId>
+			<artifactId>glyphs-icofont</artifactId>
+		</dependency>
+		-->
+	</dependencies>
+
 	<build>
 		<plugins>
 			<plugin>

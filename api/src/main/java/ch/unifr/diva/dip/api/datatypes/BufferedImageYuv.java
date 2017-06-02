@@ -7,7 +7,7 @@ import javafx.scene.input.DataFormat;
  */
 public class BufferedImageYuv implements DataType {
 
-	public final static Class type = ch.unifr.diva.dip.api.imaging.BufferedMatrix.class;
+	public final static Class type = ch.unifr.diva.dip.api.datastructures.BufferedMatrix.class;
 	public final static DataFormat dataFormat = new DataFormat("dip-datatype/buffered-matrix-yuv");
 
 	@Override

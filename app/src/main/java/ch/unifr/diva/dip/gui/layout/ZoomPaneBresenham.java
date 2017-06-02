@@ -1,7 +1,7 @@
 package ch.unifr.diva.dip.gui.layout;
 
-import ch.unifr.diva.dip.api.imaging.rescaling.FxBresenham;
 import ch.unifr.diva.dip.api.utils.DipThreadPool;
+import ch.unifr.diva.dip.imaging.rescaling.FxBresenham;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;

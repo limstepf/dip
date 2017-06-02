@@ -16,7 +16,7 @@ import ch.unifr.diva.dip.core.model.RunnableProcessor;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import ch.unifr.diva.dip.eventbus.events.ProcessorNotification;
 import ch.unifr.diva.dip.eventbus.events.ProjectNotification;
-import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
+import ch.unifr.diva.dip.glyphs.mdi.MaterialDesignIcons;
 import ch.unifr.diva.dip.gui.Presenter;
 import ch.unifr.diva.dip.gui.editor.EditorPresenter;
 import com.google.common.eventbus.Subscribe;

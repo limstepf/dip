@@ -1,8 +1,6 @@
 package ch.unifr.diva.dip.awt.tools;
 
 import ch.unifr.diva.dip.api.components.ProcessorContext;
-import ch.unifr.diva.dip.api.components.color.ColorPortsUnit;
-import ch.unifr.diva.dip.api.imaging.SimpleColorModel;
 import ch.unifr.diva.dip.api.parameters.CompositeGrid;
 import ch.unifr.diva.dip.api.parameters.EnumParameter;
 import ch.unifr.diva.dip.api.parameters.StringParameter;
@@ -11,7 +9,9 @@ import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.services.ProcessorBase;
 import ch.unifr.diva.dip.api.services.Transmutable;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
-import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
+import ch.unifr.diva.dip.awt.components.ColorPortsUnit;
+import ch.unifr.diva.dip.awt.imaging.SimpleColorModel;
+import ch.unifr.diva.dip.glyphs.mdi.MaterialDesignIcons;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;

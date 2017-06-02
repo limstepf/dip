@@ -15,6 +15,13 @@
 
 	<name>AWT Demo OSGi Bundle</name>
 
+	<dependencies>
+		<dependency>
+			<groupId>ch.unifr.diva.dip</groupId>
+			<artifactId>awt-imaging</artifactId>
+		</dependency>
+	</dependencies>
+
 	<build>
 		<plugins>
 			<plugin>

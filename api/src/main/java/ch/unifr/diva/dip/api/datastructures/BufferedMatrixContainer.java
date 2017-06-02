@@ -1,7 +1,6 @@
 package ch.unifr.diva.dip.api.datastructures;
 
-import ch.unifr.diva.dip.api.imaging.BufferedIO;
-import ch.unifr.diva.dip.api.imaging.BufferedMatrix;
+import ch.unifr.diva.dip.api.utils.BufferedIO;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

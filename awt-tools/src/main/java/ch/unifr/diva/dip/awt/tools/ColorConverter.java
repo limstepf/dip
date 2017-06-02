@@ -2,17 +2,18 @@ package ch.unifr.diva.dip.awt.tools;
 
 import ch.unifr.diva.dip.api.components.Port;
 import ch.unifr.diva.dip.api.components.ProcessorContext;
-import ch.unifr.diva.dip.api.components.color.ColorPort;
-import ch.unifr.diva.dip.api.components.color.InputColorPort;
+import ch.unifr.diva.dip.api.datastructures.BufferedMatrix;
 import ch.unifr.diva.dip.api.parameters.EnumParameter;
 import ch.unifr.diva.dip.api.services.ProcessableBase;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.services.Transmutable;
-import ch.unifr.diva.dip.api.imaging.BufferedMatrix;
-import ch.unifr.diva.dip.api.imaging.SimpleColorModel;
-import ch.unifr.diva.dip.api.imaging.ops.ColorConvertOp;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
-import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
+import ch.unifr.diva.dip.awt.components.ColorPort;
+import ch.unifr.diva.dip.awt.components.InputColorPort;
+import ch.unifr.diva.dip.awt.imaging.Filter;
+import ch.unifr.diva.dip.awt.imaging.SimpleColorModel;
+import ch.unifr.diva.dip.awt.imaging.ops.ColorConvertOp;
+import ch.unifr.diva.dip.glyphs.mdi.MaterialDesignIcons;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +39,7 @@ public class ColorConverter extends ProcessableBase implements Transmutable {
 	private final List<OutputColorPort> outputColors;
 
 	// extended output color ports by storage file and format
-	private static class OutputColorPort extends ch.unifr.diva.dip.api.components.color.OutputColorPort {
+	private static class OutputColorPort extends ch.unifr.diva.dip.awt.components.OutputColorPort {
 
 		public final String STORAGE_FILE;
 		public final String STORAGE_FORMAT;
@@ -285,7 +286,7 @@ public class ColorConverter extends ProcessableBase implements Transmutable {
 			final InputColorPort source = getSource();
 			final BufferedImage src = source.port.getValue();
 			final ColorConvertOp op = new ColorConvertOp(in.cm, out.cm);
-			final BufferedImage image = filter(context, op, src, op.createCompatibleDestImage(src, out.cm));
+			final BufferedImage image = Filter.filter(context, op, src, op.createCompatibleDestImage(src, out.cm));
 
 			if (out.cm.requiresBufferedMatrix()) {
 				writeBufferedMatrix(context, out.STORAGE_FILE, (BufferedMatrix) image);

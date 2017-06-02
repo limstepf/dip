@@ -4,10 +4,8 @@ import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.components.ProcessorContext;
 import ch.unifr.diva.dip.api.datastructures.BooleanMatrix;
+import ch.unifr.diva.dip.api.datastructures.BufferedMatrix;
 import ch.unifr.diva.dip.api.datastructures.Mask;
-import ch.unifr.diva.dip.api.imaging.BufferedMatrix;
-import ch.unifr.diva.dip.api.imaging.ops.RankOp;
-import ch.unifr.diva.dip.api.imaging.padders.ImagePadder;
 import ch.unifr.diva.dip.api.parameters.EnumParameter;
 import ch.unifr.diva.dip.api.parameters.TextParameter;
 import ch.unifr.diva.dip.api.parameters.XorParameter;
@@ -16,8 +14,11 @@ import ch.unifr.diva.dip.api.services.ProcessableBase;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.services.Transmutable;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
+import ch.unifr.diva.dip.awt.imaging.Filter;
+import ch.unifr.diva.dip.awt.imaging.ops.RankOp;
+import ch.unifr.diva.dip.awt.imaging.padders.ImagePadder;
 import ch.unifr.diva.dip.awt.tools.MatrixEditor.MatrixShapeParameter;
-import ch.unifr.diva.dip.glyphs.MaterialDesignIcons;
+import ch.unifr.diva.dip.glyphs.mdi.MaterialDesignIcons;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
@@ -243,7 +244,7 @@ public class RankFilter extends ProcessableBase implements Transmutable, Preview
 
 	private BufferedImage doProcess(ProcessorContext context, BufferedImage src, ProcessConfig cfg) {
 		final RankOp op = new RankOp(cfg.rank, cfg.mask, cfg.padderType.getInstance());
-		return filter(context, op, src, op.createCompatibleDestImage(src));
+		return Filter.filter(context, op, src, op.createCompatibleDestImage(src));
 	}
 
 	private ProcessConfig previewCfg;
