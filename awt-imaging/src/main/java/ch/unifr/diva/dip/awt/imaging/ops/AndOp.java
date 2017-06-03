@@ -7,6 +7,11 @@ import java.awt.image.BufferedImage;
  */
 public class AndOp extends BinaryImageOp {
 
+	/**
+	 * Creates a new, logical AND-filter.
+	 *
+	 * @param left the left (or first source) image.
+	 */
 	public AndOp(BufferedImage left) {
 		super(left);
 	}

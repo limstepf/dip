@@ -7,38 +7,73 @@ import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 
 /**
- * Global threshold filter.
+ * Global threshold filter. This filter operates on a single band in the source
+ * image.
  */
 public class GlobalThresholdOp extends NullOp implements TileParallelizable {
 
 	private int band;
 	private int threshold;
 
+	/**
+	 * Creates a new, global threshold filter.
+	 */
 	public GlobalThresholdOp() {
 		this(0);
 	}
 
+	/**
+	 * Creates a new, global threshold filter.
+	 *
+	 * @param band the band to threshold.
+	 */
 	public GlobalThresholdOp(int band) {
 		setBand(band);
 		setThreshold(127);
 	}
 
+	/**
+	 * Sets the band to threshold.
+	 *
+	 * @param band the band.
+	 */
 	public final void setBand(int band) {
 		this.band = band;
 	}
 
+	/**
+	 * Returns the band to threshold.
+	 *
+	 * @return the band.
+	 */
 	public int getBand() {
 		return this.band;
 	}
 
+	/**
+	 * Sets the global threshold.
+	 *
+	 * @param threshold the global threshold.
+	 */
 	public final void setThreshold(int threshold) {
 		this.threshold = threshold;
 	}
 
+	/**
+	 * Returns the global threshold.
+	 *
+	 * @return the global threshold.
+	 */
 	public int getThreshold() {
 		return this.threshold;
 	}
 
+	/**
+	 * Creates a compatible, binary destination image.
+	 *
+	 * @param src the source image.
+	 * @return a compatible, binary destination image.
+	 */
 	public BufferedImage createBinaryDestImage(BufferedImage src) {
 		return new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_BYTE_BINARY);
 	}
@@ -213,4 +248,5 @@ public class GlobalThresholdOp extends NullOp implements TileParallelizable {
 
 		return threshold;
 	}
+
 }

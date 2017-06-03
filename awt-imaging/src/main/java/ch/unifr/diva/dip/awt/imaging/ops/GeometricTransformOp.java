@@ -14,7 +14,7 @@ import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 
 /**
- * Geometric transformation operation.
+ * Geometric transformation filter.
  *
  * <p>
  * Note that some interpolation methods (e.g. cubic interpolation) absolutely
@@ -34,7 +34,7 @@ public class GeometricTransformOp<M extends InverseMapper> extends NullOp implem
 	protected final double[] max;
 
 	/**
-	 * Creates a new geometric transform op with default image padder, and
+	 * Creates a new geometric transform filter with default image padder, and
 	 * without clamping.
 	 *
 	 * @param mapper the inverse mapper.
@@ -45,7 +45,7 @@ public class GeometricTransformOp<M extends InverseMapper> extends NullOp implem
 	}
 
 	/**
-	 * Creates a new geometric transform op without clamping.
+	 * Creates a new geometric transform filter without clamping.
 	 *
 	 * @param mapper the inverse mapper.
 	 * @param interpolant the interpolation method.
@@ -56,7 +56,7 @@ public class GeometricTransformOp<M extends InverseMapper> extends NullOp implem
 	}
 
 	/**
-	 * Creates a new geometric transform op with clamping.
+	 * Creates a new geometric transform filter with clamping.
 	 *
 	 * @param mapper the inverse mapper.
 	 * @param interpolant the interpolation method.

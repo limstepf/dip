@@ -10,8 +10,8 @@ import ch.unifr.diva.dip.awt.imaging.padders.ImagePadder;
 public class ResampleOp extends GeometricTransformOp<ScalingMapper> {
 
 	/**
-	 * Creates a new resample op with an {@code EXTENDED_BORDER} image padder,
-	 * and without clamping.
+	 * Creates a new resample filter with an {@code EXTENDED_BORDER} image
+	 * padder, and without clamping.
 	 *
 	 * @param scaleX X scale factor.
 	 * @param scaleY Y scale factor.
@@ -22,8 +22,8 @@ public class ResampleOp extends GeometricTransformOp<ScalingMapper> {
 	}
 
 	/**
-	 * Creates a new resample op with an {@code EXTENDED_BORDER} image padder,
-	 * and with clamping.
+	 * Creates a new resample filter with an {@code EXTENDED_BORDER} image
+	 * padder, and with clamping.
 	 *
 	 * @param scaleX X scale factor.
 	 * @param scaleY Y scale factor.
@@ -36,7 +36,7 @@ public class ResampleOp extends GeometricTransformOp<ScalingMapper> {
 	}
 
 	/**
-	 * Creates a new resample op without clamping.
+	 * Creates a new resample filter without clamping.
 	 *
 	 * @param scaleX X scale factor.
 	 * @param scaleY Y scale factor.
@@ -48,7 +48,7 @@ public class ResampleOp extends GeometricTransformOp<ScalingMapper> {
 	}
 
 	/**
-	 * Creates a new resample op with clamping.
+	 * Creates a new resample filter with clamping.
 	 *
 	 * @param scaleX X scale factor.
 	 * @param scaleY Y scale factor.

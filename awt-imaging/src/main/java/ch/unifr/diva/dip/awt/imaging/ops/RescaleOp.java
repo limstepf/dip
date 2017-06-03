@@ -22,7 +22,7 @@ public class RescaleOp extends NullOp implements TileParallelizable {
 	private final double[][] dstRange;
 
 	/**
-	 * Gain-bias rescaling.
+	 * Creates a new rescale filter with gain-bias rescaling.
 	 * <pre>I'(x,y) = gain * I(x,y) + bias</pre>
 	 *
 	 * @param abs take the absolute value of the sample first (per band). Can be
@@ -46,7 +46,8 @@ public class RescaleOp extends NullOp implements TileParallelizable {
 	}
 
 	/**
-	 * Sample domain to sample domain rescaling.
+	 * Creates a new rescale filter with sample domain to sample domain
+	 * rescaling.
 	 * <pre>I(x,y) in [a,b] -> I'(x,y) in [a',b']</pre>
 	 *
 	 * @param srcRange sample domain range of the source per band.

@@ -7,6 +7,11 @@ import java.awt.image.BufferedImage;
  */
 public class OrOp extends BinaryImageOp {
 
+	/**
+	 * Creates a new, logical OR-filter.
+	 *
+	 * @param left the left (or first source) image.
+	 */
 	public OrOp(BufferedImage left) {
 		super(left);
 	}
@@ -15,4 +20,5 @@ public class OrOp extends BinaryImageOp {
 	public int combine(int s1, int s2) {
 		return s1 | s2;
 	}
+
 }

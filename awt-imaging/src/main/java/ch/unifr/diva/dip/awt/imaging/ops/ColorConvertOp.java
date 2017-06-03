@@ -16,6 +16,12 @@ public class ColorConvertOp extends NullOp implements TileParallelizable {
 	private final SimpleColorModel srcCm;
 	private final SimpleColorModel dstCm;
 
+	/**
+	 * Creates a new color conversion filter.
+	 *
+	 * @param srcCm the simple color model of the source image.
+	 * @param dstCm the simple color model of the destination image.
+	 */
 	public ColorConvertOp(SimpleColorModel srcCm, SimpleColorModel dstCm) {
 		this.srcCm = srcCm;
 		this.dstCm = dstCm;
@@ -41,6 +47,13 @@ public class ColorConvertOp extends NullOp implements TileParallelizable {
 		return dst;
 	}
 
+	/**
+	 * Creates a compatible destination image for the color conversion.
+	 *
+	 * @param src the source image.
+	 * @param cm the simple color model of the destination image.
+	 * @return a compatible destination image for the color conversion.
+	 */
 	public BufferedImage createCompatibleDestImage(BufferedImage src, SimpleColorModel cm) {
 		if (cm.dataType().type().equals(BufferedMatrix.class)) {
 			return new BufferedMatrix(src.getWidth(), src.getHeight(), cm.numBands());

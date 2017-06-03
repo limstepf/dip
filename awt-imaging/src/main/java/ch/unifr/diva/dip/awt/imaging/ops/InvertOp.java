@@ -20,16 +20,16 @@ public class InvertOp extends NullOp implements TileParallelizable {
 	private double[] rangeOffset;
 
 	/**
-	 * Creates a default InvertOp {@literal w.r.t.} the whole sample domain. Can
-	 * handle bit and byte samples only.
+	 * Creates a default inversion filter {@literal w.r.t.} the whole sample
+	 * domain. Can handle bit and byte samples only.
 	 */
 	public InvertOp() {
 		this.rangeOffset = null;
 	}
 
 	/**
-	 * Creates an InvertOp {@literal  w.r.t.} a specified range. Can handle
-	 * samples in any precision.
+	 * Creates an inversion filter {@literal  w.r.t.} a specified range. Can
+	 * handle samples in any precision.
 	 *
 	 * @param min minimum value(s)
 	 * @param max maximum value(s)

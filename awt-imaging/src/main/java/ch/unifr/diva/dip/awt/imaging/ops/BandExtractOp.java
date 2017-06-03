@@ -14,18 +14,36 @@ public class BandExtractOp extends NullOp implements TileParallelizable {
 
 	private int band;
 
+	/**
+	 * Creates a new band extract filter.
+	 */
 	public BandExtractOp() {
 		this(0);
 	}
 
+	/**
+	 * Creates a new band extract filter.
+	 *
+	 * @param band the band to be extracted.
+	 */
 	public BandExtractOp(int band) {
 		this.band = band;
 	}
 
+	/**
+	 * Sets the band to be extracted.
+	 *
+	 * @param band the band.
+	 */
 	public void setBand(int band) {
 		this.band = band;
 	}
 
+	/**
+	 * Returns the band to be extracted.
+	 *
+	 * @return the band.
+	 */
 	public int getBand() {
 		return this.band;
 	}

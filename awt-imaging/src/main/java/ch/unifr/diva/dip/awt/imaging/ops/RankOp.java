@@ -69,6 +69,13 @@ public class RankOp extends NullOp implements PaddedTileParallelizable {
 	private final Mask mask;
 	private final ImagePadder padder;
 
+	/**
+	 * Creates a new rank filter.
+	 *
+	 * @param rank the rank of the filter.
+	 * @param mask the mask.
+	 * @param padder the image padder.
+	 */
 	public RankOp(Rank rank, Mask mask, ImagePadder padder) {
 		this.rank = rank;
 		this.mask = mask;

@@ -7,6 +7,11 @@ import java.awt.image.BufferedImage;
  */
 public class NorOp extends BinaryImageOp {
 
+	/**
+	 * Creates a new, logical NOR-filter.
+	 *
+	 * @param left the left (or first source) image.
+	 */
 	public NorOp(BufferedImage left) {
 		super(left);
 	}
@@ -15,4 +20,5 @@ public class NorOp extends BinaryImageOp {
 	public int combine(int s1, int s2) {
 		return (s1 | s2) ^ 0xFFFFFFFF;
 	}
+	
 }

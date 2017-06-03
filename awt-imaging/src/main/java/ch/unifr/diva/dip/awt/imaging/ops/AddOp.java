@@ -11,6 +11,11 @@ public class AddOp extends BinaryImageOp {
 
 	private final int maxValue;
 
+	/**
+	 * Creates a new arithmetic add filter.
+	 *
+	 * @param left the left (or first source) image.
+	 */
 	public AddOp(BufferedImage left) {
 		super(left);
 
