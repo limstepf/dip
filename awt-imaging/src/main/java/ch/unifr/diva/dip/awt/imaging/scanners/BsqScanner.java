@@ -13,10 +13,22 @@ public class BsqScanner extends ImageScanner {
 	protected final int maxIndex;
 	protected final int bandArea;
 
+	/**
+	 * Creates a new BSQ scanner for the given region. Iterates over all
+	 * discrete positions and given number of bands in the region.
+	 *
+	 * @param image the image to scan.
+	 */
 	public BsqScanner(BufferedImage image) {
 		this(image.getRaster());
 	}
 
+	/**
+	 * Creates a new BSQ scanner for the given region. Iterates over all
+	 * discrete positions and given number of bands in the region.
+	 *
+	 * @param raster the raster to scan.
+	 */
 	public BsqScanner(WritableRaster raster) {
 		this(
 				new Rectangle(raster.getWidth(), raster.getHeight()),
@@ -24,6 +36,13 @@ public class BsqScanner extends ImageScanner {
 		);
 	}
 
+	/**
+	 * Creates a new BSQ scanner for the given region. Iterates over all
+	 * discrete positions and given number of bands in the region.
+	 *
+	 * @param region the region to scan.
+	 * @param numBands the number of bands in the region.
+	 */
 	public BsqScanner(Rectangle region, int numBands) {
 		super(region, numBands);
 
@@ -32,14 +51,29 @@ public class BsqScanner extends ImageScanner {
 		this.maxIndex = this.bandArea * numBands;
 	}
 
+	/**
+	 * Returns the current row.
+	 *
+	 * @return the current row.
+	 */
 	protected int getRow() {
 		return (index % bandArea) / region.width;
 	}
 
+	/**
+	 * Returns the current column.
+	 *
+	 * @return the current column.
+	 */
 	protected int getCol() {
 		return (index % bandArea) % region.width;
 	}
 
+	/**
+	 * Returns the current band.
+	 *
+	 * @return the current band.
+	 */
 	protected int getBand() {
 		return index / bandArea;
 	}
@@ -56,6 +90,7 @@ public class BsqScanner extends ImageScanner {
 		}
 		index++;
 
+		current.index = index;
 		current.row = getRow();
 		current.col = getCol();
 		current.band = getBand();
