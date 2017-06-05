@@ -8,7 +8,7 @@
 		<relativePath>../pom-osgi-repackage/pom.xml</relativePath>
 	</parent>
 
-	<groupId>org.ejml</groupId>
+	<groupId>ch.unifr.diva.dip.libs</groupId>
 	<artifactId>ejml</artifactId>
 	<version>0.29</version>
 
