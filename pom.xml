@@ -41,4 +41,35 @@
 		<module>ejml-tools</module>
 
 	</modules>
+
+	<build>
+		<plugins>
+			<!-- really nice plugin to plot the dependency graph of the project.
+			Either create a dot file (and createImage too if you got a copy of dot
+			on your machine), or set graphFormat to gml and use yEd to visualize
+			the graph (one-click layout does a solid job with the ch.unifr.diva.*
+			only graph).
+			Aggregate graphs can be (manually) created with degraph:aggregate and
+			degraph:aggregate-by-groupid. -->
+			<plugin>
+				<groupId>com.github.ferstl</groupId>
+				<artifactId>depgraph-maven-plugin</artifactId>
+				<version>2.2.0</version>
+				<configuration>
+					<graphFormat>gml</graphFormat>
+					<!--<graphFormat>dot</graphFormat>-->
+					<!--<createImage>true</createImage>-->
+					<showConflicts>true</showConflicts>
+					<showDuplicates>true</showDuplicates>
+					<!--<showGroupIds>true</showGroupIds>-->
+					<!--<showVersions>true</showVersions>-->
+					<includeParentProjects>true</includeParentProjects>
+					<includes>
+						<include>ch.unifr.diva.*</include>
+					</includes>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
 </project>
