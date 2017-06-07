@@ -47,6 +47,27 @@ public class ValueListSelection extends ValueList {
 		return this.get(this.selection);
 	}
 
+	/**
+	 * Returns the index of the selected object.
+	 *
+	 * @return the index of the selected object.
+	 */
+	public int getSelectedIndex() {
+		return this.selection;
+	}
+
+	/**
+	 * Selects a different object in the value list.
+	 *
+	 * @param index index of the selected object.
+	 */
+	public void setSelection(int index) {
+		if (index >= this.list.size()) {
+			return;
+		}
+		this.selection = index;
+	}
+
 	@Override
 	public int hashCode() {
 		int hash = super.hashCode();
