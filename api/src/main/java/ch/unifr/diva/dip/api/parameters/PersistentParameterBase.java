@@ -49,12 +49,14 @@ public abstract class PersistentParameterBase<T, V extends PersistentParameter.V
 		this.valueProperty = new ParentObjectProperty<T>(initialValue) {
 			@Override
 			public void set(T value) {
-				super.set(filterValueProperty(value));
-
-				if (!changeIsLocal && view != null) {
-					view.set(get());
+				final T newVal = filterValueProperty(value);
+				final T val = get();
+				if ((val == null && newVal != null) || (val != null && !val.equals(newVal))) {
+					super.set(newVal);
+					if (!changeIsLocal && view != null) {
+						view.set(get());
+					}
 				}
-
 				onValuePropertySet();
 			}
 		};

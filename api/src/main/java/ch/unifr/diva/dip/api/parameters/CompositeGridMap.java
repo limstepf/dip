@@ -130,11 +130,6 @@ public class CompositeGridMap extends CompositeGridBase<ValueMap> {
 			this.persistentChildren.get(index).set(e.getValue());
 		}
 
-		final boolean invalidate = this.valueProperty.get().equals(v);
-		if (invalidate) {
-			this.valueProperty.invalidate();
-		}
-
 		return v;
 	}
 

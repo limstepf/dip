@@ -133,11 +133,6 @@ public class CompositeGrid extends CompositeGridBase<ValueList> {
 			this.persistentChildren.get(i).set(value.get(i));
 		}
 
-		final boolean invalidate = this.valueProperty.get().equals(v);
-		if (invalidate) {
-			this.valueProperty.invalidate();
-		}
-
 		return v;
 	}
 
