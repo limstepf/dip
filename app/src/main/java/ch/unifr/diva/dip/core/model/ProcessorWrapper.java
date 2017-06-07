@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -67,6 +68,7 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	protected final BooleanProperty availableProperty;
 	protected final BooleanProperty editingProperty;
 	protected final ModifiedProperty modifiedProcessorProperty;
+	protected final InvalidationListener softEditListener;
 
 	private Map<String, Object> parameters;
 
@@ -125,6 +127,12 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 		this.editingProperty = new SimpleBooleanProperty(editing);
 		this.parameters = parameters;
 		this.modifiedProcessorProperty = new ModifiedProperty();
+		this.softEditListener = (c) -> {
+			final Project project = handler.getProject();
+			if (project != null) {
+				project.setModified(true);
+			}
+		};
 	}
 
 	/**
@@ -135,11 +143,23 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	public void init() {
 		setProcessor(pid);
 
-		// TODO/CONSIDER: these are "soft" edits, not really changing the pipeline,
-		// but only the view. Do we really wanna mark the pipeline as dirty here?
-		this.modifiedProcessorProperty.addObservedProperty(this.layoutXProperty);
-		this.modifiedProcessorProperty.addObservedProperty(this.layoutYProperty);
-		this.modifiedProcessorProperty.addObservedProperty(this.editingProperty);
+		/*
+		 * These are "soft" edits that don't really change the pipeline. For now,
+		 * we don't make/mark the pipeline itself dirty, since we'd be forced to
+		 * handle the case of modified pipelines that are in use (by some page)
+		 * with no need to.
+		 */
+//		this.modifiedProcessorProperty.addObservedProperty(this.layoutXProperty);
+//		this.modifiedProcessorProperty.addObservedProperty(this.layoutYProperty);
+//		this.modifiedProcessorProperty.addObservedProperty(this.editingProperty);
+		/*
+		 * ...so instead we just mark the project as modified, s.t. we still can
+		 * save such modifications.
+		 */
+		this.layoutXProperty.addListener(softEditListener);
+		this.layoutYProperty.addListener(softEditListener);
+		this.editingProperty.addListener(softEditListener);
+
 	}
 
 	/**
