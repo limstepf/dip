@@ -64,6 +64,22 @@ public class XorParameter extends CompositeBase<ValueListSelection, XorParameter
 		return new ValueListSelection(defaultValues, defaultSelection);
 	}
 
+	/**
+	 * Selects a parameter by index.
+	 *
+	 * @param index the index of the parameter.
+	 */
+	public void setSelection(int index) {
+		final ValueListSelection val = get();
+		if (val.getSelectedIndex() == index) { // already selected
+			return;
+		}
+		val.setSelection(index);
+		if (val.getSelectedIndex() == index) { // might have failed if out of bounds
+			this.valueProperty.invalidate();
+		}
+	}
+
 	@Override
 	protected Collection<? extends Parameter> getChildren() {
 		return this.children;
@@ -97,11 +113,6 @@ public class XorParameter extends CompositeBase<ValueListSelection, XorParameter
 				final PersistentParameter pp = (PersistentParameter) p;
 				pp.set(value.get(i));
 			}
-		}
-
-		final boolean invalidate = this.valueProperty.get().equals(value);
-		if (invalidate) {
-			this.valueProperty.invalidate();
 		}
 
 		return value;
