@@ -53,11 +53,11 @@ public class ProcessorViewLeftRight extends ProcessorView {
 	protected void showParameters(boolean show) {
 		super.showParameters(show);
 
-		final ClosedParameterView closedView = this.closedParameterView();
 		if (show) {
 			infoPane.setCenter(this.parameterView().node());
 		} else {
 			infoPane.setCenter(null);
+			final ClosedParameterView closedView = this.closedParameterView();
 			if (closedView != null) {
 				infoPane.setCenter(closedView.node());
 			}
