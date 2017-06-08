@@ -405,6 +405,9 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 	}
 
 	protected final void addProcessor(T wrapper) {
+		if (!wrapper.isAvailable()) {
+			return;
+		}
 		addTransmutableListener(wrapper);
 		registerPorts(wrapper);
 		this.modifiedPipelineProperty.addManagedProperty(wrapper);
