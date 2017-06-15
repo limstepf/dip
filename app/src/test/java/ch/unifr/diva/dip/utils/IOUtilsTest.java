@@ -98,4 +98,20 @@ public class IOUtilsTest {
 		}
 	}
 
+	@Test
+	public void nameSuffixIncrementTest() {
+		String[][] testCases = new String[][]{
+			new String[]{"", " (2)"},
+			new String[]{"x", "x (2)"},
+			new String[]{"x (2.5)", "x (2.5) (2)"},
+			new String[]{"abc def (132)", "abc def (133)"},
+			new String[]{"m4 7 ", "m4 7  (2)"},
+			new String[]{"1289 2 (26)", "1289 2 (27)"}
+		};
+		for (String[] testCase : testCases) {
+			final String next = IOUtils.nameSuffixIncrement(testCase[0]);
+			assertEquals(next, testCase[1]);
+		}
+	}
+
 }

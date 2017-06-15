@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -172,6 +174,33 @@ public class IOUtils {
 		}
 
 		return "";
+	}
+
+	/**
+	 * Increments the suffix of a string. Used to get the "next" name for copied
+	 * or cloned things. Base case (without suffix): "foo" gets turned into "foo
+	 * (2)", and then "foo (2)" gets turned into "foo (3)", and so on.
+	 *
+	 * <p>
+	 * Note that this does not take into account already incremented names. For
+	 * example if we have "foo" and a "foo (2)" too, and copy/clone "foo" again,
+	 * we'll end up with two "foo (2)".
+	 *
+	 * @param base the string, possibly already with a suffix.
+	 * @return the string with incremented suffix.
+	 */
+	public static String nameSuffixIncrement(String base) {
+		final Pattern p = Pattern.compile("(.*?) \\(((\\d+))\\)");
+		final Matcher m = p.matcher(base);
+		if (m.find()) {
+			final int n = Integer.parseInt(m.group(2)) + 1;
+			return String.format(
+					"%s (%d)",
+					m.group(1),
+					n
+			);
+		}
+		return base + " (2)";
 	}
 
 	/**
