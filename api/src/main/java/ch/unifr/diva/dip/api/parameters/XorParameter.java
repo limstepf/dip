@@ -77,6 +77,9 @@ public class XorParameter extends CompositeBase<ValueListSelection, XorParameter
 		val.setSelection(index);
 		if (val.getSelectedIndex() == index) { // might have failed if out of bounds
 			this.valueProperty.invalidate();
+			if (!changeIsLocal && view != null) {
+				view.set(get());
+			}
 		}
 	}
 

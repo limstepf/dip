@@ -24,7 +24,7 @@ public abstract class PersistentParameterBase<T, V extends PersistentParameter.V
 	protected final String label;
 	protected final T defaultValue;
 	protected final ParentObjectProperty<T> valueProperty;
-	private boolean changeIsLocal;
+	protected boolean changeIsLocal;
 
 	/**
 	 * Creates a new persistent parameter base.
