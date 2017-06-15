@@ -1,4 +1,4 @@
-package ch.unifr.diva.dip.gui.dialogs;
+package ch.unifr.diva.dip.gui.main;
 
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.ui.Glyph;
@@ -10,6 +10,7 @@ import ch.unifr.diva.dip.core.model.ProcessorWrapper;
 import ch.unifr.diva.dip.core.model.ProjectData;
 import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
+import ch.unifr.diva.dip.gui.dialogs.AbstractDialog;
 import static ch.unifr.diva.dip.gui.dialogs.AbstractDialog.getCancelButton;
 import static ch.unifr.diva.dip.gui.dialogs.AbstractDialog.getDefaultButton;
 import ch.unifr.diva.dip.gui.layout.ArrowHead;

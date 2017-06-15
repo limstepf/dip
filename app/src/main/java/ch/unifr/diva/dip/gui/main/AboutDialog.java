@@ -1,9 +1,10 @@
-package ch.unifr.diva.dip.gui.dialogs;
+package ch.unifr.diva.dip.gui.main;
 
 import ch.unifr.diva.dip.api.ui.Glyph;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.ApplicationSettings;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
+import ch.unifr.diva.dip.gui.dialogs.AbstractDialog;
 import ch.unifr.diva.dip.gui.layout.FormGridPane;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

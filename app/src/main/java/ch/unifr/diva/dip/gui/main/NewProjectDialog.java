@@ -1,4 +1,4 @@
-package ch.unifr.diva.dip.gui.dialogs;
+package ch.unifr.diva.dip.gui.main;
 
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.ApplicationSettings;
@@ -6,6 +6,7 @@ import ch.unifr.diva.dip.core.ImageFormat;
 import ch.unifr.diva.dip.core.model.PipelineData;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import ch.unifr.diva.dip.glyphs.mdi.MaterialDesignIcons;
+import ch.unifr.diva.dip.gui.dialogs.AbstractDialog;
 import ch.unifr.diva.dip.gui.layout.FormGridPane;
 import ch.unifr.diva.dip.gui.layout.VerticalSplitPane;
 import ch.unifr.diva.dip.gui.pe.DataItemListView;

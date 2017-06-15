@@ -13,8 +13,6 @@ import ch.unifr.diva.dip.gui.AbstractPresenter;
 import ch.unifr.diva.dip.gui.Presenter;
 import ch.unifr.diva.dip.gui.dialogs.ConfirmationDialog;
 import ch.unifr.diva.dip.gui.dialogs.ErrorDialog;
-import ch.unifr.diva.dip.gui.dialogs.NewProjectDialog;
-import ch.unifr.diva.dip.gui.dialogs.RepairProjectDialog;
 import ch.unifr.diva.dip.gui.editor.EditorPresenter;
 import ch.unifr.diva.dip.gui.layout.Zoomable;
 import com.google.common.eventbus.Subscribe;

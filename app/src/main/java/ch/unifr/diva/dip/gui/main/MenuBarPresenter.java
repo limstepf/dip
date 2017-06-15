@@ -9,7 +9,6 @@ import ch.unifr.diva.dip.eventbus.events.ApplicationRequest;
 import ch.unifr.diva.dip.eventbus.events.ProjectRequest;
 import ch.unifr.diva.dip.eventbus.events.SelectionMaskRequest;
 import ch.unifr.diva.dip.gui.Presenter;
-import ch.unifr.diva.dip.gui.dialogs.AboutDialog;
 import ch.unifr.diva.dip.gui.editor.EditorPresenter;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
