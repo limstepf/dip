@@ -10,6 +10,7 @@ import ch.unifr.diva.dip.core.ui.UIStrategy.Answer;
 import ch.unifr.diva.dip.api.utils.XmlUtils;
 import ch.unifr.diva.dip.core.services.api.HostService;
 import ch.unifr.diva.dip.osgi.ServiceCollection;
+import ch.unifr.diva.dip.utils.IOUtils;
 import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -248,10 +249,25 @@ public class PipelineManager implements Modifiable, Localizable {
 	 * @return the new pipeline.
 	 */
 	public Pipeline createPipeline(String name) {
-		int id = newPipelineId();
+		final int id = newPipelineId();
 		final Pipeline pipeline = new Pipeline(handler, id, name);
 		addPipeline(pipeline);
 		return pipeline;
+	}
+
+	/**
+	 * Clones a pipeline.
+	 *
+	 * @param pipeline the pipeline to be cloned.
+	 * @return the clone/a copy of the given pipeline.
+	 */
+	public Pipeline clonePipeline(Pipeline pipeline) {
+		final PipelineData.Pipeline data = new PipelineData.Pipeline<>(pipeline);
+		data.name = IOUtils.nameSuffixIncrement(data.name);
+		final int id = newPipelineId();
+		final Pipeline clone = new Pipeline(handler, data, id);
+		addPipeline(clone);
+		return clone;
 	}
 
 	private void addAllPipelines(List<Pipeline> pipelines) {

@@ -89,6 +89,10 @@ public class PipelinesWidget extends AbstractWidget {
 		editor.createPipeline(localize("pipeline.new"));
 	}
 
+	private void clonePipeline(Pipeline pipeline) {
+		editor.clonePipeline(pipeline);
+	}
+
 	private void selectDefaultPipeline(Pipeline pipeline) {
 		// toggle if already selected
 		if (editor.pipelineManager().getDefaultPipelineId() == pipeline.id) {
@@ -210,6 +214,10 @@ public class PipelinesWidget extends AbstractWidget {
 			final MenuItem newItem = new MenuItem(localize("pipeline.create"));
 			newItem.setOnAction((e) -> widget.newPipeline());
 
+			final MenuItem cloneItem = new MenuItem(localize("pipeline.clone"));
+			cloneItem.disableProperty().bind(Bindings.not(hasOneSelectedProperty));
+			cloneItem.setOnAction((e) -> widget.clonePipeline(getSelectedItem()));
+
 			final MenuItem importItem = new MenuItem(localize("pipeline.import"));
 			importItem.setOnAction((e) -> widget.importPipelines());
 
@@ -222,7 +230,8 @@ public class PipelinesWidget extends AbstractWidget {
 			deleteItem.setOnAction((e) -> widget.deletePipelines(getSelectedItems()));
 
 			contextMenu.getItems().addAll(
-					selectDefaultItem, newItem, importItem, exportItem, deleteItem
+					selectDefaultItem, newItem, cloneItem,
+					importItem, exportItem, deleteItem
 			);
 			listView.getSelectionModel().getSelectedItems().addListener(selectionListener);
 			listView.setContextMenu(contextMenu);
@@ -247,6 +256,8 @@ public class PipelinesWidget extends AbstractWidget {
 	 */
 	public static class PipelineCell extends DraggableListCell<Pipeline> implements Localizable {
 
+		private Pipeline currentPipeline;
+		private Glyph currentGlyph;
 		private final PipelineEditor editor;
 		private final ToggleGroup group;
 		private final BorderPane pane = new BorderPane();
@@ -259,6 +270,11 @@ public class PipelinesWidget extends AbstractWidget {
 		private final InvalidationListener defaultListener = (obs) -> {
 			updateDefault();
 			this.layout();
+		};
+		private final InvalidationListener selectionListener = (c) -> {
+			if (isPipelineSelected()) {
+				updateItem(currentPipeline, currentPipeline == null);
+			}
 		};
 		private final EventHandler<KeyEvent> onEnterHandler = new KeyEventHandler(
 				KeyCode.ENTER,
@@ -274,8 +290,6 @@ public class PipelinesWidget extends AbstractWidget {
 					return true;
 				}
 		);
-		private Pipeline currentPipeline;
-		private Glyph currentGlyph;
 
 		/**
 		 * Creates a new pipeline cell.
@@ -300,6 +314,7 @@ public class PipelinesWidget extends AbstractWidget {
 
 			defaultPipelineTooltip.setText(localize("pipeline.default"));
 			editor.pipelineManager().defaultPipelineIdProperty().addListener(defaultListener);
+			editor.selectedPipelineProperty().addListener(selectionListener);
 		}
 
 		// lazily initialize the editing box
@@ -313,7 +328,7 @@ public class PipelinesWidget extends AbstractWidget {
 		}
 
 		private boolean isPipelineSelected() {
-			if (editor.selectedPipeline() == null) {
+			if (currentPipeline == null || editor.selectedPipeline() == null) {
 				return false;
 			}
 			return editor.selectedPipeline().id == currentPipeline.id;

@@ -335,8 +335,18 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 	 * @param name name of the new pipeline.
 	 */
 	public void createPipeline(String name) {
-		Pipeline pipeline = manager.createPipeline(name);
+		final Pipeline pipeline = manager.createPipeline(name);
 		selectPipeline(pipeline);
+	}
+
+	/**
+	 * Clones a pipeline.
+	 *
+	 * @param pipeline the pipeline to be cloned.
+	 */
+	public void clonePipeline(Pipeline pipeline) {
+		final Pipeline clone = manager.clonePipeline(pipeline);
+		selectPipeline(clone);
 	}
 
 	/**
