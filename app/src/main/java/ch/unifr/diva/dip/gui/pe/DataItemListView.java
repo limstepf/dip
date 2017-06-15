@@ -327,6 +327,7 @@ public class DataItemListView<T extends DataItemListView.DataItem> implements Lo
 
 		protected final BorderPane pane;
 		protected final Label dtLabel;
+		protected final Label dtDescription;
 		protected final TextField dtTextField;
 		protected T currentItem;
 		protected final EventHandler<KeyEvent> onEnterHandler = new KeyEventHandler(
@@ -352,9 +353,12 @@ public class DataItemListView<T extends DataItemListView.DataItem> implements Lo
 		public EditableDataItemListCell() {
 			this.pane = new BorderPane();
 			this.dtLabel = new Label();
-			this.dtLabel.setMaxWidth(Double.MAX_VALUE);
+			dtLabel.setMaxWidth(Double.MAX_VALUE);
+			this.dtDescription = new Label();
+			dtDescription.setMaxWidth(Double.MAX_VALUE);
+			dtDescription.getStyleClass().add("dip-small");
 			this.dtTextField = new TextField();
-			this.dtTextField.setMaxWidth(Double.MAX_VALUE);
+			dtTextField.setMaxWidth(Double.MAX_VALUE);
 		}
 
 		// selection listener to alter glyph color
@@ -429,6 +433,9 @@ public class DataItemListView<T extends DataItemListView.DataItem> implements Lo
 				if (currentItem.glyphProperty() != null) {
 					currentItem.glyphProperty().removeListener(glyphNameListener);
 				}
+				if (currentItem.descriptionProperty() != null) {
+					dtDescription.textProperty().unbind();
+				}
 			}
 			currentItem = item;
 
@@ -437,6 +444,12 @@ public class DataItemListView<T extends DataItemListView.DataItem> implements Lo
 				dtLabel.textProperty().bind(item.nameProperty());
 				if (currentItem.glyphProperty() != null) {
 					currentItem.glyphProperty().addListener(glyphNameListener);
+				}
+				if (currentItem.descriptionProperty() != null) {
+					dtDescription.textProperty().bind(currentItem.descriptionProperty());
+					pane.setBottom(dtDescription);
+				} else {
+					pane.setBottom(null);
 				}
 
 				pane.setCenter(dtLabel);
@@ -478,7 +491,16 @@ public class DataItemListView<T extends DataItemListView.DataItem> implements Lo
 		public StringProperty nameProperty();
 
 		/**
-		 * The glyph property of the data item.
+		 * The (optional) description property of the data item.
+		 *
+		 * @return the description property, or null.
+		 */
+		default StringProperty descriptionProperty() {
+			return null;
+		}
+
+		/**
+		 * The (optional) glyph property of the data item.
 		 *
 		 * @return the glyph property. Can be null, or an {@code ObjectProperty}
 		 * with a null value.
