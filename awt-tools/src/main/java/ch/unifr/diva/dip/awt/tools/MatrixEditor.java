@@ -108,7 +108,8 @@ public class MatrixEditor extends ProcessorBase {
 		matModifier.addTextFieldViewHook((tf) -> tf.setPrefWidth(singleWidth));
 		final ButtonParameter modFill = new ButtonParameter("fill", (c) -> {
 			final String v = matModifier.get();
-			this.matrix.set(this.matrix.get().fill(v));
+			this.matrix.get().fill(v);
+			this.matrix.invalidate();
 		});
 		final CompositeGrid console = new CompositeGrid(
 				matModifier,

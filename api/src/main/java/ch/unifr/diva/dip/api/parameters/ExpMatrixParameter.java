@@ -22,10 +22,34 @@ import net.objecthunter.exp4j.ExpressionBuilder;
  * {@code FloatMatrix} or {@code DoubleMatrix}.
  *
  * <p>
+ * Note that if you're trying to alter the already set {@code StringMatrix}
+ * directly a call to {@code set()} will not have the desired effect, since that
+ * value is already set. Use {@code invalidate()}.
+ *
+ * <h4>Example:</h4>
+ * Instead of:
+ * <pre>
+ * <code>
+ * ExpMatrixParameter matrix = new ExpMatrixParameter("mat", new StringMatrix(3,3));
+ * matrix.set(matrix.get().fill("e")); // WRONG! (will not invalidate the property!)
+ * </code>
+ * </pre>
+ * <br />
+ * ...you should do this:
+ * <pre>
+ * <code>
+ * ExpMatrixParameter matrix = new ExpMatrixParameter("mat", new StringMatrix(3,3));
+ * matrix.get().fill("e");
+ * matrix.invalidate();
+ * </code>
+ * </pre>
+ *
+ * <p>
  * Have a look the Javadoc for {@code ExpParameter} to see what of math.
  * operators, functions, and numberical constants are supported.
  *
  * @see ExpParameter
+ * @see PersistentParameterBase
  */
 public class ExpMatrixParameter extends PersistentParameterBase<StringMatrix, ExpMatrixParameter.StringMatrixView> {
 
