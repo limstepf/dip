@@ -66,6 +66,21 @@ public class PipelineData {
 	}
 
 	/**
+	 * Returns the data of a single pipeline.
+	 *
+	 * @param id the id of the pipeline.
+	 * @return the pipeline data, or null.
+	 */
+	public Pipeline getPipeline(int id) {
+		for (Pipeline p : list) {
+			if (p.id == id) {
+				return p;
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * Adds a pipeline to the pipeline data.
 	 *
 	 * @param pipeline the pipeline.

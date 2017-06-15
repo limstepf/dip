@@ -368,19 +368,6 @@ public class RunnableProcessor extends ProcessorWrapper {
 		return null;
 	}
 
-	private Path processorExportDirectory() {
-		final String sanitizedPageName = page.getName().replaceAll(
-				"[^a-zA-Z_\\-0-9]", // simple whitelist should be good enough
-				""
-		).trim();
-		final String name = sanitizedPageName.isEmpty()
-				? String.valueOf(page.id)
-				: String.format("%s (%d)", sanitizedPageName, page.id);
-		return this.project.getExportDirectory().resolve("pages").resolve(
-				name
-		);
-	}
-
 	private Path processorDataPath() {
 		return project.zipFileSystem().getPath(PROCESSOR_DATA_DIR);
 	}
@@ -512,7 +499,7 @@ public class RunnableProcessor extends ProcessorWrapper {
 				this.handler.threadPool,
 				this.page.id,
 				processorDataDirectory(),
-				processorExportDirectory(),
+				this.page.getExportDirectory(),
 				this.project.getExportDirectory(),
 				objectMap.objects,
 				this.layerGroup,

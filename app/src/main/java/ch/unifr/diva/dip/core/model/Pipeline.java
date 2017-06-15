@@ -108,7 +108,23 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 	 * @param pipeline the pipeline data.
 	 */
 	public Pipeline(ApplicationHandler handler, PipelineData.Pipeline pipeline) {
-		this(handler, pipeline.id, pipeline.name);
+		this(handler, pipeline, -1);
+	}
+
+	/**
+	 * Creates/restores a pipeline according to the given pipeline data.
+	 *
+	 * @param handler the application handler.
+	 * @param pipeline the pipeline data.
+	 * @param id a new pipeline id, or {@code -1} to keep using the one defined
+	 * in the pipeline data.
+	 */
+	public Pipeline(ApplicationHandler handler, PipelineData.Pipeline pipeline, int id) {
+		this(
+				handler,
+				(id < 0) ? pipeline.id : id,
+				pipeline.name
+		);
 
 		// don't count the following initialization as modifications
 		this.modifiedPipelineProperty.removeObservedProperty(this.processors);

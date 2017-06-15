@@ -84,11 +84,6 @@ public class Project implements Modifiable, Localizable {
 	 */
 	private final PipelineManager pipelineManager;
 
-	/**
-	 * The project's pipeline editor.
-	 */
-	private PipelineEditor pipelineEditor;
-
 	private int maxPageId = 0;
 	private final StringProperty projectNameProperty = new SimpleStringProperty();
 	private final ModifiedProperty modifiedProjectProperty = new ModifiedProperty();
@@ -152,6 +147,13 @@ public class Project implements Modifiable, Localizable {
 		// read/parse project data
 		projectNameProperty.set(data.name);
 
+		// pipelines
+		pipelineManager = new PipelineManager(
+				this.handler,
+				data.pipelines(),
+				data.defaultPipeline
+		);
+
 		// images -> pages
 		for (ProjectData.Page image : data.getPages()) {
 			if (image.id > maxPageId) {
@@ -159,13 +161,6 @@ public class Project implements Modifiable, Localizable {
 			}
 			addPage(new ProjectPage(this, image), false);
 		}
-
-		// pipelines
-		pipelineManager = new PipelineManager(
-				this.handler,
-				data.pipelines(),
-				data.defaultPipeline
-		);
 
 		// hook up properties, attach listeners (for modifications, ...)
 		selectPage(data.getSelectedPage());
@@ -183,7 +178,6 @@ public class Project implements Modifiable, Localizable {
 	 */
 	public void close() {
 		closePage();
-		pipelineEditor = null;
 
 		if (zip != null) {
 			try {
@@ -210,10 +204,11 @@ public class Project implements Modifiable, Localizable {
 	/**
 	 * Saves the project.
 	 *
+	 * @return the saved project data.
 	 * @throws Exception in case of an I/O error.
 	 */
-	public void save() throws Exception {
-		saveInternal();
+	public ProjectData save() throws Exception {
+		return saveInternal();
 	}
 
 	/**
@@ -222,22 +217,24 @@ public class Project implements Modifiable, Localizable {
 	 * is created at the given location.
 	 *
 	 * @param file path to the new project file.
+	 * @return the saved project data.
 	 * @throws Exception in case of an I/O error.
 	 */
-	public void saveAs(Path file) throws Exception {
+	public ProjectData saveAs(Path file) throws Exception {
 		this.file = file;
 		FxUtils.run(() -> {
 			this.handler.settings.recentFiles.setSaveDirectory(this.file);
 		});
-		saveInternal();
+		return saveInternal();
 	}
 
 	/**
 	 * Internal save method used by {@code save} and {@code saveAs} methods.
 	 *
+	 * @return the saved project data.
 	 * @throws Exception in case of an I/O error.
 	 */
-	private void saveInternal() throws Exception {
+	private ProjectData saveInternal() throws Exception {
 		final ProjectData data = new ProjectData(this);
 
 		// save current page and its pipeline (e.g. the object map)
@@ -279,6 +276,7 @@ public class Project implements Modifiable, Localizable {
 
 		// mark project (and managed modifiables) as clean/unmodified
 		modifiedProjectProperty.set(false);
+		return data;
 	}
 
 	/**
@@ -420,10 +418,11 @@ public class Project implements Modifiable, Localizable {
 	 * @return the pipeline editor.
 	 */
 	public PipelineEditor getPipelineEditor(Stage stage) {
-		if (pipelineEditor == null) {
-			pipelineEditor = new PipelineEditor(stage, handler);
-		}
-		return pipelineEditor;
+		/*
+		 * Always(!) return a new pipeline editor, which first retrieves a
+		 * backup of all pipelines, s.t. we're able to restore them if needed.
+		 */
+		return new PipelineEditor(stage, handler);
 	}
 
 	/**
@@ -493,7 +492,7 @@ public class Project implements Modifiable, Localizable {
 	 * @param id id of a project page.
 	 * @return a project page - or null if not found.
 	 */
-	private ProjectPage getPage(int id) {
+	public ProjectPage getPage(int id) {
 		for (ProjectPage page : pages) {
 			if (id == page.id) {
 				return page;

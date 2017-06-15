@@ -244,7 +244,7 @@ public class PagesWidget extends AbstractWidget {
 			pipelineName.setText(String.format(
 					"%s: %s",
 					localize("pipeline"),
-					currentPage.getPipelineName()
+					currentPage.pipelineNameProperty().get()
 			));
 		}
 
@@ -257,11 +257,13 @@ public class PagesWidget extends AbstractWidget {
 
 			if (currentPage != null) {
 				currentPage.pipelineIdProperty().removeListener(pipelineListener);
+				currentPage.pipelineNameProperty().removeListener(pipelineListener);
 			}
 			currentPage = item;
 
 			if (!empty) {
 				currentPage.pipelineIdProperty().addListener(pipelineListener);
+				currentPage.pipelineNameProperty().addListener(pipelineListener);
 
 				radioButton.setUserData(this.getItem().id);
 				radioButton.setToggleGroup(group);

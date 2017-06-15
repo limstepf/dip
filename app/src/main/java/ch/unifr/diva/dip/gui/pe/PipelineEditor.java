@@ -5,6 +5,7 @@ import ch.unifr.diva.dip.api.datatypes.DataType;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.UserSettings;
 import ch.unifr.diva.dip.core.model.Pipeline;
+import ch.unifr.diva.dip.core.model.PipelineData;
 import ch.unifr.diva.dip.core.model.PipelineManager;
 import ch.unifr.diva.dip.core.model.ProcessorWrapper;
 import ch.unifr.diva.dip.gui.Presenter;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
@@ -59,6 +61,7 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 	private final EditorPane editorPane;
 	private final SideBarPresenter sideBar;
 	private final PipelineManager manager;
+	private final Map<Integer, PipelineData.Pipeline> backupData;
 	private final ObjectProperty<Pipeline> selectedPipelineProperty = new SimpleObjectProperty();
 	private final List<ProcessorsWidget> processorWidgets = new ArrayList<>();
 	private final ListChangeListener<ProcessorWrapper> processorListener;
@@ -80,6 +83,7 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 
 		this.handler = handler;
 		this.manager = handler.getProject().pipelineManager();
+		this.backupData = manager.getBackupData();
 		this.editorPane = new EditorPane(this);
 
 		this.zoomPane = new ZoomPaneSimple();
@@ -194,13 +198,18 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 			UserSettings.saveDividerPositions(splitPane, handler.settings.pipelineStage);
 			UserSettings.saveStage(this.stage, handler.settings.pipelineStage);
 
-			//TODO: update affected project pages according to changed pipelines
-			//      what if we only change some parameters?
-//			for (Pipeline p : pipelineManager().pipelines()) {
-//				System.out.println(p.getName()
-//						+ ", modified: "
-//						+ p.modifiedProperty().get());
-//			}
+			// resolve conflicts in case we've changed pipelines that are currently
+			// in use/assigned to at least one page.
+			final Map<Integer, Set<Integer>> usedAndModified = pipelineManager().getUsedPipelines(true);
+			if (!usedAndModified.isEmpty()) {
+				final ModifiedPipelinesDialog dialog = new ModifiedPipelinesDialog(
+						this.stage,
+						handler,
+						usedAndModified,
+						backupData
+				);
+				dialog.showAndWait();
+			}
 		});
 	}
 

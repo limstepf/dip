@@ -61,12 +61,12 @@
 .dip-hover-effect,
 .dip-hover-effect:pressed {
 	-fx-text-fill: linear-gradient(to bottom,
-            ladder(
-                derive(-fx-base,-16%),
-                derive(-fx-base,-8%) 75%,
-                derive(-fx-base,-4%) 80%
-            ),
-            derive(-fx-base,-24%));
+		ladder(
+		derive(-fx-base,-16%),
+		derive(-fx-base,-8%) 75%,
+		derive(-fx-base,-4%) 80%
+		),
+		derive(-fx-base,-24%));
 }
 
 .dip-title {
@@ -89,7 +89,7 @@
 
 .dip-text-input {}
 .dip-text-input:alert {
-    -fx-background-color: 
+    -fx-background-color:
         -dip-alert,
         -fx-control-inner-background,
         -dip-alert-faint,
@@ -104,6 +104,12 @@
 .dip-list-cell:insert-below {
 	-fx-border-width: 0 0 0.166667em 0;
 	-fx-border-color: -fx-accent;
+}
+
+.dip-list-header {
+	-fx-background-color: -fx-accent;
+	-fx-fill: -dip-accent-inverted;
+	-fx-text-fill: -dip-accent-inverted;
 }
 
 .dip-separator {
@@ -226,7 +232,7 @@
 		-fx-color,
 		derive(-fx-color,8%) 75%,
 		derive(-fx-color,10%) 80%
-	);
+		);
 	-fx-background-radius: 0.833em 0.833em 0 0;
 	-fx-border-radius: 0.833em 0.833em 0 0;
 	-fx-border-width: 1px 1px 0 1px;
@@ -266,7 +272,7 @@
 .dip-processor:unavailable .dip-processor-bottom,
 .dip-processor:unavailable .dip-processor-left,
 .dip-processor:unavailable .dip-processor-leftright,
-.dip-processor:unavailable .dip-processor-topdown {  
+.dip-processor:unavailable .dip-processor-topdown {
 	-fx-background-color: -dip-proc-unavailable-highlight;
 	-fx-border-color: -dip-proc-unavailable;
 }
@@ -276,7 +282,7 @@
 .dip-processor:unconnected .dip-processor-bottom,
 .dip-processor:unconnected .dip-processor-left,
 .dip-processor:unconnected .dip-processor-leftright,
-.dip-processor:unconnected .dip-processor-topdown {  
+.dip-processor:unconnected .dip-processor-topdown {
 	-fx-background-color: -dip-proc-unconnected-highlight;
 	-fx-border-color: -dip-proc-unconnected;
 }
@@ -286,7 +292,7 @@
 .dip-processor:waiting .dip-processor-bottom,
 .dip-processor:waiting .dip-processor-left,
 .dip-processor:waiting .dip-processor-leftright,
-.dip-processor:waiting .dip-processor-topdown {  
+.dip-processor:waiting .dip-processor-topdown {
 	-fx-background-color: -dip-proc-waiting-highlight;
 	-fx-border-color: -dip-proc-waiting;
 }
@@ -296,7 +302,7 @@
 .dip-processor:processing .dip-processor-bottom,
 .dip-processor:processing .dip-processor-left,
 .dip-processor:processing .dip-processor-leftright,
-.dip-processor:processing .dip-processor-topdown {  
+.dip-processor:processing .dip-processor-topdown {
 	-fx-background-color: -dip-proc-processing-highlight;
 	-fx-border-color: -dip-proc-processing;
 }
@@ -306,7 +312,7 @@
 .dip-processor:ready .dip-processor-bottom,
 .dip-processor:ready .dip-processor-left,
 .dip-processor:ready .dip-processor-leftright,
-.dip-processor:ready .dip-processor-topdown {  
+.dip-processor:ready .dip-processor-topdown {
 	-fx-background-color: -dip-proc-ready-highlight;
 	-fx-border-color: -dip-proc-ready;
 }

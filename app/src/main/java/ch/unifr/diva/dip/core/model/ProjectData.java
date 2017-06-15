@@ -176,6 +176,19 @@ public class ProjectData {
 		return pipelines.list;
 	}
 
+	/**
+	 * Returns the data of a single pipeline.
+	 *
+	 * @param id the pipeline id.
+	 * @return the pipeline data, or null.
+	 */
+	public PipelineData.Pipeline getPipeline(int id) {
+		if (pipelines == null) {
+			return null;
+		}
+		return pipelines.getPipeline(id);
+	}
+
 	// new project
 	private void addPages(List<Path> images) throws IOException {
 		for (Path image : images) {

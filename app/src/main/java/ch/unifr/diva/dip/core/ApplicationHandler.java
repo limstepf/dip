@@ -549,6 +549,8 @@ public class ApplicationHandler implements Localizable {
 			project.close();
 		}
 		project = null;
+		projectData = null;
+		projectValidation = null;
 		hasProjectProperty.set(false);
 	}
 

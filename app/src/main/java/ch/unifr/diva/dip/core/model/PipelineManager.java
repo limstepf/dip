@@ -14,9 +14,12 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -128,6 +131,61 @@ public class PipelineManager implements Modifiable, Localizable {
 	 */
 	public ObservableList<Pipeline> pipelines() {
 		return pipelines;
+	}
+
+	/**
+	 * Returns the (backup) data of all pipelines.
+	 *
+	 * @return the (backup) data of all pipelines.
+	 */
+	public Map<Integer, PipelineData.Pipeline> getBackupData() {
+		final HashMap<Integer, PipelineData.Pipeline> data = new HashMap<>();
+		for (Pipeline p : pipelines) {
+			data.put(p.id, new PipelineData.Pipeline(p));
+		}
+		return data;
+	}
+
+	/**
+	 * Returns a map of all pipelines that are assigned to/in use by at least
+	 * one page.
+	 *
+	 * @return a map of all pipelines currently in use. The returned map uses
+	 * pipeline ids as keys, pointing to a set of page ids (of pages that have
+	 * that pipeline assigned).
+	 */
+	public Map<Integer, Set<Integer>> getUsedPipelines() {
+		return getUsedPipelines(false);
+	}
+
+	/**
+	 * Returns a map of all pipelines that are assigned to/in use by at least
+	 * one page.
+	 *
+	 * @param modifiedOnly if {@code true} only pipelines are returned that are
+	 * also marked as dirty/modified.
+	 * @return a map of all pipelines currently in use (and modified, if
+	 * {@code modifiedOnly} is set to {@code true}). The returned map uses
+	 * pipeline ids as keys, pointing to a set of page ids (of pages that have
+	 * that pipeline assigned).
+	 */
+	public Map<Integer, Set<Integer>> getUsedPipelines(boolean modifiedOnly) {
+		final Project project = handler.getProject();
+		if (project == null) {
+			return Collections.EMPTY_MAP;
+		}
+		final Map<Integer, Set<Integer>> usage = PipelineManager.pipelineUsage(project.pages());
+		if (usage.isEmpty()) {
+			return Collections.EMPTY_MAP;
+		}
+		final Map<Integer, Set<Integer>> used = new HashMap<>();
+		for (Integer id : usage.keySet()) {
+			final Pipeline pipeline = getPipeline(id);
+			if (!modifiedOnly || pipeline.isModified()) {
+				used.put(id, usage.get(id));
+			}
+		}
+		return used;
 	}
 
 	/**
@@ -278,6 +336,27 @@ public class PipelineManager implements Modifiable, Localizable {
 	}
 
 	/**
+	 * Replaces a pipeline. Usually used to revert a modified pipeline to a
+	 * previous state.
+	 *
+	 * @param data the pipeline data.
+	 * @return {@code true} if the pipeline has been replace, {@code false}
+	 * otherwise.
+	 */
+	public boolean replacePipeline(PipelineData.Pipeline data) {
+		final Pipeline dst = getPipeline(data.id);
+		if (dst == null) {
+			return false;
+		}
+		final int index = pipelines.indexOf(dst);
+		final Pipeline src = new Pipeline(handler, data);
+		this.modifiedPipelinesProperty.removeManagedProperty(dst);
+		this.modifiedPipelinesProperty.addManagedProperty(src);
+		pipelines.set(index, src);
+		return true;
+	}
+
+	/**
 	 * Returns the delete pipelines confirmation message.
 	 *
 	 * @param selection the selection of pipelines to be deleted.
@@ -305,6 +384,19 @@ public class PipelineManager implements Modifiable, Localizable {
 			pipeline.id = newPipelineId();
 			addPipeline(new Pipeline(handler, pipeline));
 		}
+	}
+
+	/**
+	 * Imports a pipeline into the current project.
+	 *
+	 * @param data the pipeline data.
+	 * @return the new pipeline id.
+	 */
+	public int importPipeline(PipelineData.Pipeline data) {
+		final int id = newPipelineId();
+		final Pipeline pipeline = new Pipeline(handler, data, id);
+		addPipeline(pipeline);
+		return id;
 	}
 
 	/**
@@ -464,16 +556,24 @@ public class PipelineManager implements Modifiable, Localizable {
 	 * Counts the number of times a pipeline is in use by a page.
 	 *
 	 * @param pages pages to consider.
-	 * @return a map of pipeline ids (keys) pointing to their usage/count.
+	 * @return a map of pipeline ids (keys) pointing to a set of page ids that
+	 * use that pipeline. Pipelines that aren't used do not have an entry, so if
+	 * an entry for a certain pipeline is in the map, the size of the set is 1
+	 * or higher.
 	 */
-	public static Map<Integer, Integer> pipelineUsage(List<ProjectPage> pages) {
-		final Map<Integer, Integer> usage = new HashMap<>();
+	public static Map<Integer, Set<Integer>> pipelineUsage(List<ProjectPage> pages) {
+		final Map<Integer, Set<Integer>> usage = new HashMap<>();
 		for (ProjectPage page : pages) {
 			final int id = page.getPipelineId();
+			if (id < 0) {
+				continue; // no pipeline assigned
+			}
 			if (usage.containsKey(id)) {
-				usage.put(id, usage.get(id) + 1);
+				usage.get(id).add(page.id);
 			} else {
-				usage.put(id, 1);
+				final HashSet<Integer> pageids = new HashSet<>();
+				pageids.add(page.id);
+				usage.put(id, pageids);
 			}
 		}
 		return usage;

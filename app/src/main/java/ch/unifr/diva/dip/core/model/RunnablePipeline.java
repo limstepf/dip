@@ -245,7 +245,7 @@ public class RunnablePipeline extends Pipeline<RunnableProcessor> {
 	}
 
 	private boolean savePipelinePatch() {
-		deletePipelinePatchIfExists();
+		this.deletePipelinePatch();
 
 		final Pipeline prototype = this.page.project().pipelineManager().getPipeline(id);
 		final PipelinePatch patch = PipelinePatch.createPatch(prototype, this);
@@ -263,7 +263,13 @@ public class RunnablePipeline extends Pipeline<RunnableProcessor> {
 		return true;
 	}
 
-	private boolean deletePipelinePatchIfExists() {
+	/**
+	 * Deletes the pipeline patch.
+	 *
+	 * @return {@code true} if the pipeline patch got delete, {@code false}
+	 * otherwise (e.g. if it did not exist in the first place...).
+	 */
+	private boolean deletePipelinePatch() {
 		try {
 			return Files.deleteIfExists(this.page.pipelinePatchXml());
 		} catch (IOException ex) {
@@ -348,7 +354,7 @@ public class RunnablePipeline extends Pipeline<RunnableProcessor> {
 		}
 
 		if (unpatch) {
-			deletePipelinePatchIfExists();
+			deletePipelinePatch();
 		}
 	}
 

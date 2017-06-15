@@ -17,6 +17,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyIntegerProperty;
+import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -83,6 +84,7 @@ public class ProjectPage implements Modifiable, Localizable {
 
 	private final Project project;
 	private final StringProperty nameProperty;
+	private final StringProperty pipelineNameProperty;
 	private final IntegerProperty pipelineIdProperty;
 	private final ModifiedProperty modifiedPageProperty;
 
@@ -125,6 +127,7 @@ public class ProjectPage implements Modifiable, Localizable {
 		this.PIPELINE_PATCH_XML = String.format(PIPELINE_PATCH_XML_FORMAT, this.id);
 		this.PROCESSORS_ROOT_DIR = String.format(PROCESSORS_ROOT_DIR_FORMAT, this.id);
 		this.pipelineIdProperty = new SimpleIntegerProperty(page.pipelineId);
+		this.pipelineNameProperty = new SimpleStringProperty(getPipelineNameFromPrototype());
 		this.nameProperty = new SimpleStringProperty(page.name);
 		this.file = page.file;
 		this.checksum = page.checksum;
@@ -224,15 +227,25 @@ public class ProjectPage implements Modifiable, Localizable {
 	 * empty pipeline.
 	 */
 	public synchronized void setPipelineId(int id) {
+		setPipelineId(id, true);
+	}
+
+	/**
+	 * Sets/updates the pipeline of the project page.
+	 *
+	 * @param id new pipeline id, or -1 to delete the current one/set to the
+	 * empty pipeline.
+	 * @param reset {@code true} to reset the pipeline state/data, {@code false}
+	 * to leave the pipeline state/data as is.
+	 */
+	public synchronized void setPipelineId(int id, boolean reset) {
 		if (id == getPipelineId()) {
 			return;
 		}
 
-		// TODO: option to keep state of all processors unchanged starting from
-		// root/PageGenerator (case: only some procs. have been added/removed in
-		// the new pipeline/variant)
-		// for now; just start from scratch on pipeline change.
-		clear();
+		if (reset) {
+			clear();
+		}
 
 		if (project.pipelineManager().pipelineExists(id)) {
 			this.pipelineIdProperty.set(id);
@@ -240,11 +253,8 @@ public class ProjectPage implements Modifiable, Localizable {
 			this.pipelineIdProperty.set(-1);
 		}
 
-		if (this.pipeline != null) {
-			close(false);
-			open();
-		}
-		handler.eventBus.post(new ProjectNotification(ProjectNotification.Type.MODIFIED));
+		updatePipelineName();
+		reload(false);
 	}
 
 	/**
@@ -256,12 +266,43 @@ public class ProjectPage implements Modifiable, Localizable {
 		return this.pipelineIdProperty;
 	}
 
+	private void reload(boolean save) {
+		if (!isOpened()) {
+			return;
+		}
+		close(save);
+		open();
+		handler.eventBus.post(new ProjectNotification(ProjectNotification.Type.MODIFIED));
+	}
+
+	/**
+	 * Returns the pipeline name property.
+	 *
+	 * @return the pipeline name property.
+	 */
+	public ReadOnlyStringProperty pipelineNameProperty() {
+		return this.pipelineNameProperty;
+	}
+
 	/**
 	 * Returns the pipeline's name.
 	 *
 	 * @return the name of the pipeline.
 	 */
 	public String getPipelineName() {
+		return pipelineNameProperty.get();
+	}
+
+	/**
+	 * Updates the pipeline name. We have to keep track of the pipeline name,
+	 * since it might change after pipeline modifications (e.g. due to cloning
+	 * as a resolution).
+	 */
+	private void updatePipelineName() {
+		this.pipelineNameProperty.set(getPipelineNameFromPrototype());
+	}
+
+	private String getPipelineNameFromPrototype() {
 		final Pipeline pl = getPipelinePrototype(); // no need to have this page opened yet
 		if (pl == null) {
 			return localize("none").toLowerCase();
@@ -481,7 +522,7 @@ public class ProjectPage implements Modifiable, Localizable {
 	 *
 	 * @return the pipeline patch of the page, or null.
 	 */
-	private PipelinePatch pipelinePatch() {
+	public PipelinePatch pipelinePatch() {
 		if (Files.exists(pipelinePatchXml())) {
 			try {
 				final PipelinePatch patch = PipelinePatch.loadAsStream(pipelinePatchXml());
@@ -493,6 +534,99 @@ public class ProjectPage implements Modifiable, Localizable {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Checks whether the page patches its pipeline.
+	 *
+	 * @return {@code true} if the page's pipeline is patched (e.g. overwritten
+	 * parameters), {@code false} otherwise.
+	 */
+	public boolean hasPipelinePatch() {
+		final PipelinePatch patch = pipelinePatch();
+		if (patch == null) {
+			return false;
+		}
+		return !patch.isEmpty();
+	}
+
+	/**
+	 * Updates the pipeline of the page. The page doesn't need to be opened to
+	 * call this method. If the page is opened, it will be reloaded and a
+	 * {@code ProjectNotification.Type.MODIFIED} notification will be published.
+	 *
+	 * @param reset whether to reset the pipeline (deleting all processed data),
+	 * or not.
+	 * @param unpatch whether to unpatch the pipeline (if a pipeline patch
+	 * exists), or not.
+	 */
+	public void updatePipeline(boolean reset, boolean unpatch) {
+		if (reset) {
+			resetPipeline();
+			// manually remove any exported files, or exporters won't be reset
+			deleteExportedFiles();
+		}
+		if (unpatch) {
+			deletePipelinePatch();
+		}
+		updatePipelineName();
+		if (isOpened()) {
+			reload(!reset); // save first if we didn't reset the pipeline
+		}
+	}
+
+	private void resetPipeline() {
+		try {
+			if (Files.exists(processorRootDirectory())) {
+				FileFinder.deleteDirectory(processorRootDirectory());
+			}
+		} catch (IOException ex) {
+			log.error("failed to clear the project page's processor data: {}", this, ex);
+			handler.uiStrategy.showError(ex);
+		}
+	}
+
+	private boolean deletePipelinePatch() {
+		try {
+			return Files.deleteIfExists(pipelinePatchXml());
+		} catch (IOException ex) {
+			log.error("failed to clear the pipeline patch: {}", this, ex);
+			handler.uiStrategy.showError(ex);
+		}
+		return false;
+	}
+
+	private boolean deleteExportedFiles() {
+		try {
+			final Path export = getExportDirectory();
+			if (Files.exists(export)) {
+				FileFinder.deleteDirectory(export);
+				return true;
+			}
+		} catch (IOException ex) {
+			log.error("failed to clear the project page's export data: {}", this, ex);
+			handler.uiStrategy.showError(ex);
+		}
+		return false;
+	}
+
+	/**
+	 * Returns a path to the export directory dedicated to the page. This is a
+	 * subdirectory inside the projects export directory.
+	 *
+	 * @return the path to the export directory dedicated to the page
+	 */
+	public Path getExportDirectory() {
+		final String sanitizedPageName = getName().replaceAll(
+				"[^a-zA-Z_\\-0-9]", // simple whitelist should be good enough
+				""
+		).trim();
+		final String name = sanitizedPageName.isEmpty()
+				? String.valueOf(id)
+				: String.format("%s (%d)", sanitizedPageName, id);
+		return this.project.getExportDirectory().resolve("pages").resolve(
+				name
+		);
 	}
 
 	/**
