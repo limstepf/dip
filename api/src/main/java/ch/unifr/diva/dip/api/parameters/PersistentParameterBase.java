@@ -63,6 +63,49 @@ public abstract class PersistentParameterBase<T, V extends PersistentParameter.V
 	}
 
 	/**
+	 * Invalidates the parameter's value property. The value property doesn't
+	 * get invalidated if the new value is the same as the old one. But with
+	 * more complex value objects it's often convenient to retrieve the value
+	 * (or rather data structure) and alter it, thus also altering the already
+	 * set value (without invalidating the property). Trying to set this value
+	 * will not invalidate the property, since it's the same as the current
+	 * value, so... in such a situation a call to this method will do the trick,
+	 * and also update the view (if present).
+	 *
+	 * <h4>Example:</h4>
+	 * <pre>
+	 * <code>
+	 * ExpMatrixParameter matrix = new ExpMatrixParameter("mat", new StringMatrix(3,3));
+	 * // ...
+	 * // retrieve the value of the property, a StringMatrix in this case,
+	 * // and alter it directly, followed by a call to invalidate() instead of
+	 * // trying to set the value of the parameter.
+	 * matrix.get().fill("e");
+	 * matrix.invalidate();
+	 * </code>
+	 * </pre>
+	 *
+	 * <p>
+	 * In the same situation, the following:
+	 * <pre>
+	 * <code>
+	 * // ...
+	 * matrix.set(matrix.get().fill("e"));
+	 * </code>
+	 * </pre> ...would not work. The call to set would be ignored/not have the
+	 * desired effect, since that value is already set. Alternatively we could
+	 * create a new StringMatrix from scratch, or (deep-)clone the current
+	 * matrix before altering it, but that's rather stupid...
+	 */
+	public void invalidate() {
+		this.valueProperty.invalidate();
+		if (!changeIsLocal && view != null) {
+			view.set(get());
+		}
+		onValuePropertySet();
+	}
+
+	/**
 	 * A filter applied before setting the value property. As is, this is just a
 	 * pass-through, but can be overwritten if needed (e.g. to validate the new
 	 * value first).
