@@ -78,9 +78,9 @@ public class RepairProjectDialog extends AbstractDialog {
 	private final ProjectData projectData;
 	private final ProjectData.ValidationResult validation;
 	private final List<RepairSection> sections = new ArrayList<>();
-	private final VBox box = new VBox();
-	private final Button ok = getDefaultButton(localize("ok"));
-	private final Button cancel = getCancelButton(stage);
+	private final VBox box;
+	private final Button ok;
+	private final Button cancel;
 	private final BooleanProperty repairedProperty = new SimpleBooleanProperty(false);
 	private final InvalidationListener repairedListener = (obs) -> updateRepairedProperty();
 	private RepairImageSection repairImageSection = null;
@@ -98,9 +98,12 @@ public class RepairProjectDialog extends AbstractDialog {
 		this.handler = handler;
 		this.projectData = handler.getRepairData();
 		this.validation = handler.getRepairValidation();
+		this.ok = getDefaultButton(localize("ok"));
+		this.cancel = getCancelButton(stage);
 
 		setTitle(localize("project.open.warning"));
 
+		this.box = new VBox();
 		box.setPrefWidth(owner.getWidth() * .78);
 		box.setPrefHeight(owner.getHeight() * .42);
 		box.setSpacing(10);
@@ -134,9 +137,7 @@ public class RepairProjectDialog extends AbstractDialog {
 		buttons.add(cancel);
 
 		this.setOnCloseRequest((e) -> cleanUpOnClose());
-
 		root.setCenter(box);
-
 		updateRepairedProperty();
 	}
 
@@ -156,6 +157,12 @@ public class RepairProjectDialog extends AbstractDialog {
 		this.repairedProperty.set(true);
 	}
 
+	/**
+	 * Checks whether the repairs have been applied.
+	 *
+	 * @return {@code true} if the repairs have been applied, {@code false} if
+	 * the dialog got closed prematurely.
+	 */
 	public boolean isOk() {
 		return this.done;
 	}
@@ -318,10 +325,22 @@ public class RepairProjectDialog extends AbstractDialog {
 				this.status.setText(message);
 			}
 
+			/**
+			 * Updates the repair status.
+			 *
+			 * @param state the new repair status.
+			 */
 			public void setStatus(RepairStatus state) {
 				updateStatus(state.getGlyph(), state.getMessage());
 			}
 
+			/**
+			 * Ignores/unignores the item. Ignored items won't be (attempted to
+			 * be) repaired.
+			 *
+			 * @param ignored {@code true} to ignore, {@code false} to unignore
+			 * the item.
+			 */
 			public void setIgnored(boolean ignored) {
 				if (this.glyph != null) {
 					this.glyph.setOpacity(ignored ? 0.33 : 1.0);
@@ -337,10 +356,21 @@ public class RepairProjectDialog extends AbstractDialog {
 			this.header.setIgnored(doIgnore());
 		}
 
+		/**
+		 * The repaired property.
+		 *
+		 * @return the repaired property.
+		 */
 		public ReadOnlyBooleanProperty repairedProperty() {
 			return this.repairedProperty;
 		}
 
+		/**
+		 * Checks whether the item should be ignored, or not.
+		 *
+		 * @return {@code true} if the item should be ignored, {@code false}
+		 * otherwise.
+		 */
 		final public boolean doIgnore() {
 			return this.header.ignore.isSelected();
 		}
