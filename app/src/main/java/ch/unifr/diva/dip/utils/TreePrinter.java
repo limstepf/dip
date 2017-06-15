@@ -291,14 +291,42 @@ public class TreePrinter {
 	 * @return an array of TreePrinter node children.
 	 */
 	public static Object[] toChildren(Dictionary dictionary) {
+		return toChildren(dictionary, (key, val) -> {
+			return String.format("%s: %s", key, val);
+		});
+	}
+
+	/**
+	 * Returns (and formats) dictonary entries as TreePrinter node children.
+	 *
+	 * @param dictionary the dictionary.
+	 * @param mapper the dictionary (entry) mapper.
+	 * @return an array of TreePrinter node children.
+	 */
+	public static Object[] toChildren(Dictionary dictionary, DictMapper mapper) {
 		final Object[] children = new Object[dictionary.size()];
 		int i = 0;
 		for (Enumeration e = dictionary.keys(); e.hasMoreElements(); i++) {
 			final Object key = e.nextElement();
 			final Object val = dictionary.get(key);
-			children[i] = String.format("%s: %s", key, val);
+			children[i] = mapper.map(key, val);
 		}
 		return children;
+	}
+
+	/**
+	 * A dictionary (entry) mapper.
+	 */
+	public interface DictMapper {
+
+		/**
+		 * Maps a dictionary entry (key and value) to some output.
+		 *
+		 * @param key the key of the entry.
+		 * @param value the value of the entry.
+		 * @return some output.
+		 */
+		public Object map(Object key, Object value);
 	}
 
 }

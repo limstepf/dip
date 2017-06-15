@@ -27,6 +27,7 @@ import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import javafx.beans.InvalidationListener;
 import javafx.beans.value.ChangeListener;
@@ -379,7 +380,27 @@ public class MainCLI {
 								"version: " + bundle.getVersion(),
 								"state: " + OSGiBundleTracker.getBundleState(bundle),
 								"location: " + bundle.getLocation(),
-								new TreePrinter.Node("headers", TreePrinter.toChildren(bundle.getHeaders()))
+								new TreePrinter.Node(
+										"headers",
+										TreePrinter.toChildren(
+												bundle.getHeaders(),
+												(key, val) -> {
+													final String s = (String) key;
+													switch (s.toLowerCase()) {
+														case "embedded-artifacts":
+														case "export-package":
+														case "import-package":
+														case "bundle-classpath":
+															final String v = (String) val;
+															return new TreePrinter.Node(
+																	s,
+																	splitExcludeQuotes(v, ',')
+															);
+													}
+													return String.format("%s: %s", key, val);
+												}
+										)
+								)
 							};
 						}
 						return new Object[]{};
@@ -395,6 +416,34 @@ public class MainCLI {
 					}
 				}
 		);
+	}
+
+	// splits a string on some char unless inside quotes
+	private static List<String> splitExcludeQuotes(String src, char split) {
+		// hint: do not try to do this with a regular expression,
+		// ...or maybe do, have some fun. :)
+		final List<String> tokens = new ArrayList<>();
+		boolean inQuotes = false;
+		StringBuilder b = new StringBuilder();
+		for (char c : src.toCharArray()) {
+			switch (c) {
+				case ',':
+					if (inQuotes) {
+						b.append(c);
+					} else {
+						tokens.add(b.toString());
+						b = new StringBuilder();
+					}
+					break;
+				case '"':
+					inQuotes = !inQuotes;
+					break;
+				default:
+					b.append(c);
+					break;
+			}
+		}
+		return tokens;
 	}
 
 	private static void listSystemInformation(ApplicationHandler handler) {
