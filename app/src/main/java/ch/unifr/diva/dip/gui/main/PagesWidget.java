@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
@@ -116,6 +117,7 @@ public class PagesWidget extends AbstractWidget {
 		private final ToggleGroup group = new ToggleGroup();
 		private final ContextMenu contextMenu = new ContextMenu();
 		private final BooleanProperty hasSelectionProperty = new SimpleBooleanProperty(false);
+		private final BooleanBinding hasNoSelectionBinding = Bindings.not(hasSelectionProperty);
 		private final InvalidationListener selectionListener = (obs) -> {
 			hasSelectionProperty.set(
 					!listView.getSelectionModel().isEmpty()
@@ -144,11 +146,21 @@ public class PagesWidget extends AbstractWidget {
 				);
 			});
 
+			final MenuItem changePipelineItem = new MenuItem(localize("page.change.pipeline.selected"));
+			changePipelineItem.disableProperty().bind(hasNoSelectionBinding);
+			changePipelineItem.setOnAction((e) -> {
+				final ChangePipelineDialog dialog = new ChangePipelineDialog(
+						handler,
+						getSelectedItems()
+				);
+				dialog.showAndWait();
+			});
+
 			final MenuItem deleteItem = new MenuItem(localize("page.delete.selected"));
-			deleteItem.disableProperty().bind(Bindings.not(hasSelectionProperty));
+			deleteItem.disableProperty().bind(hasNoSelectionBinding);
 			deleteItem.setOnAction((e) -> handler.getProject().deletePages(getSelectedItems()));
 
-			contextMenu.getItems().addAll(importItem, deleteItem);
+			contextMenu.getItems().addAll(importItem, changePipelineItem, deleteItem);
 			listView.getSelectionModel().getSelectedItems().addListener(selectionListener);
 			listView.setContextMenu(contextMenu);
 
