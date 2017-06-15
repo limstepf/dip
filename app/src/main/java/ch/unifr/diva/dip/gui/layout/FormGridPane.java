@@ -58,9 +58,20 @@ public class FormGridPane extends GridPane {
 	/**
 	 * Adds a row.
 	 *
+	 * @param <T> a node class.
 	 * @param nodes nodes that make up the row, a cell/column per node.
 	 */
-	public void addRow(Node... nodes) {
+	public <T extends Node> void addRow(T... nodes) {
+		addRow(Arrays.asList(nodes));
+	}
+
+	/**
+	 * Adds a row.
+	 *
+	 * @param <T> a node class.
+	 * @param nodes nodes that make up the row, a cell/column per node.
+	 */
+	public <T extends Node> void addRow(List<T> nodes) {
 		int column = 0;
 		for (Node node : nodes) {
 			if (node != null) {
@@ -75,33 +86,36 @@ public class FormGridPane extends GridPane {
 	/**
 	 * Adds a node spanning multiple columns.
 	 *
+	 * @param <T> a node class.
 	 * @param node the node.
 	 * @param colspan the column span.
 	 */
-	public void addSpanRow(Node node, int colspan) {
+	public <T extends Node> void addSpanRow(T node, int colspan) {
 		addSpanRow(node, 0, colspan, 1);
 	}
 
 	/**
 	 * Adds a node spanning multiple columns and/or rows.
 	 *
+	 * @param <T> a node class.
 	 * @param node the node.
 	 * @param colspan the column span.
 	 * @param rowspan the row span.
 	 */
-	public void addSpanRow(Node node, int colspan, int rowspan) {
+	public <T extends Node> void addSpanRow(T node, int colspan, int rowspan) {
 		addSpanRow(node, 0, colspan, rowspan);
 	}
 
 	/**
 	 * Adds a node spanning multiple columns and/or rows.
 	 *
+	 * @param <T> a node class.
 	 * @param node the node.
 	 * @param coloffset the column offset, 0 to start at the first column.
 	 * @param colspan the column span.
 	 * @param rowspan the row span.
 	 */
-	public void addSpanRow(Node node, int coloffset, int colspan, int rowspan) {
+	public <T extends Node> void addSpanRow(T node, int coloffset, int colspan, int rowspan) {
 		this.add(node, coloffset, row, colspan, rowspan);
 		row = row + rowspan;
 	}
