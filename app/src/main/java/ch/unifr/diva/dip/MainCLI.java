@@ -204,6 +204,19 @@ public class MainCLI {
 		}
 
 		System.out.println();
+
+		/*
+		 * keep alive: this is usefull if we have a shell (e.g. Felix Gogo)
+		 * around which allows us to inspect the OSGi environment, and to debug
+		 * bundles that just wont start, and what not...
+		 */
+		if (CommandLineOption.KEEP_ALIVE.hasOption()) {
+			try {
+				handler.osgi.waitForStop();
+			} catch (InterruptedException ex) {
+				// so long...
+			}
+		}
 	}
 
 	// short sleep (in ms) after a thread has been joined to enforce correct

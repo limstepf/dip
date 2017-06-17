@@ -22,9 +22,15 @@ public enum CommandLineOption {
 			"f", "file", true,
 			"the DIP project to be loaded/processed"
 	),
+	KEEP_ALIVE(
+			null, "keep-alive", false,
+			"forces headless mode, and keeps the application running "
+			+ "until the embedded OSGi framework stops"
+	),
 	LIST_ALL(
 			null, "list-all", false,
-			"lists the system information, the installed OSGi bundles, and the project pipelines and pages"
+			"lists the system information, the installed OSGi bundles, "
+			+ "and the project pipelines and pages"
 	),
 	LIST_SYSTEM(
 			null, "list-system", false,

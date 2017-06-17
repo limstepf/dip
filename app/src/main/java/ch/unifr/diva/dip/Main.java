@@ -36,6 +36,7 @@ public class Main {
 				if (CommandLineOption.hasAnyOption(
 						CommandLineOption.PROCESS,
 						CommandLineOption.RESET,
+						CommandLineOption.KEEP_ALIVE,
 						CommandLineOption.LIST_ALL,
 						CommandLineOption.LIST_BUNDLES,
 						CommandLineOption.LIST_PROJECT,
