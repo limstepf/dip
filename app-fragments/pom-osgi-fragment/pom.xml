@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>ch.unifr.diva.dip</groupId>
+		<artifactId>dip-pom-osgi</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../../pom-osgi/pom.xml</relativePath>
+	</parent>
+
+	<groupId>ch.unifr.diva.dip</groupId>
+	<artifactId>dip-pom-osgi-fragment</artifactId>
+	<name>DIVA DIP OSGi Fragment POM</name>
+	<description>
+		The DIVA DIP OSGi Fragment POM is a direct parent POM to create OSGi
+		fragment bundles.
+	</description>
+	<packaging>pom</packaging>
+
+	<properties>
+		<!-- correct paths of bundle directories. Note that fragment bundles need
+		to be put into the bundle core directory, not the plugin one; with FileInstall
+		it will be too late to attach some more packages to the system.bundle! -->
+		<app.core.bundledir>../../app/target/bundles-core</app.core.bundledir>
+
+		<!-- needs to be set to false in child POMs. This is set to true in here
+		s.t. this POM doesn't end up in the bundle directory itself. -->
+		<osgi.fragment.skip>true</osgi.fragment.skip>
+		<osgi.fragment.filename>${project.artifactId}-${project.version}.jar</osgi.fragment.filename>
+		<osgi.fragment.host>system.bundle;extension:=framework</osgi.fragment.host>
+		<osgi.bundle.symbolicName>${project.groupId}.${project.artifactId}</osgi.bundle.symbolicName>
+		<osgi.bundle.version>${project.version}</osgi.bundle.version>
+		<osgi.bundle.exportPackage></osgi.bundle.exportPackage>
+	</properties>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.felix</groupId>
+					<artifactId>maven-bundle-plugin</artifactId>
+					<extensions>true</extensions>
+					<executions>
+						<execution>
+							<id>bundle-manifest</id>
+							<phase>process-classes</phase>
+							<goals>
+								<goal>manifest</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<instructions>
+							<Fragment-Host>${osgi.fragment.host}</Fragment-Host>
+							<Bundle-SymbolicName>${osgi.bundle.symbolicName}</Bundle-SymbolicName>
+							<Bundle-Version>${osgi.bundle.version}</Bundle-Version>
+							<Export-Package>${osgi.bundle.exportPackage}</Export-Package>
+							<!-- yeah, yeah, we know; fragment bundles just contain the manifest... -->
+							<_fixupmessages>The JAR is empty</_fixupmessages>
+						</instructions>
+					</configuration>
+				</plugin>
+
+				<plugin>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<executions>
+						<execution>
+							<id>copy-bundles</id>
+							<phase>package</phase>
+							<goals>
+								<goal>copy</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<artifactItems>
+							<artifactItem>
+								<groupId>${project.groupId}</groupId>
+								<artifactId>${project.artifactId}</artifactId>
+								<version>${project.version}</version>
+								<type>${project.packaging}</type>
+								<destFileName>${osgi.fragment.filename}</destFileName>
+							</artifactItem>
+						</artifactItems>
+						<skip>${osgi.fragment.skip}</skip>
+						<outputDirectory>${app.core.bundledir}</outputDirectory>
+						<overWriteSnapshots>true</overWriteSnapshots>
+						<overWriteIfNewer>true</overWriteIfNewer>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+</project>

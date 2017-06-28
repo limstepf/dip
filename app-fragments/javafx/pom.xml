@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>ch.unifr.diva.dip</groupId>
+		<artifactId>dip-pom-osgi-fragment</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../pom-osgi-fragment/pom.xml</relativePath>
+	</parent>
+
+	<groupId>ch.unifr.diva.dip.fragments</groupId>
+	<artifactId>javafx.fragment</artifactId>
+	<version>8.0.0</version>
+	<packaging>bundle</packaging>
+
+	<name>JavaFX Fragment Bundle</name>
+	<description>
+		JavaFX Fragment Bundle. Attaches all JavaFX packages to the system bundle.
+	</description>
+
+	<properties>
+		<osgi.fragment.skip>false</osgi.fragment.skip>
+		<osgi.bundle.exportPackage>
+			javafx.animation,
+			javafx.application,
+			javafx.beans,
+			javafx.beans.binding,
+			javafx.beans.property,
+			javafx.beans.property.adapter,
+			javafx.beans.value,
+			javafx.collections,
+			javafx.concurrent,
+			javafx.embed.swing,
+			javafx.embed.swt,
+			javafx.event,
+			javafx.fxml,
+			javafx.geometry,
+			javafx.scene,
+			javafx.scene.canvas,
+			javafx.scene.chart,
+			javafx.scene.control,
+			javafx.scene.control.cell,
+			javafx.scene.effect,
+			javafx.scene.image,
+			javafx.scene.input,
+			javafx.scene.layout,
+			javafx.scene.media,
+			javafx.scene.paint,
+			javafx.scene.shape,
+			javafx.scene.text,
+			javafx.scene.transform,
+			javafx.scene.web,
+			javafx.stage,
+			javafx.util,
+			javafx.util.converter,
+			javafx.fxml
+		</osgi.bundle.exportPackage>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

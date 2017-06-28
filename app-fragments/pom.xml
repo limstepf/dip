@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>ch.unifr.diva.dip</groupId>
+	<artifactId>dip-app-fragments</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<name>DIVA DIP OSGi bundle fragments</name>
+	<description>
+		DIVA DIP OSGi bundle fragments is a multi-module (or aggregate) for
+		attaching (or exporting) packages available on the host (i.e. the app)
+		to the system.bundle of the embedded OSGi framework.
+	</description>
+	<packaging>pom</packaging>
+
+	<!-- OSGi fragments. Fragments are bundles that can be attached to one or
+	more host bundles by the Framework. Attaching is done as part of resolving:
+	the Framework appends the relevant definitions of the fragment bundles to
+	the host's definitions before the host is resolved. Fragments are therefore
+	treated as part of the host, including any permitted headers; they must not
+	have their own class loader though fragments must have their own Protection
+	Domain.
+
+	tl;dr we're using OSGi fragments to attach some more packages to the OSGi
+	system bundle (that aren't already attached by default), and as such this is
+	very similar to passing extra system packages to the embedded OSGi framework.
+	Maybe even more convenient, actually (e.g. we get a version lookup for free).
+	-->
+
+	<modules>
+		<!-- parent POM for bundle fragments -->
+		<module>pom-osgi-fragment</module>
+
+		<!-- JavaFX packages aren't attached by default -->
+		<module>javafx</module>
+
+		<!-- com.sun.* packages (not to be confused with the sun.* packages).
+		Some packages in here might become private with Java 9, so watch out. -->
+		<module>com.sun</module>
+
+		<!-- While the sun.* packages are not part of the supported, public
+		interface, some dependencies depend on them, so here we go... Note
+		that this is *not* guaranteed to work on all Java-compatible platforms.
+		See: http://www.oracle.com/technetwork/java/faq-sun-packages-142232.html
+		Hence it's probably a good idea to mark Import-Package statements of sun.*
+		packages as optional, and hope for the best... with Java 9 this package
+		will be completely private anyways, but some stuff might still be
+		available in jdk.unsupported or something. -->
+		<module>sun</module>
+
+		<!-- Simple Logging Facade for Java (SLF4J) -->
+		<module>org.slf4j</module>
+
+		<!-- org.w3c.dom.* packages. Provides the interfaces for the Document
+		Object Model (DOM) which is a component API of the Java API for XML
+		Processing. -->
+		<module>org.w3c.dom</module>
+
+	</modules>
+</project>

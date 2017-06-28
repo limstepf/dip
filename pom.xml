@@ -21,6 +21,9 @@
 		<!-- API and host application -->
 		<module>api</module>
 		<module>app</module>
+		<!-- OSGi bundle fragments (used to export packages from the app/host)
+		that will be attached to the OSGI system.bundle -->
+		<module>app-fragments</module>
 
 		<!-- OSGi packages (copied/repackaged dependencies) -->
 		<module>third_party</module>

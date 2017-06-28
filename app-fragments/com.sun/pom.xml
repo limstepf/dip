@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>ch.unifr.diva.dip</groupId>
+		<artifactId>dip-pom-osgi-fragment</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../pom-osgi-fragment/pom.xml</relativePath>
+	</parent>
+
+	<groupId>ch.unifr.diva.dip.fragments</groupId>
+	<artifactId>com.sun.fragment</artifactId>
+	<version>1.0.0</version>
+	<packaging>bundle</packaging>
+
+	<name>com.sun Fragment Bundle</name>
+	<description>
+		com.sun.* Fragment Bundle. Attaches some additional, and rather dated 
+		packages to the system bundle.
+	</description>
+
+	<properties>
+		<osgi.fragment.skip>false</osgi.fragment.skip>
+		<osgi.bundle.exportPackage>
+			com.sun.image.codec.jpeg,
+			com.sun.jdi,
+			com.sun.jdi.connect,
+			com.sun.jdi.event,
+			com.sun.jdi.request,
+			com.sun.jdmk.comm,
+			com.sun.jimi.core,
+			com.sun.medialib.mlib,
+			com.sun.net.ssl,
+			com.sun.net.ssl.internal.ssl,
+			com.sun.tools.apt,
+			com.sun.tools.javac,
+			com.sun.tools.javah,
+			com.sun.tools.javah.oldjavah
+		</osgi.bundle.exportPackage>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

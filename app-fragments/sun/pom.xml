@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>ch.unifr.diva.dip</groupId>
+		<artifactId>dip-pom-osgi-fragment</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../pom-osgi-fragment/pom.xml</relativePath>
+	</parent>
+
+	<groupId>ch.unifr.diva.dip.fragments</groupId>
+	<artifactId>sun.fragment</artifactId>
+	<version>1.0.0</version>
+	<packaging>bundle</packaging>
+
+	<name>sun Fragment Bundle</name>
+	<description>
+		sun.* Fragment Bundle. Attaches some additional, and rather dated 
+		packages to the system bundle.
+	</description>
+
+	<properties>
+		<osgi.fragment.skip>false</osgi.fragment.skip>
+		<osgi.bundle.exportPackage>
+			sun.awt.image,
+			sun.awt.image.codec,
+			sun.io,
+			sun.misc,
+			sun.reflect,
+			sun.rmi.rmic,
+			sun.security.action,
+			sun.security.provider,
+			sun.tools.javac,
+			sun.tools.native2ascii
+		</osgi.bundle.exportPackage>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

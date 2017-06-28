@@ -47,61 +47,6 @@ public class ExtraSystemPackages {
 			new SystemPackageBundle(
 					"1.0.0",
 					"ch.unifr.diva.dip.glyphs.mdi"
-			),
-			/**
-			 * Export SLF4J. Exporting the simple logging facade is enough. No
-			 * need to export the used logging framework itself.
-			 */
-			new SystemPackageBundle(
-					"1.7.25",
-					Arrays.asList(
-							"org.slf4j",
-							"org.slf4j.Logger",
-							"org.slf4j.LoggerFactory"
-					)
-			),
-			/**
-			 * Export JavaFx packages. While the Java standard library is
-			 * already exposed to the OSGi framework, the JavaFx packages are
-			 * not. So we have to export them explicitly.
-			 */
-			new SystemPackageBundle(
-					"2.2.0",
-					Arrays.asList(
-							"javafx.animation",
-							"javafx.application",
-							"javafx.beans",
-							"javafx.beans.binding",
-							"javafx.beans.property",
-							"javafx.beans.property.adapter",
-							"javafx.beans.value",
-							"javafx.collections",
-							"javafx.concurrent",
-							"javafx.embed.swing",
-							"javafx.embed.swt",
-							"javafx.event",
-							"javafx.fxml",
-							"javafx.geometry",
-							"javafx.scene",
-							"javafx.scene.canvas",
-							"javafx.scene.chart",
-							"javafx.scene.control",
-							"javafx.scene.control.cell",
-							"javafx.scene.effect",
-							"javafx.scene.image",
-							"javafx.scene.input",
-							"javafx.scene.layout",
-							"javafx.scene.media",
-							"javafx.scene.paint",
-							"javafx.scene.shape",
-							"javafx.scene.text",
-							"javafx.scene.transform",
-							"javafx.scene.web",
-							"javafx.stage",
-							"javafx.util",
-							"javafx.util.converter",
-							"javafx.fxml"
-					)
 			)
 	);
 
