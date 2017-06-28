@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>ch.unifr.diva.dip</groupId>
+		<artifactId>dip-pom-osgi-repackage</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../pom-osgi-repackage/pom.xml</relativePath>
+	</parent>
+
+	<groupId>ch.unifr.diva.dip.libs</groupId>
+	<artifactId>com.vividsolutions.jts</artifactId>
+	<version>1.13</version>
+
+	<name>JTS Topology Suite</name>
+	<description>
+		The JTS Topology Suite is an API for modelling and manipulating 2-dimensional linear geometry. It provides numerous geometric predicates and functions. JTS conforms to the Simple Features Specification for SQL published by the Open GIS Consortium.
+	</description>
+	<packaging>bundle</packaging>
+
+	<properties>
+		<osgi.repackage.skip>false</osgi.repackage.skip>
+		<jts.version>1.13</jts.version>
+		<osgi.bundle.embedDependency>
+			jts
+		</osgi.bundle.embedDependency>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.vividsolutions</groupId>
+			<artifactId>jts</artifactId>
+			<version>${jts.version}</version>
+		</dependency>
+	</dependencies>
+
+</project>

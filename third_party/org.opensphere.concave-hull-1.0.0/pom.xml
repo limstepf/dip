@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>ch.unifr.diva.dip</groupId>
+		<artifactId>dip-pom-osgi-bundle</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../../pom-osgi-bundle/pom.xml</relativePath>
+	</parent>
+
+	<groupId>ch.unifr.diva.dip.libs</groupId>
+	<artifactId>org.opensphere.concave-hull</artifactId>
+	<version>1.0.0</version>
+	<packaging>bundle</packaging>
+
+	<name>Concave hull based on JTS</name>
+	<description>
+		This concave hull implementation is based on the algorithm developed by
+		Duckham et al. (2008) in the paper "Efficient generation of simple
+		polygons for characterizing the shape of a set of points in the plane",
+		available here: http://www.geosensor.net/papers/duckham08.PR.pdf.
+	</description>
+
+	<!--
+		This is not available on a public maven repository, but distributed as
+		a zip file (including sources), so we're building this thing on our own,
+		and pack it up nicely as an OSGi bundle.
+
+		- Last modification date: May 22, 2012.
+		- Note that this bundle includes the concave hull implementation
+		  (released	under a LGPL licence) only, the OpenJUMP plugin is omitted.
+	-->
+	<developers>
+		<developer>
+			<id>egrosso</id>
+			<name>Eric Grosso</name>
+			<email>eric.grosso.os@gmail.com</email>
+			<url>http://www.rotefabrik.free.fr/concave_hull/</url>
+		</developer>
+	</developers>
+
+	<properties>
+		<app.core.bundledir>../../app/target/bundles-core</app.core.bundledir>
+		<app.plugin.bundledir>../../app/target/bundles</app.plugin.bundledir>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.vividsolutions</groupId>
+			<artifactId>jts</artifactId>
+			<version>1.13</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

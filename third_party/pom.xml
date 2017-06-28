@@ -57,6 +57,12 @@
 		<!-- Efficient Java Matrix Library (EJML)  -->
 		<module>org.ejml-0.29</module>
 
+		<!-- JTS Topology Suite -->
+		<module>com.vividsolutions.jts-1.13</module>
+
+		<!-- Concave hull based on JTS -->
+		<module>org.opensphere.concave-hull-1.0.0</module>
+
 		<!-- OpenIMAJ (and a buttload of dependencies) -->
 		<module>org.openimaj-1.3.5</module>
 		<module>bouncycastle.jdk14-138</module>
