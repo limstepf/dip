@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>ch.unifr.diva.dip</groupId>
+		<artifactId>dip-pom-osgi-repackage</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../pom-osgi-repackage/pom.xml</relativePath>
+	</parent>
+
+	<groupId>ch.unifr.diva.dip.libs</groupId>
+	<artifactId>xml-apis</artifactId>
+	<version>1.3.04</version>
+
+	<name>Xml Apis and XML Commons External Components XML APIs Extensions</name>
+	<description>
+		Xml Apis and xml-commons provides an Apache-hosted set of DOM, 
+		SAX, and JAXP interfaces for use in other xml-based projects.
+	</description>
+	<packaging>bundle</packaging>
+
+	<properties>
+		<osgi.repackage.skip>false</osgi.repackage.skip>
+		<xml.apis.version>1.3.04</xml.apis.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>xml-apis</groupId>
+			<artifactId>xml-apis</artifactId>
+			<version>${xml.apis.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>xml-apis</groupId>
+			<artifactId>xml-apis-ext</artifactId>
+			<version>${xml.apis.version}</version>
+		</dependency>
+	</dependencies>
+
+</project>

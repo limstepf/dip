@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>ch.unifr.diva.dip</groupId>
+		<artifactId>dip-pom-osgi</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../../pom-osgi/pom.xml</relativePath>
+	</parent>
+
+	<groupId>ch.unifr.diva.dip.libs</groupId>
+	<artifactId>tw.edu.ntu.csie.libsvm</artifactId>
+	<version>3.17</version>
+
+	<name>LIBSVM</name>
+	<description>
+		A Library for Support Vector Machines.
+	</description>
+	<packaging>bundle</packaging>
+
+	<properties>
+		<app.plugin.bundledir>../../app/target/bundles</app.plugin.bundledir>
+		<osgi.bundle.filename>${project.artifactId}-${project.version}.jar</osgi.bundle.filename>
+		<osgi.bundle.symbolicName>${project.groupId}.${project.artifactId}</osgi.bundle.symbolicName>
+		<osgi.bundle.version>${project.version}</osgi.bundle.version>
+		<osgi.bundle.exportPackage>
+			libsvm,
+			*
+		</osgi.bundle.exportPackage>
+		<osgi.bundle.importPackage>
+			*
+		</osgi.bundle.importPackage>
+		<osgi.bundle.embedDependency>!*</osgi.bundle.embedDependency>
+		<osgi.bundle.embedTransitive>false</osgi.bundle.embedTransitive>
+		<osgi.bundle.excludeTransitive>true</osgi.bundle.excludeTransitive>
+		<libsvm.version>3.17</libsvm.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>tw.edu.ntu.csie</groupId>
+			<artifactId>libsvm</artifactId>
+			<version>${libsvm.version}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>unpack-jdom</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>tw.edu.ntu.csie</groupId>
+									<artifactId>libsvm</artifactId>
+									<version>${libsvm.version}</version>
+									<outputDirectory>
+										${project.build.directory}/classes
+									</outputDirectory>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+								</artifactItem>
+							</artifactItems>
+							<overWriteReleases>true</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-bundles</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>${project.groupId}</groupId>
+									<artifactId>${project.artifactId}</artifactId>
+									<version>${project.version}</version>
+									<type>${project.packaging}</type>
+									<destFileName>${osgi.bundle.filename}</destFileName>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>${app.plugin.bundledir}</outputDirectory>
+							<excludeTransitive>${osgi.bundle.excludeTransitive}</excludeTransitive>
+							<overWriteSnapshots>true</overWriteSnapshots>
+							<overWriteIfNewer>true</overWriteIfNewer>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<!-- remove classes from the root package -->
+						<id>fix-jdom</id>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<delete>
+									<fileset dir="${project.build.directory}/classes" includes="*.class"/>
+								</delete>
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<unpackBundle>true</unpackBundle>
+					<instructions>
+						<Bundle-SymbolicName>${osgi.bundle.symbolicName}</Bundle-SymbolicName>
+						<Bundle-Version>${osgi.bundle.version}</Bundle-Version>
+						<Export-Package>${osgi.bundle.exportPackage}</Export-Package>
+						<Import-Package>${osgi.bundle.importPackage}</Import-Package>
+						<Private-Package>*;-split-package:=merge-first</Private-Package>
+						<Embed-Dependency>${osgi.bundle.embedDependency}</Embed-Dependency>
+						<Embed-Transitive>${osgi.bundle.embedTransitive}</Embed-Transitive>
+					</instructions>
+				</configuration>
+			</plugin>
+
+		</plugins>
+	</build>
+
+</project>

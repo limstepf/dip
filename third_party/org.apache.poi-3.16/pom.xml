@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>ch.unifr.diva.dip</groupId>
+		<artifactId>dip-pom-osgi-repackage</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../pom-osgi-repackage/pom.xml</relativePath>
+	</parent>
+
+	<groupId>ch.unifr.diva.dip.libs</groupId>
+	<artifactId>org.apache.poi</artifactId>
+	<version>3.16</version>
+
+	<name>Apache POI</name>
+	<description>
+		Apache POI - Java API To Access Microsoft Format Files.
+	</description>
+	<packaging>bundle</packaging>
+
+	<properties>
+		<osgi.repackage.skip>false</osgi.repackage.skip>
+		<poi.version>3.16</poi.version>
+		<!--
+		<osgi.bundle.exportPackage>
+			!org.apache.jcp.xml.dsig.internal.dom,
+			*
+		</osgi.bundle.exportPackage>
+		-->
+		<osgi.bundle.importPackage>
+			junit.*;resolution:=optional,
+			org.junit*;resolution:=optional,
+			com.graphbuilder.*;resolution:=optional,
+			org.etsi.uri.x01903.v14;resolution:=optional,
+			javax.xml.parsers;version="[0.0,1)",
+			*
+		</osgi.bundle.importPackage>
+		<osgi.bundle.embedDependency>
+			poi,
+			poi-ooxml,
+			poi-ooxml-schemas,
+			poi-scratchpad,
+			ooxml-schemas
+		</osgi.bundle.embedDependency>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>${poi.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>${poi.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml-schemas</artifactId>
+			<version>${poi.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-scratchpad</artifactId>
+			<version>${poi.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>ooxml-schemas</artifactId>
+			<version>1.3</version>
+		</dependency>
+
+	</dependencies>
+
+</project>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>ch.unifr.diva.dip</groupId>
+		<artifactId>dip-pom-osgi-repackage</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../pom-osgi-repackage/pom.xml</relativePath>
+	</parent>
+
+	<groupId>ch.unifr.diva.dip.libs</groupId>
+	<artifactId>com.sun.media.jai-codec</artifactId>
+	<version>1.1.3</version>
+
+	<name>Java Advanced Imaging Codecs</name>
+	<description>
+		Java Advanced Imaging Codecs supporting support BMP, GIF (read only), FlashPix (read only), JPEG, PNG, PNM, TIFF, and WBMP.
+	</description>
+	<packaging>bundle</packaging>
+
+	<repositories>
+		<repository>
+			<id>JBoss 3rd-party Repository</id>
+			<url>https://repository.jboss.org/nexus/content/repositories/thirdparty-releases/</url>
+		</repository>
+		<repository>
+			<id>Atlassian 3rd-Party Repository</id>
+			<url>https://maven.atlassian.com/3rdparty/</url>
+		</repository>
+	</repositories>
+
+	<properties>
+		<osgi.repackage.skip>false</osgi.repackage.skip>
+		<jai.codec.version>1.1.3</jai.codec.version>
+		<osgi.bundle.importPackage>
+			com.sun.image.codec.jpeg;resolution:=optional,
+			com.sun.medialib.mlib;resolution:=optional,
+			sun.security.action;resolution:=optional,
+			*
+		</osgi.bundle.importPackage>
+		<osgi.bundle.embedDependency>
+			jai-codec
+		</osgi.bundle.embedDependency>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.sun.media</groupId>
+			<artifactId>jai-codec</artifactId>
+			<version>${jai.codec.version}</version>
+		</dependency>
+	</dependencies>
+
+</project>

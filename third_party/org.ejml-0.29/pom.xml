@@ -9,19 +9,18 @@
 	</parent>
 
 	<groupId>ch.unifr.diva.dip.libs</groupId>
-	<artifactId>ejml</artifactId>
+	<artifactId>org.ejml</artifactId>
 	<version>0.29</version>
 
-	<name>Efficient Java Matrix Library (EJML) v0.29</name>
+	<name>Efficient Java Matrix Library (EJML)</name>
 	<description>
 		A fast and easy to use dense matrix linear algebra library written in Java.
 	</description>
 	<packaging>bundle</packaging>
 
 	<properties>
-		<osgi.bundle.symbolicName>${project.groupId}</osgi.bundle.symbolicName>
-		<ejml.version>0.29</ejml.version>
 		<osgi.repackage.skip>false</osgi.repackage.skip>
+		<ejml.version>0.29</ejml.version>
 	</properties>
 
 	<dependencies>

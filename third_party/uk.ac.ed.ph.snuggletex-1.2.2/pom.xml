@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>ch.unifr.diva.dip</groupId>
+		<artifactId>dip-pom-osgi-repackage</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../pom-osgi-repackage/pom.xml</relativePath>
+	</parent>
+
+	<groupId>ch.unifr.diva.dip.libs</groupId>
+	<artifactId>uk.ac.ed.ph.snuggletex</artifactId>
+	<version>1.2.2</version>
+
+	<name>SnuggleTeX</name>
+	<description>
+		SnuggleTeX is a free and open-source Java library for converting fragments of LaTeX to XML (usually XHTML + MathML).
+	</description>
+	<packaging>bundle</packaging>
+
+	<repositories>
+		<repository>
+			<id>openimaj-maven</id>
+			<url>http://maven.openimaj.org/</url>
+		</repository>
+		<repository>
+			<id>www2.ph.ed.ac.uk-releases</id>
+			<url>http://www2.ph.ed.ac.uk/maven2</url>
+		</repository>
+	</repositories>
+
+	<properties>
+		<osgi.repackage.skip>false</osgi.repackage.skip>
+		<snuggletex.version>1.2.2</snuggletex.version>
+		<osgi.bundle.embedDependency>
+			snuggletex-core,
+			snuggletex-upconversion,
+			snuggletex-jeuclid
+		</osgi.bundle.embedDependency>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>uk.ac.ed.ph.snuggletex</groupId>
+			<artifactId>snuggletex-core</artifactId>
+			<version>${snuggletex.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>uk.ac.ed.ph.snuggletex</groupId>
+			<artifactId>snuggletex-upconversion</artifactId>
+			<version>${snuggletex.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>uk.ac.ed.ph.snuggletex</groupId>
+			<artifactId>snuggletex-jeuclid</artifactId>
+			<version>${snuggletex.version}</version>
+		</dependency>
+
+	</dependencies>
+
+</project>

@@ -7,28 +7,23 @@
 		<version>1.0.0-SNAPSHOT</version>
 		<relativePath>../pom-osgi-copy/pom.xml</relativePath>
 	</parent>
-	<artifactId>dip-felix</artifactId>
-	<name>DIVA DIP Apache Felix Core OSGi Bundles</name>
+
+	<artifactId>com.google.guava</artifactId>
+	<name>Guava: Google Core Libraries For Java</name>
 	<description>
-		Required system bundles for the Apache Felix Framework.
+		Guava is a suite of core and expanded libraries that include utility classes, google's collections, io classes, and much much more. Guava has only one code dependency - javax.annotation, per the JSR-305 spec.
 	</description>
 	<packaging>pom</packaging>
 
 	<properties>
-		<osgi.output.directory>${app.core.bundledir}</osgi.output.directory>
+		<osgi.output.directory>${app.plugin.bundledir}</osgi.output.directory>
 	</properties>
 
 	<dependencies>
 		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.fileinstall</artifactId>
-			<version>3.5.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.scr</artifactId>
-			<version>2.0.2</version>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>22.0</version>
 		</dependency>
 	</dependencies>
 

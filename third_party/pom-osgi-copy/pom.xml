@@ -23,6 +23,7 @@
 		<app.core.bundledir>../../app/target/bundles-core</app.core.bundledir>
 		<app.plugin.bundledir>../../app/target/bundles</app.plugin.bundledir>
 
+		<osgi.output.directory>${app.plugin.bundledir}</osgi.output.directory>
 		<osgi.copy.excludeTransitive>true</osgi.copy.excludeTransitive>
 	</properties>
 
@@ -39,7 +40,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<outputDirectory>${app.core.bundledir}</outputDirectory>
+					<outputDirectory>${osgi.output.directory}</outputDirectory>
 					<excludeTransitive>${osgi.copy.excludeTransitive}</excludeTransitive>
 					<overWriteSnapshots>true</overWriteSnapshots>
 					<overWriteIfNewer>true</overWriteIfNewer>

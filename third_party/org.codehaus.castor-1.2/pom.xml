@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>ch.unifr.diva.dip</groupId>
+		<artifactId>dip-pom-osgi-repackage</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../pom-osgi-repackage/pom.xml</relativePath>
+	</parent>
+
+	<groupId>ch.unifr.diva.dip.libs</groupId>
+	<artifactId>org.codehaus.castor</artifactId>
+	<version>1.2</version>
+
+	<name>Castor</name>
+	<description>
+		Castor is an open source data binding framework for Java[tm]. It’s the shortest path between Java objects, XML documents and relational tables.
+	</description>
+	<packaging>bundle</packaging>
+
+	<properties>
+		<osgi.repackage.skip>false</osgi.repackage.skip>
+		<castor.version>1.2</castor.version>
+		<osgi.bundle.importPackage>
+			javax.xml.parsers;version="[0.0,1)",
+			com.sun.org.apache.xml.internal.serialize;resolution:=optional,
+			netscape.ldap;resolution:=optional,
+			org.apache.oro.*;resolution:=optional,
+			org.apache.xerces.*;resolution:=optional,
+			weblogic.apache.xml.serialize;resolution:=optional,
+			*
+		</osgi.bundle.importPackage>
+		<osgi.bundle.embedDependency>
+			castor
+		</osgi.bundle.embedDependency>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.codehaus.castor</groupId>
+			<artifactId>castor</artifactId>
+			<version>${castor.version}</version>
+		</dependency>
+	</dependencies>
+
+</project>

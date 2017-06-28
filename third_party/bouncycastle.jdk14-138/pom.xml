@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>ch.unifr.diva.dip</groupId>
+		<artifactId>dip-pom-osgi-repackage</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../pom-osgi-repackage/pom.xml</relativePath>
+	</parent>
+
+	<groupId>ch.unifr.diva.dip.libs</groupId>
+	<artifactId>bouncycastle.jdk14</artifactId>
+	<version>138</version>
+
+	<name>Legion Of The Bouncy Castle Java Cryptography APIs</name>
+	<description>
+		The Bouncy Castle Crypto package is a Java implementation of cryptographic algorithms.
+	</description>
+	<packaging>bundle</packaging>
+
+	<repositories>
+		<repository>
+			<id>Redhat GA Repository</id>
+			<url>https://maven.repository.redhat.com/ga/</url>
+		</repository>
+	</repositories>
+
+	<properties>
+		<osgi.repackage.skip>false</osgi.repackage.skip>
+		<bouncycastle.version>138</bouncycastle.version>
+		<org.bouncycastle.version>1.38</org.bouncycastle.version>
+		<osgi.bundle.importPackage>
+			javax.mail*;resolution:=optional,
+			junit.*;resolution:=optional,
+			*
+		</osgi.bundle.importPackage>
+		<osgi.bundle.embedDependency>
+			bcmail-jdk14,
+			bcprov-jdk14,
+			bctsp-jdk14
+		</osgi.bundle.embedDependency>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>bouncycastle</groupId>
+			<artifactId>bcmail-jdk14</artifactId>
+			<version>${bouncycastle.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>bouncycastle</groupId>
+			<artifactId>bcprov-jdk14</artifactId>
+			<version>${bouncycastle.version}</version>
+		</dependency>
+
+		<!-- for some reason this one has been relocated from bouncycastle
+		to org.bouncycastle and version(format) changed from 138 to 1.38.
+		don't ask... -->
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bctsp-jdk14</artifactId>
+			<version>${org.bouncycastle.version}</version>
+		</dependency>
+	</dependencies>
+
+</project>

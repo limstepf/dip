@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>ch.unifr.diva.dip</groupId>
+		<artifactId>dip-pom-osgi-repackage</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../pom-osgi-repackage/pom.xml</relativePath>
+	</parent>
+
+	<groupId>ch.unifr.diva.dip.libs</groupId>
+	<artifactId>org.bouncycastle.jdk15on</artifactId>
+	<version>1.57</version>
+
+	<name>Legion Of The Bouncy Castle Java Cryptography APIs</name>
+	<description>
+		The Bouncy Castle Crypto package is a Java implementation of cryptographic algorithms.
+	</description>
+	<packaging>bundle</packaging>
+
+	<repositories>
+		<repository>
+			<id>Sonatype Releases Repository</id>
+			<url>https://oss.sonatype.org/content/repositories/releases/</url>
+		</repository>
+	</repositories>
+
+	<properties>
+		<osgi.repackage.skip>false</osgi.repackage.skip>
+		<bouncycastle.version>1.57</bouncycastle.version>
+		<osgi.bundle.importPackage>
+			javax.mail*;resolution:=optional,
+			*
+		</osgi.bundle.importPackage>
+		<osgi.bundle.embedDependency>
+			bcprov-jdk15on,
+			bcpkix-jdk15on,
+			bcmail-jdk15on,
+			bcpg-jdk15on
+		</osgi.bundle.embedDependency>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk15on</artifactId>
+			<version>${bouncycastle.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcpkix-jdk15on</artifactId>
+			<version>${bouncycastle.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcmail-jdk15on</artifactId>
+			<version>${bouncycastle.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcpg-jdk15on</artifactId>
+			<version>${bouncycastle.version}</version>
+		</dependency>
+
+	</dependencies>
+
+</project>

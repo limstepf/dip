@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>ch.unifr.diva.dip</groupId>
+		<artifactId>dip-pom-osgi-repackage</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../pom-osgi-repackage/pom.xml</relativePath>
+	</parent>
+
+	<groupId>ch.unifr.diva.dip.libs</groupId>
+	<artifactId>xerces.xercesImpl</artifactId>
+	<version>1.3.4</version>
+
+	<name>Xerces2 J</name>
+	<description>
+		Xerces2 is the next generation of high performance, fully compliant XML parsers in the Apache Xerces family. This new version of Xerces introduces the Xerces Native Interface (XNI), a complete framework for building parser components and configurations that is extremely modular and easy to program.
+	</description>
+	<packaging>bundle</packaging>
+
+	<properties>
+		<osgi.repackage.skip>false</osgi.repackage.skip>
+		<xerces.version>2.9.1</xerces.version>
+		<osgi.bundle.importPackage>
+			org.apache.xml.resolver*;resolution:=optional,
+			*
+		</osgi.bundle.importPackage>
+		<osgi.bundle.embedDependency>
+			xercesImpl
+		</osgi.bundle.embedDependency>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>xerces</groupId>
+			<artifactId>xercesImpl</artifactId>
+			<version>${xerces.version}</version>
+		</dependency>
+	</dependencies>
+
+</project>

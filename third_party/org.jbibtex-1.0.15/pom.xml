@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>ch.unifr.diva.dip</groupId>
+		<artifactId>dip-pom-osgi-repackage</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../pom-osgi-repackage/pom.xml</relativePath>
+	</parent>
+
+	<groupId>ch.unifr.diva.dip.libs</groupId>
+	<artifactId>org.jbibtex</artifactId>
+	<version>1.0.15</version>
+
+	<name>JBibTeX</name>
+	<description>
+		Java BibTeX parser and formatter.
+	</description>
+	<packaging>bundle</packaging>
+
+	<properties>
+		<osgi.repackage.skip>false</osgi.repackage.skip>
+		<jbibtex.version>1.0.15</jbibtex.version>
+	</properties>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.jbibtex</groupId>
+			<artifactId>jbibtex</artifactId>
+			<version>${jbibtex.version}</version>
+		</dependency>
+
+	</dependencies>
+
+</project>

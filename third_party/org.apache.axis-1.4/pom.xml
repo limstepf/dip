@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>ch.unifr.diva.dip</groupId>
+		<artifactId>dip-pom-osgi-repackage</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../pom-osgi-repackage/pom.xml</relativePath>
+	</parent>
+
+	<groupId>ch.unifr.diva.dip.libs</groupId>
+	<artifactId>org.apache.axis</artifactId>
+	<version>1.4</version>
+	<name>Axis</name>
+	<description>
+		Apache Axis is a second generation SOAP engine, the successor to the
+		Apache SOAP project, itself based on the original SOAP4J code that IBM
+		contributed to Apache in April 2000. In contrast to its predecessor,
+		Axis is fully WSDL aware. It also supports the JAX-RPC API.
+	</description>
+	<packaging>bundle</packaging>
+
+	<properties>
+		<osgi.repackage.skip>false</osgi.repackage.skip>
+		<axis.version>1.4</axis.version>
+		<osgi.bundle.importPackage>
+			javax.xml.parsers;version="[0.0,1)",
+			com.ibm.wsdl.extensions.soap;resolution:=optional,
+			com.sun.*;resolution:=optional,
+			javax.jms;resolution:=optional,
+			javax.mail*;resolution:=optional,
+			javax.servlet*;resolution:=optional,
+			javax.wsdl*;resolution:=optional,
+			javax.xml.rpc*;resolution:=optional,
+			org.apache.bsf;resolution:=optional,
+			org.apache.commons.discovery*;resolution:=optional,
+			org.apache.commons.net*;resolution:=optional,
+			org.exolab*;resolution:=optional,
+			sun.awt.image.codec;resolution:=optional,
+			sun.security.provider;resolution:=optional,
+			*
+		</osgi.bundle.importPackage>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.axis</groupId>
+			<artifactId>axis</artifactId>
+			<version>${axis.version}</version>
+		</dependency>
+	</dependencies>
+
+</project>

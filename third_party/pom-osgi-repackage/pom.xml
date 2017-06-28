@@ -25,11 +25,13 @@
 		<!-- needs to be set to false in child POMs. This is set to true in here
 		s.t. this POM doesn't end up in the bundle directory itself. -->
 		<osgi.repackage.skip>true</osgi.repackage.skip>
+		<osgi.repackage.filename>${project.artifactId}-${project.version}.jar</osgi.repackage.filename>
 		<!-- the symbolic bundle name might have to be adapted to just use the
 		groupId if the artifactId is equal to the last section of groupId -->
 		<osgi.bundle.symbolicName>${project.groupId}.${project.artifactId}</osgi.bundle.symbolicName>
 		<osgi.bundle.version>${project.version}</osgi.bundle.version>
 		<osgi.bundle.exportPackage>*</osgi.bundle.exportPackage>
+		<osgi.bundle.importPackage>*</osgi.bundle.importPackage>
 		<osgi.bundle.embedDependency>*;scope=compile|runtime</osgi.bundle.embedDependency>
 		<osgi.bundle.embedDirectory>target/dependency</osgi.bundle.embedDirectory>
 		<osgi.bundle.embedStripGroup>true</osgi.bundle.embedStripGroup>
@@ -49,6 +51,7 @@
 						<Bundle-SymbolicName>${osgi.bundle.symbolicName}</Bundle-SymbolicName>
 						<Bundle-Version>${osgi.bundle.version}</Bundle-Version>
 						<Export-Package>${osgi.bundle.exportPackage}</Export-Package>
+						<Import-Package>${osgi.bundle.importPackage}</Import-Package>
 						<Embed-Dependency>${osgi.bundle.embedDependency}</Embed-Dependency>
 						<Embed-Directory>${osgi.bundle.embedDirectory}</Embed-Directory>
 						<Embed-StripGroup>${osgi.bundle.embedStripGroup}</Embed-StripGroup>
@@ -75,6 +78,7 @@
 							<artifactId>${project.artifactId}</artifactId>
 							<version>${project.version}</version>
 							<type>${project.packaging}</type>
+							<destFileName>${osgi.repackage.filename}</destFileName>
 						</artifactItem>
 					</artifactItems>
 					<skip>${osgi.repackage.skip}</skip>

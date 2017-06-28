@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>ch.unifr.diva.dip</groupId>
+		<artifactId>dip-pom-osgi-repackage</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../pom-osgi-repackage/pom.xml</relativePath>
+	</parent>
+
+	<groupId>ch.unifr.diva.dip.libs</groupId>
+	<artifactId>eclipse.jdtcore</artifactId>
+	<version>3.1.0</version>
+
+	<name>JDT Core</name>
+	<description>
+		JDT Core is the core part of Eclipse's Java development tools. It contains the non-UI support for compiling and working with Java code.
+	</description>
+	<packaging>bundle</packaging>
+
+	<properties>
+		<osgi.repackage.skip>false</osgi.repackage.skip>
+		<jdtcore.version>3.1.0</jdtcore.version>
+		<osgi.bundle.importPackage>
+			<!-- Eclipse's stupid Require-Bundle dependencies, not so sure
+			we can make these optional... Well, this bundle starts now, but
+			we might have to come back and actually offer this org.eclipse
+			stuff... -->
+			org.eclipse.core.resources*;resolution:=optional,
+			org.eclipse.core.runtime*;resolution:=optional,
+			org.eclipse.text*;resolution:=optional,
+			<!-- some more... -->
+			org.eclipse.jface.text*;resolution:=optional,
+			org.eclipse.osgi.util*;resolution:=optional,
+			org.osgi.service.prefs*;resolution:=optional,
+			<!-- this one is actually optional, and also unused... -->
+			<!-- org.eclipse.team.core*;resolution:=optional, -->
+			*
+		</osgi.bundle.importPackage>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>eclipse</groupId>
+			<artifactId>jdtcore</artifactId>
+			<version>${jdtcore.version}</version>
+		</dependency>
+	</dependencies>
+
+	<!--
+org.eclipse.core.resources,
+ org.eclipse.core.runtime,
+ org.eclipse.text
+	-->
+
+</project>

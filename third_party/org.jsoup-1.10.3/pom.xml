@@ -7,28 +7,22 @@
 		<version>1.0.0-SNAPSHOT</version>
 		<relativePath>../pom-osgi-copy/pom.xml</relativePath>
 	</parent>
-	<artifactId>dip-felix</artifactId>
-	<name>DIVA DIP Apache Felix Core OSGi Bundles</name>
+	<artifactId>jsoup</artifactId>
+	<name>Jsoup Java HTML Parser</name>
 	<description>
-		Required system bundles for the Apache Felix Framework.
+		jsoup is a Java library for working with real-world HTML. It provides a very convenient API for extracting and manipulating data, using the best of DOM, CSS, and jquery-like methods.
 	</description>
 	<packaging>pom</packaging>
 
 	<properties>
-		<osgi.output.directory>${app.core.bundledir}</osgi.output.directory>
+		<osgi.output.directory>${app.plugin.bundledir}</osgi.output.directory>
 	</properties>
 
 	<dependencies>
 		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.fileinstall</artifactId>
-			<version>3.5.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.scr</artifactId>
-			<version>2.0.2</version>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>1.10.3</version>
 		</dependency>
 	</dependencies>
 

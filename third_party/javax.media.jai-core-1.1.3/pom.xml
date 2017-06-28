@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>ch.unifr.diva.dip</groupId>
+		<artifactId>dip-pom-osgi-repackage</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../pom-osgi-repackage/pom.xml</relativePath>
+	</parent>
+
+	<groupId>ch.unifr.diva.dip.libs</groupId>
+	<artifactId>javax.media.jai-core</artifactId>
+	<version>1.1.3</version>
+
+	<name>Java Advanced Imaging</name>
+	<description>
+		The Java Advanced Imaging API extends the Java 2 platform by allowing sophisticated, high-performance image processing to be incorporated into Java applets and applications.
+	</description>
+	<packaging>bundle</packaging>
+
+	<repositories>
+		<repository>
+			<id>JBoss 3rd-party Repository</id>
+			<url>https://repository.jboss.org/nexus/content/repositories/thirdparty-releases/</url>
+		</repository>
+		<repository>
+			<id>Atlassian 3rd-Party Repository</id>
+			<url>https://maven.atlassian.com/3rdparty/</url>
+		</repository>
+	</repositories>
+
+	<properties>
+		<osgi.repackage.skip>false</osgi.repackage.skip>
+		<jai.core.version>1.1.3</jai.core.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>javax.media</groupId>
+			<artifactId>jai-core</artifactId>
+			<version>${jai.core.version}</version>
+		</dependency>
+	</dependencies>
+
+</project>

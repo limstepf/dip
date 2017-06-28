@@ -32,13 +32,18 @@
 
 		Thus for new glyph modules we need to:
 
-			1) adjust `pom-super` to define the version,
+			1) adjust `pom-super` to set the version,
 			2) adjust the POM of the APP to include it as a dependency,
 			3) similary adjust `pom-osgi-bundle` to include it as dep., and
-			4) make sure to use the `ch.unifr.diva.dip.glyphs` namespace for the
-			   class, since that's where APP will be looking for glyph classes
-			   by means of reflection (in order to publish them to the OSGi
-			   framework).
+			4) use the `ch.unifr.diva.dip.glyphs.*` namespace for the
+			   class, and
+			5) adjust the ExtraSystemPackages class, where we define what
+			   packages should be attached (in addition) to the OSGi system
+			   bundle. And the version has to be set/managed here too (we don't
+			   use reflection to find all glyph.* packages, since we don't want
+			   to share a version for all glyph fonts, but have one for each
+			   package).
+			6) add the module right below.
 		-->
 		<module>glyphs-materialdesignicons</module>
 		<module>glyphs-fontawesome</module>
@@ -48,6 +53,92 @@
 		yet, so we have to create and add the OSGi bundle manifest file and
 		repackage the dependency as a new jar file, before copying them over to
 		a bundle directory (`app.plugin.bundledir` by default). -->
+
+		<!-- Efficient Java Matrix Library (EJML)  -->
 		<module>org.ejml-0.29</module>
+
+		<!-- OpenIMAJ (and a buttload of dependencies) -->
+		<module>org.openimaj-1.3.5</module>
+		<module>bouncycastle.jdk14-138</module>
+		<module>colt-1.2.0</module>
+		<module>com.caffeineowl.bezier-utils-1.0.0</module>
+		<module>com.esotericsoftware.kryo-2.21</module>
+		<module>com.esotericsoftware.minlog-1.2</module>
+		<module>com.flickr4java-2.16</module>
+		<module>com.github.fommil.netlib-1.1.2</module>
+		<module>com.google.guava-22.0</module>
+		<module>com.googlecode.jatl-0.2.3</module>
+		<module>com.googlecode.matrix-toolkits-java.mtj-1.0.4</module>
+		<module>com.googlecode.netlib-java-0.9.3</module>
+		<module>com.lowagie.itext-2.1.7</module>
+		<module>com.sun.media.jai-codec-1.1.3</module>
+		<module>com.thoughtworks.xstream-1.4.10</module>
+		<module>com.twelvemonkeys.imageio-3.3.2</module>
+		<module>commons-beanutils-1.8.0</module>
+		<module>commons-codec-1.10</module>
+		<module>commons-collections-2.1</module>
+		<module>commons-collections-3.2.1</module>
+		<module>commons-collections4-4.1</module>
+		<module>commons-digester-2.1</module>
+		<module>commons-httpclient-3.1</module>
+		<module>commons-io-2.5</module>
+		<module>commons-lang-2.6</module>
+		<module>commons-logging-1.2</module>
+		<module>commons-math-2.2</module>
+		<module>commons-math3-3.6.1</module>
+		<module>commons-vfs2-2.1</module>
+		<module>concurrent-1.3.4</module>
+		<module>dom4j-1.6.1</module>
+		<module>eclipse.jdtcore-3.1.0</module>
+		<module>gov.nist.math.jama-1.0.3</module>
+		<module>gov.sandia.foundry-3.4.3</module>
+		<module>javassist-3.12.1.GA</module>
+		<module>javax.media.jai-core-1.1.3</module>
+		<module>jgrapht-0.8.2</module>
+		<module>joda-time-2.9.9</module>
+		<module>log4j</module>
+		<module>net.billylieurance.azuresearch.azure-bing-search-java-0.12.0</module>
+		<module>net.jcip-annotations-1.0</module>
+		<module>net.sf.jafama-1.2</module>
+		<module>net.sf.jasperreports-4.6.0</module>
+		<module>net.sf.trove4j-3.0.2</module>
+		<module>net.sourceforge.f2j.arpack-0.1</module>
+		<module>net.sourceforge.jeuclid.core-3.1.9</module>
+		<module>net.sourceforge.jmatio-1.2</module>
+		<module>org.apache.ant-1.10.1</module>
+		<module>org.apache.axis-1.4</module>
+		<module>org.apache.geronimo.specs.geronimo-stax-api_1.0_spec-1.0.1</module>
+		<module>org.apache.httpcomponents.httpclient-4.5.3</module>
+		<module>org.apache.httpcomponents.httpcore-4.4.6</module>
+		<module>org.apache.poi-3.16</module>
+		<module>org.apache.sanselan-0.97-incubator</module>
+		<module>org.apache.santuario.xmlsec-1.5.8</module>
+		<module>org.apache.xmlbeans-2.6.0</module>
+		<module>org.apache.xmlgraphics.batik-1.9</module>
+		<module>org.apache.xmlgraphics.commons-2.2</module>
+		<module>org.bouncycastle.jdk15on</module>
+		<module>org.codehaus.castor-1.2</module>
+		<module>org.codehaus.jackson-1.9.13</module>
+		<module>org.freehep-2.4</module>
+		<module>org.jbibtex-1.0.15</module>
+		<module>org.jfree.jcommon-1.0.24</module>
+		<module>org.jfree.jfreechart-1.0.19</module>
+		<module>org.jsoup-1.10.3</module>
+		<module>org.la4j-0.6.0</module>
+		<module>org.mozilla.rhino-1.7.7.1</module>
+		<module>org.netbeans.openide-lookup-1.9-patched-1.0</module>
+		<module>org.objenesis-2.5.1</module>
+		<module>org.scribe-1.3.5</module>
+		<module>org.w3c.css.sac-1.3</module>
+		<module>stax.stax-api-1.0.1</module>
+		<module>tw.edu.ntu.csie.libsvm-3.17</module>
+		<module>uk.ac.ed.ph.snuggletex-1.2.2</module>
+		<module>uk.com.robust-it.cloning-1.9.3</module>
+		<module>xalan-2.7.2</module>
+		<module>xerces.xercesImpl-2.9.1</module>
+		<module>xml-apis-1.3.04</module>
+		<module>xmlpull-1.1.3.1</module>
+		<module>xpp3.xpp3_min-1.1.4c</module>
+
 	</modules>
 </project>

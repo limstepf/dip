@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>ch.unifr.diva.dip</groupId>
+		<artifactId>dip-pom-osgi-repackage</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../pom-osgi-repackage/pom.xml</relativePath>
+	</parent>
+
+	<groupId>ch.unifr.diva.dip.libs</groupId>
+	<artifactId>net.sf.jasperreports</artifactId>
+	<version>4.6.0</version>
+
+	<name>JasperReports</name>
+	<description>
+		JasperReports Library.
+	</description>
+	<packaging>bundle</packaging>
+
+	<properties>
+		<osgi.repackage.skip>false</osgi.repackage.skip>
+		<jasperreports.version>4.6.0</jasperreports.version>
+		<osgi.bundle.importPackage>
+			javax.xml.parsers;version="[0.0,1)",
+			antlr*;resolution:=optional,
+			bsh;resolution:=optional,
+			groovyjarjarasm.*;resolution:=optional,
+			javax.persistence;resolution:=optional,
+			javax.servlet*;resolution:=optional,
+			jxl*;resolution:=optional,
+			mondrian.*;resolution:=optional,
+			net.sourceforge.barbecue*;resolution:=optional,
+			org.apache.commons.javaflow*;resolution:=optional,
+			org.apache.velocity*;resolution:=optional,
+			org.codehaus.groovy.*;resolution:=optional,
+			org.hibernate*;resolution:=optional,
+			org.jaxen*;resolution:=optional,
+			org.krysalis.barcode4j*;resolution:=optional,
+			org.springframework.*;resolution:=optional,
+			*
+		</osgi.bundle.importPackage>
+		<osgi.bundle.embedDependency>
+			jasperreports
+		</osgi.bundle.embedDependency>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports</artifactId>
+			<version>${jasperreports.version}</version>
+		</dependency>
+	</dependencies>
+
+</project>

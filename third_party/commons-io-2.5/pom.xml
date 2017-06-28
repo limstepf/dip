@@ -7,28 +7,23 @@
 		<version>1.0.0-SNAPSHOT</version>
 		<relativePath>../pom-osgi-copy/pom.xml</relativePath>
 	</parent>
-	<artifactId>dip-felix</artifactId>
-	<name>DIVA DIP Apache Felix Core OSGi Bundles</name>
+
+	<artifactId>commons-io</artifactId>
+	<name>Apache Commons IO</name>
 	<description>
-		Required system bundles for the Apache Felix Framework.
+		The Apache Commons IO library contains utility classes, stream implementations, file filters, file comparators, endian transformation classes, and much more.
 	</description>
 	<packaging>pom</packaging>
 
 	<properties>
-		<osgi.output.directory>${app.core.bundledir}</osgi.output.directory>
+		<osgi.output.directory>${app.plugin.bundledir}</osgi.output.directory>
 	</properties>
 
 	<dependencies>
 		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.fileinstall</artifactId>
-			<version>3.5.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.scr</artifactId>
-			<version>2.0.2</version>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.5</version>
 		</dependency>
 	</dependencies>
 

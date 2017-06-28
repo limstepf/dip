@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>ch.unifr.diva.dip</groupId>
+		<artifactId>dip-pom-osgi-repackage</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../pom-osgi-repackage/pom.xml</relativePath>
+	</parent>
+
+	<groupId>ch.unifr.diva.dip.libs</groupId>
+	<artifactId>commons-logging</artifactId>
+	<version>1.2</version>
+
+	<name>Apache Commons Logging</name>
+	<description>
+		Apache Commons Logging is a thin adapter allowing configurable bridging to other, well known logging systems.
+	</description>
+	<packaging>bundle</packaging>
+
+	<properties>
+		<osgi.repackage.skip>false</osgi.repackage.skip>
+		<commons.logging.version>1.2</commons.logging.version>
+		<osgi.bundle.importPackage>
+			<!-- org.apache.avalon.framework*;resolution:=optional, -->
+			javax.servlet;resolution:=optional,
+			logkit;resolution:=optional,
+			log4j;resolution:=optional,
+			org.apache.avalon.*;resolution:=optional,
+			org.apache.log;resolution:=optional,
+			org.apache.log4j;resolution:=optional,
+			*
+		</osgi.bundle.importPackage>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>${commons.logging.version}</version>
+		</dependency>
+	</dependencies>
+
+</project>

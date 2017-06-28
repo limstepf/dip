@@ -15,23 +15,27 @@
 	</description>
 	<packaging>pom</packaging>
 
+	<properties>
+		<osgi.output.directory>${app.core.bundledir}</osgi.output.directory>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.apache.felix.gogo.runtime</artifactId>
-			<version>0.16.2</version>
+			<version>1.0.6</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.apache.felix.gogo.shell</artifactId>
-			<version>0.10.0</version>
+			<version>1.0.0</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.apache.felix.gogo.command</artifactId>
-			<version>0.14.0</version>
+			<version>1.0.2</version>
 		</dependency>
 	</dependencies>
 

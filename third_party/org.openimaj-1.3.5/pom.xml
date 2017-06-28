@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>ch.unifr.diva.dip</groupId>
+		<artifactId>dip-pom-osgi-repackage</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../pom-osgi-repackage/pom.xml</relativePath>
+	</parent>
+
+	<groupId>ch.unifr.diva.dip.libs</groupId>
+	<artifactId>org.openimaj</artifactId>
+	<version>1.3.5</version>
+
+	<name>OpenIMAJ</name>
+	<description>
+		OpenIMAJ is an award-winning set of libraries and tools for multimedia
+		(images, text, video, audio, etc.) content analysis and content generation.
+	</description>
+	<packaging>bundle</packaging>
+
+	<repositories>
+		<!-- some older dependencies (e.g. jal) are only available from here -->
+		<repository>
+			<id>openimaj-maven</id>
+			<url>http://maven.openimaj.org/</url>
+		</repository>
+	</repositories>
+
+	<properties>
+		<osgi.repackage.skip>false</osgi.repackage.skip>
+		<openimaj.version>1.3.5</openimaj.version>
+		<osgi.bundle.exportPackage>
+			org.openimaj*,
+			org.jbibtex,                 <!-- embedded jbibtex (r16) -->
+			ch.akuhn.matrix,             <!-- MatrixLib -->
+			ch.akuhn.matrix.eigenvalues, <!-- MatrixLib -->
+			no.uib.cipr.matrix,          <!-- MatrixLib -->
+			org.lemurproject.ireval,     <!-- IREval -->
+			de.bwaldvogel.liblinear,     <!-- liblinear-dense (machine-learning) -->
+			org.bridj*,                  <!-- klt-tracker (bridj/core-video-capture) -->
+			!*
+		</osgi.bundle.exportPackage>
+		<osgi.bundle.importPackage>
+			COM.jrockit.*;resolution:=optional,   <!-- embedded kryo -->
+			COM.newmonics.*;resolution:=optional, <!-- embedded kryo -->
+			jrockit.vm;resolution:=optional,      <!-- embedded kryo -->
+			*
+		</osgi.bundle.importPackage>
+		<osgi.bundle.embedDependency>
+			core,
+			jal,                      <!-- used by: core -->
+			jbibtex,                  <!-- used by: core -->
+			objenesis,                <!-- used by: core -->
+			kryo,                     <!-- used by: core -->
+			core-citation,
+			core-aop-support,
+			core-image,
+			core-math,
+			MatrixLib,
+			core-feature,
+			core-experiment,
+			ascii-table,              <!-- used by: core-experiment -->
+			IREval,
+			animation,
+			core-audio,
+			core-video,
+			JTransforms,
+			image-processing,
+			nearest-neighbour,
+			clustering,
+			liblinear-dense,          <!-- used by: machine-learning -->
+			machine-learning,
+			image-feature-extraction,
+			image-local-features,
+			bridj,                    <!-- used by: core-video-capture -->
+			core-video-capture,
+			klt-tracker,
+			video-processing,
+			object-detection,
+			vector-image
+		</osgi.bundle.embedDependency>
+	</properties>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.openimaj</groupId>
+			<artifactId>core</artifactId>
+			<version>${openimaj.version}</version>
+		</dependency>
+
+		<!-- used by core: old package from openimaj repo, unlikely to be needed
+		ever again -->
+		<dependency>
+			<groupId>vigna.dsi.unimi.it</groupId>
+			<artifactId>jal</artifactId>
+			<version>20031117</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<!-- used by core: old package from openimaj repo, unlikely to be needed
+		ever again; but needs to be exported (exposed private references) -->
+		<dependency>
+			<groupId>org.jbibtex</groupId>
+			<artifactId>jbibtex</artifactId>
+			<version>r16</version>
+		</dependency>
+
+		<!-- used by core: kryo and objenesis are embedded (and not exported) since
+		we're likely running into wiring issues (two dependency chains) otherwise,
+		or at some later point with newer versions of kryo: core has a dependency
+		on objenesis 1.2, so does kryo 2.21 (everything is fine), but if we use a
+		newer version of kryo that uses a newer version of objenesis, we're running
+		into problems, since core still wants to use objenesis 1.2, while kryo now
+		wants objenesis 2.4 (or what not). -->
+		<dependency>
+			<groupId>com.esotericsoftware.kryo</groupId>
+			<artifactId>kryo</artifactId>
+			<version>2.21</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.objenesis</groupId>
+			<artifactId>objenesis</artifactId>
+			<version>1.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openimaj</groupId>
+			<artifactId>core-citation</artifactId>
+			<version>${openimaj.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openimaj</groupId>
+			<artifactId>core-aop-support</artifactId>
+			<version>${openimaj.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openimaj</groupId>
+			<artifactId>core-image</artifactId>
+			<version>${openimaj.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openimaj</groupId>
+			<artifactId>core-math</artifactId>
+			<version>${openimaj.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openimaj</groupId>
+			<artifactId>MatrixLib</artifactId>
+			<version>${openimaj.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openimaj</groupId>
+			<artifactId>core-feature</artifactId>
+			<version>${openimaj.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openimaj</groupId>
+			<artifactId>core-experiment</artifactId>
+			<version>${openimaj.version}</version>
+		</dependency>
+
+		<!-- used by core-experiment -->
+		<dependency>
+			<groupId>org.bethecoder</groupId>
+			<artifactId>ascii-table</artifactId>
+			<version>1.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openimaj</groupId>
+			<artifactId>IREval</artifactId>
+			<version>${openimaj.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openimaj.content</groupId>
+			<artifactId>animation</artifactId>
+			<version>${openimaj.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openimaj</groupId>
+			<artifactId>core-audio</artifactId>
+			<version>${openimaj.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openimaj</groupId>
+			<artifactId>core-video</artifactId>
+			<version>${openimaj.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openimaj</groupId>
+			<artifactId>JTransforms</artifactId>
+			<version>${openimaj.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openimaj</groupId>
+			<artifactId>image-processing</artifactId>
+			<version>${openimaj.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openimaj</groupId>
+			<artifactId>nearest-neighbour</artifactId>
+			<version>${openimaj.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openimaj</groupId>
+			<artifactId>clustering</artifactId>
+			<version>${openimaj.version}</version>
+		</dependency>
+
+		<!-- used by machine-learning -->
+		<dependency>
+			<groupId>de.bwaldvogel</groupId>
+			<artifactId>liblinear-dense</artifactId>
+			<version>1.92</version>
+		</dependency>
+
+		<!-- tw.edu.ntu.csie::libsvm::3.17 (needed for machine-learning) had to
+		be fixed, since there were classes in the root package, DOH! -->
+		<dependency>
+			<groupId>org.openimaj</groupId>
+			<artifactId>machine-learning</artifactId>
+			<version>${openimaj.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openimaj</groupId>
+			<artifactId>image-feature-extraction</artifactId>
+			<version>${openimaj.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openimaj</groupId>
+			<artifactId>image-local-features</artifactId>
+			<version>${openimaj.version}</version>
+		</dependency>
+
+		<!-- used by core-video-capture -->
+		<dependency>
+			<groupId>com.nativelibs4java</groupId>
+			<artifactId>bridj</artifactId>
+			<version>0.7-20140918</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openimaj</groupId>
+			<artifactId>core-video-capture</artifactId>
+			<version>${openimaj.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openimaj</groupId>
+			<artifactId>klt-tracker</artifactId>
+			<version>${openimaj.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openimaj</groupId>
+			<artifactId>video-processing</artifactId>
+			<version>${openimaj.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openimaj</groupId>
+			<artifactId>object-detection</artifactId>
+			<version>${openimaj.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openimaj</groupId>
+			<artifactId>vector-image</artifactId>
+			<version>${openimaj.version}</version>
+		</dependency>
+
+		<!-- used by xuggle-video -->
+		<!-- ...turns out xuggler is full of 'Invalid packe names' (native packages),
+		so I'm not sure if this is a problem, or not... also this pulls in some
+		more (optional?) dependencies like org.apache.common.cli... So this stuff
+		is omitted for the time being, we can still come back if someone actually
+		needs this. -->
+		<!--
+		<dependency>
+			<groupId>xuggle</groupId>
+			<artifactId>xuggle-xuggler-lgpl</artifactId>
+			<version>5.5-20140728</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openimaj</groupId>
+			<artifactId>xuggle-video</artifactId>
+			<version>${openimaj.version}</version>
+		</dependency>
+		-->
+
+		<!-- also omitted: audio-processing, core-hadoop, core-rdf, core-web,
+		and probably some others. -->
+
+	</dependencies>
+
+</project>

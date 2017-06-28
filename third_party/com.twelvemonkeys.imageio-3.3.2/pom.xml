@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>ch.unifr.diva.dip</groupId>
+		<artifactId>dip-pom-osgi-repackage</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../pom-osgi-repackage/pom.xml</relativePath>
+	</parent>
+
+	<groupId>ch.unifr.diva.dip.libs</groupId>
+	<artifactId>com.twelvemonkeys.imageio</artifactId>
+	<!-- <version>3.0&#45;rc5</version> -->
+	<version>3.3.2</version>
+
+	<name>TwelveMonkeys ImageIO</name>
+	<description>
+		TwelveMonkeys ImageIO.
+	</description>
+	<packaging>bundle</packaging>
+
+	<properties>
+		<osgi.repackage.skip>false</osgi.repackage.skip>
+		<imageio.version>3.3.2</imageio.version>
+		<!-- <imageio.version>3.0&#45;rc5</imageio.version> -->
+		<osgi.bundle.importPackage>
+			magick;resolution:=optional,
+			*
+		</osgi.bundle.importPackage>
+		<osgi.bundle.embedDependency>
+			imageio-core,
+			imageio-metadata,
+			imageio-jpeg,
+			imageio-tiff,
+			imageio-psd,
+			imageio-clippath,
+			imageio-bmp,
+			imageio-icns,
+			imageio-pnm,
+			imageio-pdf,
+			imageio-pict,
+			imageio-pcx,
+			imageio-thumbsdb,
+			imageio-sgi,
+			imageio-tga,
+			imageio-iff,
+			imageio-hdr,
+			common-lang,
+			common-io,
+			common-image
+		</osgi.bundle.embedDependency>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.twelvemonkeys.imageio</groupId>
+			<artifactId>imageio-core</artifactId>
+			<version>${imageio.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.twelvemonkeys.common</groupId>
+			<artifactId>common-io</artifactId>
+			<version>${imageio.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.twelvemonkeys.common</groupId>
+			<artifactId>common-image</artifactId>
+			<version>${imageio.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.twelvemonkeys.common</groupId>
+			<artifactId>common-lang</artifactId>
+			<version>${imageio.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.twelvemonkeys.imageio</groupId>
+			<artifactId>imageio-metadata</artifactId>
+			<version>${imageio.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.twelvemonkeys.imageio</groupId>
+			<artifactId>imageio-jpeg</artifactId>
+			<version>${imageio.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.twelvemonkeys.imageio</groupId>
+			<artifactId>imageio-tiff</artifactId>
+			<version>${imageio.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.twelvemonkeys.imageio</groupId>
+			<artifactId>imageio-psd</artifactId>
+			<version>${imageio.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.twelvemonkeys.imageio</groupId>
+			<artifactId>imageio-clippath</artifactId>
+			<version>${imageio.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.twelvemonkeys.imageio</groupId>
+			<artifactId>imageio-bmp</artifactId>
+			<version>${imageio.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.twelvemonkeys.imageio</groupId>
+			<artifactId>imageio-icns</artifactId>
+			<version>${imageio.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.twelvemonkeys.imageio</groupId>
+			<artifactId>imageio-pnm</artifactId>
+			<version>${imageio.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.twelvemonkeys.imageio</groupId>
+			<artifactId>imageio-pdf</artifactId>
+			<version>${imageio.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.twelvemonkeys.imageio</groupId>
+			<artifactId>imageio-pict</artifactId>
+			<version>${imageio.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.twelvemonkeys.imageio</groupId>
+			<artifactId>imageio-pcx</artifactId>
+			<version>${imageio.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.twelvemonkeys.imageio</groupId>
+			<artifactId>imageio-thumbsdb</artifactId>
+			<version>${imageio.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.twelvemonkeys.imageio</groupId>
+			<artifactId>imageio-sgi</artifactId>
+			<version>${imageio.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.twelvemonkeys.imageio</groupId>
+			<artifactId>imageio-tga</artifactId>
+			<version>${imageio.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.twelvemonkeys.imageio</groupId>
+			<artifactId>imageio-iff</artifactId>
+			<version>${imageio.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.twelvemonkeys.imageio</groupId>
+			<artifactId>imageio-hdr</artifactId>
+			<version>${imageio.version}</version>
+		</dependency>
+
+	</dependencies>
+
+</project>

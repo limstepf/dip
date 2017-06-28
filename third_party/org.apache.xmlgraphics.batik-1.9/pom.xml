@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>ch.unifr.diva.dip</groupId>
+		<artifactId>dip-pom-osgi-repackage</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../pom-osgi-repackage/pom.xml</relativePath>
+	</parent>
+
+	<groupId>ch.unifr.diva.dip.libs</groupId>
+	<artifactId>org.apache.xmlgraphics.batik</artifactId>
+	<version>1.9</version>
+
+	<name>Batik</name>
+	<description>
+		Batik is a Java-based toolkit for applications or applets that want to use images in the Scalable Vector Graphics (SVG) format for various purposes, such as display, generation or manipulation.
+	</description>
+	<packaging>bundle</packaging>
+
+	<properties>
+		<osgi.repackage.skip>false</osgi.repackage.skip>
+		<batik.version>1.9</batik.version>
+		<osgi.bundle.exportPackage>
+			*
+		</osgi.bundle.exportPackage>
+		<osgi.bundle.importPackage>
+			org.w3c.dom.views;version="[0.0,1.0)", <!-- from system.bundle -->
+			org.w3c.dom*;version="1.0.0",          <!-- from xml-apis -->
+			org.python.*;resolution:=optional,     <!-- batik-script -->
+			*
+		</osgi.bundle.importPackage>
+		<osgi.bundle.embedDependency>
+			batik-anim,
+			batik-awt-util,
+			batik-bridge,
+			batik-codec,
+			batik-constants,
+			batik-css,
+			batik-dom,
+			batik-ext,
+			batik-extension,
+			batik-gui-util,
+			batik-gvt,
+			batik-i18n,
+			batik-parser,
+			batik-rasterizer,
+			batik-rasterizer-ext,
+			batik-script,
+			batik-squiggle,
+			batik-squiggle-ext,
+			batik-svggen,
+			batik-svgpp,
+			batik-svgrasterizer,
+			batik-svg-dom,
+			batik-swing,
+			batik-transcoder,
+			batik-ttf2svg,
+			batik-util,
+			batik-xml
+		</osgi.bundle.embedDependency>
+	</properties>
+
+	<dependencies>
+
+		<!-- omitted packages: batik-svgbrowser-->
+
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-anim</artifactId>
+			<version>${batik.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-awt-util</artifactId>
+			<version>${batik.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-bridge</artifactId>
+			<version>${batik.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-codec</artifactId>
+			<version>${batik.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-constants</artifactId>
+			<version>${batik.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-css</artifactId>
+			<version>${batik.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-dom</artifactId>
+			<version>${batik.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-ext</artifactId>
+			<version>${batik.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-extension</artifactId>
+			<version>${batik.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-gui-util</artifactId>
+			<version>${batik.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-gvt</artifactId>
+			<version>${batik.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-i18n</artifactId>
+			<version>${batik.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-parser</artifactId>
+			<version>${batik.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-rasterizer</artifactId>
+			<version>${batik.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-rasterizer-ext</artifactId>
+			<version>${batik.version}</version>
+			<!-- funny business; don't ask, I don't know either... -->
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.xmlgraphics</groupId>
+					<artifactId>batik-extensions</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-script</artifactId>
+			<version>${batik.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-squiggle</artifactId>
+			<version>${batik.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-squiggle-ext</artifactId>
+			<version>${batik.version}</version>
+			<!-- funny business; don't ask, I don't know either... -->
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.xmlgraphics</groupId>
+					<artifactId>batik-extensions</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-svggen</artifactId>
+			<version>${batik.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-svgpp</artifactId>
+			<version>${batik.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-svgrasterizer</artifactId>
+			<version>${batik.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-svg-dom</artifactId>
+			<version>${batik.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-swing</artifactId>
+			<version>${batik.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-transcoder</artifactId>
+			<version>${batik.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-ttf2svg</artifactId>
+			<version>${batik.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-util</artifactId>
+			<version>${batik.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-xml</artifactId>
+			<version>${batik.version}</version>
+		</dependency>
+
+	</dependencies>
+
+</project>

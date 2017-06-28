@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>ch.unifr.diva.dip</groupId>
+		<artifactId>dip-pom-osgi-repackage</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../pom-osgi-repackage/pom.xml</relativePath>
+	</parent>
+
+	<groupId>ch.unifr.diva.dip.libs</groupId>
+	<artifactId>org.apache.santuario.xmlsec</artifactId>
+	<version>1.5.8</version>
+
+	<name>Apache XML Security For Java</name>
+	<description>
+		Apache XML Security for Java supports XML-Signature Syntax and Processing, W3C Recommendation 12 February 2002, and XML Encryption Syntax and Processing, W3C Recommendation 10 December 2002. As of version 1.4, the library supports the standard Java API JSR-105: XML Digital Signature APIs.
+	</description>
+	<packaging>bundle</packaging>
+
+	<properties>
+		<osgi.repackage.skip>false</osgi.repackage.skip>
+		<xmlsec.version>1.5.8</xmlsec.version>
+		<osgi.bundle.importPackage>
+			javax.xml.parsers;version="[0.0,1)",
+			*
+		</osgi.bundle.importPackage>
+		<osgi.bundle.embedDependency>
+			xmlsec
+		</osgi.bundle.embedDependency>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.santuario</groupId>
+			<artifactId>xmlsec</artifactId>
+			<version>${xmlsec.version}</version>
+		</dependency>
+	</dependencies>
+
+</project>

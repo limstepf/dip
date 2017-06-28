@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>ch.unifr.diva.dip</groupId>
+		<artifactId>dip-pom-osgi-repackage</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../pom-osgi-repackage/pom.xml</relativePath>
+	</parent>
+
+	<groupId>ch.unifr.diva.dip.libs</groupId>
+	<artifactId>org.apache.xmlgraphics.commons</artifactId>
+	<version>2.2</version>
+
+	<name>Apache XML Graphics Commons</name>
+	<description>
+		Apache XML Graphics Commons is a library that consists of several reusable components used by Apache Batik and Apache FOP. Many of these components can easily be used separately outside the domains of SVG and XSL-FO.
+	</description>
+	<packaging>bundle</packaging>
+
+	<properties>
+		<osgi.repackage.skip>false</osgi.repackage.skip>
+		<xmlgraphics.commons.version>2.2</xmlgraphics.commons.version>
+		<osgi.bundle.embedDependency>
+			xmlgraphics-commons
+		</osgi.bundle.embedDependency>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>xmlgraphics-commons</artifactId>
+			<version>${xmlgraphics.commons.version}</version>
+		</dependency>
+	</dependencies>
+
+</project>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>ch.unifr.diva.dip</groupId>
+		<artifactId>dip-pom-osgi-repackage</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../pom-osgi-repackage/pom.xml</relativePath>
+	</parent>
+
+	<groupId>ch.unifr.diva.dip.libs</groupId>
+	<artifactId>org.freehep</artifactId>
+	<version>2.4</version>
+
+	<name>FreeHEP</name>
+	<description>
+		The goal of the FreeHEP library is to encourage the sharing and reuse of Java code in High Energy Physics. Although some of the code is fairly specific to HEP, other code is more generic and could be used by anyone.
+	</description>
+	<packaging>bundle</packaging>
+
+	<repositories>
+		<repository>
+			<id>Freehep repository</id>
+			<url>http://java.freehep.org/maven2/</url>
+		</repository>
+	</repositories>
+
+	<properties>
+		<osgi.repackage.skip>false</osgi.repackage.skip>
+		<freehep.version>2.4</freehep.version>
+		<freehep.io.version>2.2.2</freehep.io.version>
+		<freehep.util.version>2.1.2</freehep.util.version>
+		<freehep.export.version>2.1.3</freehep.export.version>
+		<freehep.swing.version>2.0.11</freehep.swing.version>
+		<osgi.bundle.importPackage>
+			junit.*;resolution:=optional,
+			*
+		</osgi.bundle.importPackage>
+		<osgi.bundle.embedDependency>
+			freehep-graphicsio,
+			freehep-graphicsbase,
+			freehep-graphics2d,
+			freehep-graphicsio-svg,
+			freehep-graphicsio-tests,
+			freehep-io,
+			freehep-export,
+			freehep-util,
+			freehep-swing
+		</osgi.bundle.embedDependency>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.freehep</groupId>
+			<artifactId>freehep-graphicsio</artifactId>
+			<version>${freehep.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.freehep</groupId>
+			<artifactId>freehep-graphicsbase</artifactId>
+			<version>${freehep.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.freehep</groupId>
+			<artifactId>freehep-graphics2d</artifactId>
+			<version>${freehep.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.freehep</groupId>
+			<artifactId>freehep-graphicsio-svg</artifactId>
+			<version>${freehep.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.freehep</groupId>
+			<artifactId>freehep-graphicsio-tests</artifactId>
+			<version>${freehep.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.freehep</groupId>
+			<artifactId>freehep-io</artifactId>
+			<version>${freehep.io.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.freehep</groupId>
+			<artifactId>freehep-export</artifactId>
+			<version>${freehep.export.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.freehep</groupId>
+			<artifactId>freehep-util</artifactId>
+			<version>${freehep.util.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.freehep</groupId>
+			<artifactId>freehep-swing</artifactId>
+			<version>${freehep.swing.version}</version>
+		</dependency>
+
+	</dependencies>
+
+</project>

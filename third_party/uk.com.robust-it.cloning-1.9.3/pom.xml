@@ -7,28 +7,23 @@
 		<version>1.0.0-SNAPSHOT</version>
 		<relativePath>../pom-osgi-copy/pom.xml</relativePath>
 	</parent>
-	<artifactId>dip-felix</artifactId>
-	<name>DIVA DIP Apache Felix Core OSGi Bundles</name>
+
+	<artifactId>uk.com.robust-it.cloning</artifactId>
+	<name>Cloning</name>
 	<description>
-		Required system bundles for the Apache Felix Framework.
+		The cloning library is a small, open source (Apache licensed) Java library which deep-clones objects. The objects do not have to implement the Cloneable interface. Effectively, this library can clone ANY Java object. It can be used i.e. in cache implementations, if you don't want the cached object to be modified or whenever you want to create a deep copy of an object.
 	</description>
 	<packaging>pom</packaging>
 
 	<properties>
-		<osgi.output.directory>${app.core.bundledir}</osgi.output.directory>
+		<osgi.output.directory>${app.plugin.bundledir}</osgi.output.directory>
 	</properties>
 
 	<dependencies>
 		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.fileinstall</artifactId>
-			<version>3.5.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.scr</artifactId>
-			<version>2.0.2</version>
+			<groupId>uk.com.robust-it</groupId>
+			<artifactId>cloning</artifactId>
+			<version>1.9.3</version>
 		</dependency>
 	</dependencies>
 
