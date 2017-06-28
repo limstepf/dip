@@ -56,6 +56,67 @@
 		<reporting.jacoco.skip>false</reporting.jacoco.skip>
 		<reporting.checkstyle.skip>true</reporting.checkstyle.skip>
 		<reporting.fingbugs.skip>false</reporting.fingbugs.skip>
+
+		<!-- maven plugin versions -->
+		<maven.jar.plugin.version>3.0.2</maven.jar.plugin.version>
+		<maven.compiler.plugin.version>3.6.1</maven.compiler.plugin.version>
+		<maven.install.plugin.version>2.5.2</maven.install.plugin.version>
+		<maven.assembly.plugin.version>2.6</maven.assembly.plugin.version>
+		<maven.dependency.plugin.version>3.0.1</maven.dependency.plugin.version>
+		<maven.clean.plugin.version>3.0.0</maven.clean.plugin.version>
+		<maven.resources.plugin.version>3.0.1</maven.resources.plugin.version>
+		<maven.antrun.plugin.version>1.8</maven.antrun.plugin.version>
+		<!--
+		Maven surfire plugin 2.19 has a bug s.t. single tests don't run (i.e.
+		with netbeans).
+
+			see: https://netbeans.org/bugzilla/show_bug.cgi?id=244404
+			see: https://issues.apache.org/jira/browse/SUREFIRE-1028
+
+		This is fixed in 2.20, but somehow the output format got changed, and
+		Netbeans 8.0.2 doesn't show the Test Results any longer... (should also
+		be fixed in the nightly build, but hasn't shipped yet). So other than
+		that, the surfire plugin could now be bumped to 2.20.
+
+			see: https://netbeans.org/bugzilla/show_bug.cgi?id=257563
+		-->
+		<maven.surefire.plugin.version>2.18.1</maven.surefire.plugin.version>
+		<maven.failsafe.plugin.version>2.20</maven.failsafe.plugin.version>
+		<maven.site.plugin.version>3.6</maven.site.plugin.version>
+		<maven.project.info.reports.plugin.version>2.9</maven.project.info.reports.plugin.version>
+		<maven.javadoc.plugin.version>2.10.4</maven.javadoc.plugin.version>
+		<umlgraph.plugin.version>5.6.6</umlgraph.plugin.version>
+		<maven.jxr.plugin.version>2.5</maven.jxr.plugin.version>
+		<maven.checkstyle.plugin.version>2.17</maven.checkstyle.plugin.version>
+		<maven.findbugs.plugin.version>3.0.4</maven.findbugs.plugin.version>
+		<maven.jacoco.plugin.version>0.7.9</maven.jacoco.plugin.version>
+
+		<!-- dependency versions -->
+		<osgi.core.version>6.0.0</osgi.core.version>
+		<osgi.compendium.version>5.0.0</osgi.compendium.version>
+		<apache.felix.version>5.6.2</apache.felix.version>
+		<logback.version>1.2.3</logback.version>
+		<google.guava.version>22.0</google.guava.version>
+		<commons.cli.version>1.4</commons.cli.version>
+		<objecthunter.exp4j.version>0.4.8</objecthunter.exp4j.version>
+		<robust.it.cloning.version>1.9.3</robust.it.cloning.version>
+		<junit.version>4.12</junit.version>
+		<openjdk.jmh.version>1.19</openjdk.jmh.version>
+		<!--
+		The following dependencies (or rather their packages) are also attached
+		(from the host/app) to the OSGi system bundle by means of bundle
+		fragments.
+
+			see: "app-fragments" multi-module
+
+		Thus keep an eye on the installed bundles after bumping the version.
+		Some of them might not get activated any longer, in which case some
+		older version of the dependency should be made available as a new bundle.
+
+			see: "third_party" multi-module (then copy or repackage)
+		-->
+		<slf4j.version>1.7.25</slf4j.version>
+
 	</properties>
 
 	<profiles>
@@ -136,90 +197,90 @@
 			<dependency>
 				<groupId>org.osgi</groupId>
 				<artifactId>org.osgi.core</artifactId>
-				<version>6.0.0</version>
+				<version>${osgi.core.version}</version>
+				<scope>provided</scope>
 			</dependency>
 
 			<dependency>
 				<groupId>org.osgi</groupId>
 				<artifactId>org.osgi.compendium</artifactId>
-				<version>5.0.0</version>
+				<version>${osgi.compendium.version}</version>
+				<scope>provided</scope>
 			</dependency>
 
 			<dependency>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>org.apache.felix.framework</artifactId>
-				<version>5.6.2</version>
+				<version>${apache.felix.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>org.apache.felix.main</artifactId>
-				<version>5.6.2</version>
+				<version>${apache.felix.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>${slf4j.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>ch.qos.logback</groupId>
 				<artifactId>logback-classic</artifactId>
-				<version>1.2.3</version>
+				<version>${logback.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>ch.qos.logback</groupId>
 				<artifactId>logback-core</artifactId>
-				<version>1.2.3</version>
+				<version>${logback.version}</version>
 			</dependency>
 
-			<!-- slf4j is exposed as an "extra system package" to the embedded
-			OSGi framework. Thus, if you bump this version, the version should
-			also be bumped in {@code ch.unifr.diva.dip.osgi.ExtraSystemPackages}.
-			-->
 			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-api</artifactId>
-				<version>1.7.25</version>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>${google.guava.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>commons-cli</groupId>
+				<artifactId>commons-cli</artifactId>
+				<version>${commons.cli.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>net.objecthunter</groupId>
+				<artifactId>exp4j</artifactId>
+				<version>${objecthunter.exp4j.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>uk.com.robust-it</groupId>
+				<artifactId>cloning</artifactId>
+				<version>${robust.it.cloning.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
-				<version>4.12</version>
+				<version>${junit.version}</version>
 				<scope>test</scope>
 			</dependency>
 
 			<dependency>
 				<groupId>org.openjdk.jmh</groupId>
 				<artifactId>jmh-core</artifactId>
-				<version>1.19</version>
+				<version>${openjdk.jmh.version}</version>
+				<scope>test</scope>
 			</dependency>
 
 			<dependency>
 				<groupId>org.openjdk.jmh</groupId>
 				<artifactId>jmh-generator-annprocess</artifactId>
-				<version>1.19</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.google.guava</groupId>
-				<artifactId>guava</artifactId>
-				<version>22.0</version>
-			</dependency>
-
-			<dependency>
-				<groupId>commons-cli</groupId>
-				<artifactId>commons-cli</artifactId>
-				<version>1.4</version>
-			</dependency>
-
-			<dependency>
-				<groupId>net.objecthunter</groupId>
-				<artifactId>exp4j</artifactId>
-				<version>0.4.8</version>
-			</dependency>
-
-			<dependency>
-				<groupId>uk.com.robust-it</groupId>
-				<artifactId>cloning</artifactId>
-				<version>1.9.3</version>
+				<version>${openjdk.jmh.version}</version>
+				<scope>test</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -230,7 +291,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
-					<version>3.0.2</version>
+					<version>${maven.jar.plugin.version}</version>
 					<configuration>
 						<archive>
 							<manifest>
@@ -244,7 +305,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.6.1</version>
+					<version>${maven.compiler.plugin.version}</version>
 					<configuration>
 						<source>${maven.compiler.source}</source>
 						<target>${maven.compiler.target}</target>
@@ -257,49 +318,43 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-install-plugin</artifactId>
-					<version>2.5.2</version>
+					<version>${maven.install.plugin.version}</version>
 				</plugin>
 
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-assembly-plugin</artifactId>
-					<version>2.6</version>
+					<version>${maven.assembly.plugin.version}</version>
 				</plugin>
 
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
-					<version>3.0.1</version>
+					<version>${maven.dependency.plugin.version}</version>
 				</plugin>
 
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-clean-plugin</artifactId>
-					<version>3.0.0</version>
+					<version>${maven.clean.plugin.version}</version>
 				</plugin>
 
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-resources-plugin</artifactId>
-					<version>3.0.1</version>
+					<version>${maven.resources.plugin.version}</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-antrun-plugin</artifactId>
+					<version>${maven.antrun.plugin.version}</version>
 				</plugin>
 
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<!--
-						2.19 has a bug s.t. single test don't run (from netbeans)
-						see: https://netbeans.org/bugzilla/show_bug.cgi?id=244404
-						see: https://issues.apache.org/jira/browse/SUREFIRE-1028
-
-						This is fixed in 2.20, but somehoe the output format got
-						changed, and Netbeans 8.0.2 doesn't show the Test Results
-						any longer... (should also be fixed in the nightly build,
-						but hasn't shipped yet). So other than that, the surfire
-						plugin could now be bumped to 2.20.
-						see: https://netbeans.org/bugzilla/show_bug.cgi?id=257563
-					-->
-					<version>2.18.1</version>
+					<version>${maven.surefire.plugin.version}</version>
 					<configuration>
 						<skipTests>${testing.surefire.skip}</skipTests>
 						<testFailureIgnore>${testing.surefire.ignoreFailure}</testFailureIgnore>
@@ -317,7 +372,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-report-plugin</artifactId>
-					<version>2.18.1</version>
+					<version>${maven.surefire.plugin.version}</version>
 					<configuration>
 						<skipSurefireReport>${reporting.surefire.skip}</skipSurefireReport>
 					</configuration>
@@ -326,7 +381,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-failsafe-plugin</artifactId>
-					<version>2.20</version>
+					<version>${maven.failsafe.plugin.version}</version>
 					<executions>
 						<execution>
 							<id>integration-test</id>
@@ -347,7 +402,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-site-plugin</artifactId>
-					<version>3.6</version>
+					<version>${maven.site.plugin.version}</version>
 					<configuration>
 						<attach>true</attach>
 						<reportPlugins>
@@ -407,13 +462,13 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-project-info-reports-plugin</artifactId>
-					<version>2.9</version>
+					<version>${maven.project.info.reports.plugin.version}</version>
 				</plugin>
 
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-javadoc-plugin</artifactId>
-					<version>2.10.4</version>
+					<version>${maven.javadoc.plugin.version}</version>
 					<configuration>
 						<skip>${reporting.javadoc.skip}</skip>
 						<failOnError>false</failOnError>
@@ -423,7 +478,7 @@
 						<docletArtifact>
 							<groupId>org.umlgraph</groupId>
 							<artifactId>umlgraph</artifactId>
-							<version>5.6.6</version>
+							<version>${umlgraph.plugin.version}</version>
 						</docletArtifact>
 						<additionalparam>-Xdoclint:none -views -all</additionalparam>
 						<useStandardDocletOptions>true</useStandardDocletOptions>
@@ -442,7 +497,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jxr-plugin</artifactId>
-					<version>2.5</version>
+					<version>${maven.jxr.plugin.version}</version>
 					<configuration>
 						<aggregate>true</aggregate>
 					</configuration>
@@ -451,7 +506,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-checkstyle-plugin</artifactId>
-					<version>2.17</version>
+					<version>${maven.checkstyle.plugin.version}</version>
 					<configuration>
 						<skip>${reporting.checkstyle.skip}</skip>
 						<includeTestSourceDirectory>true</includeTestSourceDirectory>
@@ -462,7 +517,7 @@
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>findbugs-maven-plugin</artifactId>
-					<version>3.0.4</version>
+					<version>${maven.findbugs.plugin.version}</version>
 					<configuration>
 						<skip>${reporting.fingbugs.skip}</skip>
 						<trace>false</trace>
@@ -487,7 +542,7 @@
 				<plugin>
 					<groupId>org.jacoco</groupId>
 					<artifactId>jacoco-maven-plugin</artifactId>
-					<version>0.7.9</version>
+					<version>${maven.jacoco.plugin.version}</version>
 					<configuration>
 						<skip>${reporting.jacoco.skip}</skip>
 					</configuration>
