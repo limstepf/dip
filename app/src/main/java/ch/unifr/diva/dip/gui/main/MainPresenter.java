@@ -5,22 +5,27 @@ import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.ApplicationSettings;
 import ch.unifr.diva.dip.core.ImageFormat;
 import ch.unifr.diva.dip.core.UserSettings;
+import ch.unifr.diva.dip.core.model.Project;
+import ch.unifr.diva.dip.core.model.ProjectPage;
 import ch.unifr.diva.dip.eventbus.EventBus;
 import ch.unifr.diva.dip.eventbus.events.ApplicationRequest;
 import ch.unifr.diva.dip.eventbus.events.ProjectNotification;
 import ch.unifr.diva.dip.eventbus.events.ProjectRequest;
+import ch.unifr.diva.dip.eventbus.events.StatusMessageEvent;
 import ch.unifr.diva.dip.gui.AbstractPresenter;
 import ch.unifr.diva.dip.gui.Presenter;
 import ch.unifr.diva.dip.gui.dialogs.ConfirmationDialog;
 import ch.unifr.diva.dip.gui.dialogs.ErrorDialog;
 import ch.unifr.diva.dip.gui.editor.EditorPresenter;
 import ch.unifr.diva.dip.gui.layout.Zoomable;
+import ch.unifr.diva.dip.utils.BackgroundTask;
 import com.google.common.eventbus.Subscribe;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.application.Platform;
+import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ButtonType;
@@ -340,16 +345,43 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 	 * @param page id of the project page.
 	 */
 	public void selectProjectPage(int page) {
+		final Project project = handler.getProject();
+		final ProjectPage currentPage = project.getSelectedPage();
+		final boolean isDirty = (currentPage == null) ? false : currentPage.isModified();
 		final int selected = handler.getProject().getSelectedPageId();
-		handler.getProject().selectPage(page);
+		final BackgroundTask<Void> task = new BackgroundTask<Void>(handler) {
+			@Override
+			protected Void call() throws Exception {
+				updateTitle(localize("page.selecting"));
+				updateProgress(-1, Double.NaN);
+				if (isDirty) {
+					// this might take a bit longer, so...
+					updateMessage(localize("page.saving"));
+					// explicit call to closePage (which otherwise would be called
+					// by selectPage below) to separate saving the current, dirty
+					// page, and loading of the (assets of) the new page
+					project.closePage();
+				}
+				updateMessage(localize("page.loading"));
+				project.selectPage(page);
+				return null;
+			}
 
-		// broadcast new page selection (if it actually changed)
-		if (selected != handler.getProject().getSelectedPageId()) {
-			eventBus.post(new ProjectNotification(
-					ProjectNotification.Type.SELECTED,
-					page
-			));
-		}
+			@Override
+			protected void finished(BackgroundTask.Result result) {
+				final int id = project.getSelectedPageId();
+				if (selected != id) {
+					eventBus.post(new ProjectNotification(
+							ProjectNotification.Type.SELECTED,
+							page
+					));
+					eventBus.post(new StatusMessageEvent(localize("page.selected")));
+				}
+				scene.cursorProperty().set(Cursor.DEFAULT);
+			}
+		};
+		scene.cursorProperty().set(Cursor.WAIT);
+		task.start();
 	}
 
 	/**

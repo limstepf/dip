@@ -191,14 +191,18 @@ public class Project implements Modifiable, Localizable {
 	/**
 	 * Closes the currently selected page.
 	 */
-	private void closePage() {
+	public void closePage() {
 		final ProjectPage currentPage = getSelectedPage();
 		if (currentPage != null) {
 			currentPage.close();
 		}
-		selectedPageIdProperty.set(-1);
-		this.canProcessSelectedPageProperty.unbind();
-		this.canProcessSelectedPageProperty.set(false);
+		// might run on a background thread, so make sure we only touch props
+		// and bindings on the FX Application thread
+		FxUtils.run(() -> {
+			selectedPageIdProperty.set(-1);
+			canProcessSelectedPageProperty.unbind();
+			canProcessSelectedPageProperty.set(false);
+		});
 	}
 
 	/**
@@ -450,17 +454,24 @@ public class Project implements Modifiable, Localizable {
 	 * @param id an id of a project page.
 	 */
 	public final void selectPage(int id) {
-		if (getSelectedPageId() == id) {
+		final int selected = getSelectedPageId();
+		if (selected == id) {
 			return;
 		}
 
-		closePage();
+		if (selected >= 0) {
+			closePage();
+		}
 
 		final ProjectPage page = getPage(id);
 		if (page != null) {
 			page.open();
-			selectedPageIdProperty.set(id);
-			this.canProcessSelectedPageProperty.bind(page.canProcessProperty());
+			// might run on a background thread, so make sure we only touch props
+			// and bindings on the FX Application thread
+			FxUtils.run(() -> {
+				selectedPageIdProperty.set(id);
+				canProcessSelectedPageProperty.bind(page.canProcessProperty());
+			});
 		}
 	}
 

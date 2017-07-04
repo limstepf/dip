@@ -303,12 +303,13 @@ public class RunnableProcessor extends ProcessorWrapper {
 	 */
 	public void save() {
 		if (!Files.exists(processorDataPath())) {
+			FxUtils.run(() -> modifiedProperty().set(false));
 			return; // there is no pipeline anymore
 		}
 
 		switchContext(true);
 		saveObjectMap();
-		this.modifiedProperty().set(false);
+		FxUtils.run(() -> modifiedProperty().set(false));
 	}
 
 	private void saveObjectMap() {
@@ -316,7 +317,7 @@ public class RunnableProcessor extends ProcessorWrapper {
 			Files.deleteIfExists(processorDataXML());
 		} catch (IOException ex) {
 			log.error("failed to clear the processor's data map: {}", this, ex);
-			handler.uiStrategy.showError(ex);
+			FxUtils.run(() -> handler.uiStrategy.showError(ex));
 			return;
 		}
 
@@ -324,7 +325,7 @@ public class RunnableProcessor extends ProcessorWrapper {
 			XmlUtils.marshal(this.objectMap, stream);
 		} catch (JAXBException | IOException ex) {
 			log.error("failed to save the processor's data map: {}", this, ex);
-			handler.uiStrategy.showError(ex);
+			FxUtils.run(() -> handler.uiStrategy.showError(ex));
 		}
 	}
 

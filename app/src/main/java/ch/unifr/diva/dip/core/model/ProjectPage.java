@@ -1,5 +1,6 @@
 package ch.unifr.diva.dip.core.model;
 
+import ch.unifr.diva.dip.api.utils.FxUtils;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.ImageFormat;
 import ch.unifr.diva.dip.core.ui.Localizable;
@@ -89,9 +90,9 @@ public class ProjectPage implements Modifiable, Localizable {
 	private final ModifiedProperty modifiedPageProperty;
 
 	// we load page resources lazily
-	private Image image = null;
-	private BufferedImage bufferedImage = null;
-	private RunnablePipeline pipeline = null;
+	private volatile Image image = null;
+	private volatile BufferedImage bufferedImage = null;
+	private volatile RunnablePipeline pipeline = null;
 
 	/**
 	 * Creates a new ProjectPage given an image file. Used to add pages to a
@@ -206,7 +207,7 @@ public class ProjectPage implements Modifiable, Localizable {
 	 * @return a {@code RunnablePipeline}, or {@code null} if not opened(!).
 	 * @see #open()
 	 */
-	public RunnablePipeline getPipeline() {
+	public synchronized RunnablePipeline getPipeline() {
 		return pipeline; // null if not opened!
 	}
 
@@ -352,9 +353,14 @@ public class ProjectPage implements Modifiable, Localizable {
 	public synchronized void open() {
 		this.pipeline = getRunnablePipeline();
 		if (this.pipeline != null) {
-			this.modifiedPageProperty.addManagedProperty(this.pipeline);
-			this.pipeline.stateProperty().addListener(pipelineStatusListener);
-			updatePipelineState();
+			// might run on a background thread, so make sure we only touch props
+			// and bindings on the FX Application thread
+			final RunnablePipeline currentPipeline = this.pipeline;
+			FxUtils.run(() -> {
+				modifiedPageProperty.addManagedProperty(currentPipeline);
+				currentPipeline.stateProperty().addListener(pipelineStatusListener);
+				updatePipelineState();
+			});
 		}
 	}
 
@@ -379,8 +385,13 @@ public class ProjectPage implements Modifiable, Localizable {
 		}
 
 		if (this.pipeline != null) {
-			this.pipeline.stateProperty().removeListener(pipelineStatusListener);
-			this.modifiedPageProperty.removeManagedProperty(this.pipeline);
+			// might run on a background thread, so make sure we only touch props
+			// and bindings on the FX Application thread
+			final RunnablePipeline currentPipeline = this.pipeline;
+			FxUtils.run(() -> {
+				currentPipeline.stateProperty().removeListener(pipelineStatusListener);
+				this.modifiedPageProperty.removeManagedProperty(currentPipeline);
+			});
 		}
 
 		this.image = null;
@@ -394,8 +405,8 @@ public class ProjectPage implements Modifiable, Localizable {
 	public synchronized void save() {
 		if ((getPipeline() != null) && (getPipelineId() > 0)) {
 			getPipeline().save();
-			modifiedProperty().set(false);
 		}
+		FxUtils.run(() -> modifiedProperty().set(false));
 	}
 
 	/**

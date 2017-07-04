@@ -232,7 +232,7 @@ public class RunnablePipeline extends Pipeline<RunnableProcessor> {
 			p.save();
 		}
 		savePipelinePatch();
-		this.modifiedProperty().set(false);
+		FxUtils.run(() -> modifiedProperty().set(false));
 	}
 
 	/**
@@ -255,7 +255,7 @@ public class RunnablePipeline extends Pipeline<RunnableProcessor> {
 				patch.save(stream);
 			} catch (JAXBException | IOException ex) {
 				log.error("failed to save pipeline patch: {}", this, ex);
-				handler.uiStrategy.showError(ex);
+				FxUtils.run(() -> handler.uiStrategy.showError(ex));
 				return false;
 			}
 		}
@@ -274,7 +274,7 @@ public class RunnablePipeline extends Pipeline<RunnableProcessor> {
 			return Files.deleteIfExists(this.page.pipelinePatchXml());
 		} catch (IOException ex) {
 			log.error("failed to clear the pipeline patch: {}", this, ex);
-			handler.uiStrategy.showError(ex);
+			FxUtils.run(() -> handler.uiStrategy.showError(ex));
 		}
 		return false;
 	}
