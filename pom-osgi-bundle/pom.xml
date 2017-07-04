@@ -17,6 +17,10 @@
 	<packaging>pom</packaging>
 
 	<properties>
+        <!-- Intended to be used one multi-module deeper (e.g. in 'bundles', or 
+        'third-party') -->
+		<app.core.bundledir>../../app/target/bundles-core</app.core.bundledir>
+		<app.plugin.bundledir>../../app/target/bundles</app.plugin.bundledir>
 		<!-- the symbolic bundle name might have to be adapted to just use the
 		groupId if the artifactId is equal to the last section of groupId -->
 		<osgi.bundle.symbolicName>${project.groupId}.${project.artifactId}</osgi.bundle.symbolicName>

@@ -5,17 +5,17 @@
 		<groupId>ch.unifr.diva.dip</groupId>
 		<artifactId>dip-pom-osgi-bundle</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
-		<relativePath>../pom-osgi-bundle/pom.xml</relativePath>
+		<relativePath>../../pom-osgi-bundle/pom.xml</relativePath>
 	</parent>
 
-	<groupId>org.ejml.tools</groupId>
-	<artifactId>ejml-tools</artifactId>
+	<groupId>org.ejml.demo</groupId>
+	<artifactId>ejml-demo</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 
-	<name>EJML Tools OSGi Bundle</name>
+	<name>EJML Demo OSGi Bundle</name>
 	<description>
-		EMJL tools/plugins.
+		EMJL demo plugin.
 	</description>
 
 	<properties>
@@ -31,11 +31,6 @@
 	</properties>
 
 	<dependencies>
-		<dependency>
-			<groupId>ch.unifr.diva.dip</groupId>
-			<artifactId>glyphs-materialdesignicons</artifactId>
-		</dependency>
-
 		<dependency>
 			<groupId>org.ejml</groupId>
 			<artifactId>core</artifactId>

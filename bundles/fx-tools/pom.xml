@@ -5,22 +5,16 @@
 		<groupId>ch.unifr.diva.dip</groupId>
 		<artifactId>dip-pom-osgi-bundle</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
-		<relativePath>../pom-osgi-bundle/pom.xml</relativePath>
+		<relativePath>../../pom-osgi-bundle/pom.xml</relativePath>
 	</parent>
 
 	<groupId>ch.unifr.diva.dip</groupId>
-	<artifactId>awt-demo</artifactId>
+	<artifactId>fx-tools</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 
-	<name>AWT Demo OSGi Bundle</name>
-
-	<dependencies>
-		<dependency>
-			<groupId>ch.unifr.diva.dip</groupId>
-			<artifactId>awt-imaging</artifactId>
-		</dependency>
-	</dependencies>
+	<name>FX Tools OSGi Bundle</name>
+	<description>Basic toolset for JavaFX image processing (i.e. javafx.scene.image.Image)</description>
 
 	<build>
 		<plugins>

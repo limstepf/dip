@@ -5,7 +5,7 @@
 		<groupId>ch.unifr.diva.dip</groupId>
 		<artifactId>dip-pom-osgi</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
-		<relativePath>../pom-osgi/pom.xml</relativePath>
+		<relativePath>../../pom-osgi/pom.xml</relativePath>
 	</parent>
 
 	<artifactId>imaging</artifactId>

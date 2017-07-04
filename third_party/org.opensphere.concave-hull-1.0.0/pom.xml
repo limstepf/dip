@@ -39,11 +39,6 @@
 		</developer>
 	</developers>
 
-	<properties>
-		<app.core.bundledir>../../app/target/bundles-core</app.core.bundledir>
-		<app.plugin.bundledir>../../app/target/bundles</app.plugin.bundledir>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>com.vividsolutions</groupId>
