@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
  * Wrapper for JavaFX {@code Task}s with optional status communication over an
  * event-bus.
  *
- * @param <T>
+ * @param <T> The result type returned by this FutureTask's get methods.
  */
 public abstract class BackgroundTask<T> extends Task<T> {
 
@@ -21,6 +21,9 @@ public abstract class BackgroundTask<T> extends Task<T> {
 	private final UIStrategy uiStrategy;
 	private final EventBus eventBus;
 
+	/**
+	 * The result of a background task.
+	 */
 	public enum Result {
 
 		/**
@@ -37,23 +40,50 @@ public abstract class BackgroundTask<T> extends Task<T> {
 		FAILED
 	}
 
+	/**
+	 * Creates a new background task.
+	 */
 	public BackgroundTask() {
 		this(null, null);
 	}
 
+	/**
+	 * Creates a new background task.
+	 *
+	 * @param eventBus the event bus (to handle status messages/progress
+	 * notification).
+	 */
 	public BackgroundTask(EventBus eventBus) {
 		this(null, eventBus);
 	}
 
+	/**
+	 * Creates a new background task.
+	 *
+	 * @param handler the application handler (to get the UI strategy and the
+	 * event bus).
+	 */
 	public BackgroundTask(ApplicationHandler handler) {
 		this(handler.uiStrategy, handler.eventBus);
 	}
 
+	/**
+	 * Creates a new background task.
+	 *
+	 * @param uiStrategy the UI strategy (to show potential errors).
+	 * @param eventBus the event bus (to handle status messages/progress
+	 * notification).
+	 */
 	public BackgroundTask(UIStrategy uiStrategy, EventBus eventBus) {
 		this.uiStrategy = uiStrategy;
 		this.eventBus = eventBus;
 	}
 
+	/**
+	 * Starts the background task.
+	 *
+	 * @return the thread of the background task.
+	 */
 	public Thread start() {
 		final Thread thread = new Thread(this);
 		if (eventBus != null) {
@@ -77,6 +107,11 @@ public abstract class BackgroundTask<T> extends Task<T> {
 	 * {@code failed()} methods. Get's called before error handling in
 	 * {@code failed()}. Also overwrite {@code succeeded()} in order to handle
 	 * all possible outcomes (or just {@code finished()}).
+	 *
+	 * <p>
+	 * Just like the {@code succeeded()}, {@code cancelled()}, and
+	 * {@code failed()} methods, this method is invoked on the FX Application
+	 * thread.
 	 */
 	protected void cleanUp() {
 
@@ -86,6 +121,11 @@ public abstract class BackgroundTask<T> extends Task<T> {
 	 * Hook method that get's called either way; once done, cancelled, or
 	 * failed. Get's called before {@code cleanUp()} and before error handling
 	 * in {@code failed()}.
+	 *
+	 * <p>
+	 * Just like the {@code succeeded()}, {@code cancelled()}, and
+	 * {@code failed()} methods, this method is invoked on the FX Application
+	 * thread.
 	 *
 	 * @param state state of the BackgroundTask.
 	 */
@@ -113,15 +153,16 @@ public abstract class BackgroundTask<T> extends Task<T> {
 		if (throwable instanceof Exception) {
 			// Exception (recoverable)
 			final Exception ex = (Exception) throwable;
-			log.error("background task throw an exception: ", ex);
+			log.error("background task {} threw an exception: ", this, ex);
 		} else {
 			// Error (unrecoverable)
 			final Error error = (Error) throwable;
-			log.error("background task produced an (unrecoverable) error: ", error);
+			log.error("background task {} produced an (unrecoverable) error: ", this, error);
 		}
 
 		if (uiStrategy != null) {
 			uiStrategy.showError(throwable);
 		}
 	}
+
 }
