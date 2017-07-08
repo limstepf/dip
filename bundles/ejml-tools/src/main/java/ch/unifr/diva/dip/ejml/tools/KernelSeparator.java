@@ -11,13 +11,10 @@ import ch.unifr.diva.dip.api.parameters.EnumParameter;
 import ch.unifr.diva.dip.api.parameters.ExpParameter;
 import ch.unifr.diva.dip.api.services.ProcessableBase;
 import ch.unifr.diva.dip.api.services.Processor;
-import ch.unifr.diva.dip.api.services.Transmutable;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.glyphs.mdi.MaterialDesignIcons;
 import java.util.Arrays;
 import javafx.beans.InvalidationListener;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import org.ejml.ops.SingularOps;
 import org.ejml.simple.SimpleMatrix;
 import org.ejml.simple.SimpleSVD;
@@ -38,7 +35,7 @@ import org.osgi.service.component.annotations.Component;
  * filter is ready to go with a separable filter.
  */
 @Component(service = Processor.class)
-public class KernelSeparator extends ProcessableBase implements Transmutable {
+public class KernelSeparator extends ProcessableBase {
 
 	private final InputPort<FloatMatrix> input_float;
 	private final InputPort<DoubleMatrix> input_double;
@@ -105,7 +102,7 @@ public class KernelSeparator extends ProcessableBase implements Transmutable {
 		enableInputs();
 		enableOutputs();
 
-		transmute();
+		repaint();
 	}
 
 	@Override
@@ -337,10 +334,4 @@ public class KernelSeparator extends ProcessableBase implements Transmutable {
 		return MaterialDesignIcons.MATRIX;
 	}
 
-	private final BooleanProperty transmuteProperty = new SimpleBooleanProperty();
-
-	@Override
-	public BooleanProperty transmuteProperty() {
-		return this.transmuteProperty;
-	}
 }

@@ -12,7 +12,6 @@ import ch.unifr.diva.dip.api.parameters.TextParameter;
 import ch.unifr.diva.dip.api.parameters.XorParameter;
 import ch.unifr.diva.dip.api.services.ProcessableBase;
 import ch.unifr.diva.dip.api.services.Processor;
-import ch.unifr.diva.dip.api.services.Transmutable;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.awt.components.ColorPort;
 import ch.unifr.diva.dip.awt.components.InputColorPort;
@@ -39,7 +38,7 @@ import org.osgi.service.component.annotations.Component;
  * or the range of a {@code SimpleColorModel}.
  */
 @Component(service = Processor.class)
-public class SampleInverter extends ProcessableBase implements Transmutable {
+public class SampleInverter extends ProcessableBase {
 
 	private final static String STORAGE_IMAGE = "inverted.png";
 	private final static String STORAGE_IMAGE_FORMAT = "PNG";
@@ -275,7 +274,7 @@ public class SampleInverter extends ProcessableBase implements Transmutable {
 
 	private void inputCallback() {
 		config.enablePorts();
-		transmute();
+		repaint();
 	}
 
 	private final InvalidationListener configListener = (c) -> configCallback();
@@ -287,7 +286,7 @@ public class SampleInverter extends ProcessableBase implements Transmutable {
 		config.adjustBandSelectionSlider();
 		config.enablePorts();
 
-		transmute();
+		repaint();
 	}
 
 	@Override
@@ -453,13 +452,6 @@ public class SampleInverter extends ProcessableBase implements Transmutable {
 	@Override
 	public NamedGlyph glyph() {
 		return MaterialDesignIcons.INVERT_COLORS;
-	}
-
-	private final BooleanProperty transmuteProperty = new SimpleBooleanProperty();
-
-	@Override
-	public BooleanProperty transmuteProperty() {
-		return this.transmuteProperty;
 	}
 
 }

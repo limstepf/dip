@@ -6,7 +6,6 @@ import ch.unifr.diva.dip.api.datastructures.BufferedMatrix;
 import ch.unifr.diva.dip.api.parameters.EnumParameter;
 import ch.unifr.diva.dip.api.services.ProcessableBase;
 import ch.unifr.diva.dip.api.services.Processor;
-import ch.unifr.diva.dip.api.services.Transmutable;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.awt.components.ColorPort;
 import ch.unifr.diva.dip.awt.components.InputColorPort;
@@ -18,8 +17,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.beans.InvalidationListener;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import org.osgi.service.component.annotations.Component;
 
 /**
@@ -29,7 +26,7 @@ import org.osgi.service.component.annotations.Component;
  * @see ch.unifr.diva.dip.api.imaging.SimpleColorModel
  */
 @Component(service = Processor.class)
-public class ColorConverter extends ProcessableBase implements Transmutable {
+public class ColorConverter extends ProcessableBase {
 
 	private final EnumParameter cmSrc;
 	private final EnumParameter cmDst;
@@ -198,7 +195,7 @@ public class ColorConverter extends ProcessableBase implements Transmutable {
 
 		enableInputs(connectedPort);
 		updateTitle();
-		transmute();
+		repaint();
 	}
 
 	private final InvalidationListener outputListener = (c) -> outputOptionCallback();
@@ -206,7 +203,7 @@ public class ColorConverter extends ProcessableBase implements Transmutable {
 	private void outputOptionCallback() {
 		enableOutputs();
 		updateTitle();
-		transmute();
+		repaint();
 	}
 
 	private void disconnectPort(Port port) {
@@ -323,13 +320,6 @@ public class ColorConverter extends ProcessableBase implements Transmutable {
 	@Override
 	public NamedGlyph glyph() {
 		return MaterialDesignIcons.PALETTE;
-	}
-
-	private final BooleanProperty transmuteProperty = new SimpleBooleanProperty();
-
-	@Override
-	public BooleanProperty transmuteProperty() {
-		return this.transmuteProperty;
 	}
 
 }

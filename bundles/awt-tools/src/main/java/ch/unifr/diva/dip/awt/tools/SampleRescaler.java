@@ -10,13 +10,10 @@ import ch.unifr.diva.dip.api.parameters.EmptyParameter;
 import ch.unifr.diva.dip.api.services.Previewable;
 import ch.unifr.diva.dip.api.services.ProcessableBase;
 import ch.unifr.diva.dip.api.services.Processor;
-import ch.unifr.diva.dip.api.services.Transmutable;
 import ch.unifr.diva.dip.awt.imaging.Filter;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import javafx.beans.InvalidationListener;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
@@ -26,7 +23,7 @@ import org.osgi.service.component.annotations.Component;
  * Sample rescaling filter. Scaling/gain and biasing (and clamping).
  */
 @Component(service = Processor.class)
-public class SampleRescaler extends ProcessableBase implements Transmutable, Previewable {
+public class SampleRescaler extends ProcessableBase implements Previewable {
 
 	private final static String STORAGE_IMAGE = "rescaled.png";
 	private final static String STORAGE_IMAGE_FORMAT = "PNG";
@@ -90,7 +87,7 @@ public class SampleRescaler extends ProcessableBase implements Transmutable, Pre
 	private void configCallback() {
 		this.rescaleUnit.update();
 		enableOutputs();
-		transmute();
+		repaint();
 	}
 
 	private final InvalidationListener inputListener = (c) -> inputCallback();
@@ -103,7 +100,7 @@ public class SampleRescaler extends ProcessableBase implements Transmutable, Pre
 		} else {
 			enableInput(null);
 		}
-		transmute();
+		repaint();
 	}
 
 	private void enableAllInputs() {
@@ -247,13 +244,6 @@ public class SampleRescaler extends ProcessableBase implements Transmutable, Pre
 		deleteFile(context, STORAGE_MAT);
 		resetOutputs();
 		resetLayer(context);
-	}
-
-	private final BooleanProperty transmuteProperty = new SimpleBooleanProperty();
-
-	@Override
-	public BooleanProperty transmuteProperty() {
-		return this.transmuteProperty;
 	}
 
 }

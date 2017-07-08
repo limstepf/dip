@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 
 /**
@@ -33,11 +34,36 @@ import javafx.beans.property.ReadOnlyObjectProperty;
  * to serve the page/original image in a root processor/generator).</li>
  * </ol>
  *
+ * <p>
+ * There are three distinct uses of a {@code Processor} service:
+ *
+ * <ol>
+ * <li>A non-initialized instance ({@code init()} is not called) is published to
+ * the service registry and acts as a service factory (by implementing the
+ * {@code newInstance()} method).</li>
+ *
+ * <li>Non-runnable (or passive/latent) instances (used in the pipeline editor)
+ * are spawned with a call to {@code newInstance()}, and initialized
+ * {@code init()} with no (or a null) processor context.</li>
+ *
+ * <li>Runnable processor instances are spawned with a call to
+ * {@code newInstance()} and initialized {@code init()} with a valid processor
+ * context.</li>
+ * </ol>
+ *
+ * <p>
+ * Non-runnable and runnable processors may change their form and shape (e.g. a
+ * different set of input- and/or output-ports; e.g. after changing a parameter,
+ * or after (dis-)connecting some port). The {@code repaint()} method has to be
+ * called manually after any such change. Note that all parameters/ports should
+ * be active (or published) after the constructor has been called, such that the
+ * processor (as a service) can be fully inspected. Just a subset may then be
+ * activated in the {@code init()} method, and changed as parameters or
+ * connections are modified.
+ *
+ * <p>
  * Further interfaces can be implemented to offer more functionality:
  * <dl>
- * <dt>Transmutable</dt>
- * <dd>For dynamic processors that can change their shape (e.g. ports).</dd>
- *
  * <dt>Previewable</dt>
  * <dd>For processors that offer preview functionality.</dd>
  * </dl>
@@ -472,6 +498,41 @@ public interface Processor {
 		}
 
 		return State.PROCESSING;
+	}
+
+	/**
+	 * The repaint "property" (or rather toggle). Changing the value on the
+	 * repaint property (e.g. by a call to {@code repaint()}) triggers the
+	 * processor wrapper (listening to this property) to reinstantiate/repaint
+	 * the view, and reinitialize the processor (e.g. connections, since ports
+	 * might have changed).
+	 *
+	 * @return the repaint "property" (or toggle), or null if not implemented.
+	 */
+	default BooleanProperty repaintProperty() {
+		return null;
+	}
+
+	/**
+	 * Repaints the processor (and its view). This method needs to be called
+	 * upon changing ports, parameters, or the title/labels of the processor in
+	 * order to reinstantiate/repaint the view, and reinitialize the processor
+	 * (e.g. connections, since ports might have changed).
+	 */
+	default void repaint() {
+		if (hasRepaintProperty()) {
+			repaintProperty().set(!repaintProperty().get());
+		}
+	}
+
+	/**
+	 * Checks whether the processor offers a repaint property to listen to.
+	 *
+	 * @return {@code true} if there is a repaint property, {@code false}
+	 * otherwise.
+	 */
+	default boolean hasRepaintProperty() {
+		return repaintProperty() != null;
 	}
 
 	/**

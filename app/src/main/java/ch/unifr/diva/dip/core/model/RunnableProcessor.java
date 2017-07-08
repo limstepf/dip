@@ -106,7 +106,7 @@ public class RunnableProcessor extends ProcessorWrapper {
 		super.initProcessor(processor);
 
 		// we overide initProcessor() rather than doing this in init() since a
-		// transmutable processor might have changed its name once being fully
+		// processor might have changed its name (repaint) once being fully
 		// initialized
 		this.layerGroup.setName(this.processor().name());
 		this.layerGroup.setGlyph(RunnableProcessor.glyph(this.processor()));

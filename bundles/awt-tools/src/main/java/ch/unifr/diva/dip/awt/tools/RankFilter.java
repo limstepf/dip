@@ -12,7 +12,6 @@ import ch.unifr.diva.dip.api.parameters.XorParameter;
 import ch.unifr.diva.dip.api.services.Previewable;
 import ch.unifr.diva.dip.api.services.ProcessableBase;
 import ch.unifr.diva.dip.api.services.Processor;
-import ch.unifr.diva.dip.api.services.Transmutable;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.awt.imaging.Filter;
 import ch.unifr.diva.dip.awt.imaging.ops.RankOp;
@@ -23,8 +22,6 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import javafx.beans.InvalidationListener;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import org.osgi.service.component.annotations.Component;
@@ -33,7 +30,7 @@ import org.osgi.service.component.annotations.Component;
  * A rank filter.
  */
 @Component(service = Processor.class)
-public class RankFilter extends ProcessableBase implements Transmutable, Previewable {
+public class RankFilter extends ProcessableBase implements Previewable {
 
 	private final static String IMAGE_FORMAT = "PNG";
 	private final static String IMAGE_FILE = "ranked.png";
@@ -100,7 +97,7 @@ public class RankFilter extends ProcessableBase implements Transmutable, Preview
 
 	private void maskCallback() {
 		enableBooleanMatrix(useBooleanMatrix());
-		transmute();
+		repaint();
 	}
 
 	private void enableBooleanMatrix(boolean enable) {
@@ -292,10 +289,4 @@ public class RankFilter extends ProcessableBase implements Transmutable, Preview
 		return MaterialDesignIcons.SORT;
 	}
 
-	private final BooleanProperty transmuteProperty = new SimpleBooleanProperty();
-
-	@Override
-	public BooleanProperty transmuteProperty() {
-		return this.transmuteProperty;
-	}
 }

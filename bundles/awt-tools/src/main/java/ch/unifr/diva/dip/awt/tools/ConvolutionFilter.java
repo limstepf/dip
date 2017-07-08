@@ -17,7 +17,6 @@ import ch.unifr.diva.dip.api.parameters.LabelParameter;
 import ch.unifr.diva.dip.api.services.Previewable;
 import ch.unifr.diva.dip.api.services.ProcessableBase;
 import ch.unifr.diva.dip.api.services.Processor;
-import ch.unifr.diva.dip.api.services.Transmutable;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.awt.imaging.Filter;
 import ch.unifr.diva.dip.awt.imaging.ops.ConvolutionOp;
@@ -27,8 +26,6 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.Map;
 import javafx.beans.InvalidationListener;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
 import javafx.scene.image.Image;
@@ -39,7 +36,7 @@ import org.osgi.service.component.annotations.Component;
  * A convolution filter.
  */
 @Component(service = Processor.class)
-public class ConvolutionFilter extends ProcessableBase implements Transmutable, Previewable {
+public class ConvolutionFilter extends ProcessableBase implements Previewable {
 
 	private final static String IMAGE_FORMAT = "PNG";
 	private final static String IMAGE_FILE = "convolved.png";
@@ -175,7 +172,7 @@ public class ConvolutionFilter extends ProcessableBase implements Transmutable, 
 	private void configCallback() {
 		this.rescaleUnit.update();
 		enableOutputs();
-		transmute();
+		repaint();
 	}
 
 	private final InvalidationListener inputListener = (c) -> inputCallback();
@@ -188,7 +185,7 @@ public class ConvolutionFilter extends ProcessableBase implements Transmutable, 
 		} else {
 			enableInputs(null);
 		}
-		transmute();
+		repaint();
 	}
 
 	private void enableInputs(InputPort input) {
@@ -515,13 +512,6 @@ public class ConvolutionFilter extends ProcessableBase implements Transmutable, 
 	@Override
 	public NamedGlyph glyph() {
 		return MaterialDesignIcons.BLUR;
-	}
-
-	private final BooleanProperty transmuteProperty = new SimpleBooleanProperty();
-
-	@Override
-	public BooleanProperty transmuteProperty() {
-		return this.transmuteProperty;
 	}
 
 }

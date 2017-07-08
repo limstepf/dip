@@ -8,7 +8,6 @@ import ch.unifr.diva.dip.api.parameters.ColorPickerParameter;
 import ch.unifr.diva.dip.api.services.HybridProcessorBase;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.services.ProcessorBase;
-import ch.unifr.diva.dip.api.services.Transmutable;
 import ch.unifr.diva.dip.api.tools.BrushTool;
 import ch.unifr.diva.dip.api.tools.ClickGesture;
 import ch.unifr.diva.dip.api.tools.SimpleTool;
@@ -24,9 +23,7 @@ import ch.unifr.diva.dip.glyphs.fontawesome.FontAwesome;
 import ch.unifr.diva.dip.glyphs.mdi.MaterialDesignIcons;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.EventHandler;
@@ -46,7 +43,7 @@ import org.osgi.service.component.annotations.Component;
  * A simple JavaFX paint processor.
  */
 @Component(service = Processor.class)
-public class FxPaint extends HybridProcessorBase implements Transmutable {
+public class FxPaint extends HybridProcessorBase {
 
 	protected final static String STORAGE_FORMAT = "PNG";
 	protected final static String STORAGE_IMAGE = "fxpaint.png";
@@ -95,13 +92,6 @@ public class FxPaint extends HybridProcessorBase implements Transmutable {
 		this.eyedropperTool = new EyedropperTool();
 		tools().add(eyedropperTool);
 
-	}
-
-	private final BooleanProperty transmuteProperty = new SimpleBooleanProperty();
-
-	@Override
-	public BooleanProperty transmuteProperty() {
-		return this.transmuteProperty;
 	}
 
 	/**

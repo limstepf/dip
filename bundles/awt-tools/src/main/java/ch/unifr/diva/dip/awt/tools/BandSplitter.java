@@ -7,7 +7,6 @@ import ch.unifr.diva.dip.api.parameters.BooleanParameter;
 import ch.unifr.diva.dip.api.parameters.EnumParameter;
 import ch.unifr.diva.dip.api.services.ProcessableBase;
 import ch.unifr.diva.dip.api.services.Processor;
-import ch.unifr.diva.dip.api.services.Transmutable;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.api.ui.SelectionListCellFactory;
 import ch.unifr.diva.dip.awt.components.ColorPort;
@@ -29,7 +28,7 @@ import org.osgi.service.component.annotations.Component;
  * Band/channel splitter.
  */
 @Component(service = Processor.class)
-public class BandSplitter extends ProcessableBase implements Transmutable {
+public class BandSplitter extends ProcessableBase {
 
 	private enum LayerOption {
 
@@ -298,7 +297,7 @@ public class BandSplitter extends ProcessableBase implements Transmutable {
 
 		enableInputs(opt, cm);
 		enableOutputs(cm);
-		transmute();
+		repaint();
 	}
 
 	private void enableInputs(String opt, SimpleColorModel cm) {
@@ -521,10 +520,4 @@ public class BandSplitter extends ProcessableBase implements Transmutable {
 		return MaterialDesignIcons.BUFFER;
 	}
 
-	private final BooleanProperty transmuteProperty = new SimpleBooleanProperty();
-
-	@Override
-	public BooleanProperty transmuteProperty() {
-		return this.transmuteProperty;
-	}
 }

@@ -10,7 +10,6 @@ import ch.unifr.diva.dip.api.parameters.TextParameter;
 import ch.unifr.diva.dip.api.parameters.XorParameter;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.services.ProcessorBase;
-import ch.unifr.diva.dip.api.services.Transmutable;
 import ch.unifr.diva.dip.awt.imaging.SimpleColorModel;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -27,9 +26,9 @@ import javafx.util.Callback;
  * byte, float) and color-typed (RGB, Lab, ...) ports may be specified as needed
  * (i.e. whatever the processor is able to process).
  *
- * @param <T> class of a transmutable processor.
+ * @param <T> class of a processor.
  */
-public class ColorPortsUnit<T extends Processor & Transmutable> {
+public class ColorPortsUnit<T extends Processor> {
 
 	protected final T processor;
 
@@ -75,8 +74,7 @@ public class ColorPortsUnit<T extends Processor & Transmutable> {
 	 * Creates a new color ports unit.
 	 *
 	 * <ul>
-	 * <li>The parent processor must implement the {@code Transmutable}
-	 * interface.</li>
+	 * <li>The parent processor should have a {@code repaintProperty}.</li>
 	 * <li>The unit's configuration parameter (retrieved with a call to
 	 * {@code getParameter()}) needs to be added manually to the parameters of
 	 * the parent processor.</li>
@@ -202,7 +200,7 @@ public class ColorPortsUnit<T extends Processor & Transmutable> {
 
 	protected void inputCallback() {
 		updatePorts();
-		this.processor.transmute();
+		this.processor.repaint();
 	}
 
 	protected InputPort<BufferedImage> currentInput;
@@ -248,7 +246,7 @@ public class ColorPortsUnit<T extends Processor & Transmutable> {
 
 		updateSelectedPort(this.vs);
 		updatePorts();
-		this.processor.transmute();
+		this.processor.repaint();
 	}
 
 	protected void updateSelectedPort(ValueListSelection vs) {

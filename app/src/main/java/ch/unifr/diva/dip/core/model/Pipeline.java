@@ -3,7 +3,6 @@ package ch.unifr.diva.dip.core.model;
 import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.services.Processor;
-import ch.unifr.diva.dip.api.services.Transmutable;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.model.ProcessorWrapper.PortMapEntry;
 import ch.unifr.diva.dip.core.ui.Localizable;
@@ -305,29 +304,23 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 		return this.inputPortMap;
 	}
 
-	// transmutable processors might change ports later on, so we need to listen.
+	// processors might change ports later on (repaint), so we need to listen.
 	// Removed ports are left in the map (technically they're just hidden/
 	// deactivated anyways).
-	protected final Map<T, InvalidationListener> transmutableListeners = new HashMap<>();
+	protected final Map<T, InvalidationListener> repaintListeners = new HashMap<>();
 
-	protected InvalidationListener newTransmutableListener(T p) {
-		return (c) -> registerPorts(p);
-	}
-
-	protected void addTransmutableListener(T p) {
-		if (p.processor() instanceof Transmutable) {
-			final Transmutable t = (Transmutable) p.processor();
-			final InvalidationListener listener = newTransmutableListener(p);
-			this.transmutableListeners.put(p, listener);
-			t.transmuteProperty().addListener(listener);
+	protected void addRepaintListener(T p) {
+		if (p.processor().hasRepaintProperty()) {
+			final InvalidationListener listener = (c) -> registerPorts(p);
+			this.repaintListeners.put(p, listener);
+			p.processor().repaintProperty().addListener(listener);
 		}
 	}
 
-	protected void removeTransmutableListener(T p) {
-		if (p.processor() instanceof Transmutable) {
-			final Transmutable t = (Transmutable) p.processor();
-			final InvalidationListener listener = this.transmutableListeners.get(p);
-			t.transmuteProperty().addListener(listener);
+	protected void removeRepaintListener(T p) {
+		if (p.processor().hasRepaintProperty()) {
+			final InvalidationListener listener = this.repaintListeners.get(p);
+			p.processor().repaintProperty().addListener(listener);
 		}
 	}
 
@@ -424,7 +417,7 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 		if (!wrapper.isAvailable()) {
 			return;
 		}
-		addTransmutableListener(wrapper);
+		addRepaintListener(wrapper);
 		registerPorts(wrapper);
 		this.modifiedPipelineProperty.addManagedProperty(wrapper);
 		processors.add(wrapper);
@@ -467,7 +460,7 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 		}
 
 		this.modifiedPipelineProperty.removeManagedProperty(wrapper);
-		removeTransmutableListener(wrapper);
+		removeRepaintListener(wrapper);
 		unregisterPorts(wrapper);
 		processors.remove(wrapper);
 		unregisterProcessor(wrapper);

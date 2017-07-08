@@ -424,23 +424,23 @@ public class EditorPane {
 
 		// this might be a bit awkward (why not just connect input and output
 		// before calling bindWire()?), but this order is crucial to make the
-		// transmutable feature work. Otherwise we create a newConnection() which
-		// causes transmute to fire, so we updateProcessor() a second time, bind
+		// repaint feature work. Otherwise we create a newConnection() which
+		// causes repaint to fire, so we updateProcessor() a second time, bind
 		// to new wire(s) and back to the first call to newConnection that hasnt
 		// finished yet, we finally bind the now deprecated wire, thereby overwriting
 		// the new one... UGH.
 		//
-		// Transmute synchronization problem, illustrated:
+		// Repaint synchronization problem, illustrated:
 		//
 		//	newConnection {									// manually creating a connection
-		//		connectTo -> transmute -> newConnection {	// 2nd call to newConnection!
+		//		connectTo -> repaint -> newConnection {	    // 2nd call to newConnection!
 		//			bindWire								// binds new wire, but...
 		//		}
 		//		...
 		//		bindWire	// old wire overrides the new one!
 		//  }
 		//
-		// I.e. connecting to a port causes a transmute event, thus there is a
+		// I.e. connecting to a port causes a repaint event, thus there is a
 		// second call to newConnection (updateProcessor), the new wire binds
 		// immmediately, and back to the first call to newConnection we finally
 		// bind the now deprecated wire, thereby overriding the new one...

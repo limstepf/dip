@@ -337,7 +337,7 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 			removeParameterListener(processor);
 			saveParameters(processor);
 
-			// disconnecting the old processor might change its ports (transmutable)
+			// disconnecting the old processor might change its ports (repaint)
 			// so we can't do that while iterating over the inputs, which is most
 			// likely a LinkedHashMap, or we'll face a ConcurrentModificationException
 			final List<InputPort> disconnectMe = new ArrayList<>();

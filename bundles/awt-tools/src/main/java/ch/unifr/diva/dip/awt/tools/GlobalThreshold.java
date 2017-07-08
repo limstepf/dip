@@ -11,7 +11,6 @@ import ch.unifr.diva.dip.api.parameters.XorParameter;
 import ch.unifr.diva.dip.api.services.Previewable;
 import ch.unifr.diva.dip.api.services.ProcessableBase;
 import ch.unifr.diva.dip.api.services.Processor;
-import ch.unifr.diva.dip.api.services.Transmutable;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.awt.imaging.Filter;
 import ch.unifr.diva.dip.awt.imaging.ops.GlobalThresholdOp;
@@ -20,8 +19,6 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import javafx.beans.InvalidationListener;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import org.osgi.service.component.annotations.Component;
@@ -30,7 +27,7 @@ import org.osgi.service.component.annotations.Component;
  * Global threshold processor.
  */
 @Component(service = Processor.class)
-public class GlobalThreshold extends ProcessableBase implements Transmutable, Previewable {
+public class GlobalThreshold extends ProcessableBase implements Previewable {
 
 	private final InputPort<BufferedImage> input;
 	private final InputPort<BufferedImage> input_gray;
@@ -144,7 +141,7 @@ public class GlobalThreshold extends ProcessableBase implements Transmutable, Pr
 			enableAllInputs();
 		}
 
-		transmute();
+		repaint();
 	}
 
 	private void enableAllInputs() {
@@ -263,13 +260,6 @@ public class GlobalThreshold extends ProcessableBase implements Transmutable, Pr
 	@Override
 	public NamedGlyph glyph() {
 		return MaterialDesignIcons.CONTRAST_BOX;
-	}
-
-	private final BooleanProperty transmuteProperty = new SimpleBooleanProperty();
-
-	@Override
-	public BooleanProperty transmuteProperty() {
-		return this.transmuteProperty;
 	}
 
 }

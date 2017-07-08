@@ -7,7 +7,6 @@ import ch.unifr.diva.dip.api.parameters.StringParameter;
 import ch.unifr.diva.dip.api.services.ProcessableBase;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.services.ProcessorBase;
-import ch.unifr.diva.dip.api.services.Transmutable;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.awt.components.ColorPortsUnit;
 import ch.unifr.diva.dip.awt.imaging.SimpleColorModel;
@@ -18,8 +17,6 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javax.imageio.ImageIO;
 import org.osgi.service.component.annotations.Component;
 
@@ -28,7 +25,7 @@ import org.osgi.service.component.annotations.Component;
  * project's export directory.
  */
 @Component(service = Processor.class)
-public class BufferedImageExporter extends ProcessableBase implements Transmutable {
+public class BufferedImageExporter extends ProcessableBase {
 
 	/**
 	 * Available image formats for writing/exporting.
@@ -95,13 +92,6 @@ public class BufferedImageExporter extends ProcessableBase implements Transmutab
 	@Override
 	public NamedGlyph glyph() {
 		return MaterialDesignIcons.FILE_IMAGE;
-	}
-
-	private final BooleanProperty transmuteProperty = new SimpleBooleanProperty();
-
-	@Override
-	public BooleanProperty transmuteProperty() {
-		return this.transmuteProperty;
 	}
 
 	private String getName() {

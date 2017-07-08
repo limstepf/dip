@@ -5,7 +5,6 @@ import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.parameters.Parameter;
 import ch.unifr.diva.dip.api.parameters.PersistentParameter;
 import ch.unifr.diva.dip.api.services.Processor;
-import ch.unifr.diva.dip.api.services.Transmutable;
 import ch.unifr.diva.dip.api.ui.Glyph;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.core.ApplicationHandler;
@@ -219,14 +218,13 @@ public abstract class ProcessorView extends BorderPane {
 	}
 
 	/**
-	 * Initializes the view and starts listening to transmutable invalidation
-	 * events. Needs to be called once the view has been registered to the
+	 * Initializes the view and starts listening to repaint invalidation events.
+	 * Needs to be called once the view has been registered to the
 	 * processorViews in the EditorPane.
 	 */
 	public void init() {
-		if (wrapper.processor() instanceof Transmutable) {
-			final Transmutable t = (Transmutable) wrapper.processor();
-			t.transmuteProperty().addListener(transmutableListener);
+		if (wrapper.processor().hasRepaintProperty()) {
+			wrapper.processor().repaintProperty().addListener(repaintListener);
 		}
 	}
 
@@ -242,8 +240,8 @@ public abstract class ProcessorView extends BorderPane {
 		this.pseudoClassStateChanged(UNAVAILABLE, !wrapper().isAvailable());
 	};
 
-	// listen to transmuting processors
-	protected final InvalidationListener transmutableListener = (observable) -> {
+	// listen to processor's repaint requests
+	protected final InvalidationListener repaintListener = (observable) -> {
 		editor().editorPane().updateProcessor(wrapper());
 	};
 
@@ -251,21 +249,21 @@ public abstract class ProcessorView extends BorderPane {
 	protected final BooleanProperty editingProperty = new SimpleBooleanProperty(false);
 
 	final InvalidationListener editingListener = (observable) -> {
-			if (editingProperty.get()) {
-				if (!parameterView().getChildren().isEmpty()) {
-					wrapper().editingProperty().set(true);
-					showParameters(true);
-				}
-			} else {
-				wrapper().editingProperty().set(false);
-				if (this.parameterView != null) {
-					showParameters(false);
-				}
+		if (editingProperty.get()) {
+			if (!parameterView().getChildren().isEmpty()) {
+				wrapper().editingProperty().set(true);
+				showParameters(true);
 			}
+		} else {
+			wrapper().editingProperty().set(false);
+			if (this.parameterView != null) {
+				showParameters(false);
+			}
+		}
 
-			updatePorts();
-			repaint();
-		};
+		updatePorts();
+		repaint();
+	};
 
 	protected void repaint() {
 		editor.repaint();
@@ -337,9 +335,8 @@ public abstract class ProcessorView extends BorderPane {
 
 	// safely remove wires and unregister ports
 	public void unregister() {
-		if (this.wrapper.processor() instanceof Transmutable) {
-			final Transmutable t = (Transmutable) this.wrapper.processor();
-			t.transmuteProperty().removeListener(transmutableListener);
+		if (wrapper.processor().hasRepaintProperty()) {
+			wrapper.processor().repaintProperty().removeListener(repaintListener);
 		}
 
 		for (PortView v : this.inputPorts) {
@@ -597,7 +594,7 @@ public abstract class ProcessorView extends BorderPane {
 			//
 			// loop, since parameters most likely is a LinkedHashMap, and will
 			// throw a java.util.ConcurrentModificationException in case the set
-			// of parameters changes (e.g. on transmute/init).
+			// of parameters changes (e.g. on repaint/init).
 			//
 			// Thus... we first get params/keys without further action...
 			final int n = processor.parameters().size();

@@ -17,6 +17,8 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -54,6 +56,11 @@ public abstract class ProcessorBase implements Processor {
 	protected final Map<String, Parameter> parameters = new LinkedHashMap();
 
 	/**
+	 * The repaint property.
+	 */
+	protected final BooleanProperty repaintProperty = new SimpleBooleanProperty();
+
+	/**
 	 * Creates a new processor base.
 	 *
 	 * @param name name of the processor.
@@ -82,10 +89,14 @@ public abstract class ProcessorBase implements Processor {
 		return outputs;
 	}
 
+	@Override
+	public BooleanProperty repaintProperty() {
+		return repaintProperty;
+	}
+
 	/**
 	 * Resets all (published) output ports. Make sure to override this method if
-	 * the processor is transmutable and offers a dynamic/changing set of output
-	 * ports.
+	 * the processor has a dynamic/changing set of output ports.
 	 */
 	protected void resetOutputs() {
 		for (OutputPort output : outputs.values()) {

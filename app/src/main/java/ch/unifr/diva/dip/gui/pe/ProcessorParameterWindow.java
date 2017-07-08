@@ -336,8 +336,8 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 			vbox.setSpacing(b);
 			vbox.getChildren().addAll(zoomPane.getNode(), gridPane);
 
-			// TODO/VERIFY: what about transmutable procs? Would they change params?
-			// Should we re-listen? Or should transmutable procs that actually do
+			// TODO/VERIFY: what about repainting procs? Would they change params?
+			// Should we re-listen? Or should repainting procs that actually do
 			// change params overwrite getCompositeProperty? Maybe easier...
 			final ReadOnlyObjectProperty p = previewContext.runnable.processor().getCompositeProperty();
 			p.addListener((e) -> onParamChanged());
