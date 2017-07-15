@@ -20,6 +20,10 @@
 
 	<repositories>
 		<repository>
+			<id>maven-central</id>
+			<url>http://repo1.maven.org/maven2</url>
+		</repository>
+		<repository>
 			<id>JBoss 3rd-party Repository</id>
 			<url>https://repository.jboss.org/nexus/content/repositories/thirdparty-releases/</url>
 		</repository>
