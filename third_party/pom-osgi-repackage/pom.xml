@@ -37,6 +37,10 @@
 		<osgi.bundle.embedStripGroup>true</osgi.bundle.embedStripGroup>
 		<osgi.bundle.embedTransitive>true</osgi.bundle.embedTransitive>
 		<osgi.bundle.excludeTransitive>true</osgi.bundle.excludeTransitive>
+
+		<!-- disable reporting/maven site plugin -->
+		<reporting.maven.site.skip>true</reporting.maven.site.skip>
+		<dependency.locations.enabled>false</dependency.locations.enabled>
 	</properties>
 
 	<build>

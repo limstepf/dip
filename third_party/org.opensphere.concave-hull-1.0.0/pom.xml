@@ -21,6 +21,14 @@
 		available here: http://www.geosensor.net/papers/duckham08.PR.pdf.
 	</description>
 
+	<properties>
+		<!-- suppress some unchecked conversion warnings -->
+		<maven.compiler.compilerargs.xlint>-Xlint:none</maven.compiler.compilerargs.xlint>
+		<!-- disable reporting/maven site plugin -->
+		<reporting.maven.site.skip>true</reporting.maven.site.skip>
+		<dependency.locations.enabled>false</dependency.locations.enabled>
+	</properties>
+
 	<!--
 		This is not available on a public maven repository, but distributed as
 		a zip file (including sources), so we're building this thing on our own,

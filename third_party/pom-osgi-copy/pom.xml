@@ -25,6 +25,10 @@
 
 		<osgi.output.directory>${app.plugin.bundledir}</osgi.output.directory>
 		<osgi.copy.excludeTransitive>true</osgi.copy.excludeTransitive>
+
+		<!-- disable reporting/maven site plugin -->
+		<reporting.maven.site.skip>true</reporting.maven.site.skip>
+		<dependency.locations.enabled>false</dependency.locations.enabled>
 	</properties>
 
 	<build>

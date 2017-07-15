@@ -33,6 +33,9 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.compilerargs.xlint>-Xlint:all,-processing</maven.compiler.compilerargs.xlint>
+		<maven.javadoc.additionalparam.xdoclint>-Xdoclint:none</maven.javadoc.additionalparam.xdoclint>
+		<maven.javadoc.failonerror>false</maven.javadoc.failonerror>
 
 		<!-- OSGi bundle directories -->
 		<app.core.bundledir>../app/target/bundles-core</app.core.bundledir>
@@ -56,6 +59,7 @@
 		<reporting.jacoco.skip>false</reporting.jacoco.skip>
 		<reporting.checkstyle.skip>true</reporting.checkstyle.skip>
 		<reporting.fingbugs.skip>false</reporting.fingbugs.skip>
+		<reporting.maven.site.skip>false</reporting.maven.site.skip>
 
 		<!-- maven plugin versions -->
 		<maven.jar.plugin.version>3.0.2</maven.jar.plugin.version>
@@ -312,6 +316,10 @@
 						<encoding>${project.build.sourceEncoding}</encoding>
 						<showWarnings>true</showWarnings>
 						<showDeprecation>true</showDeprecation>
+						<compilerArgs>
+							<arg>${maven.compiler.compilerargs.xlint}</arg>
+							<!--<arg>-Werror</arg>-->
+						</compilerArgs>
 					</configuration>
 				</plugin>
 
@@ -398,91 +406,45 @@
 						<argLine>-Dfile.encoding=UTF-8 @{testing.failsafe.argLine}</argLine>
 					</configuration>
 				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
 
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-site-plugin</artifactId>
-					<version>${maven.site.plugin.version}</version>
-					<configuration>
-						<attach>true</attach>
-						<reportPlugins>
-							<plugin>
-								<groupId>org.apache.maven.plugins</groupId>
-								<artifactId>maven-project-info-reports-plugin</artifactId>
-							</plugin>
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>${maven.site.plugin.version}</version>
+				<configuration>
+					<skip>${reporting.maven.site.skip}</skip>
+					<dependencyDetailsEnabled>false</dependencyDetailsEnabled>
+					<dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+				</configuration>
+			</plugin>
 
-							<plugin>
-								<groupId>org.apache.maven.plugins</groupId>
-								<artifactId>maven-javadoc-plugin</artifactId>
-							</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<version>${maven.project.info.reports.plugin.version}</version>
+			</plugin>
 
-							<plugin>
-								<groupId>org.apache.maven.plugins</groupId>
-								<artifactId>maven-jxr-plugin</artifactId>
-							</plugin>
-
-							<plugin>
-								<groupId>org.apache.maven.plugins</groupId>
-								<artifactId>maven-surefire-report-plugin</artifactId>
-							</plugin>
-
-							<plugin>
-								<groupId>org.apache.maven.plugins</groupId>
-								<artifactId>maven-checkstyle-plugin</artifactId>
-							</plugin>
-
-							<plugin>
-								<groupId>org.codehaus.mojo</groupId>
-								<artifactId>findbugs-maven-plugin</artifactId>
-							</plugin>
-
-							<plugin>
-								<groupId>org.jacoco</groupId>
-								<artifactId>jacoco-maven-plugin</artifactId>
-							</plugin>
-						</reportPlugins>
-					</configuration>
-					<executions>
-						<execution>
-							<id>default-site</id>
-							<phase>site</phase>
-							<goals>
-								<goal>site</goal>
-							</goals>
-						</execution>
-						<execution>
-							<id>attach-descriptor</id>
-							<goals>
-								<goal>attach-descriptor</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
-
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-project-info-reports-plugin</artifactId>
-					<version>${maven.project.info.reports.plugin.version}</version>
-				</plugin>
-
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-javadoc-plugin</artifactId>
-					<version>${maven.javadoc.plugin.version}</version>
-					<configuration>
-						<skip>${reporting.javadoc.skip}</skip>
-						<failOnError>false</failOnError>
-						<additionalparam>-Xdoclint:none</additionalparam>
-						<!-- UMLGraph needs a copy of graphviz installed! -->
-						<doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
-						<docletArtifact>
-							<groupId>org.umlgraph</groupId>
-							<artifactId>umlgraph</artifactId>
-							<version>${umlgraph.plugin.version}</version>
-						</docletArtifact>
-						<additionalparam>-Xdoclint:none -views -all</additionalparam>
-						<useStandardDocletOptions>true</useStandardDocletOptions>
-					</configuration>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>${maven.javadoc.plugin.version}</version>
+				<configuration>
+					<skip>${reporting.javadoc.skip}</skip>
+					<!-- UMLGraph needs a copy of graphviz installed! -->
+					<doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
+					<docletArtifact>
+						<groupId>org.umlgraph</groupId>
+						<artifactId>umlgraph</artifactId>
+						<version>${umlgraph.plugin.version}</version>
+					</docletArtifact>
+					<useStandardDocletOptions>true</useStandardDocletOptions>
+					<additionalparam>${maven.javadoc.additionalparam.xdoclint}</additionalparam>
+					<failOnError>${maven.javadoc.failonerror}</failOnError>
 					<executions>
 						<execution>
 							<id>attach-javadocs</id>
@@ -492,40 +454,40 @@
 							</goals>
 						</execution>
 					</executions>
-				</plugin>
+				</configuration>
+			</plugin>
 
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-jxr-plugin</artifactId>
-					<version>${maven.jxr.plugin.version}</version>
-					<configuration>
-						<aggregate>true</aggregate>
-					</configuration>
-				</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jxr-plugin</artifactId>
+				<version>${maven.jxr.plugin.version}</version>
+				<configuration>
+					<aggregate>true</aggregate>
+				</configuration>
+			</plugin>
 
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-checkstyle-plugin</artifactId>
-					<version>${maven.checkstyle.plugin.version}</version>
-					<configuration>
-						<skip>${reporting.checkstyle.skip}</skip>
-						<includeTestSourceDirectory>true</includeTestSourceDirectory>
-						<failOnError>false</failOnError>
-					</configuration>
-				</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>${maven.checkstyle.plugin.version}</version>
+				<configuration>
+					<skip>${reporting.checkstyle.skip}</skip>
+					<includeTestSourceDirectory>true</includeTestSourceDirectory>
+					<failOnError>false</failOnError>
+				</configuration>
+			</plugin>
 
-				<plugin>
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>findbugs-maven-plugin</artifactId>
-					<version>${maven.findbugs.plugin.version}</version>
-					<configuration>
-						<skip>${reporting.fingbugs.skip}</skip>
-						<trace>false</trace>
-						<effort>Max</effort>
-						<threshold>Low</threshold>
-						<xmlOutput>true</xmlOutput>
-						<failOnError>false</failOnError>
-					</configuration>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+				<version>${maven.findbugs.plugin.version}</version>
+				<configuration>
+					<skip>${reporting.fingbugs.skip}</skip>
+					<trace>false</trace>
+					<effort>Max</effort>
+					<threshold>Low</threshold>
+					<xmlOutput>true</xmlOutput>
+					<failOnError>false</failOnError>
 					<executions>
 						<execution>
 							<phase>verify</phase>
@@ -537,15 +499,15 @@
 							</configuration>
 						</execution>
 					</executions>
-				</plugin>
+				</configuration>
+			</plugin>
 
-				<plugin>
-					<groupId>org.jacoco</groupId>
-					<artifactId>jacoco-maven-plugin</artifactId>
-					<version>${maven.jacoco.plugin.version}</version>
-					<configuration>
-						<skip>${reporting.jacoco.skip}</skip>
-					</configuration>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${maven.jacoco.plugin.version}</version>
+				<configuration>
+					<skip>${reporting.jacoco.skip}</skip>
 					<executions>
 						<execution>
 							<id>prepare-agent</id>
@@ -613,8 +575,9 @@
 							</configuration>
 						</execution>
 					</executions>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
+
 </project>
