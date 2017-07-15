@@ -7,7 +7,7 @@ import ch.unifr.diva.dip.core.UserSettings;
 import ch.unifr.diva.dip.core.model.Pipeline;
 import ch.unifr.diva.dip.core.model.PipelineData;
 import ch.unifr.diva.dip.core.model.PipelineManager;
-import ch.unifr.diva.dip.core.model.ProcessorWrapper;
+import ch.unifr.diva.dip.core.model.PrototypeProcessor;
 import ch.unifr.diva.dip.gui.Presenter;
 import ch.unifr.diva.dip.gui.editor.NavigatorWidget;
 import ch.unifr.diva.dip.gui.layout.AbstractWindow;
@@ -63,9 +63,9 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 	private final SideBarPresenter sideBar;
 	private final PipelineManager manager;
 	private final Map<Integer, PipelineData.Pipeline> backupData;
-	private final ObjectProperty<Pipeline<ProcessorWrapper>> selectedPipelineProperty = new SimpleObjectProperty<>();
+	private final ObjectProperty<Pipeline<PrototypeProcessor>> selectedPipelineProperty = new SimpleObjectProperty<>();
 	private final List<ProcessorsWidget> processorWidgets = new ArrayList<>();
-	private final ListChangeListener<ProcessorWrapper> processorListener;
+	private final ListChangeListener<PrototypeProcessor> processorListener;
 	private final RubberBandSelector<ProcessorView> rubberBandSelector;
 
 	private final PipelinesWidget pipelinesWidget;
@@ -112,14 +112,14 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 			}
 		});
 
-		this.processorListener = (ListChangeListener.Change<? extends ProcessorWrapper> c) -> {
+		this.processorListener = (ListChangeListener.Change<? extends PrototypeProcessor> c) -> {
 			while (c.next()) {
 				if (c.wasReplaced()) {
-					for (ProcessorWrapper w : c.getRemoved()) {
+					for (PrototypeProcessor w : c.getRemoved()) {
 						editorPane().updateProcessor(w);
 					}
 				} else if (c.wasRemoved()) {
-					for (ProcessorWrapper w : c.getRemoved()) {
+					for (PrototypeProcessor w : c.getRemoved()) {
 						if (!selectedPipeline().processors().contains(w)) {
 							// processor got explicitly/manually deleted
 							editorPane().removeProcessor(w);
@@ -129,7 +129,7 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 						}
 					}
 				} else if (c.wasAdded()) {
-					for (ProcessorWrapper w : c.getAddedSubList()) {
+					for (PrototypeProcessor w : c.getAddedSubList()) {
 						editorPane().addProcessor(w);
 					}
 				}
@@ -156,7 +156,7 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 		processorWidgets.add(processorsWidget);
 		sideBar.addMainWidget(processorsWidget);
 
-		final Pipeline<ProcessorWrapper> firstPipeline = manager.pipelines().isEmpty()
+		final Pipeline<PrototypeProcessor> firstPipeline = manager.pipelines().isEmpty()
 				? null
 				: manager.pipelines().get(0);
 		selectPipeline(firstPipeline);
@@ -264,7 +264,7 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 	 *
 	 * @return the selected pipeline property.
 	 */
-	public ObjectProperty<Pipeline<ProcessorWrapper>> selectedPipelineProperty() {
+	public ObjectProperty<Pipeline<PrototypeProcessor>> selectedPipelineProperty() {
 		return selectedPipelineProperty;
 	}
 
@@ -273,7 +273,7 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 	 *
 	 * @return the selected pipeline.
 	 */
-	public final Pipeline<ProcessorWrapper> selectedPipeline() {
+	public final Pipeline<PrototypeProcessor> selectedPipeline() {
 		return selectedPipelineProperty.get();
 	}
 
@@ -291,7 +291,7 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 	 *
 	 * @param pipeline the pipeline to be selected.
 	 */
-	public final void selectPipeline(Pipeline<ProcessorWrapper> pipeline) {
+	public final void selectPipeline(Pipeline<PrototypeProcessor> pipeline) {
 		if (selectedPipeline() != null && selectedPipeline().equals(pipeline)) {
 			return;
 		}
@@ -305,7 +305,7 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 			selectedPipelineProperty.set(pipeline);
 
 			// add processors first, s.t. all ports will be initialized
-			for (ProcessorWrapper p : pipeline.processors()) {
+			for (PrototypeProcessor p : pipeline.processors()) {
 				editorPane().addProcessor(p);
 			}
 			// ...then setup existing connections
@@ -337,7 +337,7 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 	 * @param name name of the new pipeline.
 	 */
 	public void createPipeline(String name) {
-		final Pipeline<ProcessorWrapper> pipeline = manager.createPipeline(name);
+		final Pipeline<PrototypeProcessor> pipeline = manager.createPipeline(name);
 		selectPipeline(pipeline);
 	}
 
@@ -346,8 +346,8 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 	 *
 	 * @param pipeline the pipeline to be cloned.
 	 */
-	public void clonePipeline(Pipeline<ProcessorWrapper> pipeline) {
-		final Pipeline<ProcessorWrapper> clone = manager.clonePipeline(pipeline);
+	public void clonePipeline(Pipeline<PrototypeProcessor> pipeline) {
+		final Pipeline<PrototypeProcessor> clone = manager.clonePipeline(pipeline);
 		selectPipeline(clone);
 	}
 

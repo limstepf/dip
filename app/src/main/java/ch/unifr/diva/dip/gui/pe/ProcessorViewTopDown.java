@@ -1,6 +1,6 @@
 package ch.unifr.diva.dip.gui.pe;
 
-import ch.unifr.diva.dip.core.model.ProcessorWrapper;
+import ch.unifr.diva.dip.core.model.PrototypeProcessor;
 import javafx.geometry.Pos;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -21,7 +21,7 @@ public class ProcessorViewTopDown extends ProcessorView {
 	 * @param editor the pipeline editor.
 	 * @param wrapper the processor.
 	 */
-	public ProcessorViewTopDown(PipelineEditor editor, ProcessorWrapper wrapper) {
+	public ProcessorViewTopDown(PipelineEditor editor, PrototypeProcessor wrapper) {
 		super(editor, wrapper);
 
 		this.setTop(inputPane);

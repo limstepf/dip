@@ -3,7 +3,7 @@ package ch.unifr.diva.dip.gui.pe;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.model.DipData;
 import ch.unifr.diva.dip.core.model.PresetData;
-import ch.unifr.diva.dip.core.model.ProcessorWrapper;
+import ch.unifr.diva.dip.core.model.PrototypeProcessor;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import java.nio.file.Path;
 import javafx.collections.ObservableList;
@@ -17,7 +17,7 @@ import javafx.scene.control.TextField;
 public class ProcessorPresetExportDialog extends DataItemDialogBase<PresetData.PresetItem> {
 
 	private DipData data;
-	private final ProcessorWrapper wrapper;
+	private final PrototypeProcessor wrapper;
 	private final PresetData.PresetItem newPresetItem;
 	private final TextField presetName;
 
@@ -29,7 +29,7 @@ public class ProcessorPresetExportDialog extends DataItemDialogBase<PresetData.P
 	 * exported/saved as preset.
 	 */
 
-	public ProcessorPresetExportDialog(ApplicationHandler handler, ProcessorWrapper wrapper) {
+	public ProcessorPresetExportDialog(ApplicationHandler handler, PrototypeProcessor wrapper) {
 		super(
 				handler,
 				handler.dataManager.appDataDir.getProcessorPresetPath(wrapper.pid()),

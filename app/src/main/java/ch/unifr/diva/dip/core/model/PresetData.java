@@ -214,7 +214,7 @@ public class PresetData {
 		 * @param name the name of the preset.
 		 * @param wrapper the processor to copy its parameters from.
 		 */
-		public Preset(String name, ProcessorWrapper wrapper) {
+		public Preset(String name, PrototypeProcessor wrapper) {
 			this(
 					wrapper.pid,
 					toPresetVersion(wrapper.version),
@@ -247,7 +247,7 @@ public class PresetData {
 	public static class PresetItem implements Localizable, DataItemListView.DataItem {
 
 		final private PresetData.Preset preset; // existing preset, or
-		final private ProcessorWrapper wrapper; // new preset
+		final private PrototypeProcessor wrapper; // new preset
 		final private StringProperty nameProperty;
 		final private ObjectProperty<NamedGlyph> glyphProperty;
 
@@ -256,7 +256,7 @@ public class PresetData {
 		 *
 		 * @param wrapper the processor.
 		 */
-		public PresetItem(ProcessorWrapper wrapper) {
+		public PresetItem(PrototypeProcessor wrapper) {
 			this(null, wrapper);
 		}
 
@@ -275,7 +275,7 @@ public class PresetData {
 		 * @param preset the preset, or null.
 		 * @param wrapper the processor, or null.
 		 */
-		private PresetItem(PresetData.Preset preset, ProcessorWrapper wrapper) {
+		private PresetItem(PresetData.Preset preset, PrototypeProcessor wrapper) {
 			this.preset = preset;
 			this.wrapper = wrapper;
 			this.nameProperty = new SimpleStringProperty();

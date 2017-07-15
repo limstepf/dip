@@ -8,7 +8,7 @@ import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.utils.DipThreadPool;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.model.Pipeline;
-import ch.unifr.diva.dip.core.model.ProcessorWrapper;
+import ch.unifr.diva.dip.core.model.PrototypeProcessor;
 import ch.unifr.diva.dip.core.model.RunnableProcessor;
 import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
@@ -61,7 +61,7 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 
 	private final ApplicationHandler handler;
 	private final RunnableProcessor runnable;
-	private final ProcessorWrapper prototype;
+	private final PrototypeProcessor prototype;
 	private final ProcessorView.ProcessorHead head;
 	private final ProcessorView.ParameterViewBase<? extends Parent> parameterView;
 	private final PreviewWidget previewWidget;
@@ -86,7 +86,7 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 		this.handler = handler;
 		this.runnable = runnable;
 
-		final Pipeline<ProcessorWrapper> pipelinePrototype = handler.getProject().getSelectedPage().getPipelinePrototype();
+		final Pipeline<PrototypeProcessor> pipelinePrototype = handler.getProject().getSelectedPage().getPipelinePrototype();
 		this.prototype = pipelinePrototype.getProcessor(runnable.id);
 
 		this.patchedProperty = new SimpleBooleanProperty();

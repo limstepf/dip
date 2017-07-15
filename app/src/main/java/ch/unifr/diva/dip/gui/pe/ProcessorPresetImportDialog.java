@@ -3,7 +3,7 @@ package ch.unifr.diva.dip.gui.pe;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.model.DipData;
 import ch.unifr.diva.dip.core.model.PresetData;
-import ch.unifr.diva.dip.core.model.ProcessorWrapper;
+import ch.unifr.diva.dip.core.model.PrototypeProcessor;
 import java.nio.file.Path;
 import javafx.collections.ObservableList;
 
@@ -13,7 +13,7 @@ import javafx.collections.ObservableList;
 public class ProcessorPresetImportDialog extends DataItemDialogBase<PresetData.PresetItem> {
 
 	private DipData data;
-	private final ProcessorWrapper wrapper;
+	private final PrototypeProcessor wrapper;
 
 	/**
 	 * Creates a new import/load dialog for processor presets.
@@ -22,7 +22,7 @@ public class ProcessorPresetImportDialog extends DataItemDialogBase<PresetData.P
 	 * @param wrapper processor wrapper supposed to load the preset.
 	 */
 
-	public ProcessorPresetImportDialog(ApplicationHandler handler, ProcessorWrapper wrapper) {
+	public ProcessorPresetImportDialog(ApplicationHandler handler, PrototypeProcessor wrapper) {
 		super(
 				handler,
 				handler.dataManager.appDataDir.getProcessorPresetPath(wrapper.pid()),

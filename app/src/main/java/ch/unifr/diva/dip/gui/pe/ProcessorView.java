@@ -8,7 +8,7 @@ import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.ui.Glyph;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.core.ApplicationHandler;
-import ch.unifr.diva.dip.core.model.ProcessorWrapper;
+import ch.unifr.diva.dip.core.model.PrototypeProcessor;
 import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import ch.unifr.diva.dip.glyphs.mdi.MaterialDesignIcons;
@@ -57,7 +57,7 @@ public abstract class ProcessorView extends BorderPane {
 	protected static final NamedGlyph EXPORT_GLYPH = MaterialDesignIcons.EXPORT;
 
 	protected final PipelineEditor editor;
-	protected final ProcessorWrapper wrapper;
+	protected final PrototypeProcessor wrapper;
 	protected final List<PortView<InputPort<?>>> inputPorts;
 	protected final List<PortView<OutputPort<?>>> outputPorts;
 
@@ -87,7 +87,7 @@ public abstract class ProcessorView extends BorderPane {
 	 * @param editor the (parent) pipeline editor.
 	 * @param wrapper the processor wrapper to create the view for.
 	 */
-	public ProcessorView(PipelineEditor editor, ProcessorWrapper wrapper) {
+	public ProcessorView(PipelineEditor editor, PrototypeProcessor wrapper) {
 		this.editor = editor;
 		this.wrapper = wrapper;
 
@@ -151,7 +151,7 @@ public abstract class ProcessorView extends BorderPane {
 		 * @param handler the application handler.
 		 * @param wrapper the processor wrapper.
 		 */
-		public ProcessorHead(ApplicationHandler handler, ProcessorWrapper wrapper) {
+		public ProcessorHead(ApplicationHandler handler, PrototypeProcessor wrapper) {
 			this.handler = handler;
 			this.owner = handler.uiStrategy.getStage();
 			this.pane = new BorderPane();
@@ -378,7 +378,7 @@ public abstract class ProcessorView extends BorderPane {
 		return this.editor;
 	}
 
-	public final ProcessorWrapper wrapper() {
+	public final PrototypeProcessor wrapper() {
 		return this.wrapper;
 	}
 

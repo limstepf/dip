@@ -7,7 +7,7 @@ import ch.unifr.diva.dip.api.ui.MouseEventHandler;
 import ch.unifr.diva.dip.api.ui.MouseEventHandler.ClickCount;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.api.utils.L10n;
-import ch.unifr.diva.dip.core.model.ProcessorWrapper;
+import ch.unifr.diva.dip.core.model.PrototypeProcessor;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import ch.unifr.diva.dip.gui.AbstractWidget;
 import ch.unifr.diva.dip.gui.layout.FormGridPane;
@@ -192,7 +192,7 @@ public class ProcessorsWidget extends AbstractWidget {
 		private static Insets glyphInsets = new Insets(2, 0, 0, 0);
 
 		private Glyph getGlyph(Processor p) {
-			namedGlyph = ProcessorWrapper.glyph(p);
+			namedGlyph = PrototypeProcessor.glyph(p);
 			glyph = UIStrategyGUI.Glyphs.newGlyph(namedGlyph, Glyph.Size.MEDIUM);
 			updateColor();
 			BorderPane.setMargin(glyph, glyphInsets);

@@ -40,23 +40,23 @@ public enum PipelineLayoutStrategy {
 	LEFTRIGHT() {
 
 				@Override
-				public Comparator<ProcessorWrapper> comparator() {
-					return (ProcessorWrapper a, ProcessorWrapper b)
+				public Comparator<PrototypeProcessor> comparator() {
+					return (PrototypeProcessor a, PrototypeProcessor b)
 					-> Double.compare(a.layoutYProperty().get(), b.layoutYProperty().get());
 				}
 
 				@Override
-				public void arrange(Pipeline<ProcessorWrapper> pipeline, Map<ProcessorWrapper, ProcessorView> views) {
-					final Pipeline.PipelineStages<ProcessorWrapper> stages = new Pipeline.PipelineStages<>(pipeline);
+				public void arrange(Pipeline<PrototypeProcessor> pipeline, Map<PrototypeProcessor, ProcessorView> views) {
+					final Pipeline.PipelineStages<PrototypeProcessor> stages = new Pipeline.PipelineStages<>(pipeline);
 					double x = hspace;
 					double y;
 					double width = 0;
 
-					for (Pipeline.Stage<ProcessorWrapper> stage : stages) {
+					for (Pipeline.Stage<PrototypeProcessor> stage : stages) {
 						y = vspace;
 
 						final List<ProcessorView> processors = new ArrayList<>();
-						for (ProcessorWrapper p : stage.processors) {
+						for (PrototypeProcessor p : stage.processors) {
 							processors.add(views.get(p));
 						}
 
@@ -78,7 +78,7 @@ public enum PipelineLayoutStrategy {
 				}
 
 				@Override
-				public ProcessorView newProcessorView(PipelineEditor editor, ProcessorWrapper wrapper) {
+				public ProcessorView newProcessorView(PipelineEditor editor, PrototypeProcessor wrapper) {
 					return new ProcessorViewLeftRight(editor, wrapper);
 				}
 			},
@@ -88,23 +88,23 @@ public enum PipelineLayoutStrategy {
 	TOPDOWN() {
 
 				@Override
-				public Comparator<ProcessorWrapper> comparator() {
-					return (ProcessorWrapper a, ProcessorWrapper b)
+				public Comparator<PrototypeProcessor> comparator() {
+					return (PrototypeProcessor a, PrototypeProcessor b)
 					-> Double.compare(a.layoutXProperty().get(), b.layoutXProperty().get());
 				}
 
 				@Override
-				public void arrange(Pipeline<ProcessorWrapper> pipeline, Map<ProcessorWrapper, ProcessorView> views) {
-					final Pipeline.PipelineStages<ProcessorWrapper> stages = new Pipeline.PipelineStages<>(pipeline);
+				public void arrange(Pipeline<PrototypeProcessor> pipeline, Map<PrototypeProcessor, ProcessorView> views) {
+					final Pipeline.PipelineStages<PrototypeProcessor> stages = new Pipeline.PipelineStages<>(pipeline);
 					double x;
 					double y = vspace;
 					double height = 0;
 
-					for (Pipeline.Stage<ProcessorWrapper> stage : stages) {
+					for (Pipeline.Stage<PrototypeProcessor> stage : stages) {
 						x = hspace;
 
 						final List<ProcessorView> processors = new ArrayList<>();
-						for (ProcessorWrapper p : stage.processors) {
+						for (PrototypeProcessor p : stage.processors) {
 							processors.add(views.get(p));
 						}
 
@@ -128,7 +128,7 @@ public enum PipelineLayoutStrategy {
 				}
 
 				@Override
-				public ProcessorView newProcessorView(PipelineEditor editor, ProcessorWrapper wrapper) {
+				public ProcessorView newProcessorView(PipelineEditor editor, PrototypeProcessor wrapper) {
 					return new ProcessorViewTopDown(editor, wrapper);
 				}
 			};
@@ -178,14 +178,14 @@ public enum PipelineLayoutStrategy {
 	 *
 	 * @return sorted processors of a stage.
 	 */
-	public abstract Comparator<ProcessorWrapper> comparator();
+	public abstract Comparator<PrototypeProcessor> comparator();
 
 	/**
 	 * Sorts processors of a stage.
 	 *
 	 * @param processors all processors of a single stage.
 	 */
-	public void sort(List<? extends ProcessorWrapper> processors) {
+	public void sort(List<? extends PrototypeProcessor> processors) {
 		Collections.sort(processors, comparator());
 	}
 
@@ -195,7 +195,7 @@ public enum PipelineLayoutStrategy {
 	 * @param pipeline the pipeline.
 	 * @param views processor views.
 	 */
-	public abstract void arrange(Pipeline<ProcessorWrapper> pipeline, Map<ProcessorWrapper, ProcessorView> views);
+	public abstract void arrange(Pipeline<PrototypeProcessor> pipeline, Map<PrototypeProcessor, ProcessorView> views);
 
 	/**
 	 * Processor view factory. Creates a new processor view suitable for the
@@ -205,5 +205,5 @@ public enum PipelineLayoutStrategy {
 	 * @param wrapper the processor wrapper for which to create a view.
 	 * @return a processor view for the given processor wrapper.
 	 */
-	public abstract ProcessorView newProcessorView(PipelineEditor editor, ProcessorWrapper wrapper);
+	public abstract ProcessorView newProcessorView(PipelineEditor editor, PrototypeProcessor wrapper);
 }

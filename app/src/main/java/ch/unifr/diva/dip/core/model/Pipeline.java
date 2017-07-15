@@ -4,7 +4,7 @@ import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.core.ApplicationHandler;
-import ch.unifr.diva.dip.core.model.ProcessorWrapper.PortMapEntry;
+import ch.unifr.diva.dip.core.model.PrototypeProcessor.PortMapEntry;
 import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.osgi.OSGiVersionPolicy;
 import ch.unifr.diva.dip.utils.Modifiable;
@@ -25,13 +25,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Pipeline. A prototype of a pipeline to be used in the Pipeline Editor (can
+ * Pipeline. A prototype of a pipeline to be used in the pipeline editor (can
  * not be run).
  *
- * @param <T> {@code ProcessorWrapper} or {@code RunnableProcessor} (which
- * extends the firmer).
+ * @param <T> type of the processor wrapper; {@code PrototypeProcessor} or {@code RunnableProcessor}.
  */
-public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
+public class Pipeline<T extends PrototypeProcessor> implements Modifiable {
 
 	protected static final Logger log = LoggerFactory.getLogger(Pipeline.class);
 	protected final ApplicationHandler handler;
@@ -137,7 +136,7 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 
 		for (PipelineData.Processor p : pipeline.processors.list) {
 			@SuppressWarnings("unchecked")
-			final T wrapper = (T) new ProcessorWrapper(p, handler);
+			final T wrapper = (T) new PrototypeProcessor(p, handler);
 			wrapper.init();
 			addProcessor(wrapper);
 			levelMaxProcessorId(p.id);
@@ -146,7 +145,7 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 		initConnections(pipeline, processors);
 
 		// init processors now that they're connected
-		for (ProcessorWrapper p : processors) {
+		for (PrototypeProcessor p : processors) {
 			p.initProcessor();
 		}
 
@@ -163,8 +162,8 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 	 */
 	protected final void initConnections(PipelineData.Pipeline pipeline, List<T> processors) {
 		for (PipelineData.Connection c : pipeline.connections.list) {
-			final T input = ProcessorWrapper.getProcessorWrapper(c.input.id, processors);
-			final T output = ProcessorWrapper.getProcessorWrapper(c.output.id, processors);
+			final T input = PrototypeProcessor.getProcessorWrapper(c.input.id, processors);
+			final T output = PrototypeProcessor.getProcessorWrapper(c.output.id, processors);
 
 			if (input == null) {
 				log.warn("invalid connection. Input processor {} not found", c.input.id);
@@ -278,8 +277,8 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 		this.versionPolicyProperty.set(policy);
 	}
 
-	private final Map<OutputPort<?>, ProcessorWrapper.PortMapEntry> outputPortMap = new HashMap<>();
-	private final Map<InputPort<?>, ProcessorWrapper.PortMapEntry> inputPortMap = new HashMap<>();
+	private final Map<OutputPort<?>, PrototypeProcessor.PortMapEntry> outputPortMap = new HashMap<>();
+	private final Map<InputPort<?>, PrototypeProcessor.PortMapEntry> inputPortMap = new HashMap<>();
 
 	/**
 	 * Returns the output port map. Ports are stupid on do not know anything
@@ -289,7 +288,7 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 	 *
 	 * @return the output port map.
 	 */
-	public Map<OutputPort<?>, ProcessorWrapper.PortMapEntry> outputPortMap() {
+	public Map<OutputPort<?>, PrototypeProcessor.PortMapEntry> outputPortMap() {
 		return this.outputPortMap;
 	}
 
@@ -301,7 +300,7 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 	 *
 	 * @return the input port map.
 	 */
-	public Map<InputPort<?>, ProcessorWrapper.PortMapEntry> inputPortMap() {
+	public Map<InputPort<?>, PrototypeProcessor.PortMapEntry> inputPortMap() {
 		return this.inputPortMap;
 	}
 
@@ -409,7 +408,7 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 	 */
 	public final void addProcessor(String pid, String version, double x, double y) {
 		@SuppressWarnings("unchecked")
-		final T wrapper = (T) new ProcessorWrapper(newProcessorId(), pid, version, x, y, handler);
+		final T wrapper = (T) new PrototypeProcessor(newProcessorId(), pid, version, x, y, handler);
 		wrapper.init();
 		wrapper.initProcessor();
 		addProcessor(wrapper);
@@ -535,9 +534,9 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 	 * processor are made available at an earlier stage. Thus all processors in
 	 * a given stage can be processed, given all preceding stages are done.
 	 *
-	 * @param <T> class that extends from {@code ProcessorWrapper}.
+	 * @param <T> class that extends from {@code PrototypeProcessor}.
 	 */
-	public static class PipelineStages<T extends ProcessorWrapper> implements Iterable<Stage<T>> {
+	public static class PipelineStages<T extends PrototypeProcessor> implements Iterable<Stage<T>> {
 
 		/**
 		 * The stages.
@@ -559,15 +558,15 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 		 * @param pipeline the pipeline.
 		 * @param portMap the port map of the pipeline.
 		 */
-		public PipelineStages(Pipeline<T> pipeline, Map<OutputPort<?>, ProcessorWrapper.PortMapEntry> portMap) {
+		public PipelineStages(Pipeline<T> pipeline, Map<OutputPort<?>, PrototypeProcessor.PortMapEntry> portMap) {
 			buildStages(pipeline, portMap);
 		}
 
-		private static Map<OutputPort<?>, ProcessorWrapper.PortMapEntry> getPortMap(Pipeline<? extends ProcessorWrapper> pipeline) {
-			return ProcessorWrapper.getOutputPortMap(pipeline.processors());
+		private static Map<OutputPort<?>, PrototypeProcessor.PortMapEntry> getPortMap(Pipeline<? extends PrototypeProcessor> pipeline) {
+			return PrototypeProcessor.getOutputPortMap(pipeline.processors());
 		}
 
-		private void buildStages(Pipeline<T> pipeline, Map<OutputPort<?>, ProcessorWrapper.PortMapEntry> portMap) {
+		private void buildStages(Pipeline<T> pipeline, Map<OutputPort<?>, PrototypeProcessor.PortMapEntry> portMap) {
 			if (portMap == null) {
 				portMap = getPortMap(pipeline);
 			}
@@ -590,7 +589,7 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 						for (InputPort<?> input : wrapper.processor().inputs().values()) {
 							if (input.isConnected()) {
 								final OutputPort<?> output = input.connection();
-								final ProcessorWrapper.PortMapEntry source = portMap.get(output);
+								final PrototypeProcessor.PortMapEntry source = portMap.get(output);
 								if (!ready.contains(source.id)) {
 									isReady = false;
 								}
@@ -678,7 +677,7 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 	 *
 	 * @param <T> type of the processor wrapper.
 	 */
-	public static class Stage<T extends ProcessorWrapper> implements Localizable {
+	public static class Stage<T extends PrototypeProcessor> implements Localizable {
 
 		public final int number;
 		public final List<T> processors = new ArrayList<>();
@@ -719,7 +718,7 @@ public class Pipeline<T extends ProcessorWrapper> implements Modifiable {
 		 */
 		public Processor.State state() {
 			int max = -1;
-			for (ProcessorWrapper w : this.processors) {
+			for (PrototypeProcessor w : this.processors) {
 				if (w.state().weight > max) {
 					max = w.state().weight;
 				}

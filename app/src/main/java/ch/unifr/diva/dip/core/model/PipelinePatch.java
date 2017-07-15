@@ -252,7 +252,7 @@ public class PipelinePatch {
 	 * @return a pipeline delta patch with including the difference between base
 	 * and revision.
 	 */
-	public static PipelinePatch createPatch(Pipeline<ProcessorWrapper> base, RunnablePipeline revision) {
+	public static PipelinePatch createPatch(Pipeline<PrototypeProcessor> base, RunnablePipeline revision) {
 		final PipelinePatch patch = new PipelinePatch();
 
 		final int n = base.processors().size();
@@ -261,8 +261,8 @@ public class PipelinePatch {
 		}
 
 		for (int i = 0; i < n; i++) {
-			final ProcessorWrapper a = base.processors().get(i);
-			final ProcessorWrapper b = revision.processors().get(i);
+			final PrototypeProcessor a = base.processors().get(i);
+			final PrototypeProcessor b = revision.processors().get(i);
 
 			final ProcessorPatch p = new ProcessorPatch(a.id);
 

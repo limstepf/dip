@@ -4,7 +4,7 @@ import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.components.Port;
 import ch.unifr.diva.dip.core.model.Pipeline;
-import ch.unifr.diva.dip.core.model.ProcessorWrapper;
+import ch.unifr.diva.dip.core.model.PrototypeProcessor;
 import static ch.unifr.diva.dip.gui.pe.ProcessorsWidget.ProcessorListCell.OSGI_SERVICE_PROCESSOR;
 import ch.unifr.diva.dip.osgi.OSGiServiceReference;
 import ch.unifr.diva.dip.api.utils.FxUtils;
@@ -41,7 +41,7 @@ public class EditorPane {
 	private final Circle dot = new Circle(1, Color.TRANSPARENT);
 	private ConnectionView selectedWire = null;
 	private OutputPort<?> selectedPort = null;
-	private final Map<ProcessorWrapper, ProcessorView> processorViews = new HashMap<>();
+	private final Map<PrototypeProcessor, ProcessorView> processorViews = new HashMap<>();
 	private final Map<InputPort<?>, ConnectionView> connections = new HashMap<>();
 	private final Map<Port<?>, PortView<? extends Port<?>>> ports = new HashMap<>();
 	private final InvalidationListener repaintListener;
@@ -88,7 +88,7 @@ public class EditorPane {
 	 *
 	 * @return a mapping of processors to their corresponding view.
 	 */
-	public Map<ProcessorWrapper, ProcessorView> processorViewMap() {
+	public Map<PrototypeProcessor, ProcessorView> processorViewMap() {
 		return this.processorViews;
 	}
 
@@ -138,7 +138,7 @@ public class EditorPane {
 	 *
 	 * @param wrapper the processor whos view to bring to the front.
 	 */
-	public void bringToFront(ProcessorWrapper wrapper) {
+	public void bringToFront(PrototypeProcessor wrapper) {
 		final ProcessorView view = processorViews.get(wrapper);
 		bringToFront(view);
 	}
@@ -190,7 +190,7 @@ public class EditorPane {
 	 *
 	 * @return the selected pipeline.
 	 */
-	private Pipeline<ProcessorWrapper> pipeline() {
+	private Pipeline<PrototypeProcessor> pipeline() {
 		return editor.selectedPipelineProperty().get();
 	}
 
@@ -288,8 +288,8 @@ public class EditorPane {
 	 * Initializes the connections of all processors.
 	 */
 	public void setupConnections() {
-		for (Map.Entry<ProcessorWrapper, ProcessorView> e : processorViews.entrySet()) {
-			final ProcessorWrapper wrapper = e.getKey();
+		for (Map.Entry<PrototypeProcessor, ProcessorView> e : processorViews.entrySet()) {
+			final PrototypeProcessor wrapper = e.getKey();
 			setupConnections(wrapper);
 		}
 	}
@@ -299,7 +299,7 @@ public class EditorPane {
 	 *
 	 * @param wrapper the processor to connect.
 	 */
-	public void setupConnections(ProcessorWrapper wrapper) {
+	public void setupConnections(PrototypeProcessor wrapper) {
 		if (!wrapper.isAvailable()) {
 			return;
 		}
@@ -326,7 +326,7 @@ public class EditorPane {
 	 *
 	 * @param wrapper the processor to unconnect.
 	 */
-	public void removeConnections(ProcessorWrapper wrapper) {
+	public void removeConnections(PrototypeProcessor wrapper) {
 		if (!wrapper.isAvailable()) {
 			return;
 		}
@@ -502,7 +502,7 @@ public class EditorPane {
 	 *
 	 * @param wrapper the processor.
 	 */
-	public void addProcessor(ProcessorWrapper wrapper) {
+	public void addProcessor(PrototypeProcessor wrapper) {
 		final ProcessorView view = this.editor.selectedPipeline().getLayoutStrategy().newProcessorView(editor, wrapper);
 		processorViews.put(wrapper, view);
 		view.init();
@@ -514,7 +514,7 @@ public class EditorPane {
 	 *
 	 * @param wrapper the processor.
 	 */
-	public void removeProcessor(ProcessorWrapper wrapper) {
+	public void removeProcessor(PrototypeProcessor wrapper) {
 		final ProcessorView view = processorViews.get(wrapper);
 		if (view != null) {
 			pane().getChildren().remove(view);
@@ -531,7 +531,7 @@ public class EditorPane {
 	 *
 	 * @param wrapper the processor.
 	 */
-	public void unregisterPorts(ProcessorWrapper wrapper) {
+	public void unregisterPorts(PrototypeProcessor wrapper) {
 		if (!wrapper.isAvailable()) {
 			return;
 		}
@@ -559,7 +559,7 @@ public class EditorPane {
 	 *
 	 * @param wrapper the processor.
 	 */
-	public void deprecateProcessor(ProcessorWrapper wrapper) {
+	public void deprecateProcessor(PrototypeProcessor wrapper) {
 		// no-op; ProcessorView is bound to isAvailableProperty
 	}
 
@@ -577,7 +577,7 @@ public class EditorPane {
 	 *
 	 * @param wrapper the processor to update.
 	 */
-	public void updateProcessor(ProcessorWrapper wrapper) {
+	public void updateProcessor(PrototypeProcessor wrapper) {
 		final ProcessorView oldView = processorViews.get(wrapper);
 		if (oldView == null) {
 			log.warn("Couldn't update processor: processor view not found: {}", wrapper);
@@ -618,8 +618,8 @@ public class EditorPane {
 	 * changed.
 	 */
 	public void updateAllProcessors() {
-		final Set<ProcessorWrapper> processors = this.processorViews.keySet();
-		for (ProcessorWrapper p : processors) {
+		final Set<PrototypeProcessor> processors = this.processorViews.keySet();
+		for (PrototypeProcessor p : processors) {
 			updateProcessor(p);
 		}
 		if (editor.handler.settings.pipelineEditor.autoRearrangeOnChangedLayout) {

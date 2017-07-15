@@ -1,6 +1,6 @@
 package ch.unifr.diva.dip.gui.pe;
 
-import ch.unifr.diva.dip.core.model.ProcessorWrapper;
+import ch.unifr.diva.dip.core.model.PrototypeProcessor;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 
@@ -20,7 +20,7 @@ public class ProcessorViewLeftRight extends ProcessorView {
 	 * @param editor the pipeline editor.
 	 * @param wrapper the processor.
 	 */
-	public ProcessorViewLeftRight(PipelineEditor editor, ProcessorWrapper wrapper) {
+	public ProcessorViewLeftRight(PipelineEditor editor, PrototypeProcessor wrapper) {
 		super(editor, wrapper);
 
 		this.setLeft(inputPane);

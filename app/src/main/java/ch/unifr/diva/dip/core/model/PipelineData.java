@@ -59,8 +59,8 @@ public class PipelineData {
 	 *
 	 * @param pipelines a list of pipelines.
 	 */
-	public PipelineData(List<ch.unifr.diva.dip.core.model.Pipeline<ProcessorWrapper>> pipelines) {
-		for (ch.unifr.diva.dip.core.model.Pipeline<ProcessorWrapper> pipeline : pipelines) {
+	public PipelineData(List<ch.unifr.diva.dip.core.model.Pipeline<PrototypeProcessor>> pipelines) {
+		for (ch.unifr.diva.dip.core.model.Pipeline<PrototypeProcessor> pipeline : pipelines) {
 			this.list.add(new Pipeline(pipeline));
 		}
 	}
@@ -369,14 +369,14 @@ public class PipelineData {
 		 * @param <T> class of the processor wrapper.
 		 * @param pipeline a pipeline.
 		 */
-		public <T extends ProcessorWrapper> Pipeline(ch.unifr.diva.dip.core.model.Pipeline<T> pipeline) {
+		public <T extends PrototypeProcessor> Pipeline(ch.unifr.diva.dip.core.model.Pipeline<T> pipeline) {
 			this.id = pipeline.id;
 			this.name = pipeline.getName();
 			this.layoutStrategy = pipeline.getLayoutStrategy().name();
 			this.versionPolicy = pipeline.getVersionPolicy().name();
 
-			final Map<OutputPort<?>, ProcessorWrapper.PortMapEntry> outputPortMap;
-			outputPortMap = ProcessorWrapper.getOutputPortMap(pipeline.processors());
+			final Map<OutputPort<?>, PrototypeProcessor.PortMapEntry> outputPortMap;
+			outputPortMap = PrototypeProcessor.getOutputPortMap(pipeline.processors());
 
 			for (T wrapper : pipeline.processors()) {
 				this.processors.list.add(new Processor(wrapper));
@@ -384,7 +384,7 @@ public class PipelineData {
 				if (wrapper.isAvailable()) {
 					for (Map.Entry<String, InputPort<?>> e : wrapper.processor().inputs().entrySet()) {
 						final InputPort<?> input = e.getValue();
-						final ProcessorWrapper.PortMapEntry output = outputPortMap.get(input.connection());
+						final PrototypeProcessor.PortMapEntry output = outputPortMap.get(input.connection());
 						if (output != null) {
 							this.connections.list.add(
 									new Connection(
@@ -584,7 +584,7 @@ public class PipelineData {
 		 *
 		 * @param wrapper the processor wrapper.
 		 */
-		public Processor(ProcessorWrapper wrapper) {
+		public Processor(PrototypeProcessor wrapper) {
 			this.id = wrapper.id;
 			this.pid = wrapper.pid();
 			this.version = wrapper.version().toString();
@@ -708,7 +708,7 @@ public class PipelineData {
 	 */
 	public static class PipelineItem implements Localizable, DataItemListView.DataItem {
 
-		final private ch.unifr.diva.dip.core.model.Pipeline<ProcessorWrapper> pipeline;
+		final private ch.unifr.diva.dip.core.model.Pipeline<PrototypeProcessor> pipeline;
 		final private PipelineData.Pipeline data;
 		final private StringProperty nameProperty;
 		final private ObjectProperty<NamedGlyph> glyphProperty;
@@ -718,7 +718,7 @@ public class PipelineData {
 		 *
 		 * @param pipeline the pipeline.
 		 */
-		public PipelineItem(ch.unifr.diva.dip.core.model.Pipeline<ProcessorWrapper> pipeline) {
+		public PipelineItem(ch.unifr.diva.dip.core.model.Pipeline<PrototypeProcessor> pipeline) {
 			this(pipeline, null);
 		}
 
@@ -737,7 +737,7 @@ public class PipelineData {
 		 * @param pipeline the pipeline, or null.
 		 * @param data the pipeline data, or null.
 		 */
-		private PipelineItem(ch.unifr.diva.dip.core.model.Pipeline<ProcessorWrapper> pipeline, PipelineData.Pipeline data) {
+		private PipelineItem(ch.unifr.diva.dip.core.model.Pipeline<PrototypeProcessor> pipeline, PipelineData.Pipeline data) {
 			this.pipeline = pipeline;
 			this.data = data;
 			this.nameProperty = new SimpleStringProperty();

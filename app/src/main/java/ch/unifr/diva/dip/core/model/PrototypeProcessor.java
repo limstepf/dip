@@ -36,24 +36,32 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A ProcessorWrapper wrapps a processor service. While the wrapper itself is
- * persistent, the wrapped processor service is a bit more elusive and might
- * disappear and come back on at any point in time, or might get replaced by a
- * completely different processor even.
+ * A prototype processor wrapps a {@code Processor} service. Two kinds of
+ * wrappers are used to wrap processor services:
+ *
+ * <ol>
+ * <li>{@code PrototypeProcessor}s, and</li>
+ * <li>{@code RunnableProcessor}s.</li>
+ * </ol>
+ *
+ * The firmer are used by {@code Pipeline}s in the pipeline editor. The latter
+ * are a subclass of {@code PrototypeProcessor} and get instantiated by a
+ * {@code RunnablePipeline} assigned to some {@code ProjectPage}.
  *
  * <p>
- * The ProcessorWrapper is just a prototype of a processor in a (prototypical)
- * pipeline so far. A RunnablePipeline will have to instantiate
- * RunnableProcessor's that extend from ProcessorWrapper.
+ * Note that the wrapped {@code Processor} services are declarative OSGi
+ * services, meaning that they're a bit more elusive; they might disappear, and
+ * come back at some later point, maybe even replaced by a new/updated
+ * {@code Processor}.
  */
-public class ProcessorWrapper implements Modifiable, Localizable {
+public class PrototypeProcessor implements Modifiable, Localizable {
 
-	protected static final Logger log = LoggerFactory.getLogger(ProcessorWrapper.class);
+	protected static final Logger log = LoggerFactory.getLogger(PrototypeProcessor.class);
 	protected final ApplicationHandler handler;
 
 	/**
-	 * Unique id of the ProcessorWrapper. This id is unique with respect to its
-	 * parent pipeline, that is among the set of all ProcessorWrappers in the
+	 * Unique id of the PrototypeProcessor. This id is unique with respect to its
+	 * parent pipeline, that is among the set of all PrototypeProcessors in the
 	 * particular pipeline. Not to be confused with the pid of the wrapped
 	 * processor (service).
 	 */
@@ -79,7 +87,7 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	 * @param processor a PipelineData definition of a processor.
 	 * @param handler the application handler.
 	 */
-	protected ProcessorWrapper(PipelineData.Processor processor, ApplicationHandler handler) {
+	protected PrototypeProcessor(PipelineData.Processor processor, ApplicationHandler handler) {
 		this(
 				processor.id,
 				processor.pid,
@@ -95,7 +103,7 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	/**
 	 * Constructs a new instance.
 	 *
-	 * @param id new, unique id of the ProcessorWrapper, usually assigned by the
+	 * @param id new, unique id of the PrototypeProcessor, usually assigned by the
 	 * parent pipeline.
 	 * @param pid pid of the wrapped processor.
 	 * @param version version of the wrapped processor.
@@ -103,7 +111,7 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	 * @param y y position of the processor view.
 	 * @param handler the application handler.
 	 */
-	public ProcessorWrapper(int id, String pid, String version, double x, double y, ApplicationHandler handler) {
+	public PrototypeProcessor(int id, String pid, String version, double x, double y, ApplicationHandler handler) {
 		this(
 				id,
 				pid,
@@ -116,7 +124,7 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 		);
 	}
 
-	private ProcessorWrapper(int id, String pid, String version, double x, double y, boolean editing, Map<String, Object> parameters, ApplicationHandler handler) {
+	private PrototypeProcessor(int id, String pid, String version, double x, double y, boolean editing, Map<String, Object> parameters, ApplicationHandler handler) {
 		this.id = id;
 		this.pid = pid;
 		this.version = new Version(version);
@@ -618,7 +626,7 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	 * @param <T> processor class.
 	 * @param p the processor to copy the parameters from.
 	 */
-	public <T extends ProcessorWrapper> void copyParameters(T p) {
+	public <T extends PrototypeProcessor> void copyParameters(T p) {
 		copyParameters(p.processor().parameters());
 	}
 
@@ -692,7 +700,7 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	 * @return {@code true} if the parameters are equal, {@code false}
 	 * otherwise.
 	 */
-	public <T extends ProcessorWrapper> boolean equalParameters(T p) {
+	public <T extends PrototypeProcessor> boolean equalParameters(T p) {
 		return equalParameters(this, p);
 	}
 
@@ -705,7 +713,7 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	 * @return {@code true} if both sets of parameters are equal, {@code false}
 	 * otherwise.
 	 */
-	public static <T extends ProcessorWrapper> boolean equalParameters(T p, T q) {
+	public static <T extends PrototypeProcessor> boolean equalParameters(T p, T q) {
 		return equalParameters(p.processor().parameters(), q.processor().parameters());
 	}
 
@@ -741,15 +749,15 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	}
 
 	/**
-	 * Searches a list of {@code ProcessorWrapper} by id.
+	 * Searches a list of processor wrappers by id.
 	 *
-	 * @param <T>
-	 * @param id id of the {@code ProcessorWrapper}.
-	 * @param wrappers a list of {@code ProcessorWrapper}s.
-	 * @return the {@code ProcessorWrapper} with the given id, or null if not
+	 * @param <T> type of the processor wrapper ({@code PrototypeProcessor} or {@code RunnableProcessor}).
+	 * @param id id of the processor wrapper.
+	 * @param wrappers a list of processor wrappers.
+	 * @return the processor wrapper with the given id, or null if not
 	 * found.
 	 */
-	public static <T extends ProcessorWrapper> T getProcessorWrapper(int id, List<T> wrappers) {
+	public static <T extends PrototypeProcessor> T getProcessorWrapper(int id, List<T> wrappers) {
 		for (T wrapper : wrappers) {
 			if (wrapper.id == id) {
 				return wrapper;
@@ -768,10 +776,10 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	 * @param wrappers list of wrapped processors.
 	 * @return map of PortMapEntry indexed by OutputPort.
 	 */
-	public static <T extends ProcessorWrapper> Map<OutputPort<?>, PortMapEntry> getOutputPortMap(List<T> wrappers) {
+	public static <T extends PrototypeProcessor> Map<OutputPort<?>, PortMapEntry> getOutputPortMap(List<T> wrappers) {
 		final Map<OutputPort<?>, PortMapEntry> map = new HashMap<>();
 
-		for (ProcessorWrapper wrapper : wrappers) {
+		for (PrototypeProcessor wrapper : wrappers) {
 			if (!wrapper.isAvailable()) {
 				continue;
 			}
@@ -793,10 +801,10 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	 * @param wrappers list of wrapped processors.
 	 * @return map of PortMapEntry indexed by InputPort.
 	 */
-	public static <T extends ProcessorWrapper> Map<InputPort<?>, PortMapEntry> getInputPortMap(List<T> wrappers) {
+	public static <T extends PrototypeProcessor> Map<InputPort<?>, PortMapEntry> getInputPortMap(List<T> wrappers) {
 		final Map<InputPort<?>, PortMapEntry> map = new HashMap<>();
 
-		for (ProcessorWrapper wrapper : wrappers) {
+		for (PrototypeProcessor wrapper : wrappers) {
 			for (Map.Entry<String, InputPort<?>> e : wrapper.processor().inputs().entrySet()) {
 				map.put(e.getValue(), new PortMapEntry(wrapper.id, e.getKey()));
 			}
@@ -811,7 +819,7 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	public static class PortMapEntry {
 
 		/**
-		 * Unique id of the ProcessorWrapper/RunnableProcessor.
+		 * Unique id of the processor wrapper.
 		 */
 		public final int id;
 

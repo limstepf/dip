@@ -5,7 +5,7 @@ import ch.unifr.diva.dip.api.ui.RadioChoiceBox;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.model.Pipeline;
 import ch.unifr.diva.dip.core.model.PipelineManager;
-import ch.unifr.diva.dip.core.model.ProcessorWrapper;
+import ch.unifr.diva.dip.core.model.PrototypeProcessor;
 import ch.unifr.diva.dip.core.model.ProjectPage;
 import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
@@ -40,7 +40,7 @@ public class DeletePipelineDialog extends AbstractDialog {
 	private final Button ok = getDefaultButton(localize("ok"));
 	private final Button cancel = getCancelButton(stage);
 	private final List<ProjectPage> pages;
-	private final List<Pipeline<ProcessorWrapper>> deletedPipelines;
+	private final List<Pipeline<PrototypeProcessor>> deletedPipelines;
 	private final List<Integer> deletedPipelineIds;
 	private final ListView<PageItem> items;
 	private final InvalidationListener validListener;
@@ -55,7 +55,7 @@ public class DeletePipelineDialog extends AbstractDialog {
 	 * @param deletedPipelines pipelines to be deleted, but still in use.
 	 * @param deletedPipelineIds list of pipeline ids to be deleted.
 	 */
-	public DeletePipelineDialog(ApplicationHandler handler, List<ProjectPage> pages, List<Pipeline<ProcessorWrapper>> deletedPipelines, List<Integer> deletedPipelineIds) {
+	public DeletePipelineDialog(ApplicationHandler handler, List<ProjectPage> pages, List<Pipeline<PrototypeProcessor>> deletedPipelines, List<Integer> deletedPipelineIds) {
 		super(
 				handler.getProject().getPipelineEditor(handler.uiStrategy.getStage()).stage()
 		);

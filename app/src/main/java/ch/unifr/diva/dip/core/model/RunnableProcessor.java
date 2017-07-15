@@ -43,9 +43,10 @@ import javafx.util.Callback;
 import javax.xml.bind.JAXBException;
 
 /**
- * A runnable processor is a {@code ProcessorWrapper} that can be run/executed.
+ * A runnable processor is a {@code PrototypeProcessor} that can be
+ * run/executed.
  */
-public class RunnableProcessor extends ProcessorWrapper {
+public class RunnableProcessor extends PrototypeProcessor {
 
 	private final Project project;
 	private final ProjectPage page;
@@ -61,7 +62,7 @@ public class RunnableProcessor extends ProcessorWrapper {
 	private final InvalidationListener stateListener;
 
 	/**
-	 * Creates a runnable processor. As opposed to {@code ProcessorWrapper}s,
+	 * Creates a runnable processor. As opposed to {@code PrototypeProcessor}s,
 	 * {@code RunnableProcessor}'s can be executed.
 	 *
 	 * @param processor the processor specification.
@@ -416,7 +417,7 @@ public class RunnableProcessor extends ProcessorWrapper {
 	 * @param callback the callback function.
 	 */
 	protected void applyToDependentProcessors(Callback<RunnableProcessor, Void> callback) {
-		final Map<InputPort<?>, ProcessorWrapper.PortMapEntry> inputPortMap = this.pipeline.inputPortMap();
+		final Map<InputPort<?>, PrototypeProcessor.PortMapEntry> inputPortMap = this.pipeline.inputPortMap();
 		for (Map.Entry<String, Set<InputPort<?>>> e : processor().dependentInputs().entrySet()) {
 			final Set<InputPort<?>> inputs = e.getValue();
 			for (InputPort<?> input : inputs) {

@@ -9,8 +9,8 @@ import java.util.Map;
 /**
  * A processor context. A processor context offers restricted access to the DIP
  * environment and current project. Such a context is only needed for
- * {@code RunnableProcessor}, not for mere {@code ProcessorWrapper} living in
- * the pipeline editor.
+ * {@code RunnableProcessor}s, not for mere {@code PrototypeProcessor}s living
+ * in the pipeline editor.
  */
 public interface ProcessorContext {
 
