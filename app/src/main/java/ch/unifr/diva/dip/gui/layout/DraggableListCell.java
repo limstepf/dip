@@ -51,6 +51,7 @@ public class DraggableListCell<T> extends ListCell<T> {
 	 */
 	public static class ListSelection<T> implements Serializable {
 
+		private static final long serialVersionUID = 2674608960206149481L;
 		public final ArrayList<Integer> indices;
 
 		/**
@@ -96,7 +97,8 @@ public class DraggableListCell<T> extends ListCell<T> {
 		if (!db.hasContent(LIST_INDICES)) {
 			return false;
 		}
-		final ListSelection selection = (ListSelection) db.getContent(LIST_INDICES);
+		@SuppressWarnings("unchecked")
+		final ListSelection<T> selection = (ListSelection<T>) db.getContent(LIST_INDICES);
 		return selection.indices.contains(index);
 	}
 
@@ -124,7 +126,7 @@ public class DraggableListCell<T> extends ListCell<T> {
 		final Dragboard db = this.startDragAndDrop(TransferMode.MOVE);
 		final ClipboardContent content = new ClipboardContent();
 
-		final ListSelection selection = new ListSelection(
+		final ListSelection<T> selection = new ListSelection<>(
 				listView.getSelectionModel().getSelectedIndices()
 		);
 
@@ -140,10 +142,10 @@ public class DraggableListCell<T> extends ListCell<T> {
 		if (!isInSelection(getIndex(this), db) && db.hasContent(LIST_INDICES)) {
 			e.acceptTransferModes(TransferMode.MOVE);
 
-			ListSelection selection = (ListSelection) db.getContent(LIST_INDICES);
+			@SuppressWarnings("unchecked")
+			ListSelection<T> selection = (ListSelection<T>) db.getContent(LIST_INDICES);
 			final ListView<T> listView = this.getListView();
 			final List<T> list = new ArrayList<>(listView.getItems());
-			final List<T> items = selection.getItems(listView);
 			final T target = this.getItem();
 
 			if (list.indexOf(target) >= selection.getMaxIndex()) {
@@ -180,7 +182,8 @@ public class DraggableListCell<T> extends ListCell<T> {
 		final Dragboard db = e.getDragboard();
 
 		if (db.hasContent(LIST_INDICES)) {
-			ListSelection selection = (ListSelection) db.getContent(LIST_INDICES);
+			@SuppressWarnings("unchecked")
+			ListSelection<T> selection = (ListSelection<T>) db.getContent(LIST_INDICES);
 
 			final ListView<T> listView = this.getListView();
 			final List<T> list = new ArrayList<>(listView.getItems());
@@ -218,13 +221,4 @@ public class DraggableListCell<T> extends ListCell<T> {
 		e.consume();
 	}
 
-	/*
-	 private void onDragDone(DragEvent e) {
-	 if (e.getTransferMode() == TransferMode.MOVE) {
-	 // MOVE
-	 }
-
-	 e.consume();
-	 }
-	 */
 }

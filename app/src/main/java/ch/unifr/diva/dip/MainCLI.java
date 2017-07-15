@@ -11,7 +11,6 @@ import ch.unifr.diva.dip.eventbus.events.StatusMessageEvent;
 import ch.unifr.diva.dip.eventbus.events.StatusWorkerEvent;
 import ch.unifr.diva.dip.api.utils.FxUtils;
 import ch.unifr.diva.dip.core.model.PipelineData;
-import ch.unifr.diva.dip.core.model.ProcessorWrapper;
 import ch.unifr.diva.dip.core.model.Project;
 import ch.unifr.diva.dip.core.model.ProjectData;
 import ch.unifr.diva.dip.eventbus.events.ProjectNotification;
@@ -311,7 +310,7 @@ public class MainCLI {
 					@Override
 					public Object[] getChildren(Object obj) {
 						if (obj instanceof PipelineData.Pipeline) {
-							final PipelineData.Pipeline<ProcessorWrapper> pipeline = (PipelineData.Pipeline) obj;
+							final PipelineData.Pipeline pipeline = (PipelineData.Pipeline) obj;
 							final OSGiVersionPolicy policy = OSGiVersionPolicy.get(pipeline.versionPolicy);
 							return new Object[]{
 								"id: " + pipeline.id,
@@ -334,7 +333,7 @@ public class MainCLI {
 					@Override
 					public String getName(Object obj) {
 						if (obj instanceof PipelineData.Pipeline) {
-							final PipelineData.Pipeline<ProcessorWrapper> pipeline = (PipelineData.Pipeline) obj;
+							final PipelineData.Pipeline pipeline = (PipelineData.Pipeline) obj;
 							return pipeline.name;
 						}
 						return obj.toString();
@@ -513,7 +512,7 @@ public class MainCLI {
 	private class StatusListener {
 
 		@Subscribe
-		public void handleStatusEvent(StatusWorkerEvent event) {
+		public void handleStatusEvent(StatusWorkerEvent<?> event) {
 			final InvalidationListener progressListener = (e) -> {
 				printWorkerProgress(event.worker);
 			};
@@ -535,12 +534,12 @@ public class MainCLI {
 			// listening to it...
 			stateListener.changed(
 					event.worker.stateProperty(),
-					(Worker.State) event.worker.stateProperty().get(),
-					(Worker.State) event.worker.stateProperty().get()
+					event.worker.stateProperty().get(),
+					event.worker.stateProperty().get()
 			);
 		}
 
-		private void printWorkerProgress(Worker worker) {
+		private void printWorkerProgress(Worker<?> worker) {
 			System.out.println(String.format(
 					"%s%5.2f, %s: %s",
 					INDENT,
@@ -568,9 +567,9 @@ public class MainCLI {
 		 * Checks whether the worker of a worker event is done already.
 		 *
 		 * @param event the worker event.
-		 * @return True if done, False otherwise.
+		 * @return {@code true} if done, {@code false} otherwise.
 		 */
-		private boolean isDone(StatusWorkerEvent event) {
+		private boolean isDone(StatusWorkerEvent<?> event) {
 			return isDone(event.worker.getState());
 		}
 
@@ -578,7 +577,7 @@ public class MainCLI {
 		 * Checks whether a worker is done already.
 		 *
 		 * @param state a worker's state.
-		 * @return True if done, False otherwise.
+		 * @return {@code true} if done, {@code false} otherwise.
 		 */
 		private boolean isDone(Worker.State state) {
 			if (state == null) {

@@ -17,15 +17,15 @@ import java.util.List;
  */
 public class CompositeGrid extends CompositeGridBase<ValueList> {
 
-	protected final List<Parameter> children;
-	protected final List<PersistentParameter> persistentChildren;
+	protected final List<Parameter<?>> children;
+	protected final List<PersistentParameter<?>> persistentChildren;
 
 	/**
 	 * Creates a composite grid (without label).
 	 *
 	 * @param parameters child parameters to populate the grid with.
 	 */
-	public CompositeGrid(Parameter... parameters) {
+	public CompositeGrid(Parameter<?>... parameters) {
 		this("", parameters);
 	}
 
@@ -35,7 +35,7 @@ public class CompositeGrid extends CompositeGridBase<ValueList> {
 	 * @param label label.
 	 * @param parameters child parameters to populate the grid with.
 	 */
-	public CompositeGrid(String label, Parameter... parameters) {
+	public CompositeGrid(String label, Parameter<?>... parameters) {
 		this(label, Arrays.asList(parameters));
 	}
 
@@ -44,7 +44,7 @@ public class CompositeGrid extends CompositeGridBase<ValueList> {
 	 *
 	 * @param parameters child parameters to populate the grid with.
 	 */
-	public CompositeGrid(Collection<Parameter> parameters) {
+	public CompositeGrid(Collection<Parameter<?>> parameters) {
 		this("", parameters);
 	}
 
@@ -54,7 +54,7 @@ public class CompositeGrid extends CompositeGridBase<ValueList> {
 	 * @param label label.
 	 * @param parameters child parameters to populate the grid with.
 	 */
-	public CompositeGrid(String label, Collection<Parameter> parameters) {
+	public CompositeGrid(String label, Collection<Parameter<?>> parameters) {
 		super(label, initValue(parameters), initValue(parameters));
 
 		this.children = new ArrayList<>(parameters);
@@ -64,19 +64,18 @@ public class CompositeGrid extends CompositeGridBase<ValueList> {
 	}
 
 	// yes, we do this twice to not override the default later on...
-	private static ValueList initValue(Collection<Parameter> parameters) {
+	private static ValueList initValue(Collection<Parameter<?>> parameters) {
 		final List<Object> defaultValues = new ArrayList<>();
-		for (Parameter p : parameters) {
+		for (Parameter<?> p : parameters) {
 			if (p.isPersistent()) {
-				final PersistentParameter pp = (PersistentParameter) p;
-				defaultValues.add(pp.defaultValue());
+				defaultValues.add(p.asPersitentParameter().defaultValue());
 			}
 		}
 		return new ValueList(defaultValues);
 	}
 
 	@Override
-	protected Collection<? extends Parameter> getChildren() {
+	protected Collection<? extends Parameter<?>> getChildren() {
 		return this.children;
 	}
 
@@ -101,15 +100,15 @@ public class CompositeGrid extends CompositeGridBase<ValueList> {
 
 		final int m = Math.min(n, this.persistentChildren.size());
 		for (int i = 0; i < m; i++) {
-			this.persistentChildren.get(i).set(value.get(i));
+			persistentChildren.get(i).asPersitentParameter().setRaw(value.get(i));
 		}
 	}
 
 	@Override
-	protected void invalidateChildParameter(PersistentParameter p) {
+	protected void invalidateChildParameter(PersistentParameter<?> p) {
 		final ValueList vl = get();
 		for (int i = 0; i < this.persistentChildren.size(); i++) {
-			final PersistentParameter pi = this.persistentChildren.get(i);
+			final PersistentParameter<?> pi = this.persistentChildren.get(i);
 			if (p.equals(pi)) {
 				vl.list.set(i, p.get());
 				break;
@@ -130,7 +129,7 @@ public class CompositeGrid extends CompositeGridBase<ValueList> {
 		);
 		for (int i = 0; i < max; i++) {
 			v.list.set(i, value.get(i));
-			this.persistentChildren.get(i).set(value.get(i));
+			persistentChildren.get(i).asPersitentParameter().setRaw(value.get(i));
 		}
 
 		return v;

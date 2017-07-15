@@ -25,7 +25,7 @@ public class OSGiService<T> {
 	 * The {@code ServiceReference}. May be used to examine the properties of
 	 * the service and to get the service object.
 	 */
-	public final ServiceReference serviceReference;
+	public final ServiceReference<T> serviceReference;
 
 	/**
 	 * The service object referenced by the service reference.
@@ -69,9 +69,9 @@ public class OSGiService<T> {
 	 * @throws ch.unifr.diva.dip.osgi.OSGiInvalidServiceException in case the
 	 * service is invalid/misconfigured.
 	 */
-	public OSGiService(BundleContext context, ServiceReference serviceReference) throws OSGiInvalidServiceException {
+	public OSGiService(BundleContext context, ServiceReference<T> serviceReference) throws OSGiInvalidServiceException {
 		this.serviceReference = serviceReference;
-		this.serviceObject = (T) context.getService(serviceReference);
+		this.serviceObject = context.getService(serviceReference);
 
 		if (this.serviceObject == null) {
 			throw new OSGiInvalidServiceException(String.format(
@@ -90,7 +90,9 @@ public class OSGiService<T> {
 		 * The name of a component defaults to the canonical name of the class, but
 		 * may be overwritten in the @Component(name=PID) annotation.
 		 */
-		this.pid = serviceReference.getProperty(SERVICE_COMPONENTNAME).toString();
+		final Object pidProp = serviceReference.getProperty(SERVICE_COMPONENTNAME);
+		this.pid = (pidProp == null) ? null : pidProp.toString();
+		
 		if (this.pid == null || this.pid.isEmpty()) {
 			throw new OSGiInvalidServiceException(String.format(
 					"Invalid/misconfigured OSGi service: the '%s' property (used as PID) is not set! Bundle=%s, ServiceReference=%s, ServiceObject=%s",
@@ -115,7 +117,7 @@ public class OSGiService<T> {
 	 * @param version the version of the service.
 	 */
 	public OSGiService(String pid, T serviceObject, Version version) {
-		this.serviceReference = new HostServiceReference(pid);
+		this.serviceReference = new HostServiceReference<>(pid);
 		this.serviceObject = serviceObject;
 		this.pid = pid;
 		this.symbolicBundleName = "host";

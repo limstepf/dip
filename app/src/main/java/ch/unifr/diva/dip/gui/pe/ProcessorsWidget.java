@@ -56,7 +56,7 @@ public class ProcessorsWidget extends AbstractWidget {
 
 	private static final Logger log = LoggerFactory.getLogger(ProcessorsWidget.class);
 	private final View view;
-	private final ServiceMonitor services;
+	private final ServiceMonitor<Processor> services;
 
 	/**
 	 * Creates a new processor widget.
@@ -64,7 +64,7 @@ public class ProcessorsWidget extends AbstractWidget {
 	 * @param label label of the widget.
 	 * @param services the processor service monitor.
 	 */
-	public ProcessorsWidget(String label, ServiceMonitor services) {
+	public ProcessorsWidget(String label, ServiceMonitor<Processor> services) {
 		super();
 
 		this.services = services;
@@ -77,7 +77,7 @@ public class ProcessorsWidget extends AbstractWidget {
 	/**
 	 * Disables/enables the widget.
 	 *
-	 * @param disable True to disable, False to (re-)enable.
+	 * @param disable {@code true} to disable, {@code false} to (re-)enable.
 	 */
 	public void setDisable(boolean disable) {
 		this.view.setDisable(disable);
@@ -97,7 +97,6 @@ public class ProcessorsWidget extends AbstractWidget {
 		private final VBox vbox = new VBox();
 		private final Label name = new Label();
 		private final Label description = new Label();
-		private final ComboBox version = new ComboBox();
 		private final Label versionLabel = new Label();
 		private NamedGlyph namedGlyph;
 		private Glyph glyph;
@@ -129,7 +128,6 @@ public class ProcessorsWidget extends AbstractWidget {
 			description.setMinWidth(0);
 			description.setPrefWidth(15);
 			description.getStyleClass().add("dip-small");
-			version.getStyleClass().add("dip-small");
 			versionLabel.getStyleClass().add("dip-small");
 			final BorderPane titleBox = new BorderPane();
 			titleBox.setCenter(name);
@@ -306,7 +304,7 @@ public class ProcessorsWidget extends AbstractWidget {
 
 		private final FormGridPane grid;
 		private final Label versionLabel;
-		private final ComboBox versionList;
+		private final ComboBox<String> versionList;
 
 		/**
 		 * Creates a new processor cell edit box.
@@ -318,7 +316,7 @@ public class ProcessorsWidget extends AbstractWidget {
 			this.grid = new FormGridPane();
 			this.grid.setPadding(new Insets(b, 0, b, 0));
 			this.versionLabel = FormGridPane.newLabel(L10n.getInstance().getString("version") + ":");
-			this.versionList = new ComboBox();
+			this.versionList = new ComboBox<>();
 			versionList.getStyleClass().add("dip-small");
 			versionList.setOnKeyPressed(onEnterHandler);
 			grid.addRow(versionLabel, versionList);
@@ -362,7 +360,7 @@ public class ProcessorsWidget extends AbstractWidget {
 		 *
 		 * @param services the service monitor.
 		 */
-		public View(ServiceMonitor services) {
+		public View(ServiceMonitor<Processor> services) {
 			setMaxHeight(Double.MAX_VALUE);
 			VBox.setVgrow(listView, Priority.ALWAYS);
 

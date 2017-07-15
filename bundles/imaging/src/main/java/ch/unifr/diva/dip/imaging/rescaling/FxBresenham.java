@@ -54,7 +54,6 @@ public class FxBresenham {
 	/**
 	 * Upscales the source image with subpixel precision.
 	 *
-	 * @see FxRescaling.bresenhamUpsacling
 	 * @param src the source image.
 	 * @param width the width of the destination image.
 	 * @param height the height of the destination image.

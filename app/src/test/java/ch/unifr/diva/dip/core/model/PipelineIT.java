@@ -37,12 +37,12 @@ public class PipelineIT {
 		);
 
 		final Pipeline<ProcessorWrapper> theEmptyPipeline = PipelineManager.emptyPipeline(handler);
-		final List<Pipeline> pipelines = new ArrayList<>();
+		final List<Pipeline<ProcessorWrapper>> pipelines = new ArrayList<>();
 		pipelines.add(theEmptyPipeline);
 
 		PipelineManager.exportPipelines(pipelines, file);
 
-		final List<Pipeline> theSamePipelines = PipelineManager.importPipelines(handler, file, -1);
+		final List<Pipeline<ProcessorWrapper>> theSamePipelines = PipelineManager.importPipelines(handler, file, -1);
 		assertTrue("unserialized, previously serialized pipelines", theSamePipelines != null);
 		assertTrue("exactly one pipeline again", theSamePipelines.size() == 1);
 

@@ -3,16 +3,17 @@ package ch.unifr.diva.dip.api.datatypes;
 import javafx.scene.input.DataFormat;
 
 /**
- * A JavaFX image.
+ * Data type for a JavaFX image object.
  */
-public class FxImage implements DataType {
+public class FxImage extends AbstractDataType<javafx.scene.image.Image> {
 
-	public final static Class type = javafx.scene.image.Image.class;
-	public final static DataFormat dataFormat = new DataFormat("dip-datatype/fx-image");
+	private final static DataFormat dataFormat = new DataFormat("dip-datatype/fx-image");
 
-	@Override
-	public Class type() {
-		return type;
+	/**
+	 * Creates a new data type for a JavaFX image object.
+	 */
+	public FxImage() {
+		super(javafx.scene.image.Image.class);
 	}
 
 	@Override

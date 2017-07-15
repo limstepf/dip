@@ -147,7 +147,8 @@ public interface Zoomable {
 	/**
 	 * Checks whether the content pane is empty.
 	 *
-	 * @return True if the content pane is empty, false otherwise.
+	 * @return {@code true} if the content pane is empty, {@code false}
+	 * otherwise.
 	 */
 	public boolean isEmpty();
 

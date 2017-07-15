@@ -124,10 +124,11 @@ public class ApplicationDataManager {
 	 * be explicitly deleted, since the contents of the temporary directory will
 	 * get cleaned upon start and proper shutdown of the application.
 	 *
-	 * @param pathOnly if set to True no file will be created (or rather removed
-	 * right away) and only a proper tmp. path will be returned. The file still
-	 * get's deleted after being created and the JVM shuts down. If False, then
-	 * an empty file will exist, where the returned path is pointing to.
+	 * @param pathOnly if set to {@code true} no file will be created (or rather
+	 * removed right away) and only a proper tmp. path will be returned. The
+	 * file still get's deleted after being created and the JVM shuts down. If
+	 * {@code false}, then an empty file will exist, where the returned path is
+	 * pointing to.
 	 * @return path to a new temporary file that gets deleted once the JVM shuts
 	 * down.
 	 * @throws java.io.IOException
@@ -237,8 +238,10 @@ public class ApplicationDataManager {
 
 		/**
 		 * Deletes all files in the temporary directory.
+		 *
+		 * @return {@code true} if successfull, {@code false} otherwise.
 		 */
-		public void deleteTemporaryFiles() {
+		public boolean deleteTemporaryFiles() {
 			final FileFinder finder = new FileFinder("*.*");
 			try {
 				finder.walkFileTree(tmpDir, FileFinderOption.NONRECURSIVE);
@@ -247,15 +250,19 @@ public class ApplicationDataManager {
 						file.delete();
 					}
 				}
+				return true;
 			} catch (IOException ex) {
 				log.warn("failed to clean up temporary files in: {}", tmpDir, ex);
 			}
+			return false;
 		}
 
 		/**
 		 * Deletes all files in the log directory that are older than a week.
+		 *
+		 * @return {@code true} if successfull, {@code false} otherwise.
 		 */
-		public void deleteLogFiles() {
+		public boolean deleteLogFiles() {
 			final FileFinder finder = new FileFinder("*.*");
 			try {
 				finder.walkFileTree(logDir, FileFinderOption.NONRECURSIVE);
@@ -269,9 +276,11 @@ public class ApplicationDataManager {
 						}
 					}
 				}
+				return true;
 			} catch (IOException ex) {
 				log.warn("failed to clean up log files in: {}", logDir, ex);
 			}
+			return false;
 		}
 
 	}

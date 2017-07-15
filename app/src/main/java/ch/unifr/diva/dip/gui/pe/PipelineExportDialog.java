@@ -4,6 +4,7 @@ import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.model.DipData;
 import ch.unifr.diva.dip.core.model.Pipeline;
 import ch.unifr.diva.dip.core.model.PipelineData;
+import ch.unifr.diva.dip.core.model.ProcessorWrapper;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,7 @@ import javafx.collections.ObservableList;
 public class PipelineExportDialog extends DataItemDialogBase<PipelineData.PipelineItem> {
 
 	private DipData data;
-	private final List<Pipeline> pipelines;
+	private final List<Pipeline<ProcessorWrapper>> pipelines;
 	private final List<PipelineData.PipelineItem> newPipelineItems;
 
 	/**
@@ -24,7 +25,7 @@ public class PipelineExportDialog extends DataItemDialogBase<PipelineData.Pipeli
 	 * @param handler the application handler.
 	 * @param pipelines the pipelines to be exported.
 	 */
-	public PipelineExportDialog(ApplicationHandler handler, List<Pipeline> pipelines) {
+	public PipelineExportDialog(ApplicationHandler handler, List<Pipeline<ProcessorWrapper>> pipelines) {
 		super(
 				handler,
 				handler.dataManager.appDataDir.getPipelinePresetPath(),
@@ -37,9 +38,9 @@ public class PipelineExportDialog extends DataItemDialogBase<PipelineData.Pipeli
 		initFile();
 	}
 
-	private List<PipelineData.PipelineItem> toPipelineItems(List<Pipeline> pipelines) {
+	private List<PipelineData.PipelineItem> toPipelineItems(List<Pipeline<ProcessorWrapper>> pipelines) {
 		final List<PipelineData.PipelineItem> items = new ArrayList<>();
-		for (Pipeline p : pipelines) {
+		for (Pipeline<ProcessorWrapper> p : pipelines) {
 			items.add(new PipelineData.PipelineItem(p));
 		}
 		return items;

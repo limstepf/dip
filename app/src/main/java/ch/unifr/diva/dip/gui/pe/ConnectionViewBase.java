@@ -15,8 +15,8 @@ import javafx.scene.shape.Shape;
  */
 abstract public class ConnectionViewBase<T extends Shape> implements ConnectionView {
 
-	protected final InputPort input;
-	protected PortView<OutputPort> output;
+	protected final InputPort<?> input;
+	protected PortView<OutputPort<?>> output;
 	protected final Color color;
 	protected final T wire;
 
@@ -27,7 +27,7 @@ abstract public class ConnectionViewBase<T extends Shape> implements ConnectionV
 	 * @param wire a JavaFX Shape that represents the connection view (or is the
 	 * wire).
 	 */
-	public ConnectionViewBase(InputPort input, T wire) {
+	public ConnectionViewBase(InputPort<?> input, T wire) {
 		this.input = input;
 		this.color = hashColor(input);
 		this.wire = wire;
@@ -37,7 +37,7 @@ abstract public class ConnectionViewBase<T extends Shape> implements ConnectionV
 	}
 
 	@Override
-	public DataType dataType() {
+	public DataType<?> dataType() {
 		return input.getDataType();
 	}
 
@@ -57,17 +57,17 @@ abstract public class ConnectionViewBase<T extends Shape> implements ConnectionV
 	}
 
 	@Override
-	public void setOutput(PortView<OutputPort> output) {
+	public void setOutput(PortView<OutputPort<?>> output) {
 		this.output = output;
 	}
 
 	@Override
-	public InputPort inputPort() {
+	public InputPort<?> inputPort() {
 		return input;
 	}
 
 	@Override
-	public OutputPort outputPort() {
+	public OutputPort<?> outputPort() {
 		if (output == null) {
 			return null;
 		}

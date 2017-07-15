@@ -47,11 +47,12 @@ public class OutputColorPort extends ColorPort {
 	 * @param key the key of the port.
 	 * @param required whether nor not this is a required port.
 	 */
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public OutputColorPort(SimpleColorModel cm, String key, boolean required) {
 		super(cm, key);
 
 		if (cm == null) {
-			this.port = new OutputPort(
+			this.port = new OutputPort<>(
 					new ch.unifr.diva.dip.api.datatypes.BufferedImage()
 			);
 		} else {

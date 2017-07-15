@@ -114,9 +114,9 @@ public class GlyphToggleGroup<T> {
 	/**
 	 * Enables/disables the deselection of a selected glyph.
 	 *
-	 * @param enable If True a selected glyph can be deselected by clicking it
-	 * again, s.t. no glyph will be selected any longer. Otherwise, once
-	 * initialized, some glyph will always be selected.
+	 * @param enable If {@code true} a selected glyph can be deselected by
+	 * clicking it again, s.t. no glyph will be selected any longer. Otherwise,
+	 * once initialized, some glyph will always be selected.
 	 */
 	public void enableDeselection(boolean enable) {
 		this.enableDeselection = enable;

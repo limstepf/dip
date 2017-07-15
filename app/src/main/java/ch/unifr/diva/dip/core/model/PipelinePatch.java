@@ -84,7 +84,8 @@ public class PipelinePatch {
 	/**
 	 * Checks whether this is an empty patch.
 	 *
-	 * @return True if the patch is empty (and can be omitted), False otherwise.
+	 * @return {@code true} if the patch is empty (and can be omitted),
+	 * {@code false} otherwise.
 	 */
 	public boolean isEmpty() {
 		if (this.processors == null) {
@@ -164,8 +165,8 @@ public class PipelinePatch {
 		/**
 		 * Checks whether the processor patch is empty (or null).
 		 *
-		 * @return True if the patch is empty (and must be ommited), False
-		 * otherwise.
+		 * @return {@code true} if the patch is empty (and must be ommited),
+		 * {@code false} otherwise.
 		 */
 		public boolean isEmpty() {
 			if (this.parameters == null) {
@@ -246,14 +247,12 @@ public class PipelinePatch {
 	/**
 	 * Creates a pipeline delta patch.
 	 *
-	 * @param <T> class of the Pipeline.
-	 * @param <P> class of the ProcessorWrapper.
 	 * @param base the base (or prototype) pipeline.
 	 * @param revision the modified pipeline.
 	 * @return a pipeline delta patch with including the difference between base
 	 * and revision.
 	 */
-	public static <T extends Pipeline, P extends ProcessorWrapper> PipelinePatch createPatch(T base, T revision) {
+	public static PipelinePatch createPatch(Pipeline<ProcessorWrapper> base, RunnablePipeline revision) {
 		final PipelinePatch patch = new PipelinePatch();
 
 		final int n = base.processors().size();
@@ -262,8 +261,8 @@ public class PipelinePatch {
 		}
 
 		for (int i = 0; i < n; i++) {
-			final P a = (P) base.processors().get(i);
-			final P b = (P) revision.processors().get(i);
+			final ProcessorWrapper a = base.processors().get(i);
+			final ProcessorWrapper b = revision.processors().get(i);
 
 			final ProcessorPatch p = new ProcessorPatch(a.id);
 

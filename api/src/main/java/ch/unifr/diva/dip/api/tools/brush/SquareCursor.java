@@ -35,7 +35,6 @@ public class SquareCursor extends CrosshairCursor implements BrushCursor {
 		if (strokeWidth <= 1) {
 			getChildren().setAll(hline, vline);
 		} else if (strokeWidth <= crosshairThreshold) {
-			final double swr = strokeWidth - 2*r;
 			rect.setWidth(strokeWidth);
 			rect.setHeight(strokeWidth);
 			rect.setX(r - radius);

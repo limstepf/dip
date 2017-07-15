@@ -23,7 +23,7 @@ import java.awt.Rectangle;
  *
  * @param <T> class of the wrapped matrix.
  */
-public abstract class Kernel<T extends Matrix> {
+public abstract class Kernel<T extends Matrix<T>> {
 
 	protected final T matrix;
 	protected final Rectangle bounds;
@@ -136,7 +136,8 @@ public abstract class Kernel<T extends Matrix> {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		final Kernel other = (Kernel) obj;
+		@SuppressWarnings("unchecked")
+		final Kernel<T> other = (Kernel<T>) obj;
 		return matrix.equals(other.matrix);
 	}
 

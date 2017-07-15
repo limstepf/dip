@@ -8,6 +8,7 @@ import ch.unifr.diva.dip.api.utils.L10n;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.model.Pipeline;
 import ch.unifr.diva.dip.core.model.PipelineData;
+import ch.unifr.diva.dip.core.model.ProcessorWrapper;
 import ch.unifr.diva.dip.core.model.ProjectPage;
 import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.gui.dialogs.AbstractDialog;
@@ -237,6 +238,8 @@ public class ModifiedPipelinesDialog extends AbstractDialog {
 							// so all we have to do is update the pipeline id
 							a.page.setPipelineId(newId, false);
 							break;
+						default:
+							throw new RuntimeException("invalid resolution index");
 					}
 				}
 			}
@@ -261,7 +264,7 @@ public class ModifiedPipelinesDialog extends AbstractDialog {
 	private class ModifiedPipelineSection implements Localizable {
 
 		private final List<AffectedPage> affectedPages;
-		private final Pipeline pipeline;
+		private final Pipeline<ProcessorWrapper> pipeline;
 		private final Set<Integer> pageids;
 		private final InvalidationListener resolutionListener;
 		private final Label cloneLabel;
@@ -432,6 +435,7 @@ public class ModifiedPipelinesDialog extends AbstractDialog {
 		return pane;
 	}
 
+	@SuppressWarnings({"unchecked", "varargs"})
 	private static <T extends Node> FormGridPane newRow(T... nodes) {
 		return newRow(Arrays.asList(nodes));
 	}

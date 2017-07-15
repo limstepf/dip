@@ -21,8 +21,8 @@ abstract public class ImageScanner implements Iterable<Location>, Iterator<Locat
 	 * Creates a new image scanner for the given image.
 	 *
 	 * @param image the image to scan.
-	 * @param useBands iterate over all samples in all bands in True, just over
-	 * all pixels/locations otherwise.
+	 * @param useBands iterate over all samples in all bands if {@code true},
+	 * just over all pixels/locations otherwise.
 	 */
 	public ImageScanner(BufferedImage image, boolean useBands) {
 		this(

@@ -43,7 +43,7 @@ public class ConvolutionFilter extends ProcessableBase implements Previewable {
 	private final static String MATRIX_FILE = "convolved.bmat";
 
 	private final InputPort<BufferedImage> input;
-	private final InputPort<BufferedImage> input_float;
+	private final InputPort<BufferedMatrix> input_float;
 
 	private final KernelInput<FloatMatrix> kernelFloat;
 	private final KernelInput<DoubleMatrix> kernelDouble;
@@ -58,12 +58,12 @@ public class ConvolutionFilter extends ProcessableBase implements Previewable {
 	 *
 	 * @param <T> type of the matrix.
 	 */
-	private static class KernelInput<T extends Matrix> {
+	private static class KernelInput<T extends Matrix<T>> {
 
 		private final String postfix;
-		public final InputPort<T> kernel;
-		public final InputPort<T> rowVector;
-		public final InputPort<T> columnVector;
+		public final InputPort<? extends Matrix<?>> kernel;
+		public final InputPort<? extends Matrix<?>> rowVector;
+		public final InputPort<? extends Matrix<?>> columnVector;
 
 		public KernelInput(Class<T> clazz) {
 			if (clazz.equals(DoubleMatrix.class)) {
@@ -79,7 +79,7 @@ public class ConvolutionFilter extends ProcessableBase implements Previewable {
 			}
 		}
 
-		public void registerPorts(Map<String, InputPort> map) {
+		public void registerPorts(Map<String, InputPort<?>> map) {
 			map.put("kernel-" + this.postfix, kernel);
 			map.put("row-vector-" + this.postfix, rowVector);
 			map.put("column-vector-" + this.postfix, columnVector);
@@ -135,11 +135,11 @@ public class ConvolutionFilter extends ProcessableBase implements Previewable {
 		this.parameters.put("config", configGrid);
 
 		// inputs
-		this.kernelFloat = new KernelInput(FloatMatrix.class);
-		this.kernelDouble = new KernelInput(DoubleMatrix.class);
+		this.kernelFloat = new KernelInput<>(FloatMatrix.class);
+		this.kernelDouble = new KernelInput<>(DoubleMatrix.class);
 
-		this.input = new InputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImage(), false);
-		this.input_float = new InputPort(new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat(), false);
+		this.input = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImage(), false);
+		this.input_float = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat(), false);
 
 		enableAllInputs();
 		enableAllOutputs();
@@ -188,7 +188,7 @@ public class ConvolutionFilter extends ProcessableBase implements Previewable {
 		repaint();
 	}
 
-	private void enableInputs(InputPort input) {
+	private void enableInputs(InputPort<? extends BufferedImage> input) {
 		this.inputs.clear();
 
 		enableSourceInputs(input);
@@ -213,7 +213,7 @@ public class ConvolutionFilter extends ProcessableBase implements Previewable {
 		this.kernelDouble.registerPorts(this.inputs);
 	}
 
-	private void enableSourceInputs(InputPort input) {
+	private void enableSourceInputs(InputPort<? extends BufferedImage> input) {
 		if (input == null || input.equals(this.input)) {
 			this.inputs.put("buffered-image", this.input);
 		}
@@ -222,7 +222,7 @@ public class ConvolutionFilter extends ProcessableBase implements Previewable {
 		}
 	}
 
-	private InputPort<BufferedImage> getConnectedInput() {
+	private InputPort<? extends BufferedImage> getConnectedInput() {
 		if (this.input_float.isConnected()) {
 			return this.input_float;
 		}
@@ -249,7 +249,7 @@ public class ConvolutionFilter extends ProcessableBase implements Previewable {
 
 	@Override
 	protected void resetOutputs() {
-		for (OutputPort output : this.rescaleUnit.getAllOutputPorts().values()) {
+		for (OutputPort<? extends BufferedImage> output : this.rescaleUnit.getAllOutputPorts().values()) {
 			output.setOutput(null);
 		}
 	}
@@ -258,6 +258,7 @@ public class ConvolutionFilter extends ProcessableBase implements Previewable {
 		return restoreOutputs(context, null);
 	}
 
+	@SuppressWarnings({"rawtypes", "unchecked"})
 	private boolean restoreOutputs(ProcessorContext context, BufferedImage convolvedImage) {
 		final BufferedImage image;
 		if (convolvedImage == null) {
@@ -347,7 +348,7 @@ public class ConvolutionFilter extends ProcessableBase implements Previewable {
 		return isWaitingOnInputParams();
 	}
 
-	private boolean isPortWaiting(InputPort input) {
+	private boolean isPortWaiting(InputPort<?> input) {
 		return !input.isConnected() || !input.getPortState().equals(Port.State.READY);
 	}
 
@@ -358,8 +359,8 @@ public class ConvolutionFilter extends ProcessableBase implements Previewable {
 	private static class ProcessConfig {
 
 		final public Kernel.Precision precision;
-		final public Kernel kernel;
-		final public Kernel columnVector;
+		final public Kernel<?> kernel;
+		final public Kernel<?> columnVector;
 		final public ImagePadder.Type padderType;
 
 		/**
@@ -372,18 +373,18 @@ public class ConvolutionFilter extends ProcessableBase implements Previewable {
 
 			if (precision.equals(Kernel.Precision.DOUBLE)) {
 				if (filter.kernelDouble.isSeparable()) {
-					kernel = new DoubleKernel(filter.kernelDouble.rowVector.getValue());
-					columnVector = new DoubleKernel(filter.kernelDouble.columnVector.getValue());
+					kernel = new DoubleKernel((DoubleMatrix) filter.kernelDouble.rowVector.getValue());
+					columnVector = new DoubleKernel((DoubleMatrix) filter.kernelDouble.columnVector.getValue());
 				} else {
-					kernel = new DoubleKernel(filter.kernelDouble.kernel.getValue());
+					kernel = new DoubleKernel((DoubleMatrix) filter.kernelDouble.kernel.getValue());
 					columnVector = null;
 				}
 			} else {
 				if (filter.kernelFloat.isSeparable()) {
-					kernel = new FloatKernel(filter.kernelFloat.rowVector.getValue());
-					columnVector = new FloatKernel(filter.kernelFloat.columnVector.getValue());
+					kernel = new FloatKernel((FloatMatrix) filter.kernelFloat.rowVector.getValue());
+					columnVector = new FloatKernel((FloatMatrix) filter.kernelFloat.columnVector.getValue());
 				} else {
-					kernel = new FloatKernel(filter.kernelFloat.kernel.getValue());
+					kernel = new FloatKernel((FloatMatrix) filter.kernelFloat.kernel.getValue());
 					columnVector = null;
 				}
 			}
@@ -399,7 +400,7 @@ public class ConvolutionFilter extends ProcessableBase implements Previewable {
 	@Override
 	public void process(ProcessorContext context) {
 		if (!restoreOutputs(context)) {
-			final InputPort<BufferedImage> source = getConnectedInput();
+			final InputPort<? extends BufferedImage> source = getConnectedInput();
 			final BufferedImage src = source.getValue();
 
 			final ProcessConfig cfg = new ProcessConfig(this);
@@ -422,7 +423,7 @@ public class ConvolutionFilter extends ProcessableBase implements Previewable {
 		// errors will be produced (see ConvolutionOp)
 		if (cfg.columnVector != null) {
 			// 2-pass convolution
-			ConvolutionOp op = getConvolutionOp(cfg.columnVector, cfg.padderType);
+			ConvolutionOp<?> op = getConvolutionOp(cfg.columnVector, cfg.padderType);
 			final BufferedImage tmp = Filter.filter(
 					context, op, src,
 					getCompatibleDestImage(op, src)
@@ -435,7 +436,7 @@ public class ConvolutionFilter extends ProcessableBase implements Previewable {
 			);
 		} else {
 			// 1-pass convolution
-			final ConvolutionOp op = getConvolutionOp(cfg.kernel, cfg.padderType);
+			final ConvolutionOp<?> op = getConvolutionOp(cfg.kernel, cfg.padderType);
 
 			image = Filter.filter(
 					context, op, src,
@@ -446,8 +447,9 @@ public class ConvolutionFilter extends ProcessableBase implements Previewable {
 		return image;
 	}
 
-	private ConvolutionOp getConvolutionOp(Kernel kernel, ImagePadder.Type padderType) {
-		return new ConvolutionOp(
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	private ConvolutionOp<?> getConvolutionOp(Kernel kernel, ImagePadder.Type padderType) {
+		return new ConvolutionOp<>(
 				kernel,
 				null,
 				padderType.getInstance(),
@@ -460,7 +462,7 @@ public class ConvolutionFilter extends ProcessableBase implements Previewable {
 		);
 	}
 
-	private BufferedImage getCompatibleDestImage(ConvolutionOp op, BufferedImage src) {
+	private BufferedImage getCompatibleDestImage(ConvolutionOp<?> op, BufferedImage src) {
 		return op.createCompatibleDestImage(
 				src.getWidth(),
 				src.getHeight(),

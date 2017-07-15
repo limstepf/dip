@@ -19,15 +19,15 @@ import javafx.scene.shape.Shape;
  *
  * @param <T> class of simple tools implementing {@code SelectionTool}.
  */
-public class SelectionMultiTool<T extends SimpleTool & SelectionTool> extends MultiTool {
+public class SelectionMultiTool<T extends SimpleTool & SelectionTool<? extends Shape>> extends MultiTool {
 
 	protected final EditorLayerOverlay editorOverlay;
 	protected Shape mask;
 	protected Shape previousMask;
 	protected Shape bounds;
-	protected AnimatedDashedShape maskShape;
+	protected AnimatedDashedShape<Shape> maskShape;
 	protected final InvalidationListener maskZoomListener;
-	protected final SelectionHandler selectionHandler;
+	protected final SelectionHandler<Shape> selectionHandler;
 	protected final BooleanProperty hasMaskProperty;
 	protected final BooleanProperty hasPreviousMaskProperty;
 
@@ -37,6 +37,7 @@ public class SelectionMultiTool<T extends SimpleTool & SelectionTool> extends Mu
 	 * @param editorOverlay the editor overlay.
 	 * @param selectionTools the (simple) selection tools.
 	 */
+	@SuppressWarnings({"unchecked", "varargs"})
 	public SelectionMultiTool(EditorLayerOverlay editorOverlay, T... selectionTools) {
 		super(selectionTools);
 		this.editorOverlay = editorOverlay;
@@ -46,13 +47,14 @@ public class SelectionMultiTool<T extends SimpleTool & SelectionTool> extends Mu
 		this.hasPreviousMaskProperty = new SimpleBooleanProperty();
 
 		for (SimpleTool tool : this.getSimpleTools()) {
-			final SelectionTool stool = (SelectionTool) tool;
+			final SelectionTool<Shape> stool = (SelectionTool<Shape>) tool;
 			stool.setContext(editorOverlay, selectionHandler);
 		}
 	}
 
 	/**
-	 * The has (selection) mask property. Is true when a selection mask is set.
+	 * The has (selection) mask property. Is {@code true} when a selection mask
+	 * is set.
 	 *
 	 * @return the has (selection) mask property.
 	 */
@@ -61,8 +63,8 @@ public class SelectionMultiTool<T extends SimpleTool & SelectionTool> extends Mu
 	}
 
 	/**
-	 * The has previous (selection) mask property. Is true when a previously set
-	 * selection mask is stored/available.
+	 * The has previous (selection) mask property. Is {@code true} when a
+	 * previously set selection mask is stored/available.
 	 *
 	 * @return the has previous (selection) mask property.
 	 */
@@ -128,7 +130,7 @@ public class SelectionMultiTool<T extends SimpleTool & SelectionTool> extends Mu
 			}
 			hasMaskProperty.set(true);
 			onMaskCreated();
-			maskShape = new AnimatedDashedShape(ShapeUtils.exclusionOutline(mask));
+			maskShape = new AnimatedDashedShape<>(ShapeUtils.exclusionOutline(mask));
 			setMaskZoom();
 			maskShape.play();
 			editorOverlay.getChildren().add(maskShape.getSnappedShape());

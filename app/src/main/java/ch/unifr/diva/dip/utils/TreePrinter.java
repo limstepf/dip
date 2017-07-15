@@ -78,7 +78,7 @@ public class TreePrinter {
 	 * objects. Can be null if all children are of type {@code TreePrinter.Node}
 	 * (can be mixed too).
 	 */
-	public void print(String root, Collection children, Extractor extractor) {
+	public void print(String root, Collection<?> children, Extractor extractor) {
 		print(root, children.toArray(), extractor, "", -1);
 	}
 
@@ -216,7 +216,7 @@ public class TreePrinter {
 		 * @param name the name of the node.
 		 * @param children the children of the node.
 		 */
-		public Node(String name, Collection children) {
+		public Node(String name, Collection<?> children) {
 			this(name, children.toArray());
 		}
 
@@ -290,7 +290,7 @@ public class TreePrinter {
 	 * @param dictionary the dictionary.
 	 * @return an array of TreePrinter node children.
 	 */
-	public static Object[] toChildren(Dictionary dictionary) {
+	public static Object[] toChildren(Dictionary<?,?> dictionary) {
 		return toChildren(dictionary, (key, val) -> {
 			return String.format("%s: %s", key, val);
 		});
@@ -303,10 +303,10 @@ public class TreePrinter {
 	 * @param mapper the dictionary (entry) mapper.
 	 * @return an array of TreePrinter node children.
 	 */
-	public static Object[] toChildren(Dictionary dictionary, DictMapper mapper) {
+	public static Object[] toChildren(Dictionary<?,?> dictionary, DictMapper mapper) {
 		final Object[] children = new Object[dictionary.size()];
 		int i = 0;
-		for (Enumeration e = dictionary.keys(); e.hasMoreElements(); i++) {
+		for (Enumeration<?> e = dictionary.keys(); e.hasMoreElements(); i++) {
 			final Object key = e.nextElement();
 			final Object val = dictionary.get(key);
 			children[i] = mapper.map(key, val);

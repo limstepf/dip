@@ -16,7 +16,7 @@ public class SimpleTool implements Tool {
 	protected final String name;
 	protected final NamedGlyph glyph;
 	protected Gesture gesture;
-	protected final LinkedHashMap<String, SingleRowParameter> options;
+	protected final LinkedHashMap<String, SingleRowParameter<?>> options;
 	protected final ObjectProperty<Cursor> cursorProperty;
 
 	/**
@@ -37,7 +37,7 @@ public class SimpleTool implements Tool {
 	 * @param gesture the gesture of the tool.
 	 */
 	public SimpleTool(String name, NamedGlyph glyph, Gesture gesture) {
-		this(name, glyph, gesture, new SimpleObjectProperty(Cursor.CROSSHAIR));
+		this(name, glyph, gesture, new SimpleObjectProperty<>(Cursor.CROSSHAIR));
 	}
 
 	/**
@@ -65,7 +65,7 @@ public class SimpleTool implements Tool {
 	 * @return a new cursor property.
 	 */
 	public static ObjectProperty<Cursor> newCursorProperty() {
-		return new SimpleObjectProperty(Cursor.DEFAULT);
+		return new SimpleObjectProperty<>(Cursor.DEFAULT);
 	}
 
 	@Override
@@ -109,7 +109,7 @@ public class SimpleTool implements Tool {
 	}
 
 	@Override
-	public Map<String, SingleRowParameter> options() {
+	public Map<String, SingleRowParameter<?>> options() {
 		return this.options;
 	}
 

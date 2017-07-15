@@ -33,14 +33,14 @@ public interface EditorLayer {
 	/**
 	 * Checks whether the layer is visible.
 	 *
-	 * @return True if the layer is visible, false otherwise.
+	 * @return {@code true} if the layer is visible, {@code false} otherwise.
 	 */
 	public boolean isVisible();
 
 	/**
 	 * Sets the visibility of the layer.
 	 *
-	 * @param visible True to make the layer visible, False to make it
+	 * @param visible {@code true} to make the layer visible, {@code false} to make it
 	 * invisible.
 	 */
 	public void setVisible(boolean visible);

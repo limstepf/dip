@@ -12,7 +12,7 @@ import javafx.css.PseudoClass;
  * no UI controls are initialized if not needed. A ViewHook can be used to
  * customize UI controls (once initialized).
  *
- * @param <T> type of the parameter.
+ * @param <T> class of the parameter's value.
  */
 public interface PersistentParameter<T> extends Parameter<T> {
 
@@ -47,6 +47,16 @@ public interface PersistentParameter<T> extends Parameter<T> {
 	public void set(T value);
 
 	/**
+	 * Sets the (raw/untyped) value of the parameter.
+	 *
+	 * @param value the raw/untyped value.
+	 */
+	@SuppressWarnings("unchecked")
+	default void setRaw(Object value) {
+		set((T) value);
+	}
+
+	/**
 	 * Returns a read-only property to listen for (manual) changes.
 	 *
 	 * @return a read-only property.
@@ -63,9 +73,9 @@ public interface PersistentParameter<T> extends Parameter<T> {
 	 * (or face a stack overflow since the parameter will in turn update the
 	 * view, which in turn will update the parameter, ...).
 	 *
-	 * @param <T> type of the value of the parameter.
+	 * @param <T> class of the parameter's value.
 	 */
-	public interface View<T> extends Parameter.View<T> {
+	public interface View<T> extends Parameter.View {
 
 		/**
 		 * Updates the parameter and its view with a new value.
@@ -90,11 +100,11 @@ public interface PersistentParameter<T> extends Parameter<T> {
 	 * @param parameters the published parameters.
 	 * @return a map of default values.
 	 */
-	public static Map<String, Object> getDefaultPreset(Map<String, Parameter> parameters) {
+	public static Map<String, Object> getDefaultPreset(Map<String, Parameter<?>> parameters) {
 		final Map<String, Object> preset = new HashMap<>();
-		for (Map.Entry<String, Parameter> p : parameters.entrySet()) {
+		for (Map.Entry<String, Parameter<?>> p : parameters.entrySet()) {
 			if (p.getValue().isPersistent()) {
-				final PersistentParameter pp = (PersistentParameter) p.getValue();
+				final PersistentParameter<?> pp = (PersistentParameter<?>) p.getValue();
 				preset.put(p.getKey(), pp.defaultValue());
 			}
 		}
@@ -108,11 +118,11 @@ public interface PersistentParameter<T> extends Parameter<T> {
 	 * @param parameters the processor's parameters.
 	 * @return a map of the current values.
 	 */
-	public static Map<String, Object> getPreset(Map<String, Parameter> parameters) {
+	public static Map<String, Object> getPreset(Map<String, Parameter<?>> parameters) {
 		final Map<String, Object> preset = new HashMap<>();
-		for (Map.Entry<String, Parameter> p : parameters.entrySet()) {
+		for (Map.Entry<String, Parameter<?>> p : parameters.entrySet()) {
 			if (p.getValue().isPersistent()) {
-				final PersistentParameter pp = (PersistentParameter) p.getValue();
+				final PersistentParameter<?> pp = (PersistentParameter<?>) p.getValue();
 				preset.put(p.getKey(), pp.get());
 			}
 		}
@@ -130,13 +140,13 @@ public interface PersistentParameter<T> extends Parameter<T> {
 	 * @param preset the preset/a map of parameters.
 	 * @return the preset/a map of parameters with all published keys.
 	 */
-	public static Map<String, Object> validatePreset(Map<String, Parameter> parameters, Map<String, Object> preset) {
+	public static Map<String, Object> validatePreset(Map<String, Parameter<?>> parameters, Map<String, Object> preset) {
 		final Map<String, Object> validated = new HashMap<>();
 
-		for (Map.Entry<String, Parameter> p : parameters.entrySet()) {
+		for (Map.Entry<String, Parameter<?>> p : parameters.entrySet()) {
 			if (p.getValue().isPersistent()) {
 				final String key = p.getKey();
-				final PersistentParameter pp = (PersistentParameter) p.getValue();
+				final PersistentParameter<?> pp = (PersistentParameter<?>) p.getValue();
 				if (preset != null && preset.containsKey(key)) {
 					validated.put(key, preset.get(key));
 				} else {
@@ -161,7 +171,7 @@ public interface PersistentParameter<T> extends Parameter<T> {
 	 * itself of course. Implement/use a view hook instead (e.g.
 	 * {@code parameter.addViewHook(c} -> { c.setThings(); }).
 	 *
-	 * @param <T>
+	 * @param <T> class of the node.
 	 */
 	public static interface ViewHook<T> {
 

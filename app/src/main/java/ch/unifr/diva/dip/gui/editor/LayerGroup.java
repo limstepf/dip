@@ -53,7 +53,7 @@ public class LayerGroup extends LayerBase implements EditorLayerGroup {
 
 	private final ObservableList<Layer> children = FXCollections.observableArrayList();
 	private final Group group = new Group();
-	private final ListChangeListener<? super Layer> listListener;
+	private final ListChangeListener<Layer> listListener;
 
 	/**
 	 * Creates a new, unnamed and unowned layer group.
@@ -193,7 +193,7 @@ public class LayerGroup extends LayerBase implements EditorLayerGroup {
 		}
 	}
 
-	private final ObjectProperty<HideGroupMode> hideGroupModeProperty = new SimpleObjectProperty(this, "hideGroupMode", HideGroupMode.NEVER) {
+	private final ObjectProperty<HideGroupMode> hideGroupModeProperty = new SimpleObjectProperty<HideGroupMode>(this, "hideGroupMode", HideGroupMode.NEVER) {
 		@Override
 		protected void invalidated() {
 			updateHideGroup();
@@ -270,7 +270,8 @@ public class LayerGroup extends LayerBase implements EditorLayerGroup {
 	/**
 	 * Checks whether the layer group is hidden or not.
 	 *
-	 * @return True if the layer group is hidden, false otherwise.
+	 * @return {@code true} if the layer group is hidden, {@code false}
+	 * otherwise.
 	 */
 	public final boolean isHideGroup() {
 		return hideGroupProperty.get();

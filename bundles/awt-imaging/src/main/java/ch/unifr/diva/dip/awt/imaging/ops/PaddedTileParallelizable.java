@@ -1,6 +1,6 @@
 package ch.unifr.diva.dip.awt.imaging.ops;
 
-import ch.unifr.diva.dip.awt.imaging.scanners.ImageTiler;
+import ch.unifr.diva.dip.awt.imaging.scanners.PaddedImageTiler;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
@@ -27,7 +27,7 @@ import java.awt.image.BufferedImage;
  *
  * @see TileParallelizable
  */
-public interface PaddedTileParallelizable extends TileParallelizable {
+public interface PaddedTileParallelizable extends TileParallelizable<PaddedImageTiler> {
 
 	// TODO: eh, now that the InverseMappedTileParallelizable interface is here,
 	// wouldn't that do the same, but a bit cheaper?!
@@ -37,7 +37,7 @@ public interface PaddedTileParallelizable extends TileParallelizable {
 	 * and put the following bit in the implementing class. We can't implement it
 	 * here as default method, since it will be implemented/overwritten in the
 	 * base class NullOp, so that wouldn't have any effect:
-	 * 
+	 *
 	 * {@code
 	 *		@Override
 	 *		public BufferedImage filter(BufferedImage src, BufferedImage dst) {
@@ -58,6 +58,16 @@ public interface PaddedTileParallelizable extends TileParallelizable {
 	 */
 	public BufferedImage filter(BufferedImage src, BufferedImage dst, Rectangle writableRegion);
 
+	@Override
+	default void process(PaddedImageTiler tiler, BufferedImage src, BufferedImage dst) {
+		ConcurrentTileOp.processPaddedTiles(
+				this,
+				tiler,
+				src,
+				dst
+		);
+	}
+
 	/**
 	 * Returns an appropriate image tiler with as much padding as needed.
 	 *
@@ -67,6 +77,6 @@ public interface PaddedTileParallelizable extends TileParallelizable {
 	 * @return a padded image tiler.
 	 */
 	@Override
-	public ImageTiler getImageTiler(BufferedImage src, BufferedImage dst, int width, int height);
+	public PaddedImageTiler getImageTiler(BufferedImage src, BufferedImage dst, int width, int height);
 
 }

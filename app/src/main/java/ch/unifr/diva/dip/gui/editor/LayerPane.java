@@ -86,6 +86,9 @@ public class LayerPane extends LayerBase implements EditorLayerPane {
 			case REACTIVATE:
 				this.setPassiveVisible(true);
 				break;
+
+			default:
+				break;
 		}
 	}
 

@@ -20,8 +20,6 @@ import java.util.List;
  * @param <T> class of the parameter's value. For composite parameters something
  * like a {@code ValueList} or a {@code ValueMap} will do.
  * @param <V> class of the parameter's view.
- * @see ValueList
- * @see ValueMap
  */
 public abstract class CompositeBase<T, V extends PersistentParameter.View<T>> extends PersistentParameterBase<T, V> {
 
@@ -45,8 +43,8 @@ public abstract class CompositeBase<T, V extends PersistentParameter.View<T>> ex
 	 *
 	 * @param children persistent child parameters.
 	 */
-	protected void addChildListeners(List<PersistentParameter> children) {
-		for (final PersistentParameter p : children) {
+	protected void addChildListeners(List<PersistentParameter<?>> children) {
+		for (final PersistentParameter<?> p : children) {
 			p.property().addListener((c) -> {
 				if (enableChildListeners) {
 					invalidateChildParameter(p);
@@ -60,8 +58,8 @@ public abstract class CompositeBase<T, V extends PersistentParameter.View<T>> ex
 	/**
 	 * Disables/(re-)enables child parameter invalidation listeners.
 	 *
-	 * @param enable True to enable invalidation listeners, False to disable
-	 * them.
+	 * @param enable {@code true} to enable invalidation listeners,
+	 * {@code false} to disable them.
 	 */
 	protected void enableChildListeners(boolean enable) {
 		this.enableChildListeners = enable;
@@ -75,7 +73,7 @@ public abstract class CompositeBase<T, V extends PersistentParameter.View<T>> ex
 	 *
 	 * @param p the persistent child parameter that has been changed.
 	 */
-	protected abstract void invalidateChildParameter(PersistentParameter p);
+	protected abstract void invalidateChildParameter(PersistentParameter<?> p);
 
 	/**
 	 * A filter applied before setting the value property. Composite parameters
@@ -112,13 +110,14 @@ public abstract class CompositeBase<T, V extends PersistentParameter.View<T>> ex
 	 *
 	 * @return a list of all child parameters.
 	 */
-	protected abstract Collection<? extends Parameter> getChildren();
+	protected abstract Collection<? extends Parameter<?>> getChildren();
 
 	/**
 	 * Checks whether this composite has at least one persistent child
 	 * parameter.
 	 *
-	 * @return True if there are persistent child parameters, False otherwise.
+	 * @return {@code true} if there are persistent child parameters,
+	 * {@code false} otherwise.
 	 */
 	protected abstract boolean hasPersistentChildren();
 

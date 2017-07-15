@@ -17,10 +17,10 @@ import javafx.scene.shape.Shape;
  * @param <C> class of the node that implements {@code Cursor}.
  * @param <T> class of the selection shape.
  */
-public abstract class SelectionToolBase<C extends Node & Cursor, T extends Shape> extends SimpleTool implements SelectionTool {
+public abstract class SelectionToolBase<C extends Node & Cursor, T extends Shape> extends SimpleTool implements SelectionTool<T> {
 
 	protected EditorLayerOverlay editorOverlay;
-	protected SelectionHandler selectionHandler;
+	protected SelectionHandler<T> selectionHandler;
 	protected final C cursor;
 	protected final AnimatedDashedShape<T> selection;
 	protected final InvalidationListener zoomListener = (c) -> setZoom();
@@ -58,11 +58,11 @@ public abstract class SelectionToolBase<C extends Node & Cursor, T extends Shape
 		this.editorOverlay = editorOverlay;
 		this.selectionHandler = selectionHandler;
 		this.cursor = cursor;
-		this.selection = new AnimatedDashedShape(shape);
+		this.selection = new AnimatedDashedShape<>(shape);
 	}
 
 	@Override
-	public void setContext(EditorLayerOverlay editorOverlay, SelectionHandler selectionHandler) {
+	public void setContext(EditorLayerOverlay editorOverlay, SelectionHandler<T> selectionHandler) {
 		this.editorOverlay = editorOverlay;
 		this.selectionHandler = selectionHandler;
 	}
@@ -70,7 +70,8 @@ public abstract class SelectionToolBase<C extends Node & Cursor, T extends Shape
 	/**
 	 * Checks whether an editor overlay has been registered.
 	 *
-	 * @return True if the editor overlay is available, False otherwise.
+	 * @return {@code true} if the editor overlay is available, {@code false}
+	 * otherwise.
 	 */
 	protected boolean hasOverlay() {
 		return editorOverlay != null;
@@ -115,7 +116,8 @@ public abstract class SelectionToolBase<C extends Node & Cursor, T extends Shape
 	/**
 	 * Toggles the visibility of the (custom) mouse cursor.
 	 *
-	 * @param visible True to show the (custom) mouse cursor, False otherwise.
+	 * @param visible {@code true} to show the (custom) mouse cursor,
+	 * {@code false} otherwise.
 	 */
 	protected final void setCursorVisible(boolean visible) {
 		cursor.setVisible(visible);

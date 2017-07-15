@@ -16,10 +16,9 @@ public interface Gesture {
 	/**
 	 * Returns the event handlers of the gesture.
 	 *
-	 * @param <T> type of the event.
 	 * @return the event handlers.
 	 */
-	public <T extends Event> List<GestureEventHandler<T>> eventHandlers();
+	public List<GestureEventHandler<? extends Event>> eventHandlers();
 
 	/**
 	 * Adds an event handler to the given gesture.
@@ -31,7 +30,7 @@ public interface Gesture {
 	 */
 	public static <T extends Event> void addEventHandler(Gesture gesture, EventType<T> eventType, EventHandler<T> eventHandler) {
 		if (eventHandler != null) {
-			gesture.eventHandlers().add(new GestureEventHandler(
+			gesture.eventHandlers().add(new GestureEventHandler<>(
 					eventType,
 					eventHandler
 			));
@@ -48,19 +47,19 @@ public interface Gesture {
 	 */
 	public static void addMouseEventHandlers(Gesture gesture, EventHandler<MouseEvent> onEntered, EventHandler<MouseEvent> onMoved, EventHandler<MouseEvent> onExited) {
 		if (onEntered != null) {
-			gesture.eventHandlers().add(new GestureEventHandler(
+			gesture.eventHandlers().add(new GestureEventHandler<>(
 					MouseEvent.MOUSE_ENTERED,
 					onEntered
 			));
 		}
 		if (onMoved != null) {
-			gesture.eventHandlers().add(new GestureEventHandler(
+			gesture.eventHandlers().add(new GestureEventHandler<>(
 					MouseEvent.MOUSE_MOVED,
 					onMoved
 			));
 		}
 		if (onExited != null) {
-			gesture.eventHandlers().add(new GestureEventHandler(
+			gesture.eventHandlers().add(new GestureEventHandler<>(
 					MouseEvent.MOUSE_EXITED,
 					onExited
 			));
@@ -76,7 +75,7 @@ public interface Gesture {
 	 */
 	public static void addKeyEventHandler(Gesture gesture, EventHandler<KeyEvent> onKeyPressed) {
 		if (onKeyPressed != null) {
-			gesture.eventHandlers().add(new GestureEventHandler(
+			gesture.eventHandlers().add(new GestureEventHandler<>(
 					KeyEvent.KEY_PRESSED,
 					onKeyPressed
 			));

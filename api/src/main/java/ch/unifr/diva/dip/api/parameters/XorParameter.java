@@ -22,7 +22,7 @@ import javafx.scene.layout.VBox;
  */
 public class XorParameter extends CompositeBase<ValueListSelection, XorParameter.XorView> {
 
-	protected final List<Parameter> children;
+	protected final List<Parameter<?>> children;
 
 	/**
 	 * Creates an XOR parameter. Default selection is 0 (the first option).
@@ -30,7 +30,7 @@ public class XorParameter extends CompositeBase<ValueListSelection, XorParameter
 	 * @param label label.
 	 * @param parameters list of parameters to choose one from.
 	 */
-	public XorParameter(String label, List<Parameter> parameters) {
+	public XorParameter(String label, List<Parameter<?>> parameters) {
 		this(label, parameters, 0);
 	}
 
@@ -42,7 +42,7 @@ public class XorParameter extends CompositeBase<ValueListSelection, XorParameter
 	 * @param defaultSelection index of the default parameter to be
 	 * selected/used.
 	 */
-	public XorParameter(String label, List<Parameter> parameters, int defaultSelection) {
+	public XorParameter(String label, List<Parameter<?>> parameters, int defaultSelection) {
 		super(label, initValue(parameters, defaultSelection), initValue(parameters, defaultSelection));
 
 		this.children = parameters;
@@ -51,11 +51,11 @@ public class XorParameter extends CompositeBase<ValueListSelection, XorParameter
 	}
 
 	// yes, we do this twice to not override the default later on...
-	protected static ValueListSelection initValue(List<Parameter> parameters, int defaultSelection) {
+	protected static ValueListSelection initValue(List<Parameter<?>> parameters, int defaultSelection) {
 		final List<Object> defaultValues = new ArrayList<>();
-		for (Parameter p : parameters) {
+		for (Parameter<?> p : parameters) {
 			if (p.isPersistent()) {
-				final PersistentParameter pp = (PersistentParameter) p;
+				final PersistentParameter<?> pp = (PersistentParameter<?>) p;
 				defaultValues.add(pp.defaultValue());
 			} else {
 				defaultValues.add(true);
@@ -84,7 +84,7 @@ public class XorParameter extends CompositeBase<ValueListSelection, XorParameter
 	}
 
 	@Override
-	protected Collection<? extends Parameter> getChildren() {
+	protected Collection<? extends Parameter<?>> getChildren() {
 		return this.children;
 	}
 
@@ -94,10 +94,10 @@ public class XorParameter extends CompositeBase<ValueListSelection, XorParameter
 	}
 
 	@Override
-	protected void invalidateChildParameter(PersistentParameter p) {
+	protected void invalidateChildParameter(PersistentParameter<?> p) {
 		final ValueListSelection vs = get();
 		for (int i = 0; i < this.children.size(); i++) {
-			final Parameter pi = this.children.get(i);
+			final Parameter<?> pi = this.children.get(i);
 			if (p.equals(pi)) {
 				vs.list.set(i, p.get());
 				break;
@@ -111,10 +111,9 @@ public class XorParameter extends CompositeBase<ValueListSelection, XorParameter
 		enableChildListeners(false);
 
 		for (int i = 0; i < this.children.size(); i++) {
-			final Parameter p = this.children.get(i);
+			final Parameter<?> p = this.children.get(i);
 			if (p.isPersistent()) {
-				final PersistentParameter pp = (PersistentParameter) p;
-				pp.set(value.get(i));
+				p.asPersitentParameter().setRaw(value.get(i));
 			}
 		}
 
@@ -129,7 +128,7 @@ public class XorParameter extends CompositeBase<ValueListSelection, XorParameter
 	/**
 	 * XOR item/option view.
 	 *
-	 * @param <T>
+	 * @param <T> class of the item/parameter view.
 	 */
 	public static class XorViewItem<T extends Parameter.View> {
 
@@ -156,7 +155,8 @@ public class XorParameter extends CompositeBase<ValueListSelection, XorParameter
 		 * @param parent the parent node.
 		 * @param toggleGroup the toggle group.
 		 */
-		public XorViewItem(int index, Parameter parameter, Parent parent, ToggleGroup toggleGroup) {
+		@SuppressWarnings("unchecked")
+		public XorViewItem(int index, Parameter<?> parameter, Parent parent, ToggleGroup toggleGroup) {
 			this.view = (T) parameter.view();
 			this.radio = new RadioButton();
 			this.radio.setToggleGroup(toggleGroup);
@@ -171,7 +171,7 @@ public class XorParameter extends CompositeBase<ValueListSelection, XorParameter
 	public static class XorView extends PersistentParameterBase.ParameterViewBase<XorParameter, ValueListSelection, VBox> {
 
 		private final ToggleGroup toggleGroup = new ToggleGroup();
-		private final List<XorViewItem> items;
+		private final List<XorViewItem<?>> items;
 
 		/**
 		 * Creates a new XOR view.
@@ -196,7 +196,7 @@ public class XorParameter extends CompositeBase<ValueListSelection, XorParameter
 		}
 
 		private void updateItems() {
-			for (XorViewItem item : this.items) {
+			for (XorViewItem<?> item : this.items) {
 				if (item.radio.isSelected()) {
 					item.parent.getStyleClass().removeAll("dip-disabled");
 				} else {
@@ -213,44 +213,50 @@ public class XorParameter extends CompositeBase<ValueListSelection, XorParameter
 				final VBox box = new VBox();
 				pane.setPadding(new Insets(0, 0, 5, 0));
 				box.setPadding(new Insets(0, 0, 5, 5));
-				final XorViewItem item = new XorViewItem(index, p, box, this.toggleGroup);
-				this.items.add(item);
 
 				if (p.isPersistent()) {
-					final XorViewItem<PersistentParameter.View> pitem = item;
-					pitem.view.parameter().property().addListener((obs) -> {
-						parameter.get().list.set(index, pitem.view.parameter().get());
+					final XorViewItem<PersistentParameter.View<?>> item = new XorViewItem<>(index, p, box, this.toggleGroup);
+					item.view.parameter().property().addListener((obs) -> {
+						parameter.get().list.set(index, item.view.parameter().get());
 						if (item.radio.isSelected()) {
 							parameter.valueProperty.invalidate();
 						} else {
 							item.radio.setSelected(true);
 						}
 					});
-
-					final PersistentParameter pp = (PersistentParameter) p;
+					final PersistentParameter<?> pp = p.asPersitentParameter();
 					if (!pp.label().equals("")) {
 						box.getChildren().add(new Label(pp.label()));
 					}
+					addItem(pane, box, item);
 				} else {
+					final XorViewItem<Parameter.View> item = new XorViewItem<>(index, p, box, this.toggleGroup);
+					this.items.add(item);
 					p.view().node().setOnMouseClicked((e) -> {
 						item.radio.setSelected(true);
 					});
+					addItem(pane, box, item);
 				}
-
-				box.getChildren().add(item.view.node());
-				pane.setLeft(item.radio);
-				pane.setCenter(box);
-				root.getChildren().add(pane);
 			}
 		}
 
+		private void addItem(BorderPane pane, VBox box, XorViewItem<?> item) {
+			this.items.add(item);
+
+			box.getChildren().add(item.view.node());
+			pane.setLeft(item.radio);
+			pane.setCenter(box);
+			root.getChildren().add(pane);
+		}
+
 		@Override
+		@SuppressWarnings({"rawtypes", "unchecked"})
 		public final void set(ValueListSelection value) {
 			for (int i = 0; i < value.list.size(); i++) {
 				final XorViewItem item = this.items.get(i);
 				if (item.view instanceof PersistentParameter.View) {
-					final XorViewItem<PersistentParameter.View> pitem = item;
-					pitem.view.parameter().set(value.list.get(i));
+					final XorViewItem<PersistentParameter.View<?>> pitem = item;
+					pitem.view.parameter().setRaw(value.list.get(i));
 				}
 			}
 			this.items.get(value.selection).radio.setSelected(true);

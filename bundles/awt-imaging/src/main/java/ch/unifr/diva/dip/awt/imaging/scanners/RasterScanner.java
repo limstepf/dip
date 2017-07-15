@@ -29,8 +29,8 @@ public class RasterScanner extends ImageScanner {
 	 * pixels, and if desired all bands in the image.
 	 *
 	 * @param image the image to scan.
-	 * @param isBanded iterates over all pixels and bands if True, over all
-	 * pixels only if False.
+	 * @param isBanded iterates over all pixels and bands if {@code true}, over
+	 * all pixels only if {@code false}.
 	 */
 	public RasterScanner(BufferedImage image, boolean isBanded) {
 		this(

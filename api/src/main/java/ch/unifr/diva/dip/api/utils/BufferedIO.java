@@ -132,7 +132,8 @@ public class BufferedIO {
 
 						case DOUBLE:
 							buffer.asDoubleBuffer().put(mat.getPixelsDouble());
-
+							break;
+							
 						default:
 							throw new IllegalArgumentException(
 									"Don't know how to write: " + type.name()

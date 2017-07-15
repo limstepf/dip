@@ -58,6 +58,7 @@ public class ConcurrentOpTilesDynamicBenchmark {
 	@BenchmarkMode({Mode.AverageTime})
 	@OutputTimeUnit(TimeUnit.MILLISECONDS)
 	public BufferedImage staticTileSizeOp(Resources r) {
+		@SuppressWarnings({"rawtypes", "unchecked"})
 		ConcurrentTileOp op = new ConcurrentTileOp(
 				new ColorConvertOp(SimpleColorModel.RGB, SimpleColorModel.Lab),
 				r.tileSize, // use static tile size, no matter what
@@ -73,6 +74,7 @@ public class ConcurrentOpTilesDynamicBenchmark {
 	@OutputTimeUnit(TimeUnit.MILLISECONDS)
 	public BufferedImage dynamicTileSizeOp(Resources r) {
 		Rectangle tileSize = getOptimalTileSize(r.numThreads, r.image);
+		@SuppressWarnings({"rawtypes", "unchecked"})
 		ConcurrentTileOp op = new ConcurrentTileOp(
 				new ColorConvertOp(SimpleColorModel.RGB, SimpleColorModel.Lab),
 				tileSize.width, // use dynamic/optimal(?) tile size

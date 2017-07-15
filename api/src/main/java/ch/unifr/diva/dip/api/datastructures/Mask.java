@@ -3,8 +3,8 @@ package ch.unifr.diva.dip.api.datastructures;
 /**
  * A mask is a special type of kernel backed by a {@code BooleanMatrix}.
  * Primarily used to mark the neighbours of a pixel in some pattern (e.g. for a
- * rank filter), where true means inclusion, false exclusion. As with a kernel,
- * a mask is centered, s.t. rows and columns may be negative.
+ * rank filter), where {@code true} means inclusion, {@code false} exclusion. As
+ * with a kernel, a mask is centered, s.t. rows and columns may be negative.
  */
 public class Mask extends Kernel<BooleanMatrix> {
 
@@ -71,9 +71,9 @@ public class Mask extends Kernel<BooleanMatrix> {
 	}
 
 	/**
-	 * Returns the number of booleans set to true in this mask.
+	 * Returns the number of booleans set to {@code true} in this mask.
 	 *
-	 * @return the number of booleans set to true in this mask.
+	 * @return the number of booleans set to {@code true} in this mask.
 	 */
 	public int cardinality() {
 		int c = 0;

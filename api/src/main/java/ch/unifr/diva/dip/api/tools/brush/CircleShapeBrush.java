@@ -8,7 +8,7 @@ import javafx.scene.shape.Shape;
 /**
  * A circle shape brush.
  */
-public class CircleShapeBrush extends CircleBrush implements ShapeBrush {
+public class CircleShapeBrush extends CircleBrush implements ShapeBrush<Shape> {
 
 	/**
 	 * Creates a new circle shape brush.

@@ -10,7 +10,7 @@ import java.awt.image.WritableRaster;
 /**
  * Extracts a single band from a multiband image.
  */
-public class BandExtractOp extends NullOp implements TileParallelizable {
+public class BandExtractOp extends NullOp implements SimpleTileParallelizable {
 
 	private int band;
 

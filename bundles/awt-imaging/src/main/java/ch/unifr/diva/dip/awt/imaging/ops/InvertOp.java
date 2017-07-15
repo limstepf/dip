@@ -13,7 +13,7 @@ import java.awt.image.WritableRaster;
  * <pre>I_inverted(x,y) = M - I(x,y)</pre>, where
  * <pre>M</pre> is the maximum value (e.g. 255 for an 8-bit sample).
  */
-public class InvertOp extends NullOp implements TileParallelizable {
+public class InvertOp extends NullOp implements SimpleTileParallelizable {
 
 	// given range [a, b] then x' = b - x + a, so the rangeOffset is a + b, from
 	// which we can substract x to get x'

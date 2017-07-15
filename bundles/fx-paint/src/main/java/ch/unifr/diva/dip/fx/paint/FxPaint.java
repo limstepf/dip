@@ -49,7 +49,7 @@ public class FxPaint extends HybridProcessorBase {
 	protected final static String STORAGE_IMAGE = "fxpaint.png";
 
 	private final Callback<InputPort<BufferedImage>, Void> onInputCallback;
-	private final ColorPortsUnit colorPortsUnit;
+	private final ColorPortsUnit<FxPaint> colorPortsUnit;
 	private final ColorPickerParameter primaryColorOption;
 	private final PencilTool pencilTool;
 	private final EyedropperTool eyedropperTool;
@@ -62,9 +62,9 @@ public class FxPaint extends HybridProcessorBase {
 	public FxPaint() {
 		super("FX Paint");
 
-		this.gcProperty = new SimpleObjectProperty();
+		this.gcProperty = new SimpleObjectProperty<>();
 		this.onInputCallback = (in) -> initCanvas(in.getValue());
-		this.colorPortsUnit = new ColorPortsUnit(
+		this.colorPortsUnit = new ColorPortsUnit<>(
 				this,
 				"fx-paint",
 				true, // bit

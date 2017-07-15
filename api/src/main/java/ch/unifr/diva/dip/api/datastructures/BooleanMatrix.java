@@ -13,7 +13,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
-public class BooleanMatrix extends Matrix {
+public class BooleanMatrix extends Matrix<BooleanMatrix> {
 
 	/**
 	 * Continous booleans of the matrix.
@@ -258,7 +258,7 @@ public class BooleanMatrix extends Matrix {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		final StringMatrix other = (StringMatrix) obj;
+		final BooleanMatrix other = (BooleanMatrix) obj;
 		if (!Objects.equals(rows, other.rows)) {
 			return false;
 		}

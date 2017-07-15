@@ -20,9 +20,10 @@ public class ProjectNotification {
 		 */
 		SELECTED,
 		/**
-		 * Notification that the currently selected page has been (heavily) modified.
-		 * For example the whole pipeline might have been swaped, so listeners can
-		 * usually interpret/treat this event as RE-SELECTED, or RE-LOADED.
+		 * Notification that the currently selected page has been (heavily)
+		 * modified. For example the whole pipeline might have been swaped, so
+		 * listeners can usually interpret/treat this event as RE-SELECTED, or
+		 * RE-LOADED.
 		 */
 		MODIFIED,
 		/**
@@ -38,13 +39,21 @@ public class ProjectNotification {
 		 */
 		CLOSED
 	}
+
+	/**
+	 * Type of the notification.
+	 */
 	public final Type type;
+
+	/**
+	 * The index of the page.
+	 */
 	public final int page;
 
 	/**
 	 * Creates a ProjectNotification.
 	 *
-	 * @param type indicates the request.
+	 * @param type type of the notification.
 	 */
 	public ProjectNotification(Type type) {
 		this(type, -1);
@@ -53,7 +62,7 @@ public class ProjectNotification {
 	/**
 	 * Creates a ProjectNotification.
 	 *
-	 * @param type indicates the request.
+	 * @param type type of the notification.
 	 * @param page index of the page.
 	 */
 	public ProjectNotification(Type type, int page) {
@@ -69,4 +78,5 @@ public class ProjectNotification {
 				+ ", page=" + page
 				+ "}";
 	}
+
 }

@@ -185,7 +185,7 @@ public class ProjectPage implements Modifiable, Localizable {
 	 *
 	 * @return a new/fresh pipeline.
 	 */
-	public Pipeline getPipelinePrototype() {
+	public Pipeline<ProcessorWrapper> getPipelinePrototype() {
 		return getPipelinePrototype(getPipelineId());
 	}
 
@@ -196,7 +196,7 @@ public class ProjectPage implements Modifiable, Localizable {
 	 * @param pipelineId pipeline id.
 	 * @return a new/fresh pipeline.
 	 */
-	private Pipeline getPipelinePrototype(int pipelineId) {
+	private Pipeline<ProcessorWrapper> getPipelinePrototype(int pipelineId) {
 		return project.pipelineManager().getPipeline(pipelineId);
 	}
 
@@ -216,7 +216,7 @@ public class ProjectPage implements Modifiable, Localizable {
 	 *
 	 * @return the pipeline id, or -1 if none (or the empty pipeline) is set.
 	 */
-	public int getPipelineId() {
+	public synchronized int getPipelineId() {
 		return this.pipelineIdProperty().get();
 	}
 
@@ -304,7 +304,7 @@ public class ProjectPage implements Modifiable, Localizable {
 	}
 
 	private String getPipelineNameFromPrototype() {
-		final Pipeline pl = getPipelinePrototype(); // no need to have this page opened yet
+		final Pipeline<ProcessorWrapper> pl = getPipelinePrototype(); // no need to have this page opened yet
 		if (pl == null) {
 			return localize("none").toLowerCase();
 		}
@@ -332,6 +332,9 @@ public class ProjectPage implements Modifiable, Localizable {
 			switch (this.pipeline.getState()) {
 				case PROCESSING:
 					canProcess = true;
+					break;
+
+				default:
 					break;
 			}
 		}
@@ -412,7 +415,7 @@ public class ProjectPage implements Modifiable, Localizable {
 	/**
 	 * Checks whether the image associated to the page exists.
 	 *
-	 * @return True if the image exists, False otherwise.
+	 * @return {@code true} if the image exists, {@code false} otherwise.
 	 */
 	public boolean imageExists() {
 		return Files.exists(file);
@@ -468,7 +471,7 @@ public class ProjectPage implements Modifiable, Localizable {
 			return null;
 		}
 
-		final Pipeline prototype = this.project().pipelineManager().getPipeline(pipelineId);
+		final Pipeline<ProcessorWrapper> prototype = this.project().pipelineManager().getPipeline(pipelineId);
 		if (prototype == null) {
 			return null;
 		}

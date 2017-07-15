@@ -11,7 +11,7 @@ import javafx.scene.control.Button;
  * A button as parameter. This is a transient parameter (for display purposes
  * only). Nothing gets saved.
  */
-public class ButtonParameter extends TransientParameterBase<ButtonParameter.ButtonView> implements SingleRowParameter {
+public class ButtonParameter extends TransientParameterBase<ButtonParameter.ButtonView,ButtonParameter.ButtonView> implements SingleRowParameter<ButtonParameter.ButtonView> {
 
 	private final String label;
 	private EventHandler<ActionEvent> onAction;

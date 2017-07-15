@@ -1,6 +1,7 @@
 package ch.unifr.diva.dip.awt.imaging.ops;
 
 import ch.unifr.diva.dip.awt.imaging.scanners.ImageTiler;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.util.concurrent.Callable;
@@ -10,11 +11,12 @@ import java.util.concurrent.Callable;
  * {@code BufferedImageOp}s. Indended to be used by an ExecutorService.
  *
  * @param <T> subclass of BufferedImageOp and Parallelizable.
+ * @param <S> class of the ImageTiler.
  */
-public class TileOpCallable<T extends BufferedImageOp & TileParallelizable> implements Callable<Void> {
+public class TileOpCallable<T extends BufferedImageOp & TileParallelizable<S>, S extends ImageTiler<? extends Rectangle>> implements Callable<Void> {
 
 	private final T op;
-	private final ImageTiler tiler;
+	private final S tiler;
 	private final BufferedImage src;
 	private final BufferedImage dst;
 
@@ -26,7 +28,7 @@ public class TileOpCallable<T extends BufferedImageOp & TileParallelizable> impl
 	 * @param src the source image.
 	 * @param dst the destination image.
 	 */
-	public TileOpCallable(T op, ImageTiler tiler, BufferedImage src, BufferedImage dst) {
+	public TileOpCallable(T op, S tiler, BufferedImage src, BufferedImage dst) {
 		this.op = op;
 		this.tiler = tiler;
 		this.src = src;
@@ -35,7 +37,7 @@ public class TileOpCallable<T extends BufferedImageOp & TileParallelizable> impl
 
 	@Override
 	public Void call() throws Exception {
-		TileParallelizable.process(op, tiler, src, dst);
+		op.process(tiler, src, dst);
 		return null;
 	}
 

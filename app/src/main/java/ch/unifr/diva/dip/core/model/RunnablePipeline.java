@@ -207,7 +207,7 @@ public class RunnablePipeline extends Pipeline<RunnableProcessor> {
 	 * @return a clone of the runnable pipeline.
 	 */
 	public RunnablePipeline cloneRunnablePipeline() {
-		final PipelineData.Pipeline data = new PipelineData.Pipeline<>(this);
+		final PipelineData.Pipeline data = new PipelineData.Pipeline(this);
 		return new RunnablePipeline(handler, page, data);
 	}
 
@@ -247,7 +247,7 @@ public class RunnablePipeline extends Pipeline<RunnableProcessor> {
 	private boolean savePipelinePatch() {
 		this.deletePipelinePatch();
 
-		final Pipeline prototype = this.page.project().pipelineManager().getPipeline(id);
+		final Pipeline<ProcessorWrapper> prototype = this.page.project().pipelineManager().getPipeline(id);
 		final PipelinePatch patch = PipelinePatch.createPatch(prototype, this);
 
 		if (!patch.isEmpty()) {

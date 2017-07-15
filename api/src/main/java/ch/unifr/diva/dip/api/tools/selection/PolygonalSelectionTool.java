@@ -88,6 +88,7 @@ public class PolygonalSelectionTool extends SCCSelectionToolBase<Shape> {
 		return polyGesture;
 	}
 
+	@SuppressWarnings("fallthrough")
 	protected final GestureEventHandler.Handler<MouseEvent> polyHandler = (e1, e2, state) -> {
 		switch (state) {
 			case ANYKEY: {

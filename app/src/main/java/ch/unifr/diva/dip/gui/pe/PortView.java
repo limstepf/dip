@@ -26,18 +26,31 @@ import javafx.scene.shape.Circle;
 /**
  * I/O Port view.
  *
- * @param <T>
+ * @param <T> type of the port ({@code InputPort} or {@code OutputPort}).
  */
-public class PortView<T extends Port> extends Pane {
+public class PortView<T extends Port<?>> extends Pane {
 
 	private final PipelineEditor editor;
-	public final String key;
-	public final T port;
 	private final List<ConnectionView> wires;
 	private final DoubleProperty centerXProperty;
 	private final DoubleProperty centerYProperty;
 	private final Circle[] circles = new Circle[3];
+	/**
+	 * The key of the port.
+	 */
+	public final String key;
+	/**
+	 * The port.
+	 */
+	public final T port;
 
+	/**
+	 * Creates a new port view.
+	 *
+	 * @param editor the pipeline editor.
+	 * @param key the key of the port.
+	 * @param port the port.
+	 */
 	public PortView(PipelineEditor editor, String key, T port) {
 		this.editor = editor;
 		this.key = key;
@@ -75,34 +88,71 @@ public class PortView<T extends Port> extends Pane {
 		setupDraggable();
 	}
 
-	// we remember wires connected to a port s.t. we can bring them visually to
-	// front together with their selected processor.
+	/*
+	 * we remember wires connected to a port s.t. we can bring them visually to
+	 * front together with their selected processor.
+	 */
+	//
+	/**
+	 * Adds a wire.
+	 *
+	 * @param wire the wire.
+	 */
 	public void addWire(ConnectionView wire) {
 		wires.add(wire);
 	}
 
+	/**
+	 * Remove a wire.
+	 *
+	 * @param wire the wire.
+	 */
 	public void removeWire(ConnectionView wire) {
 		wires.remove(wire);
 	}
 
+	/**
+	 * Checks whether some wire(s) are registered/connected.
+	 *
+	 * @return {@code true} if some wire(s) are registered/connected,
+	 * {@code false} otherwise.
+	 */
 	public boolean hasWires() {
 		return !wires.isEmpty();
 	}
 
+	/**
+	 * Returns the list of registered/connected wires.
+	 *
+	 * @return the list of registered/connected wires.
+	 */
 	public List<ConnectionView> wires() {
 		return wires;
 	}
 
+	/**
+	 * Updates the center properties.
+	 */
 	public void updateCenter() {
 		final Point2D p = editor.editorPane().sceneToPane(centerInScene());
 		centerXProperty().set(p.getX());
 		centerYProperty().set(p.getY());
 	}
 
+	/**
+	 * The centerX property.
+	 *
+	 * @return the centerX property.
+	 */
 	public DoubleProperty centerXProperty() {
 		return this.centerXProperty;
 	}
 
+	/**
+	 * The centerY property.
+	 *
+	 * @return the centerY property.
+	 */
 	public DoubleProperty centerYProperty() {
 		return this.centerYProperty;
 	}
@@ -137,7 +187,7 @@ public class PortView<T extends Port> extends Pane {
 		editor.setCursor(Cursor.DEFAULT);
 	}
 
-	private void onDragDetected(MouseEvent e, InputPort input) {
+	private void onDragDetected(MouseEvent e, InputPort<?> input) {
 		if (input.isConnected()) {
 			editor.editorPane().setWire(editor.editorPane().getConnectionView(input));
 			editor.editorPane().wire().unbind();
@@ -185,14 +235,14 @@ public class PortView<T extends Port> extends Pane {
 		e.consume();
 	}
 
-	private void onDragDropped(DragEvent e, OutputPort output) {
+	private void onDragDropped(DragEvent e, OutputPort<?> output) {
 		editor.editorPane().setSelectedPort(output);
 
 		e.setDropCompleted(true);
 		e.consume();
 	}
 
-	private void onDragDone(DragEvent e, InputPort input) {
+	private void onDragDone(DragEvent e, InputPort<?> input) {
 		if (editor.editorPane().hasSelectedPort()) {
 			// re-connect -> disconnect first (wire is already unbound)
 			if (input.isConnected()) {

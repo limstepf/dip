@@ -3,16 +3,17 @@ package ch.unifr.diva.dip.api.datatypes;
 import javafx.scene.input.DataFormat;
 
 /**
- * A list of {@code Polygons2D}.
+ * Data type for a list of {@code Polygons2D}.
  */
-public class Polygons2D implements DataType {
+public class Polygons2D extends AbstractDataType<ch.unifr.diva.dip.api.datastructures.Polygon2D> {
 
-	public final static Class type = ch.unifr.diva.dip.api.datastructures.Polygon2D.class;
-	public final static DataFormat dataFormat = new DataFormat("dip-datatype/list-of-polygon2d");
+	private final static DataFormat dataFormat = new DataFormat("dip-datatype/list-of-polygon2d");
 
-	@Override
-	public Class type() {
-		return type;
+	/**
+	 * Creates a new data type for a list of {@code Polygons2D}.
+	 */
+	public Polygons2D() {
+		super(ch.unifr.diva.dip.api.datastructures.Polygon2D.class);
 	}
 
 	@Override
@@ -21,7 +22,8 @@ public class Polygons2D implements DataType {
 	}
 
 	@Override
-	public boolean isList() {
-		return true;
+	public CollectionType getCollectionType() {
+		return CollectionType.LIST;
 	}
+
 }

@@ -66,13 +66,14 @@ public class ColorPicker {
 	 * Creates a new color picker.
 	 *
 	 * @param owner owner of the color picker dialog.
-	 * @param enableOpacity True to enable color opacity, False to disable.
-	 * @param enableWebColor True to enable the web color field, False to
-	 * disable.
+	 * @param enableOpacity {@code true} to enable color opacity, {@code false}
+	 * to disable.
+	 * @param enableWebColor {@code true} to enable the web color field,
+	 * {@code false} to disable.
 	 */
 	public ColorPicker(Window owner, boolean enableOpacity, boolean enableWebColor) {
-		this.currentColorProperty = new SimpleObjectProperty(Color.TRANSPARENT);
-		this.newColorProperty = new SimpleObjectProperty(Color.WHITE);
+		this.currentColorProperty = new SimpleObjectProperty<>(Color.TRANSPARENT);
+		this.newColorProperty = new SimpleObjectProperty<>(Color.WHITE);
 		this.colorRectPane = new ColorRectPane();
 		this.controlsPane = new ControlsPane(owner, enableOpacity, enableWebColor);
 
@@ -96,8 +97,8 @@ public class ColorPicker {
 	/**
 	 * Checks whether the dialog has been closed with an "ok".
 	 *
-	 * @return True if the dialog has been closed by clicking the "ok" button,
-	 * False otherwise.
+	 * @return {@code true} if the dialog has been closed by clicking the "ok"
+	 * button, {@code false} otherwise.
 	 */
 	public boolean isOk() {
 		return this.isOk;
@@ -536,9 +537,10 @@ public class ColorPicker {
 		 * Creates a new controls pane.
 		 *
 		 * @param owner owner of the color picker dialog.
-		 * @param enableOpacity True to enable color opacity, False to disable.
-		 * @param enableWebColor True to enable the web color field, False to
-		 * disable.
+		 * @param enableOpacity {@code true} to enable color opacity,
+		 * {@code false} to disable.
+		 * @param enableWebColor {@code true} to enable the web color field,
+		 * {@code false} to disable.
 		 */
 		public ControlsPane(Window owner, boolean enableOpacity, boolean enableWebColor) {
 			this.currentColorLabel = newLabel(L10n.getInstance().getString("current").toLowerCase());
@@ -614,7 +616,7 @@ public class ColorPicker {
 						(i == 0) ? "hue" : (i == 1) ? "saturation" : "brightness"
 				) + ":");
 				this.hsbUnitLabels[i] = newLabel(
-						(i == 0) ? "°" : (i == 1) ? "%" : "%"
+						(i == 0) ? "°" : "%"
 				);
 
 				this.rgbSliders[i] = newSlider(0, 255);
@@ -752,11 +754,13 @@ public class ColorPicker {
 	 * @param <T> a class extending Region and implementing the
 	 * ColorPickerControl interface.
 	 * @param owner owner of the color picker dialog.
-	 * @param enableOpacity True to enable color opacity, False to disable.
-	 * @param enableWebColor True to enable the web color field, False to
-	 * disable.
+	 * @param enableOpacity {@code true} to enable color opacity, {@code false}
+	 * to disable.
+	 * @param enableWebColor {@code true} to enable the web color field,
+	 * {@code false} to disable.
 	 * @return a color picker region.
 	 */
+	@SuppressWarnings("unchecked")
 	public static <T extends Region & ColorPickerControl> T newColorPickerRegion(Window owner, boolean enableOpacity, boolean enableWebColor) {
 		final ColorPickerControlRegion control = new ColorPickerControlRegion(owner);
 		control.enableOpacity(enableOpacity);
@@ -783,9 +787,10 @@ public class ColorPicker {
 	 * @param <T> a class extending Region and implementing the
 	 * ColorPickerControl interface.
 	 * @param owner owner of the color picker dialog.
-	 * @param enableOpacity True to enable color opacity, False to disable.
-	 * @param enableWebColor True to enable the web color field, False to
-	 * disable.
+	 * @param enableOpacity {@code true} to enable color opacity, {@code false}
+	 * to disable.
+	 * @param enableWebColor {@code true} to enable the web color field,
+	 * {@code false} to disable.
 	 * @return a color picker region.
 	 */
 	public static <T extends Region & ColorPickerControl> T newFramedColorPickerRegion(Window owner, boolean enableOpacity, boolean enableWebColor) {
@@ -804,7 +809,7 @@ public class ColorPicker {
 						new BorderWidths(1)
 				)
 		));
-		return (T) control;
+		return control;
 	}
 
 	/**
@@ -816,14 +821,16 @@ public class ColorPicker {
 		 * Ënables/disables the opacity. If disabled, opacity is set to 100% and
 		 * can't be changed.
 		 *
-		 * @param opacity True to enable opacity of colors, False to disable.
+		 * @param opacity {@code true} to enable opacity of colors,
+		 * {@code false} to disable.
 		 */
 		public void enableOpacity(boolean opacity);
 
 		/**
 		 * Enables/disables the web color field.
 		 *
-		 * @param webColor True to enable the web color field, False to disable.
+		 * @param webColor {@code true} to enable the web color field,
+		 * {@code false} to disable.
 		 */
 		public void enableWebColor(boolean webColor);
 
@@ -868,7 +875,7 @@ public class ColorPicker {
 		 * @param owner owner of the color picker dialog.
 		 */
 		public ColorPickerControlRegion(Window owner) {
-			this.colorProperty = new SimpleObjectProperty(Color.WHITE);
+			this.colorProperty = new SimpleObjectProperty<>(Color.WHITE);
 			this.backgroundProperty().bind(Bindings.createObjectBinding(
 					() -> {
 						final BackgroundFill fill = new BackgroundFill(
@@ -1078,7 +1085,7 @@ public class ColorPicker {
 		double offset;
 		Stop[] stops = new Stop[255];
 		for (int y = 0; y < 255; y++) {
-			offset = (double) (1 - (1.0 / 255) * y);
+			offset = 1 - (1.0 / 255) * y;
 			int h = (int) ((y / 255.0) * 360);
 			stops[y] = new Stop(offset, Color.hsb(h, 1.0, 1.0));
 		}

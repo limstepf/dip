@@ -5,6 +5,7 @@ import ch.unifr.diva.dip.api.ui.RadioChoiceBox;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.model.Pipeline;
 import ch.unifr.diva.dip.core.model.PipelineManager;
+import ch.unifr.diva.dip.core.model.ProcessorWrapper;
 import ch.unifr.diva.dip.core.model.ProjectPage;
 import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
@@ -39,7 +40,7 @@ public class DeletePipelineDialog extends AbstractDialog {
 	private final Button ok = getDefaultButton(localize("ok"));
 	private final Button cancel = getCancelButton(stage);
 	private final List<ProjectPage> pages;
-	private final List<Pipeline> deletedPipelines;
+	private final List<Pipeline<ProcessorWrapper>> deletedPipelines;
 	private final List<Integer> deletedPipelineIds;
 	private final ListView<PageItem> items;
 	private final InvalidationListener validListener;
@@ -54,7 +55,7 @@ public class DeletePipelineDialog extends AbstractDialog {
 	 * @param deletedPipelines pipelines to be deleted, but still in use.
 	 * @param deletedPipelineIds list of pipeline ids to be deleted.
 	 */
-	public DeletePipelineDialog(ApplicationHandler handler, List<ProjectPage> pages, List<Pipeline> deletedPipelines, List<Integer> deletedPipelineIds) {
+	public DeletePipelineDialog(ApplicationHandler handler, List<ProjectPage> pages, List<Pipeline<ProcessorWrapper>> deletedPipelines, List<Integer> deletedPipelineIds) {
 		super(
 				handler.getProject().getPipelineEditor(handler.uiStrategy.getStage()).stage()
 		);
@@ -111,7 +112,7 @@ public class DeletePipelineDialog extends AbstractDialog {
 	 * Checks whether the operation was a success (the ok button has been
 	 * clicked), or not.
 	 *
-	 * @return True in case of success, False otherwise.
+	 * @return {@code true} in case of success, {@code false} otherwise.
 	 */
 	public boolean isOk() {
 		return done;
@@ -129,7 +130,8 @@ public class DeletePipelineDialog extends AbstractDialog {
 	/**
 	 * Checks whether all conflicts can be resolved, or not.
 	 *
-	 * @return True if conflicts can be resolved, False otherwise.
+	 * @return {@code true} if conflicts can be resolved, {@code false}
+	 * otherwise.
 	 */
 	public boolean isValid() {
 		return this.isValid;
@@ -138,8 +140,8 @@ public class DeletePipelineDialog extends AbstractDialog {
 	/**
 	 * Executes the repairs/resolves the conflicts.
 	 *
-	 * @return True if all conflicts have been successfully resolved, False
-	 * otherwise.
+	 * @return {@code true} if all conflicts have been successfully resolved,
+	 * {@code false} otherwise.
 	 */
 	public boolean repair() {
 		if (!isValid()) {
@@ -225,7 +227,7 @@ public class DeletePipelineDialog extends AbstractDialog {
 
 		private void updateValidProperty() {
 			boolean isValid = true;
-			final RadioChoiceBox.RadioChoice c = this.choice.selectedRadioChoice();
+			final RadioChoiceBox.RadioChoice<?> c = this.choice.selectedRadioChoice();
 			if (c.node.equals(this.hbox)) {
 				final PipelineManager.PipelineItem selected = pipelines.getSelectionModel().getSelectedItem();
 				if (deletedPipelines.contains(selected.id)) {
@@ -248,7 +250,8 @@ public class DeletePipelineDialog extends AbstractDialog {
 		/**
 		 * Checks whether the conflict can be resolved, or not.
 		 *
-		 * @return True if the conflict has been resolved, False otherwise.
+		 * @return {@code true} if the conflict has been resolved, {@code false}
+		 * otherwise.
 		 */
 		public boolean isValid() {
 			return validProperty().get();
@@ -258,7 +261,7 @@ public class DeletePipelineDialog extends AbstractDialog {
 		 * Repairs/resolves the conflict with the page.
 		 */
 		public void repair() {
-			final RadioChoiceBox.RadioChoice c = this.choice.selectedRadioChoice();
+			final RadioChoiceBox.RadioChoice<?> c = this.choice.selectedRadioChoice();
 			if (c.node.equals(this.hbox)) {
 				final PipelineManager.PipelineItem selected = pipelines.getSelectionModel().getSelectedItem();
 				this.page.setPipelineId(selected.id);

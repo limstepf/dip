@@ -60,6 +60,7 @@ public class ConcurrentOpThreadsRgbBenchmark {
 	@BenchmarkMode({Mode.AverageTime})
 	@OutputTimeUnit(TimeUnit.MILLISECONDS)
 	public BufferedImage nullOp(Resources r) {
+		@SuppressWarnings({"rawtypes", "unchecked"})
 		ConcurrentTileOp op = new ConcurrentTileOp(
 				new NullOp(),
 				r.tileSize,
@@ -74,6 +75,7 @@ public class ConcurrentOpThreadsRgbBenchmark {
 	@BenchmarkMode({Mode.AverageTime})
 	@OutputTimeUnit(TimeUnit.MILLISECONDS)
 	public BufferedImage invertOp(Resources r) {
+		@SuppressWarnings({"rawtypes", "unchecked"})
 		ConcurrentTileOp op = new ConcurrentTileOp(
 				new InvertOp(),
 				r.tileSize,
@@ -88,6 +90,7 @@ public class ConcurrentOpThreadsRgbBenchmark {
 	@BenchmarkMode({Mode.AverageTime})
 	@OutputTimeUnit(TimeUnit.MILLISECONDS)
 	public BufferedImage colorConvertOp(Resources r) {
+		@SuppressWarnings({"rawtypes", "unchecked"})
 		ConcurrentTileOp op = new ConcurrentTileOp(
 				new ColorConvertOp(SimpleColorModel.RGB, SimpleColorModel.Lab),
 				r.tileSize,

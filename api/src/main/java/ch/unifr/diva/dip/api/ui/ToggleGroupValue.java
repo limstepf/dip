@@ -32,6 +32,7 @@ public class ToggleGroupValue<T> extends ToggleGroup {
 	 * null values, which is nice for toggle groups where some toggle always has
 	 * to be selected.
 	 */
+	@SuppressWarnings("unchecked")
 	public ToggleGroupValue(boolean ignoreNullValues) {
 		this.ignoreNullValues = ignoreNullValues;
 

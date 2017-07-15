@@ -7,7 +7,7 @@ import javafx.scene.layout.Region;
  * An empty parameter. Transient parameter displaying nothing. Might be usefull
  * to fill in some gaps in a composite view/parameter.
  */
-public class EmptyParameter implements Parameter {
+public class EmptyParameter implements Parameter<Void> {
 
 	private Parameter.View view;
 	protected boolean isHidden;

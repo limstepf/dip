@@ -3,13 +3,20 @@ package ch.unifr.diva.dip.eventbus.events;
 import javafx.concurrent.Worker;
 
 /**
- * StatusWorkerEvent.
+ * A status worker event.
+ *
+ * @param <T> class of the value/result of the worker.
  */
-public class StatusWorkerEvent {
+public class StatusWorkerEvent<T> {
 
-	public final Worker worker;
+	public final Worker<T> worker;
 
-	public StatusWorkerEvent(Worker worker) {
+	/**
+	 * Creates a new status worker event.
+	 *
+	 * @param worker the worker.
+	 */
+	public StatusWorkerEvent(Worker<T> worker) {
 		this.worker = worker;
 	}
 
@@ -21,4 +28,5 @@ public class StatusWorkerEvent {
 				+ ", worker=" + worker
 				+ "}";
 	}
+
 }

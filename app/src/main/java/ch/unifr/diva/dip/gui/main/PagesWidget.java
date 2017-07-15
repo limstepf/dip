@@ -204,7 +204,7 @@ public class PagesWidget extends AbstractWidget {
 		private final Label pipelinesLabel = FormGridPane.newLabel(localize("pipeline") + ":");
 		private final FormGridPane grid = new FormGridPane();
 		private ProjectPage currentPage;
-		private ComboBox pipelines;
+		private ComboBox<PipelineManager.PipelineItem> pipelines;
 		private final EventHandler<KeyEvent> onEnterHandler = new KeyEventHandler(
 				KeyCode.ENTER,
 				(e) -> {
@@ -329,7 +329,7 @@ public class PagesWidget extends AbstractWidget {
 			}
 
 			if (pipelines != null) {
-				final PipelineManager.PipelineItem selected = (PipelineManager.PipelineItem) pipelines.getSelectionModel().getSelectedItem();
+				final PipelineManager.PipelineItem selected = pipelines.getSelectionModel().getSelectedItem();
 				if (selected != null) {
 					if (currentPage.getPipelineId() != selected.id) {
 						// TODO: ask for confirmation!

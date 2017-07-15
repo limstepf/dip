@@ -118,7 +118,7 @@ public class MatrixEditor extends ProcessorBase {
 		console.setHorizontalSpacing(3, 8);
 		// the console should appear as transient parameter, s.t. it doesn't affect
 		// equals/hashCode of the (top) parameter.
-		final TransientFacadeParameter consoleFacade = new TransientFacadeParameter(console);
+		final TransientFacadeParameter<?> consoleFacade = new TransientFacadeParameter<>(console);
 
 		final CompositeGrid mat = new CompositeGrid(
 				"Matrix",
@@ -142,9 +142,9 @@ public class MatrixEditor extends ProcessorBase {
 			}
 		};
 
-		this.output_boolean = new OutputPort(new ch.unifr.diva.dip.api.datatypes.BooleanMatrix());
-		this.output_float = new OutputPort(new ch.unifr.diva.dip.api.datatypes.FloatMatrix());
-		this.output_double = new OutputPort(new ch.unifr.diva.dip.api.datatypes.DoubleMatrix());
+		this.output_boolean = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BooleanMatrix());
+		this.output_float = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.FloatMatrix());
+		this.output_double = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.DoubleMatrix());
 
 		this.outputs.put("boolean-matrix", output_boolean);
 		this.outputs.put("float-matrix", output_float);

@@ -68,7 +68,8 @@ public class SelectableFile {
 	/**
 	 * Selects/deselects the File.
 	 *
-	 * @param selected True to select the File, false to deselect it.
+	 * @param selected {@code true} to select the File, {@code false} to
+	 * deselect it.
 	 */
 	public void setSelected(boolean selected) {
 		this.selected.set(selected);
@@ -77,7 +78,7 @@ public class SelectableFile {
 	/**
 	 * Returns whether the File is selected or not.
 	 *
-	 * @return True if the File is selected, False otherwise.
+	 * @return {@code true} if the File is selected, {@code false} otherwise.
 	 */
 	public boolean isSelected() {
 		return selected.get();
@@ -95,7 +96,8 @@ public class SelectableFile {
 	/**
 	 * Disables/enables the File for selection.
 	 *
-	 * @param disable True to disable the File, False to enable it.
+	 * @param disable {@code true} to disable the File, {@code false} to enable
+	 * it.
 	 */
 	public void setDisable(boolean disable) {
 		this.disable.set(disable);
@@ -104,7 +106,7 @@ public class SelectableFile {
 	/**
 	 * Returns whether the File is disabled for selection or not.
 	 *
-	 * @return True if the File is disabled, False otherwise.
+	 * @return {@code true} if the File is disabled, {@code false} otherwise.
 	 */
 	public boolean isDisable() {
 		return disable.get();

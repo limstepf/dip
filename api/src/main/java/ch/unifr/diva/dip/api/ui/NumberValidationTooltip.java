@@ -11,7 +11,7 @@ import javafx.scene.control.Tooltip;
  *
  * @param <T> subclass of Number.
  */
-public class NumberValidationTooltip<T extends Number & Comparable> extends Tooltip {
+public class NumberValidationTooltip<T extends Number & Comparable<T>> extends Tooltip {
 
 	private BooleanProperty validProperty = new SimpleBooleanProperty(true);
 

@@ -47,6 +47,7 @@ public class ConcurrentOpIT {
 			for (Integer width : widths) {
 				for (Integer height : heights) {
 					BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+					@SuppressWarnings({"rawtypes", "unchecked"})
 					ConcurrentTileOp cop = new ConcurrentTileOp(op, tile, tile, threadPool);
 					BufferedImage out = cop.filter(image, null);
 					Histogram histogram = new Histogram(out, 0);
@@ -67,7 +68,7 @@ public class ConcurrentOpIT {
 	/**
 	 * Simple test op that increments each sample by one.
 	 */
-	public static class TestOp extends NullOp implements TileParallelizable {
+	public static class TestOp extends NullOp implements SimpleTileParallelizable {
 
 		@Override
 		public BufferedImage filter(BufferedImage src, BufferedImage dst) {

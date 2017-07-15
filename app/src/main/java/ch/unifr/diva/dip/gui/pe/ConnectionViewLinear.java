@@ -11,7 +11,7 @@ import javafx.scene.shape.StrokeLineCap;
  */
 public class ConnectionViewLinear extends ConnectionViewBase<Line> {
 
-	public ConnectionViewLinear(InputPort input) {
+	public ConnectionViewLinear(InputPort<?> input) {
 		super(input, newWire());
 	}
 

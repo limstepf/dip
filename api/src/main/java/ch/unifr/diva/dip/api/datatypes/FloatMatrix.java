@@ -3,16 +3,17 @@ package ch.unifr.diva.dip.api.datatypes;
 import javafx.scene.input.DataFormat;
 
 /**
- * A {@code FloatMatrix} of any shape.
+ * Data type for a {@code FloatMatrix} of any shape.
  */
-public class FloatMatrix implements DataType {
+public class FloatMatrix extends AbstractDataType<ch.unifr.diva.dip.api.datastructures.FloatMatrix> {
 
-	public final static Class type = ch.unifr.diva.dip.api.datastructures.FloatMatrix.class;
-	public final static DataFormat dataFormat = new DataFormat("dip-datatype/float-matrix");
+	private final static DataFormat dataFormat = new DataFormat("dip-datatype/float-matrix");
 
-	@Override
-	public Class type() {
-		return type;
+	/**
+	 * Creates a new data type for a {@code FloatMatrix}.
+	 */
+	public FloatMatrix() {
+		super(ch.unifr.diva.dip.api.datastructures.FloatMatrix.class);
 	}
 
 	@Override

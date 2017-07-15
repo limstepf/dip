@@ -60,9 +60,10 @@ public class RubberBandSelector<T extends Node> {
 	 * @param master pane to select nodes in.
 	 * @param classFilter Class representing T; the class to select.
 	 */
-	public RubberBandSelector(Pane master, Class classFilter) {
+	@SuppressWarnings("unchecked")
+	public RubberBandSelector(Pane master, Class<? super T> classFilter) {
 		this.master = master;
-		this.classFilter = classFilter;
+		this.classFilter = (Class<T>) classFilter;
 
 		selection = FXCollections.observableSet();
 
@@ -195,8 +196,8 @@ public class RubberBandSelector<T extends Node> {
 	 * cursor on the correct node/region.
 	 *
 	 * @param e a mouse event.
-	 * @return True if rubber band selection should be suppressed, False
-	 * otherwise.
+	 * @return {@code true} if rubber band selection should be suppressed,
+	 * {@code false} otherwise.
 	 */
 	private boolean suppressIfNotDefaultCursor(MouseEvent e) {
 		if (!suppressIfNotDefaultCursorProperty.get()) {
@@ -226,6 +227,7 @@ public class RubberBandSelector<T extends Node> {
 				continue;
 			}
 
+			@SuppressWarnings("unchecked")
 			final T typedNode = (T) node;
 
 			if (rect.getBoundsInParent().intersects(typedNode.getBoundsInParent())) {
@@ -262,9 +264,9 @@ public class RubberBandSelector<T extends Node> {
 
 	/**
 	 * Suppresses the rubber band selection if the current mouse cursor is not
-	 * the default one and set to true.
+	 * the default one and set to {@code true}.
 	 *
-	 * @param enable True to suppress, False otherwise.
+	 * @param enable {@code true} to suppress, {@code false} otherwise.
 	 */
 	public void suppressIfNotDefaultCursor(boolean enable) {
 		suppressIfNotDefaultCursorProperty().set(enable);

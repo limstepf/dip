@@ -23,6 +23,7 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
@@ -164,7 +165,7 @@ public class NewProjectDialog extends AbstractDialog {
 		buttons.add(cancel);
 	}
 
-	private final EventHandler actionEventHandler = (c) -> onAction();
+	private final EventHandler<ActionEvent> actionEventHandler = (c) -> onAction();
 
 	private void onAction() {
 		this.isOk = true;
@@ -273,8 +274,8 @@ public class NewProjectDialog extends AbstractDialog {
 	/**
 	 * Checks whether the dialog has been closed after success, or cancelled.
 	 *
-	 * @return True if the dialog has been closed after success, False if the
-	 * dialog has been cancelled.
+	 * @return {@code true} if the dialog has been closed after success,
+	 * {@code false} if the dialog has been cancelled.
 	 */
 	public boolean isOk() {
 		return this.isOk;

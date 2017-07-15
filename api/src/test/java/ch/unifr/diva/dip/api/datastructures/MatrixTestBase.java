@@ -24,7 +24,7 @@ public class MatrixTestBase {
 		}
 	}
 
-	private <T extends Matrix> T getTranspose(T mat) {
+	private <T extends Matrix<T>> T getTranspose(T mat) {
 		T transpose = mat.transpose();
 
 		assertEquals(mat.columns, transpose.rows);

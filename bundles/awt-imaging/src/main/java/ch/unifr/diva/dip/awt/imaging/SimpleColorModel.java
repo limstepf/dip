@@ -736,8 +736,8 @@ public enum SimpleColorModel {
 	 */
 	private static float[] D65 = {0.95047f, 1.0f, 1.08883f};
 
-	private final Class<? extends DataType> dataTypeClass;
-	private final DataType dataType;
+	private final Class<? extends DataType<?>> dataTypeClass;
+	private final DataType<?> dataType;
 	private final int numBands;
 	private final String[] bandLabels;
 	private final String[] bandDescriptions;
@@ -752,7 +752,7 @@ public enum SimpleColorModel {
 	 * @param bandDescriptions the band descriptions.
 	 */
 	private SimpleColorModel(
-			Class<? extends DataType> dataType,
+			Class<? extends DataType<?>> dataType,
 			String[] bandLabels,
 			String[] bandDescriptions
 	) {
@@ -773,14 +773,14 @@ public enum SimpleColorModel {
 	 * @param maxValues array of maximum sample ranges for all bands.
 	 */
 	private SimpleColorModel(
-			Class<? extends DataType> dataType,
+			Class<? extends DataType<?>> dataType,
 			String[] bandLabels,
 			String[] bandDescriptions,
 			float[] minValues,
 			float[] maxValues
 	) {
 		this.dataTypeClass = dataType;
-		DataType dt = null;
+		DataType<?> dt = null;
 		try {
 			dt = this.dataTypeClass.newInstance();
 		} catch (InstantiationException | IllegalAccessException ex) {
@@ -837,7 +837,7 @@ public enum SimpleColorModel {
 	 *
 	 * @return the data type of the color model.
 	 */
-	public DataType dataType() {
+	public DataType<?> dataType() {
 		return this.dataType;
 	}
 
@@ -845,8 +845,8 @@ public enum SimpleColorModel {
 	 * Checks whether images with this color model require a
 	 * {@code BufferedMatrix} instead of a {@code BufferedImage}.
 	 *
-	 * @return True if images with this color model require a
-	 * {@code BufferedMatrix}, False otherwise.
+	 * @return {@code true} if images with this color model require a
+	 * {@code BufferedMatrix}, {@code false} otherwise.
 	 */
 	public boolean requiresBufferedMatrix() {
 		return dataType().type().equals(BufferedMatrix.class);

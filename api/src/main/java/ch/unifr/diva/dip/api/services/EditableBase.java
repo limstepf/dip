@@ -19,7 +19,7 @@ import javafx.scene.input.MouseEvent;
 public abstract class EditableBase extends ProcessorBase implements Editable {
 
 	protected final List<Tool> tools;
-	protected final LinkedHashMap<String, SingleRowParameter> options;
+	protected final LinkedHashMap<String, SingleRowParameter<?>> options;
 
 	/**
 	 * Creates the base of a new editable processor.
@@ -32,7 +32,7 @@ public abstract class EditableBase extends ProcessorBase implements Editable {
 		this.options = new LinkedHashMap<>();
 	}
 
-	protected final ObjectProperty<ProcessorContext> contextProperty = new SimpleObjectProperty();
+	protected final ObjectProperty<ProcessorContext> contextProperty = new SimpleObjectProperty<>();
 
 	/**
 	 * The context property. Editable processor typically need to manage the
@@ -58,7 +58,6 @@ public abstract class EditableBase extends ProcessorBase implements Editable {
 		contextProperty().set(context);
 	}
 
-
 	/**
 	 * Returns the current context.
 	 *
@@ -68,11 +67,11 @@ public abstract class EditableBase extends ProcessorBase implements Editable {
 		return contextProperty().get();
 	}
 
-
 	/**
 	 * Checks whether the processor context has been set.
 	 *
-	 * @return True if the processor context has been set, False otherwise.
+	 * @return {@code true} if the processor context has been set, {@code false}
+	 * otherwise.
 	 */
 	public boolean hasContext() {
 		return contextProperty.get() != null;
@@ -89,7 +88,7 @@ public abstract class EditableBase extends ProcessorBase implements Editable {
 	}
 
 	@Override
-	public Map<String, SingleRowParameter> options() {
+	public Map<String, SingleRowParameter<?>> options() {
 		return this.options;
 	}
 

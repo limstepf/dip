@@ -35,7 +35,7 @@ public class OptionParameter extends PersistentParameterBase<Integer, OptionPara
 		return new OptionView(this);
 	}
 
-	protected final List<ViewHook<ComboBox>> comboBoxViewHooks = new ArrayList<>();
+	protected final List<ViewHook<ComboBox<String>>> comboBoxViewHooks = new ArrayList<>();
 
 	/**
 	 * Adds a view hook to customize the combo box. This method is only called
@@ -43,7 +43,7 @@ public class OptionParameter extends PersistentParameterBase<Integer, OptionPara
 	 *
 	 * @param hook hook method for a combo box.
 	 */
-	public void addComboBoxViewHook(ViewHook<ComboBox> hook) {
+	public void addComboBoxViewHook(ViewHook<ComboBox<String>> hook) {
 		this.comboBoxViewHooks.add(hook);
 	}
 
@@ -52,11 +52,11 @@ public class OptionParameter extends PersistentParameterBase<Integer, OptionPara
 	 *
 	 * @param hook hook method to be removed.
 	 */
-	public void removeComboBoxViewHook(ViewHook<ComboBox> hook) {
+	public void removeComboBoxViewHook(ViewHook<ComboBox<String>> hook) {
 		this.comboBoxViewHooks.remove(hook);
 	}
 
-	protected ViewHook<ComboBox> singleRowViewHook = null;
+	protected ViewHook<ComboBox<String>> singleRowViewHook = null;
 
 	@Override
 	public void initSingleRowView() {
@@ -68,7 +68,7 @@ public class OptionParameter extends PersistentParameterBase<Integer, OptionPara
 	/**
 	 * Option view with a ComboBox.
 	 */
-	public static class OptionView extends PersistentParameterBase.ParameterViewBase<OptionParameter, Integer, ComboBox> {
+	public static class OptionView extends PersistentParameterBase.ParameterViewBase<OptionParameter, Integer, ComboBox<String>> {
 
 		/**
 		 * Creates a new option view.
@@ -76,7 +76,7 @@ public class OptionParameter extends PersistentParameterBase<Integer, OptionPara
 		 * @param parameter the option parameter.
 		 */
 		public OptionView(OptionParameter parameter) {
-			super(parameter, new ComboBox());
+			super(parameter, new ComboBox<>());
 			root.setMaxWidth(Double.MAX_VALUE);
 			root.getItems().addAll(parameter.options);
 			set(parameter.get());

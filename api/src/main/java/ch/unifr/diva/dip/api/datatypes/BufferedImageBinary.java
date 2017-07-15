@@ -3,16 +3,18 @@ package ch.unifr.diva.dip.api.datatypes;
 import javafx.scene.input.DataFormat;
 
 /**
- * A {@code BufferedImage} with a binary color space.
+ * Data type for a {@code BufferedImage} with a binary color space.
  */
-public class BufferedImageBinary implements DataType {
+public class BufferedImageBinary extends AbstractDataType<java.awt.image.BufferedImage> {
 
-	public final static Class type = java.awt.image.BufferedImage.class;
-	public final static DataFormat dataFormat = new DataFormat("dip-datatype/buffered-image-binary");
+	private final static DataFormat dataFormat = new DataFormat("dip-datatype/buffered-image-binary");
 
-	@Override
-	public Class type() {
-		return type;
+	/**
+	 * Creates a new data type for a {@code BufferedImage} with a binary color
+	 * space.
+	 */
+	public BufferedImageBinary() {
+		super(java.awt.image.BufferedImage.class);
 	}
 
 	@Override

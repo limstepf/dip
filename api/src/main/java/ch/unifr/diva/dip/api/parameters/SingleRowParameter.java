@@ -5,7 +5,7 @@ package ch.unifr.diva.dip.api.parameters;
  * parameters, which makes them available for use in a bar (e.g. the options
  * bar).
  *
- * @param <T> type of the parameter.
+ * @param <T> class of the parameter's value.
  */
 public interface SingleRowParameter<T> extends Parameter<T> {
 

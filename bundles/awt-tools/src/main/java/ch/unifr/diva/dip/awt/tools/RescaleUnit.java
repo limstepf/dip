@@ -1,9 +1,8 @@
 package ch.unifr.diva.dip.awt.tools;
 
 import ch.unifr.diva.dip.api.components.OutputPort;
+import ch.unifr.diva.dip.api.datastructures.BufferedMatrix;
 import ch.unifr.diva.dip.api.datastructures.ValueListSelection;
-import ch.unifr.diva.dip.api.datatypes.BufferedImageBinary;
-import ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat;
 import ch.unifr.diva.dip.api.parameters.CheckboxParameter;
 import ch.unifr.diva.dip.api.parameters.CompositeGrid;
 import ch.unifr.diva.dip.api.parameters.EmptyParameter;
@@ -44,8 +43,8 @@ public class RescaleUnit {
 
 	// outputs
 	private final OutputPort<BufferedImage> output;
-	private final OutputPort<BufferedImageBinary> output_binary;
-	private final OutputPort<BufferedMatrixFloat> output_float;
+	private final OutputPort<BufferedImage> output_binary;
+	private final OutputPort<BufferedMatrix> output_float;
 	private final List<OutputColorPort> outputColors;
 
 	// state/config
@@ -53,8 +52,8 @@ public class RescaleUnit {
 	private int numBands = -1;
 	private boolean isBufferedMatrix;
 	private SamplePrecision precision;
-	private final Map<String, OutputPort> outputPorts = new HashMap<>();
-	private final Map<String, OutputPort> enabledOutputPorts = new HashMap<>();
+	private final Map<String, OutputPort<? extends BufferedImage>> outputPorts = new HashMap<>();
+	private final Map<String, OutputPort<? extends BufferedImage>> enabledOutputPorts = new HashMap<>();
 
 	/**
 	 * Creates a new rescale unit with up to 4 bands.
@@ -119,7 +118,7 @@ public class RescaleUnit {
 		);
 		labelsBottom.setColumnWidthConstraints(Band.GRID_PERCENT_WIDTHS);
 
-		final List<Parameter> bandComponents = new ArrayList<>();
+		final List<Parameter<?>> bandComponents = new ArrayList<>();
 		bandComponents.add(labelsTop);
 		bandComponents.add(labelsBottom);
 		for (Band band : this.bands) {
@@ -129,9 +128,9 @@ public class RescaleUnit {
 		this.bandConfig.setColumnConstraints(1);
 
 		// outputs
-		this.output = new OutputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImage());
-		this.output_binary = new OutputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImageBinary());
-		this.output_float = new OutputPort(new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat());
+		this.output = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImage());
+		this.output_binary = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImageBinary());
+		this.output_float = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat());
 
 		this.outputPorts.put("buffered-image", this.output);
 		this.outputPorts.put("buffered-image-binary", this.output_binary);
@@ -245,7 +244,7 @@ public class RescaleUnit {
 	 *
 	 * @return the enabled output ports.
 	 */
-	public Map<String, OutputPort> getEnabledOutputPorts() {
+	public Map<String, OutputPort<? extends BufferedImage>> getEnabledOutputPorts() {
 		return this.enabledOutputPorts;
 	}
 
@@ -254,7 +253,7 @@ public class RescaleUnit {
 	 *
 	 * @return all output ports.
 	 */
-	public Map<String, OutputPort> getAllOutputPorts() {
+	public Map<String, OutputPort<? extends BufferedImage>> getAllOutputPorts() {
 		return this.outputPorts;
 	}
 
@@ -271,8 +270,8 @@ public class RescaleUnit {
 	 * Checks whether the current configuration requires a
 	 * {@code BufferedMatrix}, or if a {@code BufferedImage} will do.
 	 *
-	 * @return True if the current configuration requires a
-	 * {@code BufferedMatrix}, False otherwise.
+	 * @return {@code true} if the current configuration requires a
+	 * {@code BufferedMatrix}, {@code false} otherwise.
 	 */
 	public boolean isBufferedMatrix() {
 		return this.isBufferedMatrix;
@@ -359,6 +358,7 @@ public class RescaleUnit {
 	 * @param image the value to be set on all ports of the current
 	 * configuration.
 	 */
+	@SuppressWarnings({"rawtypes", "unchecked"})
 	public void setOutputs(BufferedImage image) {
 		for (OutputPort port : this.enabledOutputPorts.values()) {
 			port.setOutput(image);

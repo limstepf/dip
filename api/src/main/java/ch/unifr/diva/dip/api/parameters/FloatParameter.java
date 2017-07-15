@@ -62,7 +62,7 @@ public class FloatParameter extends PersistentParameterBase<Float, FloatParamete
 		return new FloatView(this);
 	}
 
-	protected final List<ViewHook> viewHooks = new ArrayList<>();
+	protected final List<ViewHook<TextField>> viewHooks = new ArrayList<>();
 
 	/**
 	 * Adds a view hook to customize the textfield. This method is only called

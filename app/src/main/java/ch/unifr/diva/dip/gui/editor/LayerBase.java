@@ -32,13 +32,13 @@ public abstract class LayerBase implements Layer, EditorLayer {
 
 	protected static final org.slf4j.Logger log = LoggerFactory.getLogger(LayerBase.class);
 
-	protected static LayerEvent MODIFIED_EVENT = new LayerEvent(LayerEvent.Type.MODIFIED);
-	protected static LayerEvent MODIFIED_PANE_EVENT = new LayerEvent(LayerEvent.Type.MODIFIED_PANE);
-	protected static LayerEvent MODIFIED_TREE_EVENT = new LayerEvent(LayerEvent.Type.MODIFIED_TREE);
-	protected static LayerEvent MODIFIED_EMPTY_EVENT = new LayerEvent(LayerEvent.Type.MODIFIED_EMPTY);
-	protected static LayerEvent DEACTIVATE_EVENT = new LayerEvent(LayerEvent.Type.DEACTIVATE);
-	protected static LayerEvent REACTIVATE_PARENT_EVENT = new LayerEvent(LayerEvent.Type.REACTIVATE_PARENT);
-	protected static LayerEvent REACTIVATE_EVENT = new LayerEvent(LayerEvent.Type.REACTIVATE);
+	protected static final LayerEvent MODIFIED_EVENT = new LayerEvent(LayerEvent.Type.MODIFIED);
+	protected static final LayerEvent MODIFIED_PANE_EVENT = new LayerEvent(LayerEvent.Type.MODIFIED_PANE);
+	protected static final LayerEvent MODIFIED_TREE_EVENT = new LayerEvent(LayerEvent.Type.MODIFIED_TREE);
+	protected static final LayerEvent MODIFIED_EMPTY_EVENT = new LayerEvent(LayerEvent.Type.MODIFIED_EMPTY);
+	protected static final LayerEvent DEACTIVATE_EVENT = new LayerEvent(LayerEvent.Type.DEACTIVATE);
+	protected static final LayerEvent REACTIVATE_PARENT_EVENT = new LayerEvent(LayerEvent.Type.REACTIVATE_PARENT);
+	protected static final LayerEvent REACTIVATE_EVENT = new LayerEvent(LayerEvent.Type.REACTIVATE);
 
 	protected final TreeItem<Layer> treeItem;
 	protected final int ownerProcessorId;
@@ -107,9 +107,13 @@ public abstract class LayerBase implements Layer, EditorLayer {
 				case MODIFIED:
 					this.setModifiedProperty();
 					break;
+
 				case MODIFIED_PANE:
 					this.setModifiedProperty();
 					this.setModifiedContentProperty();
+					break;
+
+				default:
 					break;
 			}
 		} else {
@@ -357,7 +361,7 @@ public abstract class LayerBase implements Layer, EditorLayer {
 	@Override
 	public <T> T runFutureTask(Callable<T> callable) {
 		try {
-			return FxUtils.runFutureTask((Callable<T>) callable);
+			return FxUtils.runFutureTask(callable);
 		} catch (Exception ex) {
 			log.error("failed to runFutureTask: {}", this, ex);
 			return null;

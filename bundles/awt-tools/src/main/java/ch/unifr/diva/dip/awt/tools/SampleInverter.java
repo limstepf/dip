@@ -50,8 +50,8 @@ public class SampleInverter extends ProcessableBase {
 	// single-band ports
 	private final InputPort<BufferedImage> input_binary;
 	private final OutputPort<BufferedImage> output_binary;
-	private final InputPort<BufferedImage> input_float;
-	private final OutputPort<BufferedImage> output_float;
+	private final InputPort<BufferedMatrix> input_float;
+	private final OutputPort<BufferedMatrix> output_float;
 	// color-typed ports
 	private final List<InputColorPort> inputColors;
 	private final List<OutputColorPort> outputColors;
@@ -70,7 +70,8 @@ public class SampleInverter extends ProcessableBase {
 		private final SampleInverter inverter;
 		private ValueListSelection vs;
 		private InputColorPort icp;
-		private InputPort ip;
+		private InputPort<? extends BufferedImage> ip;
+		@SuppressWarnings("rawtypes")
 		private OutputPort op;
 		private int selectedBand = -1;
 
@@ -121,10 +122,11 @@ public class SampleInverter extends ProcessableBase {
 			}
 		}
 
-		public InputPort getExtraInput() {
+		public InputPort<? extends BufferedImage> getExtraInput() {
 			return this.ip;
 		}
 
+		@SuppressWarnings("unchecked")
 		public void setExtraOutput(BufferedImage image) {
 			this.op.setOutput(image);
 		}
@@ -173,6 +175,7 @@ public class SampleInverter extends ProcessableBase {
 			}
 		}
 
+		@SuppressWarnings("unchecked")
 		public void enablePorts() {
 			inverter.enableInputs(ip);
 			inverter.enableOutputs(op);
@@ -222,12 +225,12 @@ public class SampleInverter extends ProcessableBase {
 		);
 		this.parameters.put("config", this.configParam);
 
-		this.input = new InputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImage(), false);
-		this.input_binary = new InputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImageBinary(), false);
-		this.input_float = new InputPort(new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat(), false);
-		this.output = new OutputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImage());
-		this.output_binary = new OutputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImageBinary());
-		this.output_float = new OutputPort(new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat());
+		this.input = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImage(), false);
+		this.input_binary = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImageBinary(), false);
+		this.input_float = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat(), false);
+		this.output = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImage());
+		this.output_binary = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImageBinary());
+		this.output_float = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat());
 
 		this.inputColors = new ArrayList<>();
 		this.outputColors = new ArrayList<>();
@@ -298,11 +301,11 @@ public class SampleInverter extends ProcessableBase {
 		enableInputs(null);
 	}
 
-	private void enableInputs(InputPort port) {
+	private void enableInputs(InputPort<? extends BufferedImage> port) {
 		inputs.clear();
 
 		// only show single connected port
-		final InputPort c = getConnectedInput();
+		final InputPort<? extends BufferedImage> c = getConnectedInput();
 		if (port != null && c.isConnected()) {
 			if (this.input.equals(c)) {
 				this.inputs.put("buffered-image", this.input);
@@ -340,8 +343,8 @@ public class SampleInverter extends ProcessableBase {
 		}
 	}
 
-	private InputPort<BufferedImage> getConnectedInput() {
-		final InputPort extra = this.config.getExtraInput();
+	private InputPort<? extends BufferedImage> getConnectedInput() {
+		final InputPort<? extends BufferedImage> extra = this.config.getExtraInput();
 		if (extra != null && extra.isConnected()) {
 			return extra;
 		}
@@ -354,7 +357,7 @@ public class SampleInverter extends ProcessableBase {
 	}
 
 	// untyped + one specific extra port, or all
-	private void enableOutputs(OutputPort port) {
+	private void enableOutputs(OutputPort<? extends BufferedImage> port) {
 		this.outputs.clear();
 		this.outputs.put("buffered-image", this.output);
 

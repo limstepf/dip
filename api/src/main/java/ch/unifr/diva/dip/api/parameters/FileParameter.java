@@ -52,7 +52,7 @@ public class FileParameter extends PersistentParameterBase<FileReference, FilePa
 		return new FileView(this);
 	}
 
-	protected final List<ViewHook> viewHooks = new ArrayList<>();
+	protected final List<ViewHook<FileChooser>> viewHooks = new ArrayList<>();
 
 	/**
 	 * Adds a view hook to customize the file chooser. This method is only

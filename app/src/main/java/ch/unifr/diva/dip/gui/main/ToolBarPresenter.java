@@ -2,7 +2,6 @@ package ch.unifr.diva.dip.gui.main;
 
 import ch.unifr.diva.dip.gui.VisibilityMode;
 import ch.unifr.diva.dip.api.services.Editable;
-import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.tools.GestureEventHandler;
 import ch.unifr.diva.dip.api.tools.MultiTool;
 import ch.unifr.diva.dip.api.tools.SimpleTool;
@@ -48,10 +47,8 @@ import javafx.util.Duration;
 
 /**
  * A simple tool bar.
- *
- * @param <T> class of an editable processor.
  */
-public class ToolBarPresenter<T extends Processor & Editable> implements Presenter {
+public class ToolBarPresenter implements Presenter {
 
 	protected final static NamedGlyph GLYPH_DEFAULT = MaterialDesignIcons.CURSOR_POINTER;
 	protected final static Color COLOR_SELECTED = UIStrategyGUI.Colors.accent;
@@ -61,17 +58,17 @@ public class ToolBarPresenter<T extends Processor & Editable> implements Present
 	private final Stage stage;
 	private final EditorPresenter editor;
 	private final VBox root;
-	private final List<ToolButton> globalTools;
-	private final List<ToolButton> tools;
+	private final List<ToolButton<? extends Tool>> globalTools;
+	private final List<ToolButton<? extends Tool>> tools;
 	private final ObjectProperty<VisibilityMode> visibilityModeProperty;
 	private final OptionsBar optionsBar;
 
-	private ToolButton selectedTool;
+	private ToolButton<? extends Tool> selectedTool;
 	private Glyph.Size glyphSize;
 
 	private ProjectPage currentPage;
 	private RunnableProcessor currentRunnable;
-	private T currentProcessor;
+	private Editable currentProcessor;
 
 	/**
 	 * Creates a new tool bar.
@@ -141,8 +138,8 @@ public class ToolBarPresenter<T extends Processor & Editable> implements Present
 	 * @return list of wrapped global tools (in tool buttons). Keep them around
 	 * if you whish to remove/unregister them again at some point.
 	 */
-	public List<ToolButton> addGlobalTool(Tool... tools) {
-		final List<ToolButton> tbs = new ArrayList<>();
+	public List<ToolButton<Tool>> addGlobalTool(Tool... tools) {
+		final List<ToolButton<Tool>> tbs = new ArrayList<>();
 		for (Tool tool : tools) {
 			this.globalTools.add(newToolButton(tool));
 		}
@@ -155,7 +152,7 @@ public class ToolBarPresenter<T extends Processor & Editable> implements Present
 	 *
 	 * @param tb the wrapped global tool to be removed.
 	 */
-	public void removeGlobalTool(ToolButton tb) {
+	public void removeGlobalTool(ToolButton<Tool> tb) {
 		if (this.globalTools.contains(tb)) {
 			this.globalTools.remove(tb);
 			rebuild();
@@ -190,6 +187,8 @@ public class ToolBarPresenter<T extends Processor & Editable> implements Present
 				break;
 			case CLOSING:
 				onPageClosed();
+				break;
+			default:
 				break;
 		}
 	}
@@ -277,7 +276,7 @@ public class ToolBarPresenter<T extends Processor & Editable> implements Present
 	// clear list + 1 default non-tool tool
 	private void resetToolBar() {
 		this.tools.clear();
-		for (ToolButton tb : this.globalTools) {
+		for (ToolButton<? extends Tool> tb : this.globalTools) {
 			this.tools.add(tb);
 		}
 		// TODO: keep global tool selected?
@@ -299,14 +298,14 @@ public class ToolBarPresenter<T extends Processor & Editable> implements Present
 			return;
 		}
 
-		for (ToolButton t : this.tools) {
+		for (ToolButton<? extends Tool> t : this.tools) {
 			this.root.getChildren().add(t.node());
 		}
 
 		setSelectedTool(this.tools.get(0));
 	}
 
-	protected void setSelectedTool(ToolButton tb) {
+	protected void setSelectedTool(ToolButton<? extends Tool> tb) {
 		if (tb == null || !this.tools.contains(tb)) {
 			if (this.selectedTool != null) {
 				this.selectedTool.setSelected(false);
@@ -323,7 +322,7 @@ public class ToolBarPresenter<T extends Processor & Editable> implements Present
 		setSelectedSimpleTool(tb);
 	}
 
-	protected void setSelectedMultiTool(ToolButton tb, MultiTool mt, SimpleTool newTool) {
+	protected void setSelectedMultiTool(ToolButton<? extends Tool> tb, MultiTool mt, SimpleTool newTool) {
 		final Tool currentTool = (this.selectedTool != null)
 				? this.selectedTool.simpleTool()
 				: null;
@@ -338,12 +337,13 @@ public class ToolBarPresenter<T extends Processor & Editable> implements Present
 		setSelectedSimpleTool(tb);
 	}
 
-	private void setSelectedSimpleTool(ToolButton tb) {
+	private void setSelectedSimpleTool(ToolButton<? extends Tool> tb) {
 		this.selectedTool = tb;
 		this.selectedTool.setSelected(true);
 		this.selectedTool.tool.onSelected();
 	}
 
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	private void bindTool(Tool currentTool, Tool newTool) {
 		final Pane pane = getContentPane();
 		unbindTool(pane, currentTool);
@@ -366,6 +366,7 @@ public class ToolBarPresenter<T extends Processor & Editable> implements Present
 		optionsBar.clear();
 	}
 
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	private void unbindTool(Pane pane, Tool currentTool) {
 		if (currentTool != null) {
 			for (GestureEventHandler h : currentTool.getGesture().eventHandlers()) {
@@ -397,10 +398,10 @@ public class ToolBarPresenter<T extends Processor & Editable> implements Present
 		return this.editor.getZoomPane().getContentPane();
 	}
 
-	private ToolButton newToolButton(Tool tool) {
+	private ToolButton<? extends Tool> newToolButton(Tool tool) {
 		return tool.isMultiTool()
 				? new MultiToolButton(this, tool.asMultiTool())
-				: new ToolButton(this, tool);
+				: new ToolButton<>(this, tool);
 	}
 
 	/**
@@ -497,8 +498,8 @@ public class ToolBarPresenter<T extends Processor & Editable> implements Present
 		/**
 		 * Marks the tool of this tool button as de-/selected.
 		 *
-		 * @param selected True to mark the tool as selected, False to mark it
-		 * as deselected.
+		 * @param selected {@code true} to mark the tool as selected,
+		 * {@code false} to mark it as deselected.
 		 */
 		public void setSelected(boolean selected) {
 			this.isSelected = selected;
@@ -591,7 +592,7 @@ public class ToolBarPresenter<T extends Processor & Editable> implements Present
 		}
 
 		@Override
-		protected void selectThisTool() {
+		protected final void selectThisTool() {
 			this.toolBar.setSelectedMultiTool(this, this.tool, this.tool.getSelectedTool());
 		}
 

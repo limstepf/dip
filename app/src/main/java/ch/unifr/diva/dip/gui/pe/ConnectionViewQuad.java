@@ -7,7 +7,6 @@ import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.ParallelTransition;
-import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 import javafx.animation.Transition;
 import javafx.beans.property.DoubleProperty;
@@ -21,7 +20,7 @@ import javafx.util.Duration;
  */
 public class ConnectionViewQuad extends ConnectionViewBase<QuadCurve> {
 
-	public ConnectionViewQuad(InputPort input) {
+	public ConnectionViewQuad(InputPort<?> input) {
 		super(input, newWire());
 
 		this.wire.startXProperty().addListener((e) -> updateControlPoint());
@@ -109,7 +108,7 @@ public class ConnectionViewQuad extends ConnectionViewBase<QuadCurve> {
 	}
 
 	@Override
-	public void bind(PortView<OutputPort> output, PortView<InputPort> input) {
+	public void bind(PortView<OutputPort<?>> output, PortView<InputPort<?>> input) {
 		super.bind(output, input);
 
 		playBounce();

@@ -12,9 +12,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
-import javafx.concurrent.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,8 +32,6 @@ import org.slf4j.LoggerFactory;
  * <a href="https://docs.oracle.com/javase/8/docs/api/java/nio/file/FileSystem.html#getPathMatcher-java.lang.String-">https://docs.oracle.com/javase/8/docs/api/java/nio/file/FileSystem.html#getPathMatcher-java.lang.String-</a>
  */
 public class FileFinder extends SimpleFileVisitor<Path> {
-
-
 
 	private static final Logger log = LoggerFactory.getLogger(FileFinder.class);
 	private final List<Path> matches = new ArrayList<>();
@@ -91,12 +87,13 @@ public class FileFinder extends SimpleFileVisitor<Path> {
 	}
 
 	/**
-	 * Returns true if a cycle has been detected. This can only happen while
-	 * following symbolic links. If it has happend, however, the results can't
-	 * be trusted since files might have been visited more than once (twice at
-	 * most).
+	 * Returns {@code true} if a cycle has been detected. This can only happen
+	 * while following symbolic links. If it has happend, however, the results
+	 * can't be trusted since files might have been visited more than once
+	 * (twice at most).
 	 *
-	 * @return True if a cycle has been detected, False otherwise.
+	 * @return {@code true} if a cycle has been detected, {@code false}
+	 * otherwise.
 	 */
 	public boolean hasCycleDetected() {
 		return cycleIsDetected;

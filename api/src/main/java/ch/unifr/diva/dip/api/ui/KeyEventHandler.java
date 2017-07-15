@@ -41,7 +41,7 @@ public class KeyEventHandler implements EventHandler<KeyEvent> {
 		 * Key event handler method called upon recieving a key event.
 		 *
 		 * @param event the key event.
-		 * @return True to consume the event, False otherwise.
+		 * @return {@code true} to consume the event, {@code false} otherwise.
 		 */
 		public boolean onKeyEvent(KeyEvent event);
 	}

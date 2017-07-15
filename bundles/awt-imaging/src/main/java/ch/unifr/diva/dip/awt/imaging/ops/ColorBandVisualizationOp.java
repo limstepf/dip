@@ -9,7 +9,7 @@ import java.awt.image.WritableRaster;
 /**
  * Color band visualization filter.
  */
-public class ColorBandVisualizationOp extends NullOp implements TileParallelizable {
+public class ColorBandVisualizationOp extends NullOp implements SimpleTileParallelizable {
 
 	private final SimpleColorModel cm;
 	private int band;

@@ -62,7 +62,7 @@ public class ZipFileSystem implements AutoCloseable {
 	 * @see #create(java.nio.file.Path)
 	 * @see #create(java.net.URI)
 	 * @see #open(java.io.File)
-	 * @see #open(java.nio.file.Path) 
+	 * @see #open(java.nio.file.Path)
 	 */
 	public ZipFileSystem(URI uri, HashMap<String, String> env) throws IOException {
 		fs = FileSystems.newFileSystem(uri, env);
@@ -120,7 +120,7 @@ public class ZipFileSystem implements AutoCloseable {
 	 * @throws IOException
 	 */
 	public static ZipFileSystem create(URI uri) throws IOException {
-		final HashMap<String, String> env = new HashMap();
+		final HashMap<String, String> env = new HashMap<>();
 		env.put("create", "true");
 		env.put("encoding", "UTF-8");
 		return new ZipFileSystem(uri, env);
@@ -140,7 +140,7 @@ public class ZipFileSystem implements AutoCloseable {
 	 * Tests whether a file exists.
 	 *
 	 * @param path path to a file in the zip file.
-	 * @return True if the file exists, False otherwise.
+	 * @return {@code true} if the file exists, {@code false} otherwise.
 	 */
 	public boolean exists(String path) {
 		Path file = getPath(path);
@@ -151,7 +151,7 @@ public class ZipFileSystem implements AutoCloseable {
 	 * Tests whether a file exists.
 	 *
 	 * @param file path to a file in the zip file.
-	 * @return True if the file exists, False otherwise.
+	 * @return {@code true} if the file exists, {@code false} otherwise.
 	 */
 	public boolean exists(Path file) {
 		return Files.exists(file);
@@ -221,7 +221,7 @@ public class ZipFileSystem implements AutoCloseable {
 	/**
 	 * Tells whether or not this filesystem is open.
 	 *
-	 * @return True if the filesystem is open, False otherwise.
+	 * @return {@code true} if the filesystem is open, {@code false} otherwise.
 	 */
 	public boolean isOpen() {
 		return fs.isOpen();

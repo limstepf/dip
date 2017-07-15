@@ -332,7 +332,8 @@ public class ProjectData {
 		/**
 		 * Returns the validation result.
 		 *
-		 * @return True if the project data is valid, False otherwise.
+		 * @return {@code true} if the project data is valid, {@code false}
+		 * otherwise.
 		 */
 		public boolean isValid() {
 			final boolean validImageFiles = modifiedImages.isEmpty()
@@ -399,7 +400,7 @@ public class ProjectData {
 
 		// check required processors/OSGI services
 		if (pipelines() != null) {
-			for (PipelineData.Pipeline<ProcessorWrapper> pipeline : pipelines()) {
+			for (PipelineData.Pipeline pipeline : pipelines()) {
 				final OSGiVersionPolicy policy = OSGiVersionPolicy.get(pipeline.versionPolicy);
 
 				for (PipelineData.Processor processor : pipeline.processors()) {
@@ -603,7 +604,8 @@ public class ProjectData {
 		}
 
 		private String getDefaultName(Path file) {
-			final String defaultName = file.getFileName().toString();
+			final Path p = file.getFileName();
+			final String defaultName = (p == null) ? "" : p.toString();
 			int i = defaultName.lastIndexOf('.');
 			if (i > 0) {
 				return defaultName.substring(0, i);

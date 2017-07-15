@@ -22,7 +22,7 @@ import net.objecthunter.exp4j.ExpressionBuilder;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
-public class StringMatrix extends Matrix {
+public class StringMatrix extends Matrix<StringMatrix> {
 
 	/**
 	 * Continous Strings of the matrix.
@@ -315,8 +315,8 @@ public class StringMatrix extends Matrix {
 	/**
 	 * Converts the matrix to a {@code BooleanMatrix}. This is done by either
 	 * evaluating the string elements as mathematical expressions ({@code x > 0}
-	 * is considered true), or by checking the first char which can be either
-	 * {@code 't'} or {@code 'f'} (not case sensitive).
+	 * is considered {@code true}), or by checking the first char which can be
+	 * either {@code 't'} or {@code 'f'} (not case sensitive).
 	 *
 	 * @return a matrix of booleans.
 	 */

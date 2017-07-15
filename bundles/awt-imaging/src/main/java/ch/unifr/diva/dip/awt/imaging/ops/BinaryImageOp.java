@@ -17,7 +17,7 @@ import java.awt.image.WritableRaster;
  * "currying" (i.e. the transformation of a function with multiple arguments
  * into a function with only a single argument).
  */
-public abstract class BinaryImageOp extends NullOp implements TileParallelizable {
+public abstract class BinaryImageOp extends NullOp implements SimpleTileParallelizable {
 
 	protected final BufferedImage left;
 	protected final boolean combinePixels;
@@ -35,8 +35,8 @@ public abstract class BinaryImageOp extends NullOp implements TileParallelizable
 	 * Creates a new binary image operation.
 	 *
 	 * @param left the first source image.
-	 * @param combinePixels if set to True RGB pixels will be extracted and
-	 * combined, otherwise each sample is combined individually.
+	 * @param combinePixels if set to {@code true} RGB pixels will be extracted
+	 * and combined, otherwise each sample is combined individually.
 	 */
 	public BinaryImageOp(BufferedImage left, boolean combinePixels) {
 		this.left = left;

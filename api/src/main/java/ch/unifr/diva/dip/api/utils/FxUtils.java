@@ -78,7 +78,7 @@ public class FxUtils {
 	 * @throws Exception
 	 */
 	public static <T> T runFutureTask(final Callable<T> callable) throws Exception {
-		final FutureTask<T> query = new FutureTask(callable);
+		final FutureTask<T> query = new FutureTask<>(callable);
 		final T value;
 
 		if (Platform.isFxApplicationThread()) {
@@ -181,7 +181,7 @@ public class FxUtils {
 	 * is empty, it encloses no area.
 	 *
 	 * @param r the rectangle.
-	 * @return True if the rectangle is empty, false otherwise.
+	 * @return {@code true} if the rectangle is empty, {@code false} otherwise.
 	 */
 	public static boolean isEmpty(Rectangle2D r) {
 		return (r.getWidth() <= 0 || r.getHeight() <= 0);

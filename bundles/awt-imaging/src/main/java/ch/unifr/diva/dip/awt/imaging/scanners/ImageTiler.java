@@ -53,13 +53,13 @@ public abstract class ImageTiler<T extends Rectangle> implements Iterator<T>, It
 		if (this.width >= this.imageWidth) {
 			this.cols = 1;
 		} else {
-			this.cols = (int) Math.floor(this.imageWidth / this.width);
+			this.cols = this.imageWidth / this.width;
 		}
 
 		if (this.height >= this.imageHeight) {
 			this.rows = 1;
 		} else {
-			this.rows = (int) Math.floor(this.imageHeight / this.height);
+			this.rows = this.imageHeight / this.height;
 		}
 
 		this.last = this.cols * this.rows - 1;

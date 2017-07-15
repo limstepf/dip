@@ -59,8 +59,8 @@ public class PipelineData {
 	 *
 	 * @param pipelines a list of pipelines.
 	 */
-	public PipelineData(List<ch.unifr.diva.dip.core.model.Pipeline> pipelines) {
-		for (ch.unifr.diva.dip.core.model.Pipeline pipeline : pipelines) {
+	public PipelineData(List<ch.unifr.diva.dip.core.model.Pipeline<ProcessorWrapper>> pipelines) {
+		for (ch.unifr.diva.dip.core.model.Pipeline<ProcessorWrapper> pipeline : pipelines) {
 			this.list.add(new Pipeline(pipeline));
 		}
 	}
@@ -161,7 +161,7 @@ public class PipelineData {
 	 * @param swap the processor swap object/data.
 	 */
 	public void swapProcessor(ProcessorSwap swap) {
-		for (Pipeline<ProcessorWrapper> pipeline : this.list) {
+		for (Pipeline pipeline : this.list) {
 			// swap connections
 			final List<Integer> ids = pipeline.getProcessorIds(swap.pid, swap.version);
 			for (Integer id : ids) {
@@ -275,6 +275,7 @@ public class PipelineData {
 	 * @return unmarshalled {@code PipelineData}.
 	 * @throws JAXBException
 	 */
+	@SuppressWarnings("unchecked")
 	public static PipelineData load(Path file) throws JAXBException {
 		return XmlUtils.unmarshal(PipelineData.class, file);
 	}
@@ -286,16 +287,15 @@ public class PipelineData {
 	 * @return unmarshalled {@code PipelineData}.
 	 * @throws JAXBException
 	 */
+	@SuppressWarnings("unchecked")
 	public static PipelineData load(InputStream stream) throws JAXBException {
 		return XmlUtils.unmarshal(PipelineData.class, stream);
 	}
 
 	/**
 	 * A configuration of a pipeline.
-	 *
-	 * @param <T>
 	 */
-	public static class Pipeline<T extends ProcessorWrapper> {
+	public static class Pipeline {
 
 		/**
 		 * The ID of the pipeline.
@@ -366,23 +366,24 @@ public class PipelineData {
 		/**
 		 * Creates a PipelineData.Pipeline instance from a Pipeline.
 		 *
+		 * @param <T> class of the processor wrapper.
 		 * @param pipeline a pipeline.
 		 */
-		public Pipeline(ch.unifr.diva.dip.core.model.Pipeline<T> pipeline) {
+		public <T extends ProcessorWrapper> Pipeline(ch.unifr.diva.dip.core.model.Pipeline<T> pipeline) {
 			this.id = pipeline.id;
 			this.name = pipeline.getName();
 			this.layoutStrategy = pipeline.getLayoutStrategy().name();
 			this.versionPolicy = pipeline.getVersionPolicy().name();
 
-			final Map<OutputPort, ProcessorWrapper.PortMapEntry> outputPortMap;
+			final Map<OutputPort<?>, ProcessorWrapper.PortMapEntry> outputPortMap;
 			outputPortMap = ProcessorWrapper.getOutputPortMap(pipeline.processors());
 
 			for (T wrapper : pipeline.processors()) {
 				this.processors.list.add(new Processor(wrapper));
 
 				if (wrapper.isAvailable()) {
-					for (Map.Entry<String, InputPort> e : wrapper.processor().inputs().entrySet()) {
-						final InputPort input = e.getValue();
+					for (Map.Entry<String, InputPort<?>> e : wrapper.processor().inputs().entrySet()) {
+						final InputPort<?> input = e.getValue();
 						final ProcessorWrapper.PortMapEntry output = outputPortMap.get(input.connection());
 						if (output != null) {
 							this.connections.list.add(
@@ -658,7 +659,7 @@ public class PipelineData {
 		 * @param input id of the processor on the input port.
 		 * @param inputPort key of the input port.
 		 */
-		public Connection(DataType dataType, int output, String outputPort, int input, String inputPort) {
+		public Connection(DataType<?> dataType, int output, String outputPort, int input, String inputPort) {
 			this.type = dataType.getClass().getName();
 			this.output = new Port(output, outputPort);
 			this.input = new Port(input, inputPort);
@@ -707,7 +708,7 @@ public class PipelineData {
 	 */
 	public static class PipelineItem implements Localizable, DataItemListView.DataItem {
 
-		final private ch.unifr.diva.dip.core.model.Pipeline pipeline;
+		final private ch.unifr.diva.dip.core.model.Pipeline<ProcessorWrapper> pipeline;
 		final private PipelineData.Pipeline data;
 		final private StringProperty nameProperty;
 		final private ObjectProperty<NamedGlyph> glyphProperty;
@@ -717,7 +718,7 @@ public class PipelineData {
 		 *
 		 * @param pipeline the pipeline.
 		 */
-		public PipelineItem(ch.unifr.diva.dip.core.model.Pipeline pipeline) {
+		public PipelineItem(ch.unifr.diva.dip.core.model.Pipeline<ProcessorWrapper> pipeline) {
 			this(pipeline, null);
 		}
 
@@ -736,11 +737,11 @@ public class PipelineData {
 		 * @param pipeline the pipeline, or null.
 		 * @param data the pipeline data, or null.
 		 */
-		private PipelineItem(ch.unifr.diva.dip.core.model.Pipeline pipeline, PipelineData.Pipeline data) {
+		private PipelineItem(ch.unifr.diva.dip.core.model.Pipeline<ProcessorWrapper> pipeline, PipelineData.Pipeline data) {
 			this.pipeline = pipeline;
 			this.data = data;
 			this.nameProperty = new SimpleStringProperty();
-			this.glyphProperty = new SimpleObjectProperty();
+			this.glyphProperty = new SimpleObjectProperty<>();
 			if (isNewItem()) {
 				this.nameProperty.setValue(this.pipeline.getName());
 				this.glyphProperty.set(MaterialDesignIcons.FLOPPY);
@@ -763,7 +764,8 @@ public class PipelineData {
 		 * Checks whether this pipeline item refers to a new pipeline (to be
 		 * exported/saved), or to an existing one.
 		 *
-		 * @return true if this item refers to a new pipeline, false otherwise.
+		 * @return {@code true} if this item refers to a new pipeline,
+		 * {@code false} otherwise.
 		 */
 		final public boolean isNewItem() {
 			return this.pipeline != null;
@@ -786,7 +788,7 @@ public class PipelineData {
 			}
 			if (this.pipeline != null) {
 				this.pipeline.setName(this.nameProperty.get());
-				return new PipelineData.Pipeline<>(this.pipeline);
+				return new PipelineData.Pipeline(this.pipeline);
 			}
 			return null;
 		}

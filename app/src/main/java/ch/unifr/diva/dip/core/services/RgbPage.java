@@ -43,10 +43,10 @@ public class RgbPage extends HostService {
 	public RgbPage(HostProcessorContext context) {
 		super("RGB " + L10n.getInstance().getString("page"));
 
-		this.bi_out = new OutputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImage());
+		this.bi_out = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImage());
 		this.outputs.put(BI_KEY, this.bi_out);
 
-		this.rgb_out = new OutputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImageRgb());
+		this.rgb_out = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImageRgb());
 		this.outputs.put(RGB_KEY, this.rgb_out);
 	}
 

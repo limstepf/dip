@@ -9,7 +9,7 @@ import java.awt.image.WritableRaster;
 /**
  * Linear scaling filter.
  */
-public class RescaleOp extends NullOp implements TileParallelizable {
+public class RescaleOp extends NullOp implements SimpleTileParallelizable {
 
 	private final boolean[] abs;
 	private final double[] gain;

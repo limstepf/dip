@@ -635,8 +635,9 @@ public interface Pannable extends Zoomable {
 		/**
 		 * Checks whether there is no visible region.
 		 *
-		 * @return True if nothing of the content pane is displayed, that is,
-		 * outside of the bounds of the viewport, False if something is visible.
+		 * @return {@code true} if nothing of the content pane is displayed,
+		 * that is, outside of the bounds of the viewport, {@code false} if
+		 * something is visible.
 		 */
 		public boolean isEmpty() {
 			return FxUtils.isEmpty(intersection);

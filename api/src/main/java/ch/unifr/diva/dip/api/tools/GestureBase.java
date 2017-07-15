@@ -8,10 +8,8 @@ import javafx.scene.input.MouseEvent;
 
 /**
  * Base class for gestures.
- *
- * @param <T> type of the event.
  */
-public abstract class GestureBase<T extends Event> implements Gesture {
+public abstract class GestureBase implements Gesture {
 
 	protected final List<GestureEventHandler<? extends Event>> eventHandlers;
 

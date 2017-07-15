@@ -1,6 +1,7 @@
 package ch.unifr.diva.dip.awt.imaging.ops;
 
 import ch.unifr.diva.dip.awt.imaging.scanners.ImageTiler;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 
@@ -9,11 +10,12 @@ import java.awt.image.BufferedImageOp;
  * {@code BufferedImageOp}s.
  *
  * @param <T> subclass of BufferedImageOp and Parallelizable.
+ * @param <S> class of the ImageTiler.
  */
-public class TileOpThread<T extends BufferedImageOp & TileParallelizable> extends Thread {
+public class TileOpThread<T extends BufferedImageOp & TileParallelizable<S>, S extends ImageTiler<? extends Rectangle>> extends Thread {
 
 	private final T op;
-	private final ImageTiler tiler;
+	private final S tiler;
 	private final BufferedImage src;
 	private final BufferedImage dst;
 
@@ -25,7 +27,7 @@ public class TileOpThread<T extends BufferedImageOp & TileParallelizable> extend
 	 * @param src the source image.
 	 * @param dst the destination image.
 	 */
-	public TileOpThread(T op, ImageTiler tiler, BufferedImage src, BufferedImage dst) {
+	public TileOpThread(T op, S tiler, BufferedImage src, BufferedImage dst) {
 		this.op = op;
 		this.tiler = tiler;
 		this.src = src;
@@ -34,7 +36,7 @@ public class TileOpThread<T extends BufferedImageOp & TileParallelizable> extend
 
 	@Override
 	public void run() {
-		TileParallelizable.process(op, tiler, src, dst);
+		op.process(tiler, src, dst);
 	}
 
 }

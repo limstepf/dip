@@ -40,10 +40,10 @@ public class EditorPane {
 	private final Pane pane = new Pane();
 	private final Circle dot = new Circle(1, Color.TRANSPARENT);
 	private ConnectionView selectedWire = null;
-	private OutputPort selectedPort = null;
+	private OutputPort<?> selectedPort = null;
 	private final Map<ProcessorWrapper, ProcessorView> processorViews = new HashMap<>();
-	private final Map<InputPort, ConnectionView> connections = new HashMap<>();
-	private final Map<Port, PortView> ports = new HashMap<>();
+	private final Map<InputPort<?>, ConnectionView> connections = new HashMap<>();
+	private final Map<Port<?>, PortView<? extends Port<?>>> ports = new HashMap<>();
 	private final InvalidationListener repaintListener;
 
 	/**
@@ -171,7 +171,7 @@ public class EditorPane {
 	 * @param port the port to register.
 	 * @param view the view and parent of the port.
 	 */
-	public void registerPort(Port port, PortView view) {
+	public void registerPort(Port<?> port, PortView<? extends Port<?>> view) {
 		ports.put(port, view);
 	}
 
@@ -190,7 +190,7 @@ public class EditorPane {
 	 *
 	 * @return the selected pipeline.
 	 */
-	private Pipeline pipeline() {
+	private Pipeline<ProcessorWrapper> pipeline() {
 		return editor.selectedPipelineProperty().get();
 	}
 
@@ -217,8 +217,8 @@ public class EditorPane {
 	/**
 	 * Checks whether there is an active wire, or not.
 	 *
-	 * @return True if there is currently an active wire being used, False
-	 * otherwise.
+	 * @return {@code true} if there is currently an active wire being used,
+	 * {@code false} otherwise.
 	 */
 	public boolean hasWire() {
 		return (this.selectedWire != null);
@@ -256,7 +256,8 @@ public class EditorPane {
 	/**
 	 * Check whether we have an active/selected port.
 	 *
-	 * @return True if there is an active/selected port, False otherwise.
+	 * @return {@code true} if there is an active/selected port, {@code false}
+	 * otherwise.
 	 */
 	public boolean hasSelectedPort() {
 		return (this.selectedPort != null);
@@ -268,7 +269,7 @@ public class EditorPane {
 	 * @param output the active/selected output port connected to the active
 	 * wire.
 	 */
-	public void setSelectedPort(OutputPort output) {
+	public void setSelectedPort(OutputPort<?> output) {
 		this.selectedPort = output;
 		editor.repaint();
 	}
@@ -279,7 +280,7 @@ public class EditorPane {
 	 *
 	 * @return the active/selected port, or null if there isn't any.
 	 */
-	public OutputPort selectedPort() {
+	public OutputPort<?> selectedPort() {
 		return this.selectedPort;
 	}
 
@@ -302,8 +303,8 @@ public class EditorPane {
 		if (!wrapper.isAvailable()) {
 			return;
 		}
-		for (Map.Entry<String, InputPort> port : wrapper.processor().inputs().entrySet()) {
-			final InputPort input = port.getValue();
+		for (Map.Entry<String, InputPort<?>> port : wrapper.processor().inputs().entrySet()) {
+			final InputPort<?> input = port.getValue();
 			if (input.isConnected()) {
 				newConnection(input);
 			}
@@ -316,7 +317,7 @@ public class EditorPane {
 	 * @param input the input port.
 	 * @return the wire attached to the given input port.
 	 */
-	public ConnectionView getConnectionView(InputPort input) {
+	public ConnectionView getConnectionView(InputPort<?> input) {
 		return connections.get(input);
 	}
 
@@ -330,19 +331,19 @@ public class EditorPane {
 			return;
 		}
 
-		final Set<InputPort> trash = new HashSet<>();
+		final Set<InputPort<?>> trash = new HashSet<>();
 
-		for (InputPort input : wrapper.processor().inputs().values()) {
+		for (InputPort<?> input : wrapper.processor().inputs().values()) {
 			trash.add(input);
 		}
 
-		for (Set<InputPort> inputs : wrapper.processor().dependentInputs().values()) {
-			for (InputPort input : inputs) {
+		for (Set<InputPort<?>> inputs : wrapper.processor().dependentInputs().values()) {
+			for (InputPort<?> input : inputs) {
 				trash.add(input);
 			}
 		}
 
-		for (InputPort input : trash) {
+		for (InputPort<?> input : trash) {
 			removeConnection(input);
 		}
 	}
@@ -352,7 +353,7 @@ public class EditorPane {
 	 *
 	 * @param input the input port owning/connected to the wire.
 	 */
-	public void removeConnection(InputPort input) {
+	public void removeConnection(InputPort<?> input) {
 		if (!input.isConnected()) {
 			return;
 		}
@@ -363,7 +364,7 @@ public class EditorPane {
 	}
 
 	// if already connected (e.g. for loading)
-	private void newConnection(InputPort input) {
+	private void newConnection(InputPort<?> input) {
 		final ConnectionView wire = newWire(input);
 		connections.put(input, wire);
 		bindWire(input, wire, input.connection(), false);
@@ -376,24 +377,26 @@ public class EditorPane {
 	 * @param input the input port of the connection.
 	 * @param wire the wire/connection view.
 	 */
-	public void newConnection(OutputPort output, InputPort input, ConnectionView wire) {
+	public void newConnection(OutputPort<?> output, InputPort<?> input, ConnectionView wire) {
 		connections.put(input, wire);
 		bindWire(input, wire, output, true);
 	}
 
-	private void bindWire(InputPort input, ConnectionView wire, OutputPort output, boolean doConnect) {
-		final PortView<InputPort> ip = this.ports.get(input);
-		final PortView<OutputPort> op = this.ports.get(output);
+	private void bindWire(InputPort<?> input, ConnectionView wire, OutputPort<?> output, boolean doConnect) {
+		@SuppressWarnings("unchecked")
+		final PortView<InputPort<?>> ip = (PortView<InputPort<?>>) this.ports.get(input);
+		@SuppressWarnings("unchecked")
+		final PortView<OutputPort<?>> op = (PortView<OutputPort<?>>) this.ports.get(output);
 
 		// unregister wire from previous ports
 		if (wire.inputPort() != null) {
-			final PortView pv = this.ports.get(wire.inputPort());
+			final PortView<?> pv = this.ports.get(wire.inputPort());
 			if (pv != null) {
 				pv.removeWire(wire);
 			}
 		}
 		if (wire.outputPort() != null) {
-			final PortView pv = this.ports.get(wire.outputPort());
+			final PortView<?> pv = this.ports.get(wire.outputPort());
 			if (pv != null) {
 				pv.removeWire(wire);
 			}
@@ -456,7 +459,7 @@ public class EditorPane {
 	 * @param input the input port owning the wire.
 	 * @return a new wire.
 	 */
-	public ConnectionView newWire(InputPort input) {
+	public ConnectionView newWire(InputPort<?> input) {
 		final ConnectionView.Type type = this.editor.handler.settings.pipelineEditor.getDefaultConnectionType();
 		final ConnectionView view = type.newConnection(input);
 
@@ -470,7 +473,7 @@ public class EditorPane {
 	 *
 	 * @param input the input port owning the wire.
 	 */
-	public void removeWire(InputPort input) {
+	public void removeWire(InputPort<?> input) {
 		final ConnectionView wire = connections.get(input);
 		removeWire(wire);
 	}
@@ -482,11 +485,11 @@ public class EditorPane {
 	 */
 	public void removeWire(ConnectionView wire) {
 		// clean up first, or end up with reappearing dead wires
-		final PortView input = this.ports.get(wire.inputPort());
+		final PortView<?> input = this.ports.get(wire.inputPort());
 		if (input != null) {
 			input.wires().remove(wire);
 		}
-		final PortView output = this.ports.get(wire.outputPort());
+		final PortView<?> output = this.ports.get(wire.outputPort());
 		if (output != null) {
 			output.wires().remove(wire);
 		}
@@ -533,10 +536,10 @@ public class EditorPane {
 			return;
 		}
 
-		for (InputPort port : wrapper.processor().inputs().values()) {
+		for (InputPort<?> port : wrapper.processor().inputs().values()) {
 			ports.remove(port);
 		}
-		for (OutputPort port : wrapper.processor().outputs().values()) {
+		for (OutputPort<?> port : wrapper.processor().outputs().values()) {
 			ports.remove(port);
 		}
 	}
@@ -546,7 +549,7 @@ public class EditorPane {
 	 *
 	 * @param port the port.
 	 */
-	public void unregisterPort(Port port) {
+	public void unregisterPort(Port<?> port) {
 		ports.remove(port);
 	}
 
@@ -597,14 +600,14 @@ public class EditorPane {
 			);
 		}
 
-		for (InputPort input : wrapper.processor().inputs().values()) {
+		for (InputPort<?> input : wrapper.processor().inputs().values()) {
 			if (input.isConnected()) {
 				newConnection(input);
 			}
 		}
 
-		for (Set<InputPort> inputs : wrapper.processor().dependentInputs().values()) {
-			for (InputPort input : inputs) {
+		for (Set<InputPort<?>> inputs : wrapper.processor().dependentInputs().values()) {
+			for (InputPort<?> input : inputs) {
 				newConnection(input);
 			}
 		}

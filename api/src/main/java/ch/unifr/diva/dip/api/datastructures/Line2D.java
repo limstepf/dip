@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
-public class Line2D {
+public class Line2D implements Cloneable {
 
 	@XmlElement
 	public final Point2D end;

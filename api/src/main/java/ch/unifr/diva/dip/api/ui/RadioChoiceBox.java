@@ -1,6 +1,7 @@
 package ch.unifr.diva.dip.api.ui;
 
 import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -27,17 +28,18 @@ public class RadioChoiceBox extends VBox {
 	/**
 	 * Creates a new radio choice box.
 	 *
-	 * @param <T> type of the node used as body of the choice.
 	 * @param nodes the choices.
 	 */
-	public <T extends Node> RadioChoiceBox(T... nodes) {
+	@SuppressWarnings({"unchecked", "varargs"})
+	public RadioChoiceBox(Node... nodes) {
 		this(new ToggleGroup(), toRadioChoices(nodes));
 	}
 
-	private static <T extends Node> RadioChoice[] toRadioChoices(T... nodes) {
-		final RadioChoice[] choices = new RadioChoice[nodes.length];
+	@SuppressWarnings({"rawtypes", "unchecked", "varargs"})
+	private static <T extends Node> RadioChoice<T>[] toRadioChoices(T... nodes) {
+		final RadioChoice<T>[] choices = new RadioChoice[nodes.length];
 		for (int i = 0; i < nodes.length; i++) {
-			choices[i] = new RadioChoice(nodes[i]);
+			choices[i] = new RadioChoice<>(nodes[i]);
 		}
 		return choices;
 	}
@@ -47,13 +49,15 @@ public class RadioChoiceBox extends VBox {
 	 *
 	 * @param choices the choices.
 	 */
-	public RadioChoiceBox(RadioChoice... choices) {
+	@SafeVarargs
+	public RadioChoiceBox(RadioChoice<Node>... choices) {
 		this(new ToggleGroup(), choices);
 	}
 
-	protected RadioChoiceBox(ToggleGroup toggleGroup, RadioChoice... choices) {
+	@SafeVarargs
+	protected RadioChoiceBox(ToggleGroup toggleGroup, RadioChoice<Node>... choices) {
 		this.toggleGroup = toggleGroup;
-		for (RadioChoice c : choices) {
+		for (RadioChoice<Node> c : choices) {
 			add(c);
 		}
 
@@ -67,9 +71,10 @@ public class RadioChoiceBox extends VBox {
 	}
 
 	// visually disable unselected choices
+	@SuppressWarnings("unchecked")
 	private void updateChoices() {
 		for (Node n : this.getChildren()) {
-			final RadioChoice choice = (RadioChoice) n;
+			final RadioChoice<Node> choice = (RadioChoice<Node>) n;
 			if (choice.radio.isSelected()) {
 				choice.node.getStyleClass().removeAll("dip-disabled");
 			} else {
@@ -81,13 +86,12 @@ public class RadioChoiceBox extends VBox {
 	/**
 	 * Adds a radio choice.
 	 *
-	 * @param <T> type of the node used as body of the choice.
 	 * @param node the choice. Will be auto-wrapped by a {@code RadioChoice}
 	 * object.
 	 * @return the {@code RadioChoice} object wrapping the given choice.
 	 */
-	public <T extends Node> RadioChoice<T> add(T node) {
-		final RadioChoice<T> choice = new RadioChoice(node);
+	public RadioChoice<Node> add(Node node) {
+		final RadioChoice<Node> choice = new RadioChoice<>(node);
 		add(choice);
 		return choice;
 	}
@@ -95,12 +99,11 @@ public class RadioChoiceBox extends VBox {
 	/**
 	 * Removes a radio choice.
 	 *
-	 * @param <T> type of the node used as body of the choice.
 	 * @param node the node (or body) of the {@code RadioChoice}.
 	 * @return the removed radio choice, or null if not found.
 	 */
-	public <T extends Node> RadioChoice<T> remove(T node) {
-		final RadioChoice choice = getRadioChoice(node);
+	public RadioChoice<Node> remove(Node node) {
+		final RadioChoice<Node> choice = getRadioChoice(node);
 		if (choice != null) {
 			remove(choice);
 		}
@@ -112,7 +115,7 @@ public class RadioChoiceBox extends VBox {
 	 *
 	 * @param choice the new radio choice.
 	 */
-	final public void add(RadioChoice choice) {
+	final public void add(RadioChoice<Node> choice) {
 		choice.init(this.toggleGroup);
 		this.getChildren().add(choice);
 	}
@@ -122,7 +125,7 @@ public class RadioChoiceBox extends VBox {
 	 *
 	 * @param choice the radio choice to be removed.
 	 */
-	final public void remove(RadioChoice choice) {
+	final public void remove(RadioChoice<Node> choice) {
 		this.getChildren().remove(choice);
 		choice.deinit();
 	}
@@ -133,8 +136,9 @@ public class RadioChoiceBox extends VBox {
 	 * @param index the index of the radio choice.
 	 * @return the radio choice.
 	 */
-	public RadioChoice get(int index) {
-		return (RadioChoice) this.getChildren().get(index);
+	@SuppressWarnings("unchecked")
+	public RadioChoice<Node> get(int index) {
+		return (RadioChoice<Node>) this.getChildren().get(index);
 	}
 
 	/**
@@ -152,12 +156,13 @@ public class RadioChoiceBox extends VBox {
 	 *
 	 * @return the selected radio choice/item, or null if none is selected.
 	 */
-	public RadioChoice selectedRadioChoice() {
+	@SuppressWarnings("unchecked")
+	public RadioChoice<Node> selectedRadioChoice() {
 		final Toggle toggle = selectedToggleProperty().get();
 		if (toggle == null) {
 			return null;
 		}
-		return (RadioChoice) toggle.getUserData();
+		return (RadioChoice<Node>) toggle.getUserData();
 	}
 
 	/**
@@ -165,7 +170,7 @@ public class RadioChoiceBox extends VBox {
 	 *
 	 * @param choice the radio choice.
 	 */
-	public void selectRadioChoice(RadioChoice choice) {
+	public void selectRadioChoice(RadioChoice<Node> choice) {
 		choice.radio.setSelected(true);
 	}
 
@@ -176,7 +181,7 @@ public class RadioChoiceBox extends VBox {
 	 * @param node the node (or body) of the choice.
 	 */
 	public <T extends Node> void selectNode(T node) {
-		final RadioChoice choice = getRadioChoice(node);
+		final RadioChoice<T> choice = getRadioChoice(node);
 		if (choice != null) {
 			choice.radio.setSelected(true);
 		}
@@ -189,9 +194,10 @@ public class RadioChoiceBox extends VBox {
 	 * @param node the node (or body) of the choice.
 	 * @return the radio choice (wrapping the given node), or null if not found.
 	 */
+	@SuppressWarnings("unchecked")
 	public <T extends Node> RadioChoice<T> getRadioChoice(T node) {
 		for (Node n : this.getChildren()) {
-			final RadioChoice choice = (RadioChoice) n;
+			final RadioChoice<T> choice = (RadioChoice<T>) n;
 			if (choice.node.equals(node)) {
 				return choice;
 			}
@@ -209,7 +215,7 @@ public class RadioChoiceBox extends VBox {
 
 		public final T node;
 		public final RadioButton radio;
-		protected final EventHandler clickHandler;
+		protected final EventHandler<Event> clickHandler;
 
 		/**
 		 * Creates a new radio choice/item.

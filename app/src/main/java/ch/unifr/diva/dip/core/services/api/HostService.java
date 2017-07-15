@@ -5,7 +5,7 @@ import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.core.services.RgbPage;
 import ch.unifr.diva.dip.glyphs.mdi.MaterialDesignIcons;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.osgi.framework.Version;
@@ -34,8 +34,8 @@ public abstract class HostService implements HostProcessor {
 	public static final String DEFAULT_GENERATOR = RgbPage.class.getCanonicalName();
 
 	protected final String name;
-	protected final Map<String, InputPort> inputs;
-	protected final Map<String, OutputPort> outputs;
+	protected final Map<String, InputPort<?>> inputs;
+	protected final Map<String, OutputPort<?>> outputs;
 
 	/**
 	 * Creates a new host service.
@@ -43,7 +43,7 @@ public abstract class HostService implements HostProcessor {
 	 * @param name name of the host service.
 	 */
 	public HostService(String name) {
-		this(name, Collections.EMPTY_MAP, new LinkedHashMap());
+		this(name, new HashMap<>(), new LinkedHashMap<>());
 	}
 
 	/**
@@ -53,7 +53,7 @@ public abstract class HostService implements HostProcessor {
 	 * @param inputs input port map (port key to input port).
 	 * @param outputs output port map (port key to output port).
 	 */
-	public HostService(String name, Map<String, InputPort> inputs, Map<String, OutputPort> outputs) {
+	public HostService(String name, Map<String, InputPort<?>> inputs, Map<String, OutputPort<?>> outputs) {
 		this.name = name;
 		this.inputs = inputs;
 		this.outputs = outputs;
@@ -70,12 +70,12 @@ public abstract class HostService implements HostProcessor {
 	}
 
 	@Override
-	public Map<String, InputPort> inputs() {
+	public Map<String, InputPort<?>> inputs() {
 		return inputs;
 	}
 
 	@Override
-	public Map<String, OutputPort> outputs() {
+	public Map<String, OutputPort<?>> outputs() {
 		return outputs;
 	}
 

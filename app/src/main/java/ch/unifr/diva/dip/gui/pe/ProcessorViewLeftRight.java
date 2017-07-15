@@ -14,12 +14,18 @@ public class ProcessorViewLeftRight extends ProcessorView {
 	protected final VBox outputPane = new VBox();
 	protected final BorderPane infoPane = new BorderPane();
 
+	/**
+	 * Creates a new left-right processor view.
+	 *
+	 * @param editor the pipeline editor.
+	 * @param wrapper the processor.
+	 */
 	public ProcessorViewLeftRight(PipelineEditor editor, ProcessorWrapper wrapper) {
 		super(editor, wrapper);
 
 		this.setLeft(inputPane);
 		inputPane.getStyleClass().add("dip-processor-left");
-		for (PortView v : this.inputPorts) {
+		for (PortView<?> v : this.inputPorts) {
 			inputPane.getChildren().add(v);
 		}
 
@@ -30,7 +36,7 @@ public class ProcessorViewLeftRight extends ProcessorView {
 
 		this.setRight(outputPane);
 		outputPane.getStyleClass().add("dip-processor-right");
-		for (PortView v : this.outputPorts) {
+		for (PortView<?> v : this.outputPorts) {
 			outputPane.getChildren().add(v);
 		}
 

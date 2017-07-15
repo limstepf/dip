@@ -2,6 +2,7 @@ package ch.unifr.diva.dip.awt.imaging.ops;
 
 import ch.unifr.diva.dip.awt.imaging.scanners.ImageTiler;
 import ch.unifr.diva.dip.awt.imaging.scanners.SimpleImageTiler;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 /**
@@ -21,7 +22,7 @@ import java.awt.image.BufferedImage;
  * Implementing ops will have to check if the raster of the destination image
  * has a parent raster (if {@code dst.getRaster().getParent()} is not null),
  * meaning that the filter runs in parallel. In this case the tile offset can be
- * retrieved from the destination raster with a calls to
+ * retrieved from the destination raster with calls to
  * {@code raster.getSampleModelTranslateX()} and
  * {@code raster.getSampleModelTranslateY()}. Those guys need to be
  * substracted(!) from the destination location before doing the mapping
@@ -31,11 +32,21 @@ import java.awt.image.BufferedImage;
  * Also note that a {@code RasterScanner} should iterate over the destination
  * image (or raster), not the source image!
  */
-public interface InverseMappedTileParallelizable extends TileParallelizable {
+public interface InverseMappedTileParallelizable extends TileParallelizable<ImageTiler<Rectangle>> {
 
 	@Override
-	default ImageTiler getImageTiler(BufferedImage src, BufferedImage dst, int width, int height) {
-		// tiles over the destination instead of the source image
+	default void process(ImageTiler<Rectangle> tiler, BufferedImage src, BufferedImage dst) {
+		ConcurrentTileOp.processMappedTiles(
+				this,
+				tiler,
+				src,
+				dst
+		);
+	}
+
+	@Override
+	default ImageTiler<Rectangle> getImageTiler(BufferedImage src, BufferedImage dst, int width, int height) {
+		// tiles over the destination instead of the source image!
 		return new SimpleImageTiler(dst, width, height);
 	}
 

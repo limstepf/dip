@@ -38,6 +38,7 @@ import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.layout.Pane;
+import javafx.scene.shape.Shape;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +51,7 @@ public class EditorPresenter implements Presenter {
 	private final ApplicationHandler handler;
 	private final LayerGroup rootLayer;
 	private final ZoomPaneBresenham zoomPane;
-	private NavigatorWidget navigatorWidget;
+	private NavigatorWidget<Pannable> navigatorWidget;
 	private LayersWidget layersWidget;
 	private RunnableProcessor currentProcessor = null;
 	// private overlay pane shared by global tools and processor overlays
@@ -233,9 +234,9 @@ public class EditorPresenter implements Presenter {
 	 *
 	 * @return a navigator widget.
 	 */
-	public NavigatorWidget navigatorWidget() {
+	public NavigatorWidget<Pannable> navigatorWidget() {
 		if (this.navigatorWidget == null) {
-			this.navigatorWidget = new NavigatorWidget(this.zoomPane);
+			this.navigatorWidget = new NavigatorWidget<>(this.zoomPane);
 		}
 		return this.navigatorWidget;
 	}
@@ -264,12 +265,13 @@ public class EditorPresenter implements Presenter {
 	 */
 	private EditorLayerOverlay editorOverlay;
 	private SimpleTool moveTool;
-	private SelectionMultiTool selectionTool;
+	private SelectionMultiTool<? extends SelectionTool<? extends Shape>> selectionTool;
 	private final BooleanProperty hasMaskProperty = new SimpleBooleanProperty();
 	private final BooleanProperty hasPreviousMaskProperty = new SimpleBooleanProperty();
 
 	/**
-	 * The has (selection) mask property. Is true when a selection mask is set.
+	 * The has (selection) mask property. Is {@code true} when a selection mask
+	 * is set.
 	 *
 	 * @return the has (selection) mask property.
 	 */
@@ -278,8 +280,8 @@ public class EditorPresenter implements Presenter {
 	}
 
 	/**
-	 * The has previous (selection) mask property. Is true when a previously set
-	 * selection mask is stored/available.
+	 * The has previous (selection) mask property. Is {@code true} when a
+	 * previously set selection mask is stored/available.
 	 *
 	 * @return the has previous (selection) mask property.
 	 */
@@ -370,7 +372,8 @@ public class EditorPresenter implements Presenter {
 	 * @param <T> class of the selection tools.
 	 * @param selectionTools the selection tools.
 	 */
-	public <T extends SimpleTool & SelectionTool> void initSelectionTool(T... selectionTools) {
+	@SuppressWarnings({"unchecked", "varargs"})
+	public final <T extends SimpleTool & SelectionTool<? extends Shape>> void initSelectionTool(T... selectionTools) {
 		if (selectionTool != null) {
 			throw new IllegalStateException(
 					"selection tool must be initialized before a call to getSelectionTool"
@@ -384,7 +387,8 @@ public class EditorPresenter implements Presenter {
 	 *
 	 * @return the selection tool.
 	 */
-	public SelectionMultiTool getSelectionTool() {
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	public SelectionMultiTool<? extends SelectionTool<? extends Shape>> getSelectionTool() {
 		if (selectionTool == null) {
 			selectionTool = newSelectionTool(
 					new RectangularSelectionTool(
@@ -416,8 +420,9 @@ public class EditorPresenter implements Presenter {
 		return selectionTool;
 	}
 
-	private <T extends SimpleTool & SelectionTool> SelectionMultiTool newSelectionTool(T... selectionTools) {
-		final SelectionMultiTool smt = new SelectionMultiTool(
+	@SuppressWarnings({"rawtypes", "unchecked", "varargs"})
+	private <T extends SimpleTool & SelectionTool<? extends Shape>> SelectionMultiTool<? extends SelectionTool<? extends Shape>> newSelectionTool(T... selectionTools) {
+		final SelectionMultiTool<? extends SelectionTool<? extends Shape>> smt = new SelectionMultiTool(
 				getEditorOverlay(),
 				selectionTools
 		) {

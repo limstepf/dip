@@ -63,7 +63,7 @@ public class DataItemListView<T extends DataItemListView.DataItem> implements Lo
 	 * @return a new, selectable data item list view.
 	 */
 	public static <T extends DataItemListView.DataItem> DataItemListView<T> newSelectableDataItemListView(Callback<T, Void> selectionCallback) {
-		return new DataItemListView(false, selectionCallback);
+		return new DataItemListView<>(false, selectionCallback);
 	}
 
 	/**
@@ -75,7 +75,7 @@ public class DataItemListView<T extends DataItemListView.DataItem> implements Lo
 	 * @return a new, editable data item list view.
 	 */
 	public static <T extends DataItemListView.DataItem> DataItemListView<T> newEditableDataItemListView() {
-		return new DataItemListView(true, null);
+		return new DataItemListView<>(true, null);
 	}
 
 	/**
@@ -90,11 +90,11 @@ public class DataItemListView<T extends DataItemListView.DataItem> implements Lo
 		if (editable) {
 			listView.setEditable(true);
 			listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-			listView.setCellFactory((ListView<T> param) -> new DataItemListView.EditableDataItemListCell());
+			listView.setCellFactory((ListView<T> param) -> new DataItemListView.EditableDataItemListCell<>());
 		} else {
 			listView.setEditable(false);
 			listView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-			listView.setCellFactory((ListView<T> param) -> new DataItemListView.SelectableDataItemListCell(selectionCallback));
+			listView.setCellFactory((ListView<T> param) -> new DataItemListView.SelectableDataItemListCell<>(selectionCallback));
 		}
 		listView.setMaxHeight(Double.MAX_VALUE);
 		listView.getSelectionModel().getSelectedItems().addListener(selectionListener);
@@ -104,7 +104,8 @@ public class DataItemListView<T extends DataItemListView.DataItem> implements Lo
 	/**
 	 * Checks whether the list view is editable or selectable.
 	 *
-	 * @return true if the list view is editable, false otherwise.
+	 * @return {@code true} if the list view is editable, {@code false}
+	 * otherwise.
 	 */
 	public boolean isEditable() {
 		return this.isEditable;
@@ -114,7 +115,8 @@ public class DataItemListView<T extends DataItemListView.DataItem> implements Lo
 	 * Changes the editability of the list. This can be useful in order to have
 	 * a list with draggable/rearrangable items that still aren't editable.
 	 *
-	 * @param editable True to set the list to be editable, False otherwise.
+	 * @param editable {@code true} to set the list to be editable,
+	 * {@code false} otherwise.
 	 */
 	public void setEditable(boolean editable) {
 		this.isEditable = editable;
@@ -180,8 +182,8 @@ public class DataItemListView<T extends DataItemListView.DataItem> implements Lo
 	}
 
 	/**
-	 * Returns the has selection property. This property is true if at least one
-	 * item in the list is selected.
+	 * Returns the has selection property. This property is {@code true} if at
+	 * least one item in the list is selected.
 	 *
 	 * @return the has selection property.
 	 */
@@ -190,8 +192,8 @@ public class DataItemListView<T extends DataItemListView.DataItem> implements Lo
 	}
 
 	/**
-	 * Returns the has one selected (item) property. This property is true if
-	 * exactly one item in the list is selected.
+	 * Returns the has one selected (item) property. This property is
+	 * {@code true} if exactly one item in the list is selected.
 	 *
 	 * @return the has one selected (item) property.
 	 */

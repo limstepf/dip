@@ -4,6 +4,7 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.filter.ThresholdFilter;
+import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.ConsoleAppender;
 import ch.qos.logback.core.FileAppender;
 import java.nio.file.Path;
@@ -60,7 +61,7 @@ public enum LogBackConfig {
 									)
 							)
 					);
-					final FileAppender fileAppender = newFileAppender(
+					final FileAppender<ILoggingEvent> fileAppender = newFileAppender(
 							loggerContext,
 							"main",
 							logFile.toString()
@@ -79,7 +80,7 @@ public enum LogBackConfig {
 					fileAppender.start();
 
 					// configure console appender
-					final ConsoleAppender consoleAppender = newConsoleAppender(
+					final ConsoleAppender<ILoggingEvent> consoleAppender = newConsoleAppender(
 							loggerContext,
 							"console"
 					);
@@ -112,15 +113,15 @@ public enum LogBackConfig {
 	 */
 	private final static String PATTERN_DEFAULT = "%d{HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n";
 
-	private static ConsoleAppender newConsoleAppender(LoggerContext loggerContext, String name) {
-		final ConsoleAppender appender = new ConsoleAppender();
+	private static ConsoleAppender<ILoggingEvent> newConsoleAppender(LoggerContext loggerContext, String name) {
+		final ConsoleAppender<ILoggingEvent> appender = new ConsoleAppender<>();
 		appender.setContext(loggerContext);
 		appender.setName(name);
 		return appender;
 	}
 
-	private static FileAppender newFileAppender(LoggerContext loggerContext, String name, String file) {
-		final FileAppender appender = new FileAppender();
+	private static FileAppender<ILoggingEvent> newFileAppender(LoggerContext loggerContext, String name, String file) {
+		final FileAppender<ILoggingEvent> appender = new FileAppender<>();
 		appender.setContext(loggerContext);
 		appender.setName(name);
 		appender.setPrudent(true);

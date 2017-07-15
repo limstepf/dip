@@ -59,6 +59,7 @@ public class ConcurrentOpTilesBenchmark {
 	@BenchmarkMode({Mode.AverageTime})
 	@OutputTimeUnit(TimeUnit.MILLISECONDS)
 	public BufferedImage nullOp(Resources r) {
+		@SuppressWarnings({"rawtypes", "unchecked"})
 		ConcurrentTileOp op = new ConcurrentTileOp(
 				new NullOp(),
 				r.tileSize,
@@ -73,6 +74,7 @@ public class ConcurrentOpTilesBenchmark {
 	@BenchmarkMode({Mode.AverageTime})
 	@OutputTimeUnit(TimeUnit.MILLISECONDS)
 	public BufferedImage colorConvertOp(Resources r) {
+		@SuppressWarnings({"rawtypes", "unchecked"})
 		ConcurrentTileOp op = new ConcurrentTileOp(
 				new ColorConvertOp(SimpleColorModel.RGB, SimpleColorModel.YCbCr),
 				r.tileSize,

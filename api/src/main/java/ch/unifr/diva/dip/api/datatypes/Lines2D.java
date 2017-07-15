@@ -4,16 +4,17 @@ import ch.unifr.diva.dip.api.datastructures.Line2D;
 import javafx.scene.input.DataFormat;
 
 /**
- * A list of {@code Line2D}.
+ * Data type for a list of {@code Line2D}.
  */
-public class Lines2D implements DataType {
+public class Lines2D extends AbstractDataType<Line2D> {
 
-	public final static Class type = Line2D.class;
-	public final static DataFormat dataFormat = new DataFormat("dip-datatype/list-of-line2d");
+	private final static DataFormat dataFormat = new DataFormat("dip-datatype/list-of-line2d");
 
-	@Override
-	public Class type() {
-		return type;
+	/**
+	 * Creates a new data type for a list of {@code Line2D}.
+	 */
+	public Lines2D() {
+		super(Line2D.class);
 	}
 
 	@Override
@@ -22,7 +23,8 @@ public class Lines2D implements DataType {
 	}
 
 	@Override
-	public boolean isList() {
-		return true;
+	public CollectionType getCollectionType() {
+		return CollectionType.LIST;
 	}
+
 }

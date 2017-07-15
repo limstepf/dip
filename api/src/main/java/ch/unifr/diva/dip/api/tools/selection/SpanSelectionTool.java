@@ -12,7 +12,7 @@ import javafx.scene.shape.Shape;
  * Selection by spanning a shape. Base class for rectangular and elliptical
  * selection tools.
  *
- * @param <T>
+ * @param <T> class of the shape.
  */
 public abstract class SpanSelectionTool<T extends Shape> extends SCCSelectionToolBase<T> {
 
@@ -52,6 +52,7 @@ public abstract class SpanSelectionTool<T extends Shape> extends SCCSelectionToo
 		));
 	}
 
+	@SuppressWarnings("fallthrough")
 	protected final GestureEventHandler.Handler<MouseEvent> spanHandler = (start, end, state) -> {
 		switch (state) {
 			case ANYKEY: {

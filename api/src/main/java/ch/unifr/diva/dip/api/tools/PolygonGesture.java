@@ -24,7 +24,7 @@ public class PolygonGesture extends GestureBase {
 	 *
 	 * @param onGesture the gesture event handler.
 	 */
-	public PolygonGesture(GestureEventHandler.Handler onGesture) {
+	public PolygonGesture(GestureEventHandler.Handler<MouseEvent> onGesture) {
 		this(onGesture, null, null, null);
 	}
 
@@ -36,7 +36,7 @@ public class PolygonGesture extends GestureBase {
 	 * @param onMoved the moved (and dragged) handler, or null.
 	 * @param onExited the exited handler.
 	 */
-	public PolygonGesture(GestureEventHandler.Handler onGesture, EventHandler<MouseEvent> onEntered, EventHandler<MouseEvent> onMoved, EventHandler<MouseEvent> onExited) {
+	public PolygonGesture(GestureEventHandler.Handler<MouseEvent> onGesture, EventHandler<MouseEvent> onEntered, EventHandler<MouseEvent> onMoved, EventHandler<MouseEvent> onExited) {
 		super();
 		this.closingDistance = 16; // in pixel, no matter what zoom
 		this.invZoom = 1;
@@ -118,7 +118,8 @@ public class PolygonGesture extends GestureBase {
 	 * can be closed with the next (double-)click. This is the case when at
 	 * least 3 points (to form a triangle) have already been registered.
 	 *
-	 * @return True if the polygon can be closed, false otherwise.
+	 * @return {@code true} if the polygon can be closed, {@code false}
+	 * otherwise.
 	 */
 	public final boolean canClose() {
 		return numPoints > 2;
@@ -130,7 +131,7 @@ public class PolygonGesture extends GestureBase {
 	 * closing distance, instead the polygon is closed.
 	 *
 	 * @param e the mouse event.
-	 * @return True if in closing distance, False otherwise.
+	 * @return {@code true} if in closing distance, {@code false} otherwise.
 	 */
 	public final boolean inClosingDistance(MouseEvent e) {
 		return ShapeUtils.distance(sx, sy, e.getX(), e.getY()) <= (closingDistance * invZoom);

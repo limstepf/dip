@@ -14,32 +14,29 @@ import javafx.scene.Node;
  * initialized, s.t. no UI controls are initialized if not needed. A ViewHook
  * can be used to customize UI controls (once initialized).
  *
- * @param <T> type of the parameter.
+ * @param <T> class of the parameter's value.
  */
 public interface Parameter<T> {
 
 	/**
 	 * Returns the view (or graphical representation) of a parameter.
 	 *
-	 * @param <U> subclass of the parameter view
 	 * @return the view.
 	 */
-	public <U extends View<T>> U view();
+	public View view();
 
 	/**
 	 * Un-/hides the parameter (and it's view).
 	 *
-	 * @param hide True to hide the parameter, False to unhide/show the
-	 * parameter.
+	 * @param hide {@code true} to hide the parameter, {@code false} to
+	 * unhide/show the parameter.
 	 */
 	public void setHide(boolean hide);
 
 	/**
 	 * A view of a transient parameter.
-	 *
-	 * @param <T>
 	 */
-	public interface View<T> {
+	public interface View {
 
 		/**
 		 * Returns the root node of the view.
@@ -53,7 +50,8 @@ public interface Parameter<T> {
 		 * also as unmanaged by its parent, thereby removing it from the
 		 * flow/size calculations.
 		 *
-		 * @param hide True to hide the view, False to unhide/show the view.
+		 * @param hide {@code true} to hide the view, {@code false} to
+		 * unhide/show the view.
 		 */
 		default void setHide(boolean hide) {
 			node().setVisible(!hide);
@@ -70,13 +68,24 @@ public interface Parameter<T> {
 	 * {@code PersistentParameter}. Yet parent-, or composite parameters might
 	 * override this method s.t. its child parameters are considered as well
 	 * (e.g. a composite parameter, that on its own is a persitent parameter,
-	 * might still return false here in case all of it's child parameters are
-	 * transient).
+	 * might still return {@code false} here in case all of it's child
+	 * parameters are transient).
 	 *
-	 * @return True if this parameter is persistent, False otherwise.
+	 * @return {@code true} if this parameter is persistent, {@code false}
+	 * otherwise.
 	 */
 	default boolean isPersistent() {
 		return (this instanceof PersistentParameter);
+	}
+
+	/**
+	 * Returns the parameter as a persistent parameter. Make sure this is
+	 * actually a persistent parameter with {@code isPersistent()}.
+	 *
+	 * @return the parameter as a persistent parameter.
+	 */
+	default PersistentParameter<T> asPersitentParameter() {
+		return (PersistentParameter<T>) this;
 	}
 
 	/**
@@ -85,9 +94,9 @@ public interface Parameter<T> {
 	 * @param parameters map of parameters.
 	 * @return map of non-transient parameters.
 	 */
-	public static Map<String, PersistentParameter> filterPersistent(Map<String, Parameter> parameters) {
-		final Map<String, PersistentParameter> filtered = new HashMap<>();
-		for (Map.Entry<String, Parameter> p : parameters.entrySet()) {
+	public static Map<String, PersistentParameter<?>> filterPersistent(Map<String, Parameter<?>> parameters) {
+		final Map<String, PersistentParameter<?>> filtered = new HashMap<>();
+		for (Map.Entry<String, Parameter<?>> p : parameters.entrySet()) {
 			if (p.getValue().isPersistent()) {
 				filtered.put(p.getKey(), (PersistentParameter) p.getValue());
 			}
@@ -102,9 +111,9 @@ public interface Parameter<T> {
 	 * @param parameters list of parameters.
 	 * @return list of non-transient parameters.
 	 */
-	public static List<PersistentParameter> filterPersistent(List<Parameter> parameters) {
-		final List<PersistentParameter> filtered = new ArrayList<>();
-		for (Parameter p : parameters) {
+	public static List<PersistentParameter<?>> filterPersistent(List<Parameter<?>> parameters) {
+		final List<PersistentParameter<?>> filtered = new ArrayList<>();
+		for (Parameter<?> p : parameters) {
 			if (p.isPersistent()) {
 				filtered.add((PersistentParameter) p);
 			}

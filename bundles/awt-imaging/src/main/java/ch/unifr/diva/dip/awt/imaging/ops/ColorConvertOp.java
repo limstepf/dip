@@ -11,7 +11,7 @@ import java.awt.image.WritableRaster;
 /**
  * Color conversion from and to known SimpleColorModels.
  */
-public class ColorConvertOp extends NullOp implements TileParallelizable {
+public class ColorConvertOp extends NullOp implements SimpleTileParallelizable {
 
 	private final SimpleColorModel srcCm;
 	private final SimpleColorModel dstCm;

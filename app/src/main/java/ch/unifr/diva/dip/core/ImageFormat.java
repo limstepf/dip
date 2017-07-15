@@ -171,7 +171,8 @@ public enum ImageFormat {
 	abstract BufferedImage loadBufferedImage(String url) throws IOException;
 
 	/**
-	 * Construct a BufferedImage with content loaded from the specified input stream.
+	 * Construct a BufferedImage with content loaded from the specified input
+	 * stream.
 	 *
 	 * @param stream the stream from which to load the image.
 	 * @return a BufferedImage.
@@ -182,8 +183,8 @@ public enum ImageFormat {
 	 * Checks whether a given file extension is supported by the ImageFile.
 	 *
 	 * @param extension a file extension (in lowercase!)
-	 * @return True if the ImageFile supports the file extension, False
-	 * otherwise.
+	 * @return {@code true} if the ImageFile supports the file extension,
+	 * {@code false} otherwise.
 	 */
 	public boolean supportsExtension(String extension) {
 		return extensions.contains(extension);
@@ -209,7 +210,7 @@ public enum ImageFormat {
 		try (InputStream stream = new BufferedInputStream(Files.newInputStream(file))) {
 			return format.loadImage(stream);
 		} catch (IOException ex) {
-			throw(ex);
+			throw (ex);
 		}
 	}
 
@@ -222,7 +223,7 @@ public enum ImageFormat {
 		try (InputStream stream = new BufferedInputStream(Files.newInputStream(file))) {
 			return format.loadBufferedImage(stream);
 		} catch (IOException ex) {
-			throw(ex);
+			throw (ex);
 		}
 	}
 
@@ -247,7 +248,8 @@ public enum ImageFormat {
 	 * Check whether a file extension looks like a supported image format.
 	 *
 	 * @param extension a file extension (usually 3 or 4 chars long).
-	 * @return True if the file extension is supported, False otherwise.
+	 * @return {@code true} if the file extension is supported, {@code false}
+	 * otherwise.
 	 */
 	public static boolean isSupported(String extension) {
 		return supported.contains(extension.toLowerCase());

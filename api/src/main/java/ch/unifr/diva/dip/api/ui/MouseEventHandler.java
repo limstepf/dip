@@ -70,7 +70,7 @@ public class MouseEventHandler implements EventHandler<MouseEvent> {
 		 * Handler method called upon recieving a mouse event.
 		 *
 		 * @param event the mouse event.
-		 * @return True to consume the event, False otherwise.
+		 * @return {@code true} to consume the event, {@code false} otherwise.
 		 */
 		public boolean onMouseEvent(MouseEvent event);
 	}

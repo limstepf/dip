@@ -26,7 +26,8 @@ public interface Cursor {
 	 * implemented by JavaFX {@code Node} (or {@code Group}) from which a cursor
 	 * extends from.
 	 *
-	 * @param value True to make the cursor visible, False to hide it.
+	 * @param value {@code true} to make the cursor visible, {@code false} to
+	 * hide it.
 	 */
 	public void setVisible(boolean value);
 

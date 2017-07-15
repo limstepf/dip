@@ -4,6 +4,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
+import java.nio.IntBuffer;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelFormat;
@@ -251,7 +252,7 @@ public class FxRescaling {
 	 * based on Bresenham's (line) algorithm.
 	 *
 	 * <p>
-	 * See R. Ulichney, "Bresenham -style Sealing," Proceedings of the IS&T
+	 * See R. Ulichney, "Bresenham -style Sealing," Proceedings of the IS&amp;T
 	 * Annual Conference (Cambridge, Mass., 1993): 101-103. For a short paper on
 	 * this. The key idea is to fill accumulators with a fixed number of
 	 * repeating pixels up to where they overflow to know when to sample from
@@ -274,7 +275,7 @@ public class FxRescaling {
 		final int xd = w / newW;
 		final int xr = w % newW;
 
-		final WritablePixelFormat format = PixelFormat.getIntArgbPreInstance();
+		final WritablePixelFormat<IntBuffer> format = PixelFormat.getIntArgbPreInstance();
 		if (srcBuffer == null) {
 			srcBuffer = new int[w * h];
 		}
@@ -327,8 +328,8 @@ public class FxRescaling {
 	 *      +----+----+----+----+       c' = floor(a_x), ceil(a_y)
 	 *      |  . |    |    | .  |       d' = ceil(a_x),  ceil(a_y)
 	 *      +----+----+----+----+
-	 *      |  c | . .| . .| d  |       -> compute differences, and scale up
-	 *      c'---+----+----+----d'         to get shiftX/Y, restX/Y
+	 *      |  c | . .| . .| d  |       - compute differences, and scale up
+	 *      c'---+----+----+----d'        to get shiftX/Y, restX/Y
 	 *
 	 *
 	 * Upscaled destination image:
@@ -384,7 +385,7 @@ public class FxRescaling {
 		final int fullW = virtualW + restX;
 		final int fullH = shiftY + newH + restY;
 
-		final WritablePixelFormat format = PixelFormat.getIntArgbPreInstance();
+		final WritablePixelFormat<IntBuffer> format = PixelFormat.getIntArgbPreInstance();
 		if (srcBuffer == null) {
 			srcBuffer = new int[w * h];
 		}

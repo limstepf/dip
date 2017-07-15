@@ -7,7 +7,7 @@ import javafx.event.Event;
  *
  * @param <T> type of the event.
  */
-public class NopGesture<T extends Event> extends GestureBase<T> {
+public class NopGesture<T extends Event> extends GestureBase {
 
 	/**
 	 * Creates a new NOP gesture.

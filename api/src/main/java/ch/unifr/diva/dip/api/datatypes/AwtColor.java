@@ -3,16 +3,18 @@ package ch.unifr.diva.dip.api.datatypes;
 import javafx.scene.input.DataFormat;
 
 /**
- * A Java AWT color. Used to encapsulate colors in the default sRGB color space.
+ * Data type for a Java AWT color object. Used to encapsulate colors in the
+ * default sRGB color space.
  */
-public class AwtColor implements DataType {
+public class AwtColor extends AbstractDataType<java.awt.Color> {
 
-	public final static Class type = java.awt.Color.class;
-	public final static DataFormat dataFormat = new DataFormat("dip-datatype/awt-color");
+	private final static DataFormat dataFormat = new DataFormat("dip-datatype/awt-color");
 
-	@Override
-	public Class type() {
-		return type;
+	/**
+	 * Creates a new data type for a Java AWT color object.
+	 */
+	public AwtColor() {
+		super(java.awt.Color.class);
 	}
 
 	@Override

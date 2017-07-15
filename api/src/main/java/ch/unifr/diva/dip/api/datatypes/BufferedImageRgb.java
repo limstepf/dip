@@ -3,16 +3,18 @@ package ch.unifr.diva.dip.api.datatypes;
 import javafx.scene.input.DataFormat;
 
 /**
- * A {@code BufferedImage} with an RGB color space.
+ * Data type for a {@code BufferedImage} with an RGB color space.
  */
-public class BufferedImageRgb implements DataType {
+public class BufferedImageRgb extends AbstractDataType<java.awt.image.BufferedImage> {
 
-	public final static Class type = java.awt.image.BufferedImage.class;
-	public final static DataFormat dataFormat = new DataFormat("dip-datatype/buffered-image-rgb");
+	private final static DataFormat dataFormat = new DataFormat("dip-datatype/buffered-image-rgb");
 
-	@Override
-	public Class type() {
-		return type;
+	/**
+	 * Creates a new data type for a {@code BufferedImage} with an RGB color
+	 * space.
+	 */
+	public BufferedImageRgb() {
+		super(java.awt.image.BufferedImage.class);
 	}
 
 	@Override

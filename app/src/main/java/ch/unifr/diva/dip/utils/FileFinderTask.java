@@ -71,7 +71,11 @@ public class FileFinderTask extends Task<Void> {
 	 * @return a FileDescriptor describing the query.
 	 */
 	public FileDescriptor addQuery(Path file, String checksum) {
-		return addQuery(file.getFileName().toString(), checksum);
+		final Path p = file.getFileName();
+		if (p == null) {
+			return null;
+		}
+		return addQuery(p.toString(), checksum);
 	}
 
 	/**
@@ -162,7 +166,7 @@ public class FileFinderTask extends Task<Void> {
 	@Override
 	protected Void call() throws Exception {
 		for (int i = 0; i < files.size(); i++) {
-			updateProgress(i+1, files.size());
+			updateProgress(i + 1, files.size());
 
 			final FileDescriptor fd = files.get(i);
 			final FileVisitor visitor = new FileVisitor(fd, this);
@@ -204,7 +208,10 @@ public class FileFinderTask extends Task<Void> {
 					this.callback.onMiss(fd);
 				}
 			} else {
-				addSuspect(file.getParent());
+				final Path parent = file.getParent();
+				if (parent != null) {
+					addSuspect(parent);
+				}
 
 				if (this.callback.executeOnFxThread()) {
 					final FileDescriptor t_fd = fd;
@@ -238,12 +245,23 @@ public class FileFinderTask extends Task<Void> {
 		private final FileFinderTask task;
 		private Path file;
 
+		/**
+		 * Creates a new file visitor.
+		 *
+		 * @param fd the file descriptor.
+		 * @param task the finder task.
+		 */
 		public FileVisitor(FileDescriptor fd, FileFinderTask task) {
 			this.fd = fd;
 			this.task = task;
 			this.file = null;
 		}
 
+		/**
+		 * Returns the path to the file.
+		 *
+		 * @return the path to the file, or null if not found.
+		 */
 		public Path getFile() {
 			return file;
 		}
@@ -304,8 +322,9 @@ public class FileFinderTask extends Task<Void> {
 		 * Whether or not to execute the callbacks on the JavaFX application
 		 * thread or not.
 		 *
-		 * @return if True all callbacks are executed on the JavaFX application
-		 * thread, otherwise the background thread of the task is used.
+		 * @return {@code true} if all callbacks are executed on the JavaFX
+		 * application thread, otherwise the background thread of the task is
+		 * used.
 		 */
 		default boolean executeOnFxThread() {
 			return true;
@@ -345,23 +364,58 @@ public class FileFinderTask extends Task<Void> {
 		public final String checksum;
 		private PathMatcher matcher;
 
+		/**
+		 * Creates a new file descriptor.
+		 *
+		 * @param file the file.
+		 */
 		public FileDescriptor(Path file) {
 			this(file, "");
 		}
 
+		/**
+		 * Creates a new file descriptor.
+		 *
+		 * @param filename the filename.
+		 */
 		public FileDescriptor(String filename) {
 			this(filename, "");
 		}
 
+		/**
+		 * Creates a new file descriptor.
+		 *
+		 * @param file the file.
+		 * @param checksum the checksum of the file.
+		 */
 		public FileDescriptor(Path file, String checksum) {
-			this(file.getFileName().toString(), checksum);
+			this(getFileName(file), checksum);
 		}
 
+		/**
+		 * Creates a new file descriptor.
+		 *
+		 * @param filename the filename.
+		 * @param checksum the checksum of the file.
+		 */
 		public FileDescriptor(String filename, String checksum) {
 			this.pattern = filename;
 			this.checksum = checksum;
 		}
 
+		private static String getFileName(Path file) {
+			final Path p = file.getFileName();
+			if (p == null) {
+				return "";
+			}
+			return p.toString();
+		}
+
+		/**
+		 * Returns the matcher.
+		 *
+		 * @return the matcher.
+		 */
 		public PathMatcher matcher() {
 			if (this.matcher == null) {
 				this.matcher = FileSystems.getDefault().getPathMatcher("glob:" + this.pattern);
@@ -378,4 +432,5 @@ public class FileFinderTask extends Task<Void> {
 					+ "}";
 		}
 	}
+
 }

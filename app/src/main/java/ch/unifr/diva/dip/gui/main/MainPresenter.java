@@ -157,7 +157,8 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 	/**
 	 * Shows/hides the pipeline editor of the current project.
 	 *
-	 * @param show True to show, False to hide the pipeline editor.
+	 * @param show {@code true} to show, {@code false} to hide the pipeline
+	 * editor.
 	 */
 	public void openPipelineEditor(boolean show) {
 		if (!this.handler.hasProject()) {
@@ -250,7 +251,8 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 	 * current project has been modified, a save-dialog is openend first to ask
 	 * how to proceed (save, discard changes/continue, or cancel).
 	 *
-	 * @return True if we're save/allowed to continue, False otherwise.
+	 * @return {@code true} if we're save/allowed to continue, {@code false}
+	 * otherwise.
 	 */
 	public final boolean confirmClosingProject() {
 		if (!handler.hasProject()) {
@@ -456,8 +458,8 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 	/**
 	 * Closes a project.
 	 *
-	 * @param confirm asks for confirmation first if set to True, closes the
-	 * project immediately if False.
+	 * @param confirm asks for confirmation first if set to {@code true}, closes
+	 * the project immediately if {@code false}.
 	 */
 	public void closeProject(boolean confirm) {
 		if (confirm) {

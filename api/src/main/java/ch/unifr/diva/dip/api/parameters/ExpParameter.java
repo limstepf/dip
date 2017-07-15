@@ -57,7 +57,8 @@ import net.objecthunter.exp4j.ExpressionBuilder;
  * <li>φ (the golden ratio 1.618...)</li>
  * </ul>
  *
- * @see net.objecthunter.exp4j
+ * @see
+ * <a href="http://www.objecthunter.net/exp4j/">http://www.objecthunter.net/exp4j/</a>
  */
 public class ExpParameter extends PersistentParameterBase<String, ExpParameter.ExpView> implements SingleRowParameter<String> {
 
@@ -127,7 +128,7 @@ public class ExpParameter extends PersistentParameterBase<String, ExpParameter.E
 		}
 	}
 
-	protected final List<ViewHook> viewHooks = new ArrayList<>();
+	protected final List<ViewHook<TextField>> viewHooks = new ArrayList<>();
 
 	/**
 	 * Adds a view hook to customize the textfield. This method is only called

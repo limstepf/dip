@@ -121,7 +121,7 @@ public class IOUtils {
 		if (Files.exists(directory) && isDirectoryEmpty(directory)) {
 			final Path parent = directory.getParent();
 			Files.delete(directory);
-			if (!parent.equals(root)) {
+			if (parent != null && !parent.equals(root)) {
 				deleteDirectoryIfEmpty(parent, root);
 			}
 		}

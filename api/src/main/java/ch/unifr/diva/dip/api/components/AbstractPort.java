@@ -2,6 +2,7 @@ package ch.unifr.diva.dip.api.components;
 
 import ch.unifr.diva.dip.api.datatypes.DataType;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 /**
@@ -19,7 +20,7 @@ import javafx.beans.property.SimpleObjectProperty;
  */
 public abstract class AbstractPort<T> implements Port<T> {
 
-	private final DataType dataType;
+	private final DataType<T> dataType;
 	private final Class<T> type;
 	private final boolean required;
 	private final ObjectProperty<State> portStateProperty;
@@ -30,15 +31,15 @@ public abstract class AbstractPort<T> implements Port<T> {
 	 * @param dataType data type of the port.
 	 * @param required flag if the port is absolutely required to work.
 	 */
-	public AbstractPort(DataType dataType, boolean required) {
+	public AbstractPort(DataType<T> dataType, boolean required) {
 		this.dataType = dataType;
 		this.type = this.dataType.type();
 		this.required = required;
-		this.portStateProperty = new SimpleObjectProperty(State.UNCONNECTED);
+		this.portStateProperty = new SimpleObjectProperty<>(State.UNCONNECTED);
 	}
 
 	@Override
-	public DataType getDataType() {
+	public DataType<T> getDataType() {
 		return this.dataType;
 	}
 
@@ -52,13 +53,21 @@ public abstract class AbstractPort<T> implements Port<T> {
 		return this.required;
 	}
 
+	@Override
+	public ReadOnlyObjectProperty<State> portStateProperty() {
+		return portStateProperty;
+	}
+	
+	/**
+	 * Sets/udpates the port state. This method is only exposed to the package,
+	 * and to be used by the direct subclasses {@code InputPort} and
+	 * {@code OutputPort}, for otherwise the state property is supposed to be
+	 * read only.
+	 *
+	 * @param state the new state of the port.
+	 */
 	protected void setPortState(State state) {
 		portStateProperty.set(state);
-	}
-
-	@Override
-	public ObjectProperty<State> portStateProperty() {
-		return portStateProperty;
 	}
 
 }

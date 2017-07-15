@@ -5,6 +5,7 @@ import ch.unifr.diva.dip.api.utils.DipThreadPool;
 import ch.unifr.diva.dip.api.utils.MathUtils;
 import ch.unifr.diva.dip.awt.imaging.ops.ConcurrentTileOp;
 import ch.unifr.diva.dip.awt.imaging.ops.Parallelizable;
+import ch.unifr.diva.dip.awt.imaging.ops.TileParallelizable;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
@@ -87,6 +88,7 @@ public class Filter {
 	 * @param dest the destination image, or null.
 	 * @return the filtered image.
 	 */
+	@SuppressWarnings({"rawtypes", "unchecked"})
 	public static BufferedImage filter(DipThreadPool threadPool, BufferedImageOp op, BufferedImage src, BufferedImage dest) {
 		// get parallelizable mode of the op...
 		final Parallelizable.Mode mode = Parallelizable.getMode(op, threadPool.poolSize());

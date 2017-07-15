@@ -3,16 +3,18 @@ package ch.unifr.diva.dip.api.datatypes;
 import javafx.scene.input.DataFormat;
 
 /**
- * A {@code BufferedImage} with an XYZ (or CIE XYZ) color space.
+ * Data type for a {@code BufferedMatrix} with an XYZ (or CIE XYZ) color space.
  */
-public class BufferedImageXyz implements DataType {
+public class BufferedImageXyz extends AbstractDataType<ch.unifr.diva.dip.api.datastructures.BufferedMatrix> {
 
-	public final static Class type = ch.unifr.diva.dip.api.datastructures.BufferedMatrix.class;
-	public final static DataFormat dataFormat = new DataFormat("dip-datatype/buffered-matrix-xyz");
+	private final static DataFormat dataFormat = new DataFormat("dip-datatype/buffered-matrix-xyz");
 
-	@Override
-	public Class type() {
-		return type;
+	/**
+	 * Creates a new data type for a {@code BufferedMatrix} with an XYZ (or CIE
+	 * XYZ) color space.
+	 */
+	public BufferedImageXyz() {
+		super(ch.unifr.diva.dip.api.datastructures.BufferedMatrix.class);
 	}
 
 	@Override

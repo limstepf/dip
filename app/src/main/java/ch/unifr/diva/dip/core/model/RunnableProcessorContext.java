@@ -82,7 +82,6 @@ public class RunnableProcessorContext implements ProcessorContext {
 		if (file == null) {
 			return false;
 		}
-		final Path parent = file.getParent();
 		boolean ret = false;
 		try {
 			ret = Files.deleteIfExists(file);

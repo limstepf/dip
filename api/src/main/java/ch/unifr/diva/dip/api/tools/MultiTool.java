@@ -20,7 +20,7 @@ public class MultiTool implements Tool {
 
 	protected final List<SimpleTool> tools;
 	protected final ObjectProperty<SimpleTool> selectedToolProperty;
-	protected final LinkedHashMap<String, SingleRowParameter> options;
+	protected final LinkedHashMap<String, SingleRowParameter<?>> options;
 
 	/**
 	 * Creates a new multi tool.
@@ -44,7 +44,7 @@ public class MultiTool implements Tool {
 			));
 		}
 		this.tools = tools;
-		this.selectedToolProperty = new SimpleObjectProperty(this.tools.get(0));
+		this.selectedToolProperty = new SimpleObjectProperty<>(this.tools.get(0));
 		this.options = new LinkedHashMap<>();
 	}
 
@@ -118,7 +118,7 @@ public class MultiTool implements Tool {
 	}
 
 	@Override
-	public Map<String, SingleRowParameter> options() {
+	public Map<String, SingleRowParameter<?>> options() {
 		return this.options;
 	}
 

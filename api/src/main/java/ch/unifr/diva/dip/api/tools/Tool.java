@@ -73,12 +73,13 @@ public interface Tool {
 	 *
 	 * @return the options of the tool.
 	 */
-	public Map<String, SingleRowParameter> options();
+	public Map<String, SingleRowParameter<?>> options();
 
 	/**
 	 * Checks whether this tool has options.
 	 *
-	 * @return True if this tool has at least one option, False otherwise.
+	 * @return {@code true} if this tool has at least one option, {@code false}
+	 * otherwise.
 	 */
 	default boolean hasOptions() {
 		return !options().isEmpty();
@@ -87,7 +88,7 @@ public interface Tool {
 	/**
 	 * Checks whether this is a multi-tool.
 	 *
-	 * @return True if this is a multi-tool, False otherwise.
+	 * @return {@code true} if this is a multi-tool, {@code false} otherwise.
 	 */
 	default boolean isMultiTool() {
 		return (this instanceof MultiTool);

@@ -3,12 +3,11 @@ package ch.unifr.diva.dip.api.tools.brush;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.api.utils.ShapeUtils;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.Shape;
 
 /**
  * A square shape brush.
  */
-public class SquareShapeBrush extends SquareBrush implements ShapeBrush {
+public class SquareShapeBrush extends SquareBrush implements ShapeBrush<Rectangle> {
 
 	/**
 	 * Creates a new square shape brush.
@@ -21,7 +20,7 @@ public class SquareShapeBrush extends SquareBrush implements ShapeBrush {
 	}
 
 	@Override
-	public Shape paint(double x, double y) {
+	public Rectangle paint(double x, double y) {
 		return paint(
 				(int) Math.round(x - getStrokeRadius()),
 				(int) Math.round(y - getStrokeRadius())
@@ -29,7 +28,7 @@ public class SquareShapeBrush extends SquareBrush implements ShapeBrush {
 	}
 
 	@Override
-	public Shape paint(int x, int y) {
+	public Rectangle paint(int x, int y) {
 		return ShapeUtils.prepareMask(
 				new Rectangle(x, y, getStrokeWidth(), getStrokeWidth())
 		);

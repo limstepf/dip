@@ -58,8 +58,8 @@ public abstract class ProcessorView extends BorderPane {
 
 	protected final PipelineEditor editor;
 	protected final ProcessorWrapper wrapper;
-	protected final List<PortView> inputPorts;
-	protected final List<PortView> outputPorts;
+	protected final List<PortView<InputPort<?>>> inputPorts;
+	protected final List<PortView<OutputPort<?>>> outputPorts;
 
 	protected final ProcessorHead head;
 	protected ParameterView parameterView;
@@ -99,10 +99,10 @@ public abstract class ProcessorView extends BorderPane {
 		this.inputPorts = new ArrayList<>();
 		this.outputPorts = new ArrayList<>();
 		if (wrapper.isAvailable()) {
-			for (Map.Entry<String, InputPort> e : wrapper.processor().inputs().entrySet()) {
-				final InputPort input = e.getValue();
+			for (Map.Entry<String, InputPort<?>> e : wrapper.processor().inputs().entrySet()) {
+				final InputPort<?> input = e.getValue();
 				if (input != null) {
-					final PortView view = new PortView(editor, e.getKey(), input);
+					final PortView<InputPort<?>> view = new PortView<>(editor, e.getKey(), input);
 					editor.editorPane().registerPort(input, view);
 					inputPorts.add(view);
 				} else {
@@ -110,10 +110,10 @@ public abstract class ProcessorView extends BorderPane {
 				}
 			}
 
-			for (Map.Entry<String, OutputPort> e : wrapper.processor().outputs().entrySet()) {
-				final OutputPort output = e.getValue();
+			for (Map.Entry<String, OutputPort<?>> e : wrapper.processor().outputs().entrySet()) {
+				final OutputPort<?> output = e.getValue();
 				if (output != null) {
-					final PortView view = new PortView(editor, e.getKey(), output);
+					final PortView<OutputPort<?>> view = new PortView<>(editor, e.getKey(), output);
 					editor.editorPane().registerPort(output, view);
 					outputPorts.add(view);
 				} else {
@@ -310,10 +310,10 @@ public abstract class ProcessorView extends BorderPane {
 	};
 
 	protected final void updatePorts() {
-		for (PortView v : this.inputPorts) {
+		for (PortView<?> v : this.inputPorts) {
 			v.updateCenter();
 		}
-		for (PortView v : this.outputPorts) {
+		for (PortView<?> v : this.outputPorts) {
 			v.updateCenter();
 		}
 	}
@@ -325,8 +325,8 @@ public abstract class ProcessorView extends BorderPane {
 		return wires;
 	}
 
-	protected void addWires(List<ConnectionView> wires, List<PortView> ports) {
-		for (PortView v : ports) {
+	protected void addWires(List<ConnectionView> wires, List<? extends PortView<?>> ports) {
+		for (PortView<?> v : ports) {
 			if (v.hasWires()) {
 				wires.addAll(v.wires());
 			}
@@ -339,8 +339,8 @@ public abstract class ProcessorView extends BorderPane {
 			wrapper.processor().repaintProperty().removeListener(repaintListener);
 		}
 
-		for (PortView v : this.inputPorts) {
-			final InputPort input = (InputPort) v.port;
+		for (PortView<InputPort<?>> v : this.inputPorts) {
+			final InputPort<?> input = v.port;
 
 			final List<ConnectionView> remove = new ArrayList<>();
 			final List<ConnectionView> wires = v.wires();
@@ -356,8 +356,8 @@ public abstract class ProcessorView extends BorderPane {
 			editor.editorPane().unregisterPort(input);
 		}
 
-		for (PortView v : this.outputPorts) {
-			final OutputPort output = (OutputPort) v.port;
+		for (PortView<OutputPort<?>> v : this.outputPorts) {
+			final OutputPort<?> output = v.port;
 
 			final List<ConnectionView> remove = new ArrayList<>();
 			final List<ConnectionView> wires = v.wires();
@@ -458,7 +458,7 @@ public abstract class ProcessorView extends BorderPane {
 		repaint();
 	}
 
-	protected void findMinimalNodes(Set<Node> nodes) {
+	protected void findMinimalNodes(Set<? extends Node> nodes) {
 		this.minimalNodeX = this;
 		this.minimalNodeY = this;
 		for (Node node : nodes) {
@@ -598,26 +598,26 @@ public abstract class ProcessorView extends BorderPane {
 			//
 			// Thus... we first get params/keys without further action...
 			final int n = processor.parameters().size();
-			final Parameter[] params = new Parameter[n];
-			final String[] keys = new String[n];
+			final Parameter<?>[] params = new Parameter<?>[n];
+			//final String[] keys = new String[n];
 
 			int j = 0;
-			for (Map.Entry<String, Parameter> e : processor.parameters().entrySet()) {
+			for (Map.Entry<String, Parameter<?>> e : processor.parameters().entrySet()) {
 				params[j] = e.getValue();
-				keys[j] = e.getKey();
+				//keys[j] = e.getKey();
 				j++;
 			}
 
 			// ...and do our thing now.
 			if (hasLabels(params)) {
 				for (int i = 0; i < n; i++) {
-					final Parameter p = params[i];
-					final String key = keys[i];
+					final Parameter<?> p = params[i];
+					//final String key = keys[i];
 					final Parameter.View v = p.view();
 					final Label label;
 
 					if (p.isPersistent()) {
-						final PersistentParameter pp = (PersistentParameter) p;
+						final PersistentParameter<?> pp = p.asPersitentParameter();
 						label = new Label((pp.label().isEmpty()) ? "" : pp.label() + ":");
 					} else {
 						label = new Label("");
@@ -634,11 +634,10 @@ public abstract class ProcessorView extends BorderPane {
 			}
 		}
 
-		private boolean hasLabels(Parameter[] params) {
+		private boolean hasLabels(Parameter<?>[] params) {
 			for (int i = 0; i < params.length; i++) {
 				if (params[i].isPersistent()) {
-					final PersistentParameter pp = (PersistentParameter) params[i];
-					if (!pp.label().isEmpty()) {
+					if (!params[i].asPersitentParameter().label().isEmpty()) {
 						return true;
 					}
 				}

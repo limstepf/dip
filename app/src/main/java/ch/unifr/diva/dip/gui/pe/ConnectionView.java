@@ -23,7 +23,7 @@ public interface ConnectionView {
 		 */
 		LINEAR() {
 					@Override
-					public ConnectionView newConnection(InputPort input) {
+					public ConnectionView newConnection(InputPort<?> input) {
 						return new ConnectionViewLinear(input);
 					}
 				},
@@ -32,7 +32,7 @@ public interface ConnectionView {
 		 */
 		QUAD() {
 					@Override
-					public ConnectionView newConnection(InputPort input) {
+					public ConnectionView newConnection(InputPort<?> input) {
 						return new ConnectionViewQuad(input);
 					}
 				};
@@ -70,7 +70,7 @@ public interface ConnectionView {
 		 * @param input already connected input port, or origin of the wire.
 		 * @return a new connection view.
 		 */
-		public abstract ConnectionView newConnection(InputPort input);
+		public abstract ConnectionView newConnection(InputPort<?> input);
 	}
 
 	/**
@@ -78,7 +78,7 @@ public interface ConnectionView {
 	 *
 	 * @return the data type of the connection.
 	 */
-	DataType dataType();
+	DataType<?> dataType();
 
 	/**
 	 * Returns the node of the connection.
@@ -90,7 +90,7 @@ public interface ConnectionView {
 	/**
 	 * Checks whether the wire is fully connected to in- and output ports.
 	 *
-	 * @return True if fully connected, False otherwise.
+	 * @return {@code true} if fully connected, {@code false} otherwise.
 	 */
 	boolean isConnected();
 
@@ -108,7 +108,7 @@ public interface ConnectionView {
 	 * the wire is not set to loose, then the connection can be made by dropping
 	 * the wire onto the compatible port.
 	 *
-	 * @param loose marks the connection (or wire) as loose if True.
+	 * @param loose marks the connection (or wire) as loose if {@code true}.
 	 */
 	void setLoose(boolean loose);
 
@@ -117,14 +117,14 @@ public interface ConnectionView {
 	 *
 	 * @return the input port of the connection.
 	 */
-	public InputPort inputPort();
+	public InputPort<?> inputPort();
 
 	/**
 	 * Returns the output port of the connection.
 	 *
 	 * @return the output port of the connection.
 	 */
-	public OutputPort outputPort();
+	public OutputPort<?> outputPort();
 
 	/**
 	 * Binds the connection view (or wire) to an input and an output port view.
@@ -132,7 +132,7 @@ public interface ConnectionView {
 	 * @param output the port view of an output port.
 	 * @param input the port view of an input port.
 	 */
-	default void bind(PortView<OutputPort> output, PortView<InputPort> input) {
+	default void bind(PortView<OutputPort<?>> output, PortView<InputPort<?>> input) {
 		startXProperty().bind(input.centerXProperty());
 		startYProperty().bind(input.centerYProperty());
 		endXProperty().bind(output.centerXProperty());
@@ -146,7 +146,7 @@ public interface ConnectionView {
 	 *
 	 * @param output the port view of an output port.
 	 */
-	void setOutput(PortView<OutputPort> output);
+	void setOutput(PortView<OutputPort<?>> output);
 
 	/**
 	 * Unbinds a connection view (or wire) from its ports.

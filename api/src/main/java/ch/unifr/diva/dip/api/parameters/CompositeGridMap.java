@@ -16,8 +16,8 @@ import java.util.Map;
  */
 public class CompositeGridMap extends CompositeGridBase<ValueMap> {
 
-	protected final List<Parameter> children;
-	protected final List<PersistentParameter> persistentChildren;
+	protected final List<Parameter<?>> children;
+	protected final List<PersistentParameter<?>> persistentChildren;
 	protected final List<String> persistentKeys;
 
 	/**
@@ -25,7 +25,7 @@ public class CompositeGridMap extends CompositeGridBase<ValueMap> {
 	 *
 	 * @param parameters child parameters to populate the grid with.
 	 */
-	public CompositeGridMap(Map<String, Parameter> parameters) {
+	public CompositeGridMap(Map<String, Parameter<?>> parameters) {
 		this("", parameters);
 	}
 
@@ -35,14 +35,14 @@ public class CompositeGridMap extends CompositeGridBase<ValueMap> {
 	 * @param label label.
 	 * @param parameters child parameters to populate the grid with.
 	 */
-	public CompositeGridMap(String label, Map<String, Parameter> parameters) {
+	public CompositeGridMap(String label, Map<String, Parameter<?>> parameters) {
 		super(label, initValue(parameters), initValue(parameters));
 
 		this.children = new ArrayList<>(parameters.values());
 		this.persistentChildren = new ArrayList<>();
 		this.persistentKeys = new ArrayList<>();
 
-		for (Map.Entry<String, Parameter> p : parameters.entrySet()) {
+		for (Map.Entry<String, Parameter<?>> p : parameters.entrySet()) {
 			if (p.getValue().isPersistent()) {
 				this.persistentKeys.add(p.getKey());
 				this.persistentChildren.add((PersistentParameter) p.getValue());
@@ -53,11 +53,11 @@ public class CompositeGridMap extends CompositeGridBase<ValueMap> {
 	}
 
 	// yes, we do this twice to not override the default later on...
-	protected static ValueMap initValue(Map<String, Parameter> parameters) {
+	protected static ValueMap initValue(Map<String, Parameter<?>> parameters) {
 		final Map<String, Object> defaultValues = new HashMap<>();
-		for (Map.Entry<String, Parameter> p : parameters.entrySet()) {
+		for (Map.Entry<String, Parameter<?>> p : parameters.entrySet()) {
 			if (p.getValue().isPersistent()) {
-				final PersistentParameter pp = (PersistentParameter) p.getValue();
+				final PersistentParameter<?> pp = (PersistentParameter<?>) p.getValue();
 				defaultValues.put(p.getKey(), pp.defaultValue());
 			}
 		}
@@ -76,7 +76,7 @@ public class CompositeGridMap extends CompositeGridBase<ValueMap> {
 	}
 
 	@Override
-	protected Collection<? extends Parameter> getChildren() {
+	protected Collection<? extends Parameter<?>> getChildren() {
 		return this.children;
 	}
 
@@ -98,16 +98,16 @@ public class CompositeGridMap extends CompositeGridBase<ValueMap> {
 		for (Map.Entry<String, Object> e : value.map.entrySet()) {
 			final int index = getIndexFromKey(e.getKey());
 			if (index >= 0) {
-				this.persistentChildren.get(index).set(e.getValue());
+				persistentChildren.get(index).asPersitentParameter().setRaw(e.getValue());
 			}
 		}
 	}
 
 	@Override
-	protected void invalidateChildParameter(PersistentParameter p) {
+	protected void invalidateChildParameter(PersistentParameter<?> p) {
 		final ValueMap vm = get();
 		for (int i = 0; i < this.persistentChildren.size(); i++) {
-			final PersistentParameter pi = this.persistentChildren.get(i);
+			final PersistentParameter<?> pi = this.persistentChildren.get(i);
 			if (p.equals(pi)) {
 				final String key = this.persistentKeys.get(i);
 				vm.set(key, p.get());
@@ -127,7 +127,7 @@ public class CompositeGridMap extends CompositeGridBase<ValueMap> {
 		for (Map.Entry<String, Object> e : value.map.entrySet()) {
 			v.map.put(e.getKey(), e.getValue());
 			final int index = getIndexFromKey(e.getKey());
-			this.persistentChildren.get(index).set(e.getValue());
+			persistentChildren.get(index).asPersitentParameter().setRaw(e.getValue());
 		}
 
 		return v;

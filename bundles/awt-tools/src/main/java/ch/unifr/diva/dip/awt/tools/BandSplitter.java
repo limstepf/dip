@@ -20,8 +20,6 @@ import java.awt.image.WritableRaster;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.beans.InvalidationListener;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import org.osgi.service.component.annotations.Component;
 
 /**
@@ -49,7 +47,7 @@ public class BandSplitter extends ProcessableBase {
 
 	private final EnumParameter cmSrc;
 	private final EnumParameter provideLayers;
-	private final SelectionListCellFactory provideLayersCellFactory;
+	private final SelectionListCellFactory<String> provideLayersCellFactory;
 	private final BooleanParameter processAllBands;
 	private final static String STORAGE_FORMAT = "PNG";
 
@@ -99,9 +97,9 @@ public class BandSplitter extends ProcessableBase {
 			this.GRAY_FILE = this.key_bi + ".png";
 			this.FLOAT_FILE = this.key_bi + ".bmat";
 			this.VIS_FILE = this.key_bi + "-vis.png";
-			this.output_bi = new OutputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImage());
-			this.output_gray = new OutputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImageGray());
-			this.output_float = new OutputPort(new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat());
+			this.output_bi = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImage());
+			this.output_gray = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImageGray());
+			this.output_float = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat());
 		}
 
 		public boolean isConnected() {
@@ -115,7 +113,7 @@ public class BandSplitter extends ProcessableBase {
 		this.cmSrc = new EnumParameter("source", SimpleColorModel.class, ANY_OPTION);
 		this.cmSrc.addOption(ANY_OPTION, "Any/unknown");
 		this.cmSrc.addComboBoxViewHook((combo) -> {
-			final SelectionListCellFactory cf = new SelectionListCellFactory();
+			final SelectionListCellFactory<String> cf = new SelectionListCellFactory<>();
 			cf.addSeparator(0);
 			combo.setCellFactory(cf);
 		});

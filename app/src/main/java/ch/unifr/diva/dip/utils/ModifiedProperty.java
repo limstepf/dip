@@ -28,7 +28,7 @@ public class ModifiedProperty {
 	private final ChangeListener<Boolean> modifiedListener;
 
 	/**
-	 * Default constructor creating a modified property initially set to false.
+	 * Default constructor creating a modified property initially set to {@code false}.
 	 */
 	public ModifiedProperty() {
 		this.modifiedProperty = new SimpleBooleanProperty(false);
@@ -94,7 +94,8 @@ public class ModifiedProperty {
 	 * If set to unmodified all managed properties will be set to unmodified as
 	 * well.
 	 *
-	 * @param modified True to set this property to modified, False otherwise.
+	 * @param modified {@code true} to set this property to modified,
+	 * {@code false} otherwise.
 	 */
 	public final void set(boolean modified) {
 		if (!modified) {
@@ -106,10 +107,11 @@ public class ModifiedProperty {
 	}
 
 	/**
-	 * Checks whether the property is true (or the parent object is marked as
-	 * modified respectively) or not.
+	 * Checks whether the property is {@code true} (or the parent object is
+	 * marked as modified respectively) or not.
 	 *
-	 * @return True if the parent object is markes as modified, False otherwise.
+	 * @return {@code true} if the parent object is markes as modified,
+	 * {@code false} otherwise.
 	 */
 	public boolean get() {
 		return modifiedProperty.get();

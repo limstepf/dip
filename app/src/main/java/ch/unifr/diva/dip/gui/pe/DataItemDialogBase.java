@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -134,7 +135,7 @@ public abstract class DataItemDialogBase<T extends DataItemListView.DataItem> ex
 		return null;
 	};
 
-	protected final EventHandler actionEventHandler = (c) -> onAction();
+	protected final EventHandler<ActionEvent> actionEventHandler = (c) -> onAction();
 
 	protected void onAction() {
 		if (doAction()) {
@@ -196,7 +197,7 @@ public abstract class DataItemDialogBase<T extends DataItemListView.DataItem> ex
 	 * Executes the dialog's action. E.g. load/import, or save/export data
 	 * items.
 	 *
-	 * @return True on success, False on failure.
+	 * @return {@code true} on success, {@code false} on failure.
 	 */
 	public abstract boolean doAction();
 
@@ -223,7 +224,7 @@ public abstract class DataItemDialogBase<T extends DataItemListView.DataItem> ex
 	 *
 	 * @param data the DIP data object.
 	 * @param file the destination.
-	 * @return True if successful, False on failure.
+	 * @return {@code true} if successful, {@code false} on failure.
 	 */
 	protected boolean saveDipData(DipData data, Path file) {
 		try {
@@ -270,7 +271,8 @@ public abstract class DataItemDialogBase<T extends DataItemListView.DataItem> ex
 	/**
 	 * Checks whether doAction can be executed.
 	 *
-	 * @return True if doAction can be executed, False otherwise.
+	 * @return {@code true} if doAction can be executed, {@code false}
+	 * otherwise.
 	 */
 	public boolean isValid() {
 		return isValidDestination(false);
@@ -280,8 +282,9 @@ public abstract class DataItemDialogBase<T extends DataItemListView.DataItem> ex
 	 * Checks whether a valid destination (or source) is selected.
 	 *
 	 * @param assertDipDataFile asserts that the file is a dip data file if
-	 * True.
-	 * @return True if the destination is valid, False otherwise.
+	 * {@code true}.
+	 * @return {@code true} if the destination is valid, {@code false}
+	 * otherwise.
 	 */
 	protected boolean isValidDestination(boolean assertDipDataFile) {
 		final int sel = dst.get().selection;

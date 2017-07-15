@@ -2,12 +2,12 @@ package ch.unifr.diva.dip.api.components;
 
 import ch.unifr.diva.dip.api.datatypes.DataType;
 import java.util.Set;
-import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 
 /**
  * Port interface.
  *
- * @param <T> type of the port.
+ * @param <T> type of the value on the port (i.e. not the DataType).
  */
 public interface Port<T> {
 
@@ -43,7 +43,7 @@ public interface Port<T> {
 	 *
 	 * @return the DataType of the port.
 	 */
-	public DataType getDataType();
+	public DataType<T> getDataType();
 
 	/**
 	 * The class behind the DataType. If the DataType is a collection, then the
@@ -57,7 +57,7 @@ public interface Port<T> {
 	 * Checks whether this port is required. A required port needs to be
 	 * connected in order to have a fully functional (or executable) processor.
 	 *
-	 * @return True if the port is required, False otherwise.
+	 * @return {@code true} if the port is required, {@code false} otherwise.
 	 */
 	public boolean isRequired();
 
@@ -66,7 +66,7 @@ public interface Port<T> {
 	 *
 	 * @return property of the port state.
 	 */
-	public ObjectProperty<State> portStateProperty();
+	public ReadOnlyObjectProperty<State> portStateProperty();
 
 	/**
 	 * Returns the port state.
@@ -80,7 +80,7 @@ public interface Port<T> {
 	/**
 	 * Checks whether the port is connected to another port.
 	 *
-	 * @return True if the port is connected, False otherwise.
+	 * @return {@code true} if the port is connected, {@code false} otherwise.
 	 */
 	public boolean isConnected();
 
@@ -91,21 +91,21 @@ public interface Port<T> {
 	 *
 	 * @return a set of all ports connected to this port.
 	 */
-	public Set<? extends Port> connections();
+	public Set<? extends Port<?>> connections();
 
 	/**
 	 * Connects a port to this port.
 	 *
 	 * @param port the port to connect with.
 	 */
-	public void connectTo(Port port);
+	public void connectTo(Port<?> port);
 
 	/**
 	 * Disconnects a port from this port.
 	 *
 	 * @param port the port to disconnect.
 	 */
-	public void disconnect(Port port);
+	public void disconnect(Port<?> port);
 
 	/**
 	 * Disconnects all connections to this port.

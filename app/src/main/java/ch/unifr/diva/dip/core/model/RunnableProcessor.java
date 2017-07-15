@@ -75,7 +75,7 @@ public class RunnableProcessor extends ProcessorWrapper {
 		this.pipeline = pipeline;
 		this.page = pipeline.page;
 		this.project = page.project();
-		this.stateProperty = new SynchronizedObjectProperty(Processor.State.WAITING);
+		this.stateProperty = new SynchronizedObjectProperty<>(Processor.State.WAITING);
 		this.stateListener = (e) -> updateStatusColor();
 		stateProperty.getReadOnlyProperty().addListener(stateListener);
 
@@ -118,7 +118,7 @@ public class RunnableProcessor extends ProcessorWrapper {
 	/**
 	 * Checks whether the runnable processor is previewable, or not.
 	 *
-	 * @return True if a preview is offered, False otherwise.
+	 * @return {@code true} if a preview is offered, {@code false} otherwise.
 	 */
 	public boolean isPreviewable() {
 		return this.processor() instanceof Previewable;
@@ -338,11 +338,11 @@ public class RunnableProcessor extends ProcessorWrapper {
 	 * opened zip file system.</li>
 	 * </ul>
 	 *
-	 * @param saveRequired if True the state of the processor needs to be saved
-	 * (since we're about to close the page with the pipeline containing this
-	 * processor), otherwise only the processor context needs to be updated
-	 * (since references/paths might have changed; e.g. after saving the
-	 * project), while saving the processor's state is not required.
+	 * @param saveRequired if {@code true} the state of the processor needs to
+	 * be saved (since we're about to close the page with the pipeline
+	 * containing this processor), otherwise only the processor context needs to
+	 * be updated (since references/paths might have changed; e.g. after saving
+	 * the project), while saving the processor's state is not required.
 	 */
 	public void switchContext(boolean saveRequired) {
 		if (processor.canEdit()) {
@@ -416,10 +416,10 @@ public class RunnableProcessor extends ProcessorWrapper {
 	 * @param callback the callback function.
 	 */
 	protected void applyToDependentProcessors(Callback<RunnableProcessor, Void> callback) {
-		final Map<InputPort, ProcessorWrapper.PortMapEntry> inputPortMap = this.pipeline.inputPortMap();
-		for (Map.Entry<String, Set<InputPort>> e : processor().dependentInputs().entrySet()) {
-			final Set<InputPort> inputs = e.getValue();
-			for (InputPort input : inputs) {
+		final Map<InputPort<?>, ProcessorWrapper.PortMapEntry> inputPortMap = this.pipeline.inputPortMap();
+		for (Map.Entry<String, Set<InputPort<?>>> e : processor().dependentInputs().entrySet()) {
+			final Set<InputPort<?>> inputs = e.getValue();
+			for (InputPort<?> input : inputs) {
 				final PortMapEntry m = inputPortMap.get(input);
 				if (m != null) {
 					final RunnableProcessor runnable = this.pipeline.getProcessor(m.id);
@@ -436,7 +436,7 @@ public class RunnableProcessor extends ProcessorWrapper {
 	 *
 	 * @param updateDependentProcessors Also updates the state of (directly)
 	 * dependend processors (i.e. processors connected to some output of this
-	 * processor) if set to True, does not otherwise.
+	 * processor) if set to {@code true}, does not otherwise.
 	 */
 	protected void updateState(boolean updateDependentProcessors) {
 		if (this.processor() == null) {

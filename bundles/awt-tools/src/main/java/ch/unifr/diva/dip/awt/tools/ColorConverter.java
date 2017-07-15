@@ -206,7 +206,7 @@ public class ColorConverter extends ProcessableBase {
 		repaint();
 	}
 
-	private void disconnectPort(Port port) {
+	private void disconnectPort(Port<?> port) {
 		if (port.isConnected()) {
 			port.disconnect();
 		}

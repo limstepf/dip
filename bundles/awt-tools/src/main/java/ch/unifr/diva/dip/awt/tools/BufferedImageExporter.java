@@ -48,7 +48,7 @@ public class BufferedImageExporter extends ProcessableBase {
 	 */
 	public static ImageFormat DEFAULT_IMAGE_FORMAT = ImageFormat.PNG;
 
-	private final ColorPortsUnit colorPortsUnit;
+	private final ColorPortsUnit<BufferedImageExporter> colorPortsUnit;
 	private final StringParameter nameParam;
 	private final EnumParameter formatParam;
 	// we keep a path to the export directory around (updated each time we see a
@@ -62,7 +62,7 @@ public class BufferedImageExporter extends ProcessableBase {
 		super("BufferedImage Exporter");
 
 		this.exportDirectory = null;
-		this.colorPortsUnit = new ColorPortsUnit(
+		this.colorPortsUnit = new ColorPortsUnit<>(
 				this,
 				"buffered-image-exporter",
 				true, // bit

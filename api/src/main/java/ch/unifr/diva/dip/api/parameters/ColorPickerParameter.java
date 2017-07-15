@@ -56,7 +56,8 @@ public class ColorPickerParameter extends PersistentParameterBase<FxColor, Color
 	 * can't be changed. Needs to be called before the view is requested.
 	 * Disabled by default.
 	 *
-	 * @param opacity True to enable opacity of colors, False to disable.
+	 * @param opacity {@code true} to enable opacity of colors, {@code false} to
+	 * disable.
 	 */
 	public void enableOpacity(boolean opacity) {
 		this.enableOpacity = opacity;
@@ -66,7 +67,8 @@ public class ColorPickerParameter extends PersistentParameterBase<FxColor, Color
 	 * Enables/disables the web color field. Needs to be called before the view
 	 * is requested. Enabled by default.
 	 *
-	 * @param webColor True to enable the web color field, False to disable.
+	 * @param webColor {@code true} to enable the web color field, {@code false}
+	 * to disable.
 	 */
 	public void enableWebColor(boolean webColor) {
 		this.enableWebColor = webColor;
@@ -75,9 +77,10 @@ public class ColorPickerParameter extends PersistentParameterBase<FxColor, Color
 	/**
 	 * Enables/disables horizontal grow of the color picker control region.
 	 *
-	 * @param hgrow horizontally grows to occupy available width if set to True,
-	 * otherwise the region ends up as a square depending on the taken height.
-	 * Needs to be called before the view is requested. Enabled by default.
+	 * @param hgrow horizontally grows to occupy available width if set to
+	 * {@code true}, otherwise the region ends up as a square depending on the
+	 * taken height. Needs to be called before the view is requested. Enabled by
+	 * default.
 	 */
 	public void enableHgrow(boolean hgrow) {
 		this.enableHgrow = hgrow;
@@ -86,8 +89,8 @@ public class ColorPickerParameter extends PersistentParameterBase<FxColor, Color
 	/**
 	 * Enables a framed color picker region.
 	 *
-	 * @param framedRegion True to have a black and white border around the
-	 * color picker region, False to have a region without border.
+	 * @param framedRegion {@code true} to have a black and white border around
+	 * the color picker region, {@code false} to have a region without border.
 	 */
 	public void enableFramedPickerRegion(boolean framedRegion) {
 		this.enableFramedPickerRegion = framedRegion;
@@ -114,7 +117,7 @@ public class ColorPickerParameter extends PersistentParameterBase<FxColor, Color
 	 */
 	public ReadOnlyObjectProperty<Color> colorProperty() {
 		if (colorProperty == null) {
-			colorProperty = new SimpleObjectProperty(get().toColor());
+			colorProperty = new SimpleObjectProperty<>(get().toColor());
 			property().addListener((c) -> {
 				colorProperty.set(get().toColor());
 			});

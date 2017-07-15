@@ -29,7 +29,7 @@ import javafx.scene.transform.Scale;
 public class NavigatorWidget<T extends Pannable> extends AbstractWidget {
 
 	protected final T pannable;
-	protected final NavigatorWidgetView view;
+	protected final NavigatorWidgetView<T> view;
 	protected final InvalidationListener contentChangedListener;
 	protected final ChangeListener<Object> viewportListener;
 	protected final EventHandler<MouseEvent> viewportDownEvent;
@@ -43,7 +43,7 @@ public class NavigatorWidget<T extends Pannable> extends AbstractWidget {
 	public NavigatorWidget(T pannable) {
 		super();
 		this.pannable = pannable;
-		this.view = new NavigatorWidgetView(this.pannable);
+		this.view = new NavigatorWidgetView<>(this.pannable);
 
 		this.contentChangedListener = (e) -> {
 			view.setDisableViewport(pannable.isEmpty());

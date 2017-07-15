@@ -87,7 +87,7 @@ public abstract class BackgroundTask<T> extends Task<T> {
 	public Thread start() {
 		final Thread thread = new Thread(this);
 		if (eventBus != null) {
-			eventBus.post(new StatusWorkerEvent(this));
+			eventBus.post(new StatusWorkerEvent<>(this));
 		}
 		thread.start();
 		return thread;

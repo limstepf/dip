@@ -13,8 +13,8 @@ public interface Modifiable {
 	 * Checks whether the object has been modified (since being opened or
 	 * saved).
 	 *
-	 * @return True if the object has been modified and needs to be saved, False
-	 * otherwise.
+	 * @return {@code true} if the object has been modified and needs to be
+	 * saved, {@code false} otherwise.
 	 */
 	default boolean isModified() {
 		return modifiedProperty().get();
@@ -23,7 +23,8 @@ public interface Modifiable {
 	/**
 	 * Changes the modification state of the modifiable object.
 	 *
-	 * @param modified True to mark this object as modified, False otherwise.
+	 * @param modified {@code true} to mark this object as modified,
+	 * {@code false} otherwise.
 	 */
 	default void setModified(boolean modified) {
 		modifiedProperty().set(modified);

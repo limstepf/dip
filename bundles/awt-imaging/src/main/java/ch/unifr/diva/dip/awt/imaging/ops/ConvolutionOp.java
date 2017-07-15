@@ -5,7 +5,6 @@ import ch.unifr.diva.dip.api.datastructures.Kernel;
 import ch.unifr.diva.dip.api.datastructures.Matrix;
 import ch.unifr.diva.dip.awt.imaging.ImagingUtils;
 import ch.unifr.diva.dip.awt.imaging.padders.ImagePadder;
-import ch.unifr.diva.dip.awt.imaging.scanners.ImageTiler;
 import ch.unifr.diva.dip.awt.imaging.scanners.Location;
 import ch.unifr.diva.dip.awt.imaging.scanners.PaddedImageTiler;
 import ch.unifr.diva.dip.awt.imaging.scanners.RasterScanner;
@@ -18,12 +17,12 @@ import java.awt.image.WritableRaster;
  *
  * @param <T> class of the matrix backing the used kernel.
  */
-public class ConvolutionOp<T extends Matrix> extends NullOp implements PaddedTileParallelizable {
+public class ConvolutionOp<T extends Matrix<T>> extends NullOp implements PaddedTileParallelizable {
 
 	private final ImagePadder padder;
 	private final Kernel<T> kernel; // *the* kernel, or just the row vector if separable
 	private final Kernel<T> columnVector; // ...or, null if not separable
-	private final ConvolutionOp[] convolutionPasses; // 1st and 2nd pass, null if not separable
+	private final ConvolutionOp<T>[] convolutionPasses; // 1st and 2nd pass, null if not separable
 	private final boolean isDoublePrecision;
 	private final boolean[] abs;
 	private final double[] gain;
@@ -39,7 +38,7 @@ public class ConvolutionOp<T extends Matrix> extends NullOp implements PaddedTil
 	 * @param kernel the row or column vector.
 	 * @param op the parent double-pass convolution filter.
 	 */
-	private ConvolutionOp(Kernel<T> kernel, ConvolutionOp op) {
+	private ConvolutionOp(Kernel<T> kernel, ConvolutionOp<T> op) {
 		this.padder = op.padder;
 		this.kernel = kernel;
 		this.isDoublePrecision = this.kernel.matrix() instanceof DoubleMatrix;
@@ -79,6 +78,7 @@ public class ConvolutionOp<T extends Matrix> extends NullOp implements PaddedTil
 	 * @param max maximum value per band used for clamping.
 	 * @param precision desired output sample precision.
 	 */
+	@SuppressWarnings({"rawtypes", "unchecked"})
 	public ConvolutionOp(Kernel<T> rowVector, Kernel<T> columnVector, ImagePadder padder,
 			boolean[] abs, double[] gain, double[] bias, double[] min, double[] max, SamplePrecision precision) {
 		this.padder = padder;
@@ -90,8 +90,8 @@ public class ConvolutionOp<T extends Matrix> extends NullOp implements PaddedTil
 			this.convolutionPasses = null;
 		} else {
 			this.convolutionPasses = new ConvolutionOp[2];
-			this.convolutionPasses[0] = new ConvolutionOp(this.columnVector, this);
-			this.convolutionPasses[1] = new ConvolutionOp(this.kernel, this);
+			this.convolutionPasses[0] = new ConvolutionOp<>(this.columnVector, this);
+			this.convolutionPasses[1] = new ConvolutionOp<>(this.kernel, this);
 		}
 
 		this.abs = abs;
@@ -161,7 +161,7 @@ public class ConvolutionOp<T extends Matrix> extends NullOp implements PaddedTil
 	}
 
 	@Override
-	public ImageTiler getImageTiler(BufferedImage src, BufferedImage dst, int width, int height) {
+	public PaddedImageTiler getImageTiler(BufferedImage src, BufferedImage dst, int width, int height) {
 		return new PaddedImageTiler(
 				src,
 				width,

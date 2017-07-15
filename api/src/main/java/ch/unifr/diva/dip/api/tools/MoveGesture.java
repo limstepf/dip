@@ -6,7 +6,7 @@ import javafx.scene.input.MouseEvent;
 /**
  * A move(-ement) gesture.
  */
-public class MoveGesture extends GestureBase<MouseEvent> {
+public class MoveGesture extends GestureBase {
 
 	/**
 	 * Creates a new move gesture (without entered/exited handlers).
@@ -26,7 +26,7 @@ public class MoveGesture extends GestureBase<MouseEvent> {
 	 */
 	public MoveGesture(EventHandler<MouseEvent> onEntered, EventHandler<MouseEvent> onMoved, EventHandler<MouseEvent> onExited) {
 		if (onMoved != null) {
-			eventHandlers().add(new GestureEventHandler(
+			eventHandlers().add(new GestureEventHandler<>(
 					MouseEvent.MOUSE_DRAGGED,
 					onMoved
 			));

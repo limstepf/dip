@@ -48,7 +48,7 @@ public class StatusBarPresenter implements Presenter {
 	private final Label message = new Label();
 	private final StringProperty messageProperty = new SimpleStringProperty();
 	private final ProgressBar progress = new ProgressBar();
-	private final LinkedBlockingDeque<StatusWorkerEvent> stack = new LinkedBlockingDeque<>();
+	private final LinkedBlockingDeque<StatusWorkerEvent<?>> stack = new LinkedBlockingDeque<>();
 	private Transition messageTransition;
 
 	/**
@@ -76,7 +76,7 @@ public class StatusBarPresenter implements Presenter {
 	}
 
 	@Subscribe
-	public void handleStatusEvent(StatusWorkerEvent event) {
+	public void handleStatusEvent(StatusWorkerEvent<?> event) {
 		/*
 		 * Latest worker is shown, once done we check for older workers and
 		 * bind to them if still running, or, finally, bind back to the regular
@@ -101,18 +101,18 @@ public class StatusBarPresenter implements Presenter {
 		// event will be properly cleaned up
 		listener.changed(
 				event.worker.stateProperty(),
-				(Worker.State) event.worker.stateProperty().get(),
-				(Worker.State) event.worker.stateProperty().get()
+				event.worker.stateProperty().get(),
+				event.worker.stateProperty().get()
 		);
 	}
 
-	private void removeStatusWorkerEvent(StatusWorkerEvent event) {
+	private void removeStatusWorkerEvent(StatusWorkerEvent<?> event) {
 		stack.remove(event);
 
 		if (stack.isEmpty()) {
 			unbindStatusWorkerEvent(); // done, show regular msg again
 		} else {
-			final StatusWorkerEvent next = stack.peek();
+			final StatusWorkerEvent<?> next = stack.peek();
 			if (isDone(next)) {
 				removeStatusWorkerEvent(next); // pop, try next
 			} else {
@@ -128,7 +128,7 @@ public class StatusBarPresenter implements Presenter {
 		enableProgress(false);
 	}
 
-	private void bindToStatusWorkerEvent(StatusWorkerEvent event) {
+	private void bindToStatusWorkerEvent(StatusWorkerEvent<?> event) {
 		if (messageTransition != null) {
 			messageTransition.stop();
 		}
@@ -171,9 +171,9 @@ public class StatusBarPresenter implements Presenter {
 	 * Checks whether the worker of a worker event is done already.
 	 *
 	 * @param event the worker event.
-	 * @return True if done, False otherwise.
+	 * @return {@code true} if done, {@code false} otherwise.
 	 */
-	private boolean isDone(StatusWorkerEvent event) {
+	private boolean isDone(StatusWorkerEvent<?> event) {
 		return isDone(event.worker.getState());
 	}
 
@@ -181,7 +181,7 @@ public class StatusBarPresenter implements Presenter {
 	 * Checks whether a worker is done already.
 	 *
 	 * @param state a worker's state.
-	 * @return True if done, False otherwise.
+	 * @return {@code true} if done, {@code false} otherwise.
 	 */
 	private boolean isDone(Worker.State state) {
 		if (state == null) {
@@ -199,7 +199,8 @@ public class StatusBarPresenter implements Presenter {
 	/**
 	 * Visually enables/disables the progress bar.
 	 *
-	 * @param enable True to enable the progress bar, False to disable it.
+	 * @param enable {@code true} to enable the progress bar, {@code false} to
+	 * disable it.
 	 */
 	private void enableProgress(boolean enable) {
 		if (enable) {

@@ -30,7 +30,7 @@ public class SampleRescaler extends ProcessableBase implements Previewable {
 	private final static String STORAGE_MAT = "rescaled.bmat";
 
 	private final InputPort<BufferedImage> input;
-	private final InputPort<BufferedImage> input_float;
+	private final InputPort<BufferedMatrix> input_float;
 
 	private final RescaleUnit rescaleUnit;
 	private final CompositeGrid configGrid;
@@ -54,8 +54,8 @@ public class SampleRescaler extends ProcessableBase implements Previewable {
 		this.configGrid.setColumnWidthConstraints(0.5, 0.5);
 		this.parameters.put("config", configGrid);
 
-		this.input = new InputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImage(), false);
-		this.input_float = new InputPort(new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat(), false);
+		this.input = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImage(), false);
+		this.input_float = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat(), false);
 
 		enableAllInputs();
 		enableAllOutputs();
@@ -107,7 +107,7 @@ public class SampleRescaler extends ProcessableBase implements Previewable {
 		enableInput(null);
 	}
 
-	private void enableInput(InputPort input) {
+	private void enableInput(InputPort<?> input) {
 		this.inputs.clear();
 
 		if (input == null || input.equals(this.input)) {
@@ -118,7 +118,7 @@ public class SampleRescaler extends ProcessableBase implements Previewable {
 		}
 	}
 
-	private InputPort<BufferedImage> getConnectedInput() {
+	private InputPort<? extends BufferedImage> getConnectedInput() {
 		if (this.input_float.isConnected()) {
 			return this.input_float;
 		}
@@ -137,7 +137,7 @@ public class SampleRescaler extends ProcessableBase implements Previewable {
 
 	@Override
 	protected void resetOutputs() {
-		for (OutputPort output : this.rescaleUnit.getAllOutputPorts().values()) {
+		for (OutputPort<?> output : this.rescaleUnit.getAllOutputPorts().values()) {
 			output.setOutput(null);
 		}
 	}
@@ -146,6 +146,7 @@ public class SampleRescaler extends ProcessableBase implements Previewable {
 		return restoreOutputs(context, null);
 	}
 
+	@SuppressWarnings({"rawtypes", "unchecked"})
 	private boolean restoreOutputs(ProcessorContext context, BufferedImage rescaledImage) {
 		final BufferedImage image;
 		if (rescaledImage == null) {
@@ -179,7 +180,7 @@ public class SampleRescaler extends ProcessableBase implements Previewable {
 	@Override
 	public void process(ProcessorContext context) {
 		if (!restoreOutputs(context)) {
-			final InputPort<BufferedImage> source = getConnectedInput();
+			final InputPort<? extends BufferedImage> source = getConnectedInput();
 			final BufferedImage src = source.getValue();
 			final BufferedImage rescaledImage = doProcess(context, src);
 

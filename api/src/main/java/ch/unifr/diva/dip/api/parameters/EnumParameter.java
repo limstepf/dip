@@ -43,7 +43,7 @@ public class EnumParameter extends PersistentParameterBase<String, EnumParameter
 	 * the labels.
 	 * @param defaultValue name of the default enumeration option.
 	 */
-	public <E extends Enum<E>> EnumParameter(String label, Class<E> e, EnumStringMapper mapper, String defaultValue) {
+	public <E extends Enum<E>> EnumParameter(String label, Class<E> e, EnumStringMapper<E> mapper, String defaultValue) {
 		this(label, getEnumNames(e), getEnumLabels(e, mapper), defaultValue);
 	}
 
@@ -89,7 +89,7 @@ public class EnumParameter extends PersistentParameterBase<String, EnumParameter
 		return items;
 	}
 
-	private static <E extends Enum<E>> List<String> getEnumLabels(Class<E> enumeration, EnumStringMapper mapper) {
+	private static <E extends Enum<E>> List<String> getEnumLabels(Class<E> enumeration, EnumStringMapper<E> mapper) {
 		return EnumStringMapper.map(enumeration, mapper);
 	}
 
@@ -160,7 +160,7 @@ public class EnumParameter extends PersistentParameterBase<String, EnumParameter
 		return new EnumView(this);
 	}
 
-	protected final List<ViewHook<ComboBox>> comboBoxViewHooks = new ArrayList<>();
+	protected final List<ViewHook<ComboBox<String>>> comboBoxViewHooks = new ArrayList<>();
 
 	/**
 	 * Adds a view hook to customize the combo box. This method is only called
@@ -168,7 +168,7 @@ public class EnumParameter extends PersistentParameterBase<String, EnumParameter
 	 *
 	 * @param hook hook method for a combo box.
 	 */
-	public void addComboBoxViewHook(ViewHook<ComboBox> hook) {
+	public void addComboBoxViewHook(ViewHook<ComboBox<String>> hook) {
 		this.comboBoxViewHooks.add(hook);
 	}
 
@@ -177,11 +177,11 @@ public class EnumParameter extends PersistentParameterBase<String, EnumParameter
 	 *
 	 * @param hook hook method to be removed.
 	 */
-	public void removeComboBoxViewHook(ViewHook<ComboBox> hook) {
+	public void removeComboBoxViewHook(ViewHook<ComboBox<String>> hook) {
 		this.comboBoxViewHooks.remove(hook);
 	}
 
-	protected ViewHook<ComboBox> singleRowViewHook = null;
+	protected ViewHook<ComboBox<String>> singleRowViewHook = null;
 
 	@Override
 	public void initSingleRowView() {
@@ -193,7 +193,7 @@ public class EnumParameter extends PersistentParameterBase<String, EnumParameter
 	/**
 	 * Enum view with a ComboBox.
 	 */
-	public static class EnumView extends PersistentParameterBase.ParameterViewBase<EnumParameter, String, ComboBox> {
+	public static class EnumView extends PersistentParameterBase.ParameterViewBase<EnumParameter, String, ComboBox<String>> {
 
 		/**
 		 * Creates a new enum view.
@@ -201,7 +201,7 @@ public class EnumParameter extends PersistentParameterBase<String, EnumParameter
 		 * @param parameter the enum parameter.
 		 */
 		public EnumView(EnumParameter parameter) {
-			super(parameter, new ComboBox());
+			super(parameter, new ComboBox<>());
 
 			root.setMaxWidth(Double.MAX_VALUE);
 			root.getItems().addAll(parameter.labels);

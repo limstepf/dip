@@ -18,8 +18,8 @@ public class IntegerSliderParameter extends PersistentParameterBase<Integer, Int
 
 	protected final int minValue;
 	protected final int maxValue;
-	protected Parameter prefixParameter;
-	protected Parameter postfixParameter;
+	protected Parameter<?> prefixParameter;
+	protected Parameter<?> postfixParameter;
 
 	/**
 	 * Creates an integer slider parameter (without label). Use a view hook to
@@ -55,7 +55,7 @@ public class IntegerSliderParameter extends PersistentParameterBase<Integer, Int
 	 *
 	 * @param parameter a (transient) parameter. Does not get saved.
 	 */
-	public void setPrefix(Parameter parameter) {
+	public void setPrefix(Parameter<?> parameter) {
 		this.prefixParameter = parameter;
 	}
 
@@ -65,7 +65,7 @@ public class IntegerSliderParameter extends PersistentParameterBase<Integer, Int
 	 *
 	 * @param parameter a (transient) parameter. Does not get saved.
 	 */
-	public void setPostfix(Parameter parameter) {
+	public void setPostfix(Parameter<?> parameter) {
 		this.postfixParameter = parameter;
 	}
 

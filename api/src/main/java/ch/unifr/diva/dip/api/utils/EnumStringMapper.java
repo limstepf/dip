@@ -9,7 +9,7 @@ import java.util.List;
  *
  * @param <E> type of the enumeration.
  */
-public interface EnumStringMapper<E extends Enum> {
+public interface EnumStringMapper<E extends Enum<E>> {
 
 	/**
 	 * Formats an enumeration item.
@@ -27,7 +27,7 @@ public interface EnumStringMapper<E extends Enum> {
 	 * @param mapper the mapping function.
 	 * @return a list of formatted enumeration strings.
 	 */
-	public static <E extends Enum<E>> List<String> map(Class<E> enumeration, EnumStringMapper mapper) {
+	public static <E extends Enum<E>> List<String> map(Class<E> enumeration, EnumStringMapper<E> mapper) {
 		final List<String> mapped = new ArrayList<>();
 		for (E e : enumeration.getEnumConstants()) {
 			mapped.add(mapper.map(e));

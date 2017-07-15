@@ -93,7 +93,7 @@ public class GeometricTransformOp<M extends InverseMapper> extends NullOp implem
 
 		final WritableRaster raster = dst.getRaster();
 		final Raster dstParent = raster.getParent();
-		final Rectangle bounds = raster.getBounds();
+		//final Rectangle bounds = raster.getBounds();
 		final int offsetX;
 		final int offsetY;
 		if (dstParent == null) {

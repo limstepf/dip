@@ -25,10 +25,10 @@ public class BufferedImageConverter extends ProcessableBase {
 	public BufferedImageConverter() {
 		super("BufferedImage Converter");
 
-		this.input = new InputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImage(), true);
+		this.input = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImage(), true);
 		inputs.put("buffered-image", input);
 
-		this.output = new OutputPort(new ch.unifr.diva.dip.api.datatypes.FxImage());
+		this.output = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.FxImage());
 		outputs.put("image", output);
 	}
 

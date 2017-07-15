@@ -11,6 +11,7 @@ import ch.unifr.diva.dip.core.model.ProcessorWrapper;
 import ch.unifr.diva.dip.gui.Presenter;
 import ch.unifr.diva.dip.gui.editor.NavigatorWidget;
 import ch.unifr.diva.dip.gui.layout.AbstractWindow;
+import ch.unifr.diva.dip.gui.layout.Pannable;
 import ch.unifr.diva.dip.gui.layout.RubberBandSelector;
 import ch.unifr.diva.dip.gui.layout.ZoomPaneSimple;
 import ch.unifr.diva.dip.gui.main.SideBarPresenter;
@@ -62,10 +63,10 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 	private final SideBarPresenter sideBar;
 	private final PipelineManager manager;
 	private final Map<Integer, PipelineData.Pipeline> backupData;
-	private final ObjectProperty<Pipeline> selectedPipelineProperty = new SimpleObjectProperty();
+	private final ObjectProperty<Pipeline<ProcessorWrapper>> selectedPipelineProperty = new SimpleObjectProperty<>();
 	private final List<ProcessorsWidget> processorWidgets = new ArrayList<>();
 	private final ListChangeListener<ProcessorWrapper> processorListener;
-	private final RubberBandSelector rubberBandSelector;
+	private final RubberBandSelector<ProcessorView> rubberBandSelector;
 
 	private final PipelinesWidget pipelinesWidget;
 	private final ProcessorsWidget hostProcessorsWidget;
@@ -136,7 +137,7 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 		};
 
 		this.sideBar = new SideBarPresenter();
-		final NavigatorWidget navigator = new NavigatorWidget(this.zoomPane);
+		final NavigatorWidget<Pannable> navigator = new NavigatorWidget<>(this.zoomPane);
 		sideBar.addAuxiliaryWidget(navigator);
 		this.pipelinesWidget = new PipelinesWidget(handler, this);
 		sideBar.addMainWidget(pipelinesWidget);
@@ -155,7 +156,7 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 		processorWidgets.add(processorsWidget);
 		sideBar.addMainWidget(processorsWidget);
 
-		final Pipeline firstPipeline = manager.pipelines().isEmpty()
+		final Pipeline<ProcessorWrapper> firstPipeline = manager.pipelines().isEmpty()
 				? null
 				: manager.pipelines().get(0);
 		selectPipeline(firstPipeline);
@@ -263,7 +264,7 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 	 *
 	 * @return the selected pipeline property.
 	 */
-	public ObjectProperty<Pipeline> selectedPipelineProperty() {
+	public ObjectProperty<Pipeline<ProcessorWrapper>> selectedPipelineProperty() {
 		return selectedPipelineProperty;
 	}
 
@@ -272,7 +273,7 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 	 *
 	 * @return the selected pipeline.
 	 */
-	public final Pipeline selectedPipeline() {
+	public final Pipeline<ProcessorWrapper> selectedPipeline() {
 		return selectedPipelineProperty.get();
 	}
 
@@ -321,7 +322,8 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 	/**
 	 * Disables/enables the processor widgets.
 	 *
-	 * @param disable True to disable, False to enable the processor widgets.
+	 * @param disable {@code true} to disable, {@code false} to enable the
+	 * processor widgets.
 	 */
 	public void setDisableProcessorWidgets(boolean disable) {
 		for (ProcessorsWidget w : processorWidgets) {
@@ -335,7 +337,7 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 	 * @param name name of the new pipeline.
 	 */
 	public void createPipeline(String name) {
-		final Pipeline pipeline = manager.createPipeline(name);
+		final Pipeline<ProcessorWrapper> pipeline = manager.createPipeline(name);
 		selectPipeline(pipeline);
 	}
 
@@ -344,8 +346,8 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 	 *
 	 * @param pipeline the pipeline to be cloned.
 	 */
-	public void clonePipeline(Pipeline pipeline) {
-		final Pipeline clone = manager.clonePipeline(pipeline);
+	public void clonePipeline(Pipeline<ProcessorWrapper> pipeline) {
+		final Pipeline<ProcessorWrapper> clone = manager.clonePipeline(pipeline);
 		selectPipeline(clone);
 	}
 
@@ -363,14 +365,14 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 	 *
 	 * @return observable set of selected nodes.
 	 */
-	public final ObservableSet<Node> selection() {
+	public final ObservableSet<ProcessorView> selection() {
 		return rubberBandSelector.selection();
 	}
 
 	/**
 	 * Shows/hides the side bar of the pipeline editor.
 	 *
-	 * @param show True to show, False to hide the side bar.
+	 * @param show {@code true} to show, {@code false} to hide the side bar.
 	 */
 	public void showSideBar(boolean show) {
 		if (show) {
@@ -401,12 +403,12 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 	 * @param port an input or output port.
 	 * @return a deterministic color.
 	 */
-	public static Color hashColor(Port port) {
+	public static Color hashColor(Port<?> port) {
 		return hashColor(port.getDataType());
 	}
 
 	// hash color cache
-	private static final Map<DataType, Color> hashColors = new HashMap<>();
+	private static final Map<DataType<?>, Color> hashColors = new HashMap<>();
 
 	/**
 	 * Computes a hash in form of a color for a given datatype (and associated
@@ -415,21 +417,22 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 	 * @param dataType the datatype.
 	 * @return a deterministic color.
 	 */
-	public static Color hashColor(DataType dataType) {
+	public static Color hashColor(DataType<?> dataType) {
 		if (hashColors.containsKey(dataType)) {
 			return hashColors.get(dataType);
 		}
 
 		final String keyC = dataType.dataFormat().toString();
 		final String keyS = dataType.type().getCanonicalName();
+		final String keyD = dataType.getCollectionType().name();
 
 		final int k = keyC.length();
-		final int j = (k > 4) ? k - 5 : 0;
+		final int j = (k > 8) ? k - 9 : 0;
 		final String keyM = keyC.substring(j, k);
 
 		int[] channels = {
 			255 - IOUtils.hash(keyC, 233),
-			IOUtils.hash(keyM, 251) + 5,
+			IOUtils.hash(keyM + keyD, 251) + 5,
 			IOUtils.hash(keyM + keyS, 251) + 5
 		};
 

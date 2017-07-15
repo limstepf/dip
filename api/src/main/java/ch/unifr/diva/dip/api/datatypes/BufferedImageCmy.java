@@ -3,20 +3,23 @@ package ch.unifr.diva.dip.api.datatypes;
 import javafx.scene.input.DataFormat;
 
 /**
- * A {@code BufferedImage} with a CMY color space.
+ * Data type for a {@code BufferedImage} with a CMY color space.
  */
-public class BufferedImageCmy implements DataType {
+public class BufferedImageCmy extends AbstractDataType<java.awt.image.BufferedImage> {
 
-	public final static Class type = java.awt.image.BufferedImage.class;
-	public final static DataFormat dataFormat = new DataFormat("dip-datatype/buffered-image-cmy");
+	private final static DataFormat dataFormat = new DataFormat("dip-datatype/buffered-image-cmy");
 
-	@Override
-	public Class type() {
-		return type;
+	/**
+	 * Creates a new data type for a {@code BufferedImage} with a CMY color
+	 * space.
+	 */
+	public BufferedImageCmy() {
+		super(java.awt.image.BufferedImage.class);
 	}
 
 	@Override
 	public DataFormat dataFormat() {
 		return dataFormat;
 	}
+
 }

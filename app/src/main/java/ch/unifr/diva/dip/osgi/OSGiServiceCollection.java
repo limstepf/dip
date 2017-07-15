@@ -17,7 +17,7 @@ import org.osgi.framework.VersionRange;
  *
  * @param <T> type/interface of the service.
  */
-public class OSGiServiceCollection<T> implements ServiceCollection<T>, Comparable<OSGiServiceCollection> {
+public class OSGiServiceCollection<T> implements ServiceCollection<T>, Comparable<OSGiServiceCollection<T>> {
 
 	private final String pid;
 	private final LinkedList<OSGiService<T>> versions;
@@ -43,7 +43,7 @@ public class OSGiServiceCollection<T> implements ServiceCollection<T>, Comparabl
 	}
 
 	@Override
-	public int compareTo(OSGiServiceCollection t) {
+	public int compareTo(OSGiServiceCollection<T> t) {
 		return getNameFromPID().compareTo(t.getNameFromPID());
 	}
 
@@ -180,7 +180,7 @@ public class OSGiServiceCollection<T> implements ServiceCollection<T>, Comparabl
 	 * @param reference the service reference.
 	 * @return the index of the service in the versions list.
 	 */
-	private int indexOf(ServiceReference reference) {
+	private int indexOf(ServiceReference<T> reference) {
 		for (int i = 0; i < versions.size(); i++) {
 			final OSGiService<T> service = versions.get(i);
 			if (service.serviceReference.equals(reference)) {
@@ -227,7 +227,7 @@ public class OSGiServiceCollection<T> implements ServiceCollection<T>, Comparabl
 	 */
 	public FxContext<T> getFxContext() {
 		if (fxContext == null) {
-			fxContext = new FxContext(this);
+			fxContext = new FxContext<>(this);
 		}
 
 		return fxContext;
@@ -280,7 +280,7 @@ public class OSGiServiceCollection<T> implements ServiceCollection<T>, Comparabl
 		 * @return a list of the versions.
 		 */
 		public ObservableList<String> getVersionList() {
-			final ObservableList list = FXCollections.observableArrayList();
+			final ObservableList<String> list = FXCollections.observableArrayList();
 			for (OSGiService<T> service : collection.getVersions()) {
 				list.add(service.version.toString());
 			}
@@ -341,8 +341,8 @@ public class OSGiServiceCollection<T> implements ServiceCollection<T>, Comparabl
 		 * Checks whether the selected version is the latest one available, or
 		 * not.
 		 *
-		 * @return True if the selected version is the latest one available,
-		 * False otherwise.
+		 * @return {@code true} if the selected version is the latest one
+		 * available, {@code false} otherwise.
 		 */
 		public boolean isLatest() {
 			return getSelectedVersion().equals(collection.getService());

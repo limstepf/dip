@@ -9,6 +9,7 @@ import ch.unifr.diva.dip.api.utils.L10n;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.model.Pipeline;
 import ch.unifr.diva.dip.core.model.PipelineLayoutStrategy;
+import ch.unifr.diva.dip.core.model.ProcessorWrapper;
 import ch.unifr.diva.dip.core.model.ProjectPage;
 import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
@@ -89,11 +90,11 @@ public class PipelinesWidget extends AbstractWidget {
 		editor.createPipeline(localize("pipeline.new"));
 	}
 
-	private void clonePipeline(Pipeline pipeline) {
+	private void clonePipeline(Pipeline<ProcessorWrapper> pipeline) {
 		editor.clonePipeline(pipeline);
 	}
 
-	private void selectDefaultPipeline(Pipeline pipeline) {
+	private void selectDefaultPipeline(Pipeline<ProcessorWrapper> pipeline) {
 		// toggle if already selected
 		if (editor.pipelineManager().getDefaultPipelineId() == pipeline.id) {
 			editor.pipelineManager().setDefaultPipelineId(-1);
@@ -102,9 +103,9 @@ public class PipelinesWidget extends AbstractWidget {
 		editor.pipelineManager().setDefaultPipelineId(pipeline.id);
 	}
 
-	private void deletePipelines(List<Pipeline> pipelines) {
+	private void deletePipelines(List<Pipeline<ProcessorWrapper>> pipelines) {
 		final List<Integer> ids = getPipelineIds(pipelines);
-		final List<Pipeline> inUse = getPipelinesStillInUse(pipelines);
+		final List<Pipeline<ProcessorWrapper>> inUse = getPipelinesStillInUse(pipelines);
 		if (inUse.isEmpty()) {
 			// no pipeline is in use by a page, no problem
 			if (!editor.pipelineManager().deletePipelines(pipelines)) {
@@ -134,13 +135,13 @@ public class PipelinesWidget extends AbstractWidget {
 		}
 	}
 
-	private List<Integer> getPipelineIds(List<Pipeline> pipelines) {
+	private List<Integer> getPipelineIds(List<Pipeline<ProcessorWrapper>> pipelines) {
 		return pipelines.stream().map((p) -> p.id).collect(Collectors.toList());
 	}
 
-	private List<Pipeline> getPipelinesStillInUse(List<Pipeline> pipelines) {
-		final List<Pipeline> inUse = new ArrayList<>();
-		for (Pipeline p : pipelines) {
+	private List<Pipeline<ProcessorWrapper>> getPipelinesStillInUse(List<Pipeline<ProcessorWrapper>> pipelines) {
+		final List<Pipeline<ProcessorWrapper>> inUse = new ArrayList<>();
+		for (Pipeline<ProcessorWrapper> p : pipelines) {
 			final int usage = this.handler.getProject().getPipelineUsage(p.id);
 			if (usage > 0) {
 				inUse.add(p);
@@ -164,7 +165,7 @@ public class PipelinesWidget extends AbstractWidget {
 		dialog.show();
 	}
 
-	private void exportPipelines(List<Pipeline> pipelines) {
+	private void exportPipelines(List<Pipeline<ProcessorWrapper>> pipelines) {
 		final PipelineExportDialog dialog = new PipelineExportDialog(handler, pipelines);
 		dialog.show();
 	}
@@ -177,7 +178,7 @@ public class PipelinesWidget extends AbstractWidget {
 		private static final org.slf4j.Logger log = LoggerFactory.getLogger(PipelinesWidget.View.class);
 
 		private final PipelinesWidget widget;
-		protected final ListView<Pipeline> listView = new ListView<>();
+		protected final ListView<Pipeline<ProcessorWrapper>> listView = new ListView<>();
 		private final ToggleGroup group = new ToggleGroup();
 		private final ContextMenu contextMenu = new ContextMenu();
 		private final BooleanProperty hasSelectionProperty = new SimpleBooleanProperty(false);
@@ -205,7 +206,7 @@ public class PipelinesWidget extends AbstractWidget {
 			listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 			listView.setPrefHeight(0);
 			listView.setMaxHeight(Double.MAX_VALUE);
-			listView.setCellFactory((ListView<Pipeline> param) -> new PipelineCell(widget.editor, group));
+			listView.setCellFactory((ListView<Pipeline<ProcessorWrapper>> param) -> new PipelineCell(widget.editor, group));
 
 			final MenuItem selectDefaultItem = new MenuItem(localize("pipeline.default.set"));
 			selectDefaultItem.disableProperty().bind(Bindings.not(hasOneSelectedProperty));
@@ -239,11 +240,11 @@ public class PipelinesWidget extends AbstractWidget {
 			this.getChildren().addAll(listView);
 		}
 
-		public final Pipeline getSelectedItem() {
+		public final Pipeline<ProcessorWrapper> getSelectedItem() {
 			return listView.getSelectionModel().getSelectedItem();
 		}
 
-		public final List<Pipeline> getSelectedItems() {
+		public final List<Pipeline<ProcessorWrapper>> getSelectedItems() {
 			// ye, we really need to make a copy, or otherwise feeding that list
 			// back to listView (e.g. to delete those items) wont behave as expected...
 			return new ArrayList<>(listView.getSelectionModel().getSelectedItems());
@@ -254,9 +255,9 @@ public class PipelinesWidget extends AbstractWidget {
 	/**
 	 * A pipeline cell.
 	 */
-	public static class PipelineCell extends DraggableListCell<Pipeline> implements Localizable {
+	public static class PipelineCell extends DraggableListCell<Pipeline<ProcessorWrapper>> implements Localizable {
 
-		private Pipeline currentPipeline;
+		private Pipeline<ProcessorWrapper> currentPipeline;
 		private Glyph currentGlyph;
 		private final PipelineEditor editor;
 		private final ToggleGroup group;
@@ -382,7 +383,7 @@ public class PipelinesWidget extends AbstractWidget {
 		}
 
 		@Override
-		public final void updateItem(Pipeline item, boolean empty) {
+		public final void updateItem(Pipeline<ProcessorWrapper> item, boolean empty) {
 			super.updateItem(item, empty);
 
 			setText(null);
@@ -525,7 +526,7 @@ public class PipelinesWidget extends AbstractWidget {
 		 * @param name the name of the pipeline.
 		 * @param usage the usage message of the pipeline.
 		 */
-		public void init(Pipeline pipeline, String name, String usage) {
+		public void init(Pipeline<ProcessorWrapper> pipeline, String name, String usage) {
 			layoutStrategy.set(pipeline.getLayoutStrategy().name());
 			versionPolicy.set(pipeline.getVersionPolicy().name());
 			pipelineName.setText(name);

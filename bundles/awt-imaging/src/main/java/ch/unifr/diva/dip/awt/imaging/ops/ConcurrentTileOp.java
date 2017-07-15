@@ -15,8 +15,9 @@ import java.util.concurrent.Callable;
  * parallel.
  *
  * @param <T> subclass of BufferedImageOp and TileParallelizable.
+ * @param <S> class of the ImageTiler.
  */
-public class ConcurrentTileOp<T extends BufferedImageOp & TileParallelizable> extends NullOp {
+public class ConcurrentTileOp<T extends BufferedImageOp & TileParallelizable<S>, S extends ImageTiler<? extends Rectangle>> extends NullOp {
 
 	private final T op;
 	private final int tileWidth;
@@ -94,11 +95,11 @@ public class ConcurrentTileOp<T extends BufferedImageOp & TileParallelizable> ex
 	}
 
 	private void runOnThreads(BufferedImage src, BufferedImage dst) {
-		final ImageTiler tiler = this.op.getImageTiler(src, dst, this.tileWidth, this.tileHeight);
+		final S tiler = this.op.getImageTiler(src, dst, this.tileWidth, this.tileHeight);
 		final Thread[] threads = new Thread[this.threadCount];
 
 		for (int i = 0; i < this.threadCount; i++) {
-			threads[i] = new TileOpThread(this.op, tiler, src, dst);
+			threads[i] = new TileOpThread<>(this.op, tiler, src, dst);
 			threads[i].start();
 		}
 
@@ -112,11 +113,11 @@ public class ConcurrentTileOp<T extends BufferedImageOp & TileParallelizable> ex
 	}
 
 	private void runOnThreadPool(BufferedImage src, BufferedImage dst) {
-		final ImageTiler tiler = this.op.getImageTiler(src, dst, this.tileWidth, this.tileHeight);
+		final S tiler = this.op.getImageTiler(src, dst, this.tileWidth, this.tileHeight);
 		final List<Callable<Void>> callables = new ArrayList<>();
 
 		for (int i = 0; i < this.threadCount; i++) {
-			callables.add(new TileOpCallable(this.op, tiler, src, dst));
+			callables.add(new TileOpCallable<>(this.op, tiler, src, dst));
 		}
 
 		try {
@@ -130,13 +131,14 @@ public class ConcurrentTileOp<T extends BufferedImageOp & TileParallelizable> ex
 	 * Processes tiles for as long as there are tiles left to be processed.
 	 *
 	 * @param <T> subclass of {@code TileParallelizable}.
+	 * @param <S> class of the ImageTiler.
 	 * @param op the {@code BufferedImageOp} implementing
 	 * {@code TileParallelizable}.
 	 * @param tiler the image tiler to ask for the next tile(s).
 	 * @param src the source image.
 	 * @param dst the destination image.
 	 */
-	public static <T extends TileParallelizable> void processTiles(T op, ImageTiler tiler, BufferedImage src, BufferedImage dst) {
+	public static <T extends TileParallelizable<S>, S extends ImageTiler<? extends Rectangle>> void processTiles(T op, S tiler, BufferedImage src, BufferedImage dst) {
 		Rectangle tile;
 		while ((tile = tiler.next()) != null) {
 			final BufferedImage srcTile = src.getSubimage(tile.x, tile.y, tile.width, tile.height);
@@ -165,7 +167,19 @@ public class ConcurrentTileOp<T extends BufferedImageOp & TileParallelizable> ex
 		}
 	}
 
-	public static <T extends InverseMappedTileParallelizable> void processMappedTiles(T op, ImageTiler tiler, BufferedImage src, BufferedImage dst) {
+	/**
+	 * Processes (inversely mapped) tiles for as long as there are tiles left to
+	 * be processed.
+	 *
+	 * @param <T> subclass of {@code InverseMappedTileParallelizable}.
+	 * @param <S> class of the ImageTiler.
+	 * @param op the {@code BufferedImageOp} implementing
+	 * {@code InverseMappedTileParallelizable}.
+	 * @param tiler the image tiler to ask for the next tile(s).
+	 * @param src the source image.
+	 * @param dst the destination image.
+	 */
+	public static <T extends InverseMappedTileParallelizable, S extends ImageTiler<? extends Rectangle>> void processMappedTiles(T op, S tiler, BufferedImage src, BufferedImage dst) {
 		Rectangle tile;
 		while ((tile = tiler.next()) != null) {
 			final BufferedImage dstTile = dst.getSubimage(tile.x, tile.y, tile.width, tile.height);

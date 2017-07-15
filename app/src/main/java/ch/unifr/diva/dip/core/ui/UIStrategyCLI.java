@@ -40,7 +40,7 @@ public class UIStrategyCLI implements UIStrategy, Localizable {
 	@Override
 	public Answer getAnswer(String message) {
 		System.out.println(message);
-		Scanner scanner = new Scanner(System.in);
+		Scanner scanner = new Scanner(System.in, "UTF-8");
 		Answer answer = Answer.NO;
 		// TODO: needs to be localized, and generally improved I guess...
 		while (answer == null) {

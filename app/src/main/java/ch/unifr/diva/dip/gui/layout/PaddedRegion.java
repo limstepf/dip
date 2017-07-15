@@ -119,13 +119,13 @@ public class PaddedRegion extends Region {
 	}
 
 	// object property that request(s)Layout on invalidation
-	protected class LayoutObjectProperty extends SimpleObjectProperty {
+	protected class LayoutObjectProperty<T> extends SimpleObjectProperty<T> {
 
 		public LayoutObjectProperty() {
 			super();
 		}
 
-		public LayoutObjectProperty(Object obj) {
+		public LayoutObjectProperty(T obj) {
 			super(obj);
 		}
 
@@ -366,7 +366,7 @@ public class PaddedRegion extends Region {
 	 */
 	public ObjectProperty<Pos> alignmentProperty() {
 		if (alignmentProperty == null) {
-			alignmentProperty = new LayoutObjectProperty(Pos.CENTER);
+			alignmentProperty = new LayoutObjectProperty<>(Pos.CENTER);
 		}
 		return alignmentProperty;
 	}
@@ -446,7 +446,7 @@ public class PaddedRegion extends Region {
 	 */
 	public final ObjectProperty<Bounds> minBoundsProperty() {
 		if (minBoundsProperty == null) {
-			minBoundsProperty = new LayoutObjectProperty();
+			minBoundsProperty = new LayoutObjectProperty<>();
 		}
 		return minBoundsProperty;
 	}
@@ -472,8 +472,8 @@ public class PaddedRegion extends Region {
 	/**
 	 * Checks whether there are minimum bounds.
 	 *
-	 * @return True if there are minimum bounds to be respected, False
-	 * otherwise.
+	 * @return {@code true} if there are minimum bounds to be respected,
+	 * {@code false} otherwise.
 	 */
 	public boolean hasMinBounds() {
 		if (minBoundsProperty == null) {
@@ -496,7 +496,7 @@ public class PaddedRegion extends Region {
 	 */
 	public final ObjectProperty<Node> contentProperty() {
 		if (contentProperty == null) {
-			contentProperty = new LayoutObjectProperty() {
+			contentProperty = new LayoutObjectProperty<Node>() {
 				@Override
 				public void invalidated() {
 					super.invalidated();
@@ -533,7 +533,8 @@ public class PaddedRegion extends Region {
 	/**
 	 * Checks whether the padded region is empty.
 	 *
-	 * @return True if there is no child node set as content, False otherwise.
+	 * @return {@code true} if there is no child node set as content,
+	 * {@code false} otherwise.
 	 */
 	public final boolean isEmpty() {
 		if (contentProperty == null) {
@@ -564,7 +565,7 @@ public class PaddedRegion extends Region {
 	 */
 	public ObjectProperty<Node> redispatchTargetProperty() {
 		if (redispatchTargetProperty == null) {
-			redispatchTargetProperty = new SimpleObjectProperty();
+			redispatchTargetProperty = new SimpleObjectProperty<>();
 		}
 		return redispatchTargetProperty;
 	}

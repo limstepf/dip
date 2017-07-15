@@ -24,8 +24,8 @@ public class OSGiServiceTracker<T> {
 	private static final Logger log = LoggerFactory.getLogger(OSGiServiceTracker.class);
 	private final Class<T> service;
 	private final BundleContext context;
-	private final TrackerCustomizer customizer;
-	private final ServiceTracker tracker;
+	private final TrackerCustomizer<T> customizer;
+	private final ServiceTracker<T,T> tracker;
 
 	/**
 	 * Creates a new OSGi service tracker.
@@ -37,7 +37,7 @@ public class OSGiServiceTracker<T> {
 		this.context = context;
 		this.service = service;
 		this.customizer = new TrackerCustomizer<>(context);
-		this.tracker = new ServiceTracker(context, service.getName(), this.customizer);
+		this.tracker = new ServiceTracker<>(context, service.getName(), this.customizer);
 
 		log.debug("starting service tracker: {}", service);
 	}
@@ -146,7 +146,7 @@ public class OSGiServiceTracker<T> {
 	 *
 	 * @param listener the tracker listener.
 	 */
-	public void addListener(TrackerListener listener) {
+	public void addListener(TrackerListener<T> listener) {
 		customizer.addListener(listener);
 	}
 
@@ -155,7 +155,7 @@ public class OSGiServiceTracker<T> {
 	 *
 	 * @param listener the tracker listener.
 	 */
-	public void removeListener(TrackerListener listener) {
+	public void removeListener(TrackerListener<T> listener) {
 		customizer.removeListener(listener);
 	}
 
@@ -197,11 +197,11 @@ public class OSGiServiceTracker<T> {
 	 *
 	 * @param <T> class of the service interface of the tracked services.
 	 */
-	private static class TrackerCustomizer<T> implements ServiceTrackerCustomizer {
+	private static class TrackerCustomizer<T> implements ServiceTrackerCustomizer<T,T> {
 
 		private final BundleContext context;
 		private final Map<String, OSGiServiceCollection<T>> services;
-		private final CopyOnWriteArrayList<TrackerListener> listeners;
+		private final CopyOnWriteArrayList<TrackerListener<T>> listeners;
 
 		/**
 		 * Creates a new service tracker customizer.
@@ -219,7 +219,7 @@ public class OSGiServiceTracker<T> {
 		 *
 		 * @return a list of all service collections.
 		 */
-		public synchronized List<OSGiServiceCollection<T>> getServiceCollectionList() {
+		public synchronized List<ServiceCollection<T>> getServiceCollectionList() {
 			return new ArrayList<>(services.values());
 		}
 
@@ -228,7 +228,7 @@ public class OSGiServiceTracker<T> {
 		 *
 		 * @return a map of all service collections, indexed by their PID.
 		 */
-		public synchronized Map<String, OSGiServiceCollection<T>> getServiceCollectionMap() {
+		public synchronized Map<String, ServiceCollection<T>> getServiceCollectionMap() {
 			return new HashMap<>(services);
 		}
 
@@ -238,7 +238,7 @@ public class OSGiServiceTracker<T> {
 		 * @param pid PID of the service.
 		 * @return a collection of available versions of the service.
 		 */
-		public synchronized OSGiServiceCollection<T> getServiceCollection(String pid) {
+		public synchronized ServiceCollection<T> getServiceCollection(String pid) {
 			return services.get(pid);
 		}
 
@@ -247,7 +247,7 @@ public class OSGiServiceTracker<T> {
 		 *
 		 * @param listener the tracker listener.
 		 */
-		public void addListener(TrackerListener listener) {
+		public void addListener(TrackerListener<T> listener) {
 			listeners.add(listener);
 		}
 
@@ -256,15 +256,15 @@ public class OSGiServiceTracker<T> {
 		 *
 		 * @param listener the tracker listener.
 		 */
-		public void removeListener(TrackerListener listener) {
+		public void removeListener(TrackerListener<T> listener) {
 			listeners.remove(listener);
 		}
 
 		@Override
-		public T addingService(ServiceReference reference) {
+		public T addingService(ServiceReference<T> reference) {
 			final OSGiService<T> service;
 			try {
-				service = new OSGiService(context, reference);
+				service = new OSGiService<>(context, reference);
 			} catch (OSGiInvalidServiceException ex) {
 				log.warn("can't add service: {}", ex.getMessage());
 				return null; // ignore/do not add modified service
@@ -274,7 +274,7 @@ public class OSGiServiceTracker<T> {
 			final OSGiServiceCollection<T> collection;
 			synchronized (this) {
 				if (!services.containsKey(service.pid)) {
-					collection = new OSGiServiceCollection(service.pid);
+					collection = new OSGiServiceCollection<>(service.pid);
 					services.put(service.pid, collection);
 				} else {
 					collection = services.get(service.pid);
@@ -282,7 +282,7 @@ public class OSGiServiceTracker<T> {
 				collection.add(service);
 			}
 
-			for (TrackerListener listener : listeners) {
+			for (TrackerListener<T> listener : listeners) {
 				listener.onAdded(collection, service);
 			}
 
@@ -296,10 +296,10 @@ public class OSGiServiceTracker<T> {
 		 * re-added again, ... Anyways.
 		 */
 		@Override
-		public void modifiedService(ServiceReference reference, Object obj) {
+		public void modifiedService(ServiceReference<T> reference, T obj) {
 			final OSGiService<T> service;
 			try {
-				service = new OSGiService(context, reference);
+				service = new OSGiService<>(context, reference);
 			} catch (OSGiInvalidServiceException ex) {
 				log.warn("can't update service: {}", ex.getMessage());
 				return; // ignore/do not update modified service
@@ -316,16 +316,16 @@ public class OSGiServiceTracker<T> {
 				collection.update(service);
 			}
 
-			for (TrackerListener listener : listeners) {
+			for (TrackerListener<T> listener : listeners) {
 				listener.onModified(collection, service);
 			}
 		}
 
 		@Override
-		public void removedService(ServiceReference reference, Object obj) {
+		public void removedService(ServiceReference<T> reference, T obj) {
 			final OSGiService<T> service;
 			try {
-				service = new OSGiService(context, reference);
+				service = new OSGiService<>(context, reference);
 			} catch (OSGiInvalidServiceException ex) {
 				log.warn("can't remove service: {}", ex.getMessage());
 				return; // ignore/do not remove modified service
@@ -343,7 +343,7 @@ public class OSGiServiceTracker<T> {
 				collection.remove(service);
 			}
 
-			for (TrackerListener listener : listeners) {
+			for (TrackerListener<T> listener : listeners) {
 				listener.onRemoved(collection, service);
 			}
 		}

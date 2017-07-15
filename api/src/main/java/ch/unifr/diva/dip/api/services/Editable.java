@@ -25,14 +25,14 @@ public interface Editable extends Resetable {
 	 *
 	 * @return the shared options of the processor.
 	 */
-	public Map<String, SingleRowParameter> options();
+	public Map<String, SingleRowParameter<?>> options();
 
 	/**
 	 * Checks whether this processor has shared options. These options are
 	 * shared by all tools of the processor.
 	 *
-	 * @return True if this processor has at least one shared option, False
-	 * otherwise.
+	 * @return {@code true} if this processor has at least one shared option,
+	 * {@code false} otherwise.
 	 */
 	default boolean hasOptions() {
 		return !options().isEmpty();
@@ -46,18 +46,18 @@ public interface Editable extends Resetable {
 	 * allowing editable processors to store unsaved data.
 	 *
 	 * @param context the processor context.
-	 * @param saveRequired if True the state of the processor needs to be saved
-	 * (since we're about to close the page with the pipeline containing this
-	 * processor), otherwise only the processor context needs to be updated
-	 * (since references/paths might have changed; e.g. after saving the
-	 * project), while saving the processor's state is not required.
+	 * @param saveRequired if {@code true} the state of the processor needs to
+	 * be saved (since we're about to close the page with the pipeline
+	 * containing this processor), otherwise only the processor context needs to
+	 * be updated (since references/paths might have changed; e.g. after saving
+	 * the project), while saving the processor's state is not required.
 	 */
 	public void onContextSwitch(ProcessorContext context, boolean saveRequired);
 
 	/**
-	 * Callback method called if the global selection mask has changed. Only gets
-	 * called for active/currently selected processors, and once as a new processor
-	 * gets selected (no matter if the mask has actually changed).
+	 * Callback method called if the global selection mask has changed. Only
+	 * gets called for active/currently selected processors, and once as a new
+	 * processor gets selected (no matter if the mask has actually changed).
 	 *
 	 * @param selectionMask the selection mask, or null if nothing is selected.
 	 */

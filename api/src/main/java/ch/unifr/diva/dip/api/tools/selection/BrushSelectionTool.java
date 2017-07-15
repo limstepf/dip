@@ -14,9 +14,9 @@ import javafx.scene.shape.Shape;
  *
  * @param <T> class of the shape brush.
  */
-public class BrushSelectionTool<T extends ShapeBrush> extends BrushTool<T> implements SelectionTool {
+public class BrushSelectionTool<T extends ShapeBrush<Shape>> extends BrushTool<T> implements SelectionTool<Shape> {
 
-	protected SelectionHandler selectionHandler;
+	protected SelectionHandler<Shape> selectionHandler;
 
 	/**
 	 * Creates a new brush selection tool.
@@ -25,6 +25,7 @@ public class BrushSelectionTool<T extends ShapeBrush> extends BrushTool<T> imple
 	 * @param glyph the glyph of the tool.
 	 * @param brushes the brushes.
 	 */
+	@SuppressWarnings({"unchecked", "varargs"})
 	public BrushSelectionTool(String name, NamedGlyph glyph, T... brushes) {
 		this(null, null, name, glyph, Arrays.asList(brushes));
 	}
@@ -49,6 +50,7 @@ public class BrushSelectionTool<T extends ShapeBrush> extends BrushTool<T> imple
 	 * @param glyph the glyph of the tool.
 	 * @param brushes the brushes.
 	 */
+	@SuppressWarnings({"unchecked", "varargs"})
 	public BrushSelectionTool(EditorLayerOverlay editorOverlay, SelectionHandler<Shape> selectionHandler, String name, NamedGlyph glyph, T... brushes) {
 		this(editorOverlay, selectionHandler, name, glyph, Arrays.asList(brushes));
 	}
@@ -69,7 +71,7 @@ public class BrushSelectionTool<T extends ShapeBrush> extends BrushTool<T> imple
 	}
 
 	@Override
-	public void setContext(EditorLayerOverlay editorOverlay, SelectionHandler selectionHandler) {
+	public void setContext(EditorLayerOverlay editorOverlay, SelectionHandler<Shape> selectionHandler) {
 		this.editorOverlay = editorOverlay;
 		this.selectionHandler = selectionHandler;
 	}

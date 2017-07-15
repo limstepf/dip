@@ -1,7 +1,6 @@
 package ch.unifr.diva.dip.gui.editor;
 
 import ch.unifr.diva.dip.core.ApplicationHandler;
-import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.eventbus.events.ProcessorNotification;
 import ch.unifr.diva.dip.gui.AbstractWidget;
 import javafx.scene.control.TreeItem;
@@ -13,7 +12,7 @@ import javafx.scene.layout.VBox;
  * Layers widget. The layers widget displays the processors of a
  * {@code RunnablePipeline} ordered/grouped by the stages of the pipeline.
  */
-public class LayersWidget extends AbstractWidget implements Localizable {
+public class LayersWidget extends AbstractWidget {
 
 	private final ApplicationHandler handler;
 	private final LayerTreeView view;
@@ -45,13 +44,13 @@ public class LayersWidget extends AbstractWidget implements Localizable {
 			if (owner >= 0) {
 				// send notification that the layer of a processor (and thereby the
 				// processor itself) has been selected
-				handler.eventBus.post(
+				this.handler.eventBus.post(
 						new ProcessorNotification(ProcessorNotification.Type.SELECTED, owner)
 				);
 			} else {
 				// send notification that no layer of a processor is selected any
 				// longer
-				handler.eventBus.post(
+				this.handler.eventBus.post(
 						new ProcessorNotification(ProcessorNotification.Type.SELECTED, -1)
 				);
 			}

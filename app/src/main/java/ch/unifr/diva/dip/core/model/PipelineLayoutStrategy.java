@@ -46,7 +46,7 @@ public enum PipelineLayoutStrategy {
 				}
 
 				@Override
-				public void arrange(Pipeline pipeline, Map<ProcessorWrapper, ProcessorView> views) {
+				public void arrange(Pipeline<ProcessorWrapper> pipeline, Map<ProcessorWrapper, ProcessorView> views) {
 					final Pipeline.PipelineStages<ProcessorWrapper> stages = new Pipeline.PipelineStages<>(pipeline);
 					double x = hspace;
 					double y;
@@ -94,7 +94,7 @@ public enum PipelineLayoutStrategy {
 				}
 
 				@Override
-				public void arrange(Pipeline pipeline, Map<ProcessorWrapper, ProcessorView> views) {
+				public void arrange(Pipeline<ProcessorWrapper> pipeline, Map<ProcessorWrapper, ProcessorView> views) {
 					final Pipeline.PipelineStages<ProcessorWrapper> stages = new Pipeline.PipelineStages<>(pipeline);
 					double x;
 					double y = vspace;
@@ -185,7 +185,7 @@ public enum PipelineLayoutStrategy {
 	 *
 	 * @param processors all processors of a single stage.
 	 */
-	public void sort(List<ProcessorWrapper> processors) {
+	public void sort(List<? extends ProcessorWrapper> processors) {
 		Collections.sort(processors, comparator());
 	}
 
@@ -195,7 +195,7 @@ public enum PipelineLayoutStrategy {
 	 * @param pipeline the pipeline.
 	 * @param views processor views.
 	 */
-	public abstract void arrange(Pipeline pipeline, Map<ProcessorWrapper, ProcessorView> views);
+	public abstract void arrange(Pipeline<ProcessorWrapper> pipeline, Map<ProcessorWrapper, ProcessorView> views);
 
 	/**
 	 * Processor view factory. Creates a new processor view suitable for the

@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,10 +69,10 @@ public class OSGiFramework {
 		this.framework = createFramework(systemPackages);
 		this.context = framework.getBundleContext();
 		this.bundleTracker = new OSGiBundleTracker(this.context);
-		this.processorServiceTracker = new OSGiServiceTracker(this.context, Processor.class);
-		this.processorHostServiceTracker = new HostServiceTracker();
-		this.processors = new OSGiServiceMonitor(processorServiceTracker);
-		this.hostProcessors = new HostServiceMonitor(processorHostServiceTracker);
+		this.processorServiceTracker = new OSGiServiceTracker<>(this.context, Processor.class);
+		this.processorHostServiceTracker = new HostServiceTracker<>();
+		this.processors = new OSGiServiceMonitor<>(processorServiceTracker);
+		this.hostProcessors = new HostServiceMonitor<>(processorHostServiceTracker);
 		this.bundleTracker.open();
 		this.processorServiceTracker.open();
 
@@ -122,7 +121,7 @@ public class OSGiFramework {
 	 * @see org.apache.felix.main.Main
 	 */
 	private Framework createFramework(List<ExtraSystemPackages.SystemPackage> systemPackages) throws BundleException {
-		final Map config = new HashMap<>();
+		final Map<String, String> config = new HashMap<>();
 
 		// framework/bundle cache directory
 		config.put(Constants.FRAMEWORK_STORAGE, bundleCacheDir.toString());
@@ -161,7 +160,7 @@ public class OSGiFramework {
 			log.error("error starting OSGi framework: ", ex);
 			throw ex;
 		}
-		
+
 		return fwk;
 	}
 
@@ -346,7 +345,7 @@ public class OSGiFramework {
 	 * @return a list of compatible processors.
 	 */
 	public static List<ServiceCollection<Processor>> getCompatibleProcessors(List<ServiceCollection<Processor>> collections, Collection<String> inputTypes, Collection<String> outputTypes) {
-		return getCompatibleProcessors(collections, Collections.EMPTY_LIST, inputTypes, outputTypes);
+		return getCompatibleProcessors(collections, new ArrayList<>(), inputTypes, outputTypes);
 	}
 
 	/**
@@ -407,7 +406,7 @@ public class OSGiFramework {
 	 * @return a filtered service collection of compatible processors.
 	 */
 	public static ServiceCollection<Processor> filterCollection(ServiceCollection<Processor> collection, Collection<String> inputTypes, Collection<String> outputTypes) {
-		final ServiceCollectionSnapshot<Processor> filtered = new ServiceCollectionSnapshot(collection.pid());
+		final ServiceCollectionSnapshot<Processor> filtered = new ServiceCollectionSnapshot<>(collection.pid());
 		for (OSGiService<Processor> service : collection.getVersions()) {
 			final Processor p = service.serviceObject;
 			final List<String> inputs = p.portTypes(p.inputs());

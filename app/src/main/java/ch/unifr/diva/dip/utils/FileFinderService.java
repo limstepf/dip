@@ -1,4 +1,3 @@
-
 package ch.unifr.diva.dip.utils;
 
 import java.nio.file.Files;
@@ -25,10 +24,27 @@ public class FileFinderService extends Service<Void> {
 	private final FileFinderTask.FinderCallback callback;
 	private final StringProperty currentDirectoryProperty;
 
+	/**
+	 * Creates a new file finder service.
+	 *
+	 * @param root directory to start the search from.
+	 * @param callback finder callback.
+	 */
 	public FileFinderService(Path root, FileFinderTask.FinderCallback callback) {
 		this(root, new ArrayList<>(), new ArrayList<>(), callback);
 	}
 
+	/**
+	 * Creates a new file finder service.
+	 *
+	 * @param root directory to start the search from.
+	 * @param suspects list of directories that always get checked 1-level deep
+	 * before the search from root starts. This list is extended during the
+	 * search by directories some file has been found in, and thus it's likely
+	 * that other files we're looking for are in there as well.
+	 * @param files the search queries.
+	 * @param callback finder callback.
+	 */
 	public FileFinderService(Path root, List<Path> suspects, List<FileFinderTask.FileDescriptor> files, FileFinderTask.FinderCallback callback) {
 		this.root = root;
 		this.suspects = suspects;
@@ -37,10 +53,20 @@ public class FileFinderService extends Service<Void> {
 		this.currentDirectoryProperty = new SimpleStringProperty();
 	}
 
+	/**
+	 * Sets the root directory of the search.
+	 *
+	 * @param root directory to start the search from.
+	 */
 	public void setRoot(Path root) {
 		this.root = root;
 	}
 
+	/**
+	 * Returns the root directory of the search.
+	 *
+	 * @return the root directory of the search.
+	 */
 	public Path getRoot() {
 		return this.root;
 	}
@@ -55,7 +81,11 @@ public class FileFinderService extends Service<Void> {
 	 * @return a FileDescriptor describing the query.
 	 */
 	public FileFinderTask.FileDescriptor addQuery(Path file, String checksum) {
-		return addQuery(file.getFileName().toString(), checksum);
+		final Path p = file.getFileName();
+		if (p == null) {
+			return null;
+		}
+		return addQuery(p.toString(), checksum);
 	}
 
 	/**
@@ -81,15 +111,24 @@ public class FileFinderService extends Service<Void> {
 		return this.files.size();
 	}
 
+	/**
+	 * Clears queries and suspects.
+	 */
 	public void clear() {
 		clearQueries();
 		clearSuspects();
 	}
 
+	/**
+	 * Clears the queries.
+	 */
 	public void clearQueries() {
 		this.files.clear();
 	}
 
+	/**
+	 * Clears the suspects.
+	 */
 	public void clearSuspects() {
 		this.suspects.clear();
 	}

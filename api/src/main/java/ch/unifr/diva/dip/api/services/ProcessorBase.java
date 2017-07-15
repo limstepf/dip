@@ -43,17 +43,17 @@ public abstract class ProcessorBase implements Processor {
 	/**
 	 * Published input ports.
 	 */
-	protected final Map<String, InputPort> inputs = new LinkedHashMap();
+	protected final Map<String, InputPort<?>> inputs = new LinkedHashMap<>();
 
 	/**
 	 * Published output ports.
 	 */
-	protected final Map<String, OutputPort> outputs = new LinkedHashMap();
+	protected final Map<String, OutputPort<?>> outputs = new LinkedHashMap<>();
 
 	/**
 	 * Published parameters.
 	 */
-	protected final Map<String, Parameter> parameters = new LinkedHashMap();
+	protected final Map<String, Parameter<?>> parameters = new LinkedHashMap<>();
 
 	/**
 	 * The repaint property.
@@ -75,17 +75,17 @@ public abstract class ProcessorBase implements Processor {
 	}
 
 	@Override
-	public Map<String, Parameter> parameters() {
+	public Map<String, Parameter<?>> parameters() {
 		return parameters;
 	}
 
 	@Override
-	public Map<String, InputPort> inputs() {
+	public Map<String, InputPort<?>> inputs() {
 		return inputs;
 	}
 
 	@Override
-	public Map<String, OutputPort> outputs() {
+	public Map<String, OutputPort<?>> outputs() {
 		return outputs;
 	}
 
@@ -99,7 +99,7 @@ public abstract class ProcessorBase implements Processor {
 	 * the processor has a dynamic/changing set of output ports.
 	 */
 	protected void resetOutputs() {
-		for (OutputPort output : outputs.values()) {
+		for (OutputPort<?> output : outputs.values()) {
 			output.setOutput(null);
 		}
 	}
@@ -317,7 +317,8 @@ public abstract class ProcessorBase implements Processor {
 	 *
 	 * @param context the processor context.
 	 * @param filename the filename of the file.
-	 * @return True if the file was deleted by this method, false otherwise.
+	 * @return {@code true} if the file was deleted by this method,
+	 * {@code false} otherwise.
 	 */
 	public static boolean deleteFile(ProcessorContext context, String filename) {
 		final Path file = context.getDirectory().resolve(filename);
@@ -328,7 +329,8 @@ public abstract class ProcessorBase implements Processor {
 	 * Removes a file (if it exists).
 	 *
 	 * @param file the file.
-	 * @return True if the file was deleted by this method, false otherwise.
+	 * @return {@code true} if the file was deleted by this method,
+	 * {@code false} otherwise.
 	 */
 	public static boolean deleteFile(Path file) {
 		try {
@@ -347,12 +349,11 @@ public abstract class ProcessorBase implements Processor {
 	 * Usually used together with the xorCallback method which disables the rest
 	 * of the ports, once the needed connection has been made.
 	 *
-	 * @see xorCallback
 	 * @param ports a collection of optional ports.
-	 * @return True if the port is connected, False otherwise.
+	 * @return {@code true} if the port is connected, {@code false} otherwise.
 	 */
-	public static boolean xorIsConnected(Collection<? extends Port> ports) {
-		for (Port port : ports) {
+	public static boolean xorIsConnected(Collection<? extends Port<?>> ports) {
+		for (Port<?> port : ports) {
 			if (port.isConnected()) {
 				return true; // no need to check that there aren't more connections...
 			}

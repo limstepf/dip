@@ -21,6 +21,7 @@ public class SpanGesture extends GestureBase {
 	 *
 	 * @param onGesture the gesture event handler.
 	 */
+	@SuppressWarnings("rawtypes")
 	public SpanGesture(GestureEventHandler.Handler onGesture) {
 		this(onGesture, null, null, null);
 	}
@@ -33,6 +34,7 @@ public class SpanGesture extends GestureBase {
 	 * @param onMoved the moved (and dragged) handler, or null.
 	 * @param onExited the exited handler.
 	 */
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public SpanGesture(GestureEventHandler.Handler onGesture, EventHandler<MouseEvent> onEntered, EventHandler<MouseEvent> onMoved, EventHandler<MouseEvent> onExited) {
 		super();
 

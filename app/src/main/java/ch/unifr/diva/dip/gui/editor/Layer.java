@@ -79,9 +79,9 @@ public interface Layer {
 	public ObservableList<?> getChildren();
 
 	/**
-	 * The empty property. This property is true if no content is added to the
-	 * layer's canvas by this or any of it's child layers (i.e. there must be a
-	 * layer pane with at least one child to be considered not empty).
+	 * The empty property. This property is {@code true} if no content is added
+	 * to the layer's canvas by this or any of it's child layers (i.e. there
+	 * must be a layer pane with at least one child to be considered not empty).
 	 *
 	 * @return the empty property.
 	 */
@@ -90,7 +90,8 @@ public interface Layer {
 	/**
 	 * Checks whether the layer's canvas is empty, or not.
 	 *
-	 * @return True if the layer's canvas is empty, false otherwise.
+	 * @return {@code true} if the layer's canvas is empty, {@code false}
+	 * otherwise.
 	 */
 	public boolean isEmpty();
 
@@ -212,7 +213,7 @@ public interface Layer {
 	/**
 	 * Checks whether the layer is visible, or not.
 	 *
-	 * @return True if the layer is visible, False otherwise.
+	 * @return {@code true} if the layer is visible, {@code false} otherwise.
 	 */
 	default boolean isVisible() {
 		return visibleProperty().get();
@@ -221,7 +222,8 @@ public interface Layer {
 	/**
 	 * Toggles the visibility of the layer's conents.
 	 *
-	 * @param visible True to show the layer, False to not show the layer.
+	 * @param visible {@code true} to show the layer, {@code false} to not show
+	 * the layer.
 	 */
 	default void setVisible(boolean visible) {
 		visibleProperty().set(visible);
@@ -240,8 +242,8 @@ public interface Layer {
 	/**
 	 * Checks whether a layer is passively/indirectly visible.
 	 *
-	 * @return True if the layer is passively/indirectly visible, False
-	 * otherwise.
+	 * @return {@code true} if the layer is passively/indirectly visible,
+	 * {@code false} otherwise.
 	 */
 	default boolean isPassiveVisible() {
 		return passiveVisibleProperty().get();
@@ -250,8 +252,8 @@ public interface Layer {
 	/**
 	 * Sets passive/indirect visibility of the layer.
 	 *
-	 * @param visible True to make the layer passively/indirectly visible, False
-	 * to hide it.
+	 * @param visible {@code true} to make the layer passively/indirectly
+	 * visible, {@code false} to hide it.
 	 */
 	default void setPassiveVisible(boolean visible) {
 		passiveVisibleProperty().set(visible);

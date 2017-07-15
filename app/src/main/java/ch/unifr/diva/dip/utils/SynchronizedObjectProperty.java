@@ -30,7 +30,7 @@ public class SynchronizedObjectProperty<T> {
 	 */
 	public SynchronizedObjectProperty(T value) {
 		this.value = value;
-		this.property = new SimpleObjectProperty(value);
+		this.property = new SimpleObjectProperty<>(value);
 	}
 
 	/**

@@ -29,7 +29,7 @@ public interface UIStrategy {
 	/**
 	 * Checks whether the UI has a stage.
 	 *
-	 * @return true if there is a stage, false otherwise.
+	 * @return {@code true} if there is a stage, {@code false} otherwise.
 	 */
 	default boolean hasStage() {
 		return false;

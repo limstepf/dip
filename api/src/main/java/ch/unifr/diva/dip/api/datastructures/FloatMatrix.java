@@ -13,7 +13,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
-public class FloatMatrix extends Matrix {
+public class FloatMatrix extends Matrix<FloatMatrix> {
 
 	/**
 	 * Continous floats of the matrix.
@@ -279,7 +279,7 @@ public class FloatMatrix extends Matrix {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		final StringMatrix other = (StringMatrix) obj;
+		final FloatMatrix other = (FloatMatrix) obj;
 		if (!Objects.equals(rows, other.rows)) {
 			return false;
 		}

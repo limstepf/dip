@@ -20,7 +20,7 @@ public class OSGiBundleTracker {
 	private static final Logger log = LoggerFactory.getLogger(OSGiBundleTracker.class);
 	private final BundleContext context;
 	private final TrackerCustomizer customizer;
-	private final BundleTracker tracker;
+	private final BundleTracker<Bundle> tracker;
 
 	/**
 	 * Creates a new OSGi bundle tracker.
@@ -52,7 +52,7 @@ public class OSGiBundleTracker {
 	public OSGiBundleTracker(BundleContext context, int stateMask) {
 		this.context = context;
 		this.customizer = new TrackerCustomizer();
-		this.tracker = new BundleTracker(
+		this.tracker = new BundleTracker<>(
 				context,
 				stateMask,
 				this.customizer
@@ -172,7 +172,7 @@ public class OSGiBundleTracker {
 	/**
 	 * Bundle tracker customizer.
 	 */
-	private static class TrackerCustomizer implements BundleTrackerCustomizer {
+	private static class TrackerCustomizer implements BundleTrackerCustomizer<Bundle> {
 
 		private final CopyOnWriteArrayList<TrackerListener> listeners;
 
@@ -202,7 +202,7 @@ public class OSGiBundleTracker {
 		}
 
 		@Override
-		public Object addingBundle(Bundle bundle, BundleEvent event) {
+		public Bundle addingBundle(Bundle bundle, BundleEvent event) {
 			for (TrackerListener listener : listeners) {
 				listener.onAdded(bundle, event);
 			}
@@ -210,14 +210,14 @@ public class OSGiBundleTracker {
 		}
 
 		@Override
-		public void modifiedBundle(Bundle bundle, BundleEvent event, Object object) {
+		public void modifiedBundle(Bundle bundle, BundleEvent event, Bundle object) {
 			for (TrackerListener listener : listeners) {
 				listener.onModified(bundle, event);
 			}
 		}
 
 		@Override
-		public void removedBundle(Bundle bundle, BundleEvent event, Object object) {
+		public void removedBundle(Bundle bundle, BundleEvent event, Bundle object) {
 			for (TrackerListener listener : listeners) {
 				listener.onRemoved(bundle, event);
 			}

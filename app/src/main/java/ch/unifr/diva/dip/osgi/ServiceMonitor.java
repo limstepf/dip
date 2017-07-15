@@ -69,7 +69,8 @@ public interface ServiceMonitor<T> {
 	 * Checks whether a service (any version) is available.
 	 *
 	 * @param pid PID of the service.
-	 * @return True if the service is available, False otherwise.
+	 * @return {@code true} if the service is available, {@code false}
+	 * otherwise.
 	 */
 	default boolean isAvailable(String pid) {
 		return getService(pid) != null;
@@ -96,7 +97,8 @@ public interface ServiceMonitor<T> {
 	 *
 	 * @param pid the PID of the service.
 	 * @param major the major version.
-	 * @return True if the service is available, False otherwise.
+	 * @return {@code true} if the service is available, {@code false}
+	 * otherwise.
 	 */
 	default boolean isAvailable(String pid, int major) {
 		return getService(pid, major) != null;
@@ -125,7 +127,8 @@ public interface ServiceMonitor<T> {
 	 * @param pid the PID of the service.
 	 * @param major the major version.
 	 * @param minor the minor version.
-	 * @return True if the service is available, False otherwise.
+	 * @return {@code true} if the service is available, {@code false}
+	 * otherwise.
 	 */
 	default boolean isAvailable(String pid, int major, int minor) {
 		return getService(pid, major, minor) != null;
@@ -170,7 +173,8 @@ public interface ServiceMonitor<T> {
 	 * @param major the major version.
 	 * @param minor the minor version.
 	 * @param micro the micro version.
-	 * @return True if the service is available, False otherwise.
+	 * @return {@code true} if the service is available, {@code false}
+	 * otherwise.
 	 */
 	default boolean isAvailable(String pid, int major, int minor, int micro) {
 		return getService(pid, major, minor, micro) != null;
@@ -181,7 +185,8 @@ public interface ServiceMonitor<T> {
 	 *
 	 * @param pid the PID of the service.
 	 * @param version the semantic version of the service.
-	 * @return True if the service is available, False otherwise.
+	 * @return {@code true} if the service is available, {@code false}
+	 * otherwise.
 	 */
 	default boolean isAvailable(String pid, String version) {
 		return isAvailable(pid, new Version(version));
@@ -192,7 +197,8 @@ public interface ServiceMonitor<T> {
 	 *
 	 * @param pid the PID of the service.
 	 * @param version the semantic version of the service.
-	 * @return True if the service is available, False otherwise.
+	 * @return {@code true} if the service is available, {@code false}
+	 * otherwise.
 	 */
 	default boolean isAvailable(String pid, Version version) {
 		return getService(pid, version) != null;

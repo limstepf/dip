@@ -97,7 +97,7 @@ public class FxColor {
 	 * {@code FxColor} object.
 	 *
 	 * @param color the JavaFX {@code Color} object.
-	 * @return True if the colors are equal, False otherwise.
+	 * @return {@code true} if the colors are equal, {@code false} otherwise.
 	 */
 	public boolean equalsColor(Color color) {
 		if (this.red != (int) color.getRed()) {

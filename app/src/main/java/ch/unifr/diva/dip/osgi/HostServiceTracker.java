@@ -34,9 +34,10 @@ public class HostServiceTracker<T> {
 			for (String cn : classes) {
 				pid = cn;
 				final Class<?> clazz = ReflectionUtils.getClass(cn);
+				@SuppressWarnings("unchecked")
 				final T service = (T) clazz.newInstance();
-				final OSGiServiceCollection<T> collection = new OSGiServiceCollection(
-						new OSGiService(pid, service, HostService.VERSION)
+				final OSGiServiceCollection<T> collection = new OSGiServiceCollection<>(
+						new OSGiService<>(pid, service, HostService.VERSION)
 				);
 				services.put(pid, collection);
 			}

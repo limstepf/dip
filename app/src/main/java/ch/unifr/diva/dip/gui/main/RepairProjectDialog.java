@@ -6,7 +6,6 @@ import ch.unifr.diva.dip.api.ui.RadioChoiceBox;
 import ch.unifr.diva.dip.api.utils.L10n;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.model.PipelineData;
-import ch.unifr.diva.dip.core.model.ProcessorWrapper;
 import ch.unifr.diva.dip.core.model.ProjectData;
 import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
@@ -29,7 +28,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -198,7 +196,8 @@ public class RepairProjectDialog extends AbstractDialog {
 		 * repaired means being in a valid state (incl. scheduled repaires that
 		 * will be applied by a call to {@code applyRepairs}), ready to proceed.
 		 *
-		 * @return True if the section is repaired, false otherwise.
+		 * @return {@code true} if the section is repaired, {@code false}
+		 * otherwise.
 		 */
 		default boolean isRepaired() {
 			return repairedProperty().get();
@@ -249,7 +248,7 @@ public class RepairProjectDialog extends AbstractDialog {
 		protected final Header header;
 		protected final T body;
 		protected final BooleanProperty repairedProperty = new SimpleBooleanProperty(false);
-		protected final ChangeListener repairedListener = (obs, a, b) -> updateRepairedProperty();
+		protected final ChangeListener<? super Boolean> repairedListener = (obs, a, b) -> updateRepairedProperty();
 
 		/**
 		 * Creates a new listable base object.
@@ -394,7 +393,7 @@ public class RepairProjectDialog extends AbstractDialog {
 		protected final VBox parent;
 		protected final Label title;
 		protected final BooleanProperty repairedProperty = new SimpleBooleanProperty(false);
-		protected final ChangeListener repairedListener = (obs, a, b) -> updateRepairedProperty();
+		protected final ChangeListener<? super Boolean> repairedListener = (obs, a, b) -> updateRepairedProperty();
 
 		/**
 		 * Creates a new repair section.
@@ -874,8 +873,8 @@ public class RepairProjectDialog extends AbstractDialog {
 		private final boolean canReplace;
 		private final Map<String, String> inputs = new LinkedHashMap<>();
 		private final Map<String, String> outputs = new LinkedHashMap<>();
-		private final List<ComboBox> inputCombos = new ArrayList<>();
-		private final List<ComboBox> outputCombos = new ArrayList<>();
+		private final List<ComboBox<String>> inputCombos = new ArrayList<>();
+		private final List<ComboBox<String>> outputCombos = new ArrayList<>();
 		private final List<List<String>> inputKeys = new ArrayList<>();
 		private final List<List<String>> outputKeys = new ArrayList<>();
 
@@ -888,9 +887,9 @@ public class RepairProjectDialog extends AbstractDialog {
 		private final RadioChoiceBox choice;
 		private final HBox upgradeOption;
 		private final HBox replaceOption;
-		private final ComboBox upgradeVersionOption;
-		private final ComboBox replaceProcessorOption;
-		private final ComboBox replaceVersionOption;
+		private final ComboBox<String> upgradeVersionOption;
+		private final ComboBox<String> replaceProcessorOption;
+		private final ComboBox<String> replaceVersionOption;
 		private final ObservableList<String> replaceVersionList;
 
 		private ServiceState state = ServiceState.UNAVAILABLE;
@@ -909,7 +908,7 @@ public class RepairProjectDialog extends AbstractDialog {
 			this.version = version;
 
 			// read all (global) pipeline prototypes
-			for (PipelineData.Pipeline<ProcessorWrapper> pipeline : projectData.pipelines()) {
+			for (PipelineData.Pipeline pipeline : projectData.pipelines()) {
 				parsePipeline(pid, pipeline, inputs, outputs);
 			}
 
@@ -929,7 +928,7 @@ public class RepairProjectDialog extends AbstractDialog {
 			this.canUpgrade = this.compatibleVersions != null;
 			this.compatibleVersionList = FXCollections.observableArrayList();
 			if (canUpgrade) {
-				for (OSGiService v : compatibleVersions.getVersions()) {
+				for (OSGiService<Processor> v : compatibleVersions.getVersions()) {
 					this.compatibleVersionList.add(v.version.toString());
 				}
 			}
@@ -943,7 +942,7 @@ public class RepairProjectDialog extends AbstractDialog {
 			);
 			this.canReplace = !compatibleServices.isEmpty();
 			this.compatibleServiceList = FXCollections.observableArrayList();
-			for (ServiceCollection collection : compatibleServices.values()) {
+			for (ServiceCollection<Processor> collection : compatibleServices.values()) {
 				this.compatibleServiceList.add(collection.pid());
 			}
 
@@ -969,8 +968,8 @@ public class RepairProjectDialog extends AbstractDialog {
 			);
 
 			// make sure to not select an invalid/disabled option
-			final RadioChoiceBox.RadioChoice upgradeChoice = this.choice.get(0);
-			final RadioChoiceBox.RadioChoice replaceChoice = this.choice.get(1);
+			final RadioChoiceBox.RadioChoice<?> upgradeChoice = this.choice.get(0);
+			final RadioChoiceBox.RadioChoice<?> replaceChoice = this.choice.get(1);
 			if (!canUpgrade) {
 				upgradeChoice.setDisable(true);
 				upgradeChoice.radio.setSelected(false);
@@ -1002,7 +1001,7 @@ public class RepairProjectDialog extends AbstractDialog {
 
 				int i = 0;
 				for (Map.Entry<String, String> port : inputs.entrySet()) {
-					final ComboBox combo = newComboBox();
+					final ComboBox<String> combo = newComboBox();
 					inputCombos.add(combo);
 					addPortToGrid(port, combo, row++);
 				}
@@ -1015,7 +1014,7 @@ public class RepairProjectDialog extends AbstractDialog {
 				this.body.add(label, 0, row);
 
 				for (Map.Entry<String, String> port : outputs.entrySet()) {
-					final ComboBox combo = newComboBox();
+					final ComboBox<String> combo = newComboBox();
 					outputCombos.add(combo);
 					addPortToGrid(port, combo, row++);
 				}
@@ -1044,7 +1043,7 @@ public class RepairProjectDialog extends AbstractDialog {
 			return cc;
 		}
 
-		private void addPortToGrid(Map.Entry<String, String> port, ComboBox combo, int row) {
+		private void addPortToGrid(Map.Entry<String, String> port, ComboBox<String> combo, int row) {
 			final Parent desc = newPortDescription(port.getKey(), port.getValue());
 			final HLine map = new HLine();
 			final ArrowHead head = new ArrowHead();
@@ -1069,15 +1068,15 @@ public class RepairProjectDialog extends AbstractDialog {
 		}
 
 		// for port mappings
-		private static ComboBox newComboBox() {
-			final ComboBox box = new ComboBox();
+		private static ComboBox<String> newComboBox() {
+			final ComboBox<String> box = new ComboBox<>();
 			box.getStyleClass().add("dip-small");
 			return box;
 		}
 
 		// for service/version
-		private static ComboBox newComboBox(ObservableList items) {
-			final ComboBox box = new ComboBox(items);
+		private static ComboBox<String> newComboBox(ObservableList<String> items) {
+			final ComboBox<String> box = new ComboBox<>(items);
 			box.getStyleClass().add("dip-small");
 			HBox.setMargin(box, comboInsets);
 			if (items.size() > 0) {
@@ -1117,7 +1116,7 @@ public class RepairProjectDialog extends AbstractDialog {
 				for (Map.Entry<String, String> port : inputs.entrySet()) {
 					final List<String> opt = p.serviceObject.inputs(port.getValue());
 					inputKeys.add(opt);
-					final ComboBox combo = inputCombos.get(i++);
+					final ComboBox<String> combo = inputCombos.get(i++);
 					combo.getItems().setAll(opt);
 					combo.getSelectionModel().select(0);
 				}
@@ -1127,7 +1126,7 @@ public class RepairProjectDialog extends AbstractDialog {
 				for (Map.Entry<String, String> port : outputs.entrySet()) {
 					final List<String> opt = p.serviceObject.outputs(port.getValue());
 					outputKeys.add(opt);
-					final ComboBox combo = outputCombos.get(i++);
+					final ComboBox<String> combo = outputCombos.get(i++);
 					combo.getItems().setAll(opt);
 					combo.getSelectionModel().select(0);
 				}
@@ -1169,7 +1168,7 @@ public class RepairProjectDialog extends AbstractDialog {
 
 		// -1: none, 0: upgrade, 1: replace
 		private int selectedOption() {
-			final RadioChoiceBox.RadioChoice r = this.choice.selectedRadioChoice();
+			final RadioChoiceBox.RadioChoice<?> r = this.choice.selectedRadioChoice();
 			if (r == null) {
 				return -1;
 			}
@@ -1225,7 +1224,7 @@ public class RepairProjectDialog extends AbstractDialog {
 						return p.version.toString();
 					}).collect(Collectors.toList());
 				} else {
-					versions = Collections.EMPTY_LIST;
+					versions = new ArrayList<>();
 				}
 				compatibleServiceVersions.put(pid, versions);
 				return versions;
@@ -1233,7 +1232,7 @@ public class RepairProjectDialog extends AbstractDialog {
 			return compatibleServiceVersions.get(pid);
 		}
 
-		private void parsePipeline(String pid, PipelineData.Pipeline<ProcessorWrapper> pipeline, Map<String, String> inputs, Map<String, String> outputs) {
+		private void parsePipeline(String pid, PipelineData.Pipeline pipeline, Map<String, String> inputs, Map<String, String> outputs) {
 			final Set<Integer> ids = new HashSet<>();
 			for (PipelineData.Processor processor : pipeline.processors()) {
 				if (processor.pid.equals(pid)) {

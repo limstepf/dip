@@ -113,10 +113,12 @@ public class ApplicationContext {
 		);
 
 		// log data manager main directories, now that the logger is configured.
-		log.debug("Current working directory: {}", dataManager.workingDir);
-		log.debug("Application directory: {}", dataManager.appDir);
-		log.debug("Application data directory: {}", dataManager.appDataDir);
-		log.debug("User directory: {}", dataManager.userDir);
+		if (dataManager != null) {
+			log.debug("Current working directory: {}", dataManager.workingDir);
+			log.debug("Application directory: {}", dataManager.appDir);
+			log.debug("Application data directory: {}", dataManager.appDataDir);
+			log.debug("User directory: {}", dataManager.userDir);
+		}
 
 		// init thread pools/executor services
 		threadPool = new DipThreadPool();

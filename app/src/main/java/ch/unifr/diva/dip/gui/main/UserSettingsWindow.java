@@ -89,7 +89,7 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 		// locale/language
 		general.addItem(new Item<EnumParameter>() {
 			@Override
-			public PersistentParameter parameter() {
+			public EnumParameter parameter() {
 				if (this.parameter == null) {
 					this.parameter = new EnumParameter(
 							localize("language"),
@@ -109,7 +109,7 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 		// default processor/OSGi service version (or auto-upgrade) policy
 		general.addItem(new Item<EnumParameter>() {
 			@Override
-			public PersistentParameter parameter() {
+			public EnumParameter parameter() {
 				if (this.parameter == null) {
 					this.parameter = new EnumParameter(
 							localize("processor.version.policy.default"),
@@ -144,7 +144,7 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 		// display/zoom interpolation method/algorithm
 		me.addItem(new Item<EnumParameter>() {
 			@Override
-			public PersistentParameter parameter() {
+			public EnumParameter parameter() {
 				if (this.parameter == null) {
 					this.parameter = new EnumParameter(
 							localize("interpolation"),
@@ -172,7 +172,7 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 		// connection-view/wire type
 		pe.addItem(new Item<EnumParameter>() {
 			@Override
-			public PersistentParameter parameter() {
+			public EnumParameter parameter() {
 				if (this.parameter == null) {
 					this.parameter = new EnumParameter(
 							localize("pipeline.connection.type"),
@@ -192,7 +192,7 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 		// pipeline layout strategy (or main direction)
 		pe.addItem(new Item<EnumParameter>() {
 			@Override
-			public PersistentParameter parameter() {
+			public EnumParameter parameter() {
 				if (this.parameter == null) {
 					this.parameter = new EnumParameter(
 							localize("pipeline.layout.strategy.default"),
@@ -213,7 +213,7 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 		// processor view un-/folding (or editing).
 		pe.addItem(new Item<CompositeGrid>() {
 			@Override
-			public PersistentParameter parameter() {
+			public CompositeGrid parameter() {
 				if (this.parameter == null) {
 					final LabelParameter layoutLabel = new LabelParameter(localize("pipeline.auto.rearrange.layout") + ": ");
 					final LabelParameter foldLabel = new LabelParameter(localize("pipeline.auto.rearrange.fold") + ": ");
@@ -303,7 +303,7 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 	private void apply() {
 		for (Category category : this.categories) {
 			if (category.hasBeenInitialized()) {
-				for (Item item : category.items) {
+				for (Item<?> item : category.items) {
 					if (item.hasBeenInitialized()) {
 						item.save();
 					}
@@ -351,7 +351,7 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 		/**
 		 * List of items in the category.
 		 */
-		public final List<Item> items;
+		public final List<Item<? extends PersistentParameter<?>>> items;
 
 		private Node contentPane;
 
@@ -370,7 +370,7 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 		 *
 		 * @param item a user settings item.
 		 */
-		public void addItem(Item item) {
+		public void addItem(Item<? extends PersistentParameter<?>> item) {
 			this.items.add(item);
 		}
 
@@ -379,7 +379,8 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 		 * Used to only save a category if it actually has been
 		 * initialized/used.
 		 *
-		 * @return True if the category has been initialized, False otherwise.
+		 * @return {@code true} if the category has been initialized,
+		 * {@code false} otherwise.
 		 */
 		public boolean hasBeenInitialized() {
 			return this.contentPane != null;
@@ -402,7 +403,7 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 		private Node newContentPane() {
 			final FormGridPane grid = new FormGridPane();
 
-			for (Item item : this.items) {
+			for (Item<?> item : this.items) {
 				final Label title = new Label(item.parameter().label());
 				title.getStyleClass().add("dip-small");
 				GridPane.setMargin(
@@ -425,7 +426,7 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 	 *
 	 * @param <T> type of the persistent parameter.
 	 */
-	public static abstract class Item<T extends PersistentParameter> {
+	public static abstract class Item<T extends PersistentParameter<?>> {
 
 		protected T parameter;
 
@@ -433,7 +434,8 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 		 * Checks whether the item has been initialized (viewed/opened). Used to
 		 * only save an item if it actually has been initialized/used.
 		 *
-		 * @return True if the item has been initialized, False otherwise.
+		 * @return {@code true} if the item has been initialized, {@code false}
+		 * otherwise.
 		 */
 		public boolean hasBeenInitialized() {
 			return this.parameter != null;
@@ -444,7 +446,7 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 		 *
 		 * @return the parameter backing the item.
 		 */
-		public abstract PersistentParameter<T> parameter();
+		public abstract T parameter();
 
 		/**
 		 * Saves the item. First check if the item {@code hasBeenInitialized},

@@ -95,15 +95,15 @@ public class GlobalThreshold extends ProcessableBase implements Previewable {
 		));
 		this.parameters.put("threshold", this.thresholdParameter);
 
-		this.input = new InputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImage(), true);
-		this.input_gray = new InputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImageGray(), true);
+		this.input = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImage(), true);
+		this.input_gray = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImageGray(), true);
 
 		enableAllInputs();
 
-		this.output = new OutputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImage());
+		this.output = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImage());
 		this.outputs.put("buffered-image", this.output);
 
-		this.output_binary = new OutputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImageBinary());
+		this.output_binary = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImageBinary());
 		this.outputs.put("binary-image", this.output_binary);
 	}
 
@@ -148,7 +148,7 @@ public class GlobalThreshold extends ProcessableBase implements Previewable {
 		enableInputs(null);
 	}
 
-	private void enableInputs(InputPort input) {
+	private void enableInputs(InputPort<BufferedImage> input) {
 		inputs.clear();
 
 		if (input == null || input.equals(this.input)) {

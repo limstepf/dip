@@ -14,11 +14,11 @@ package ch.unifr.diva.dip.api.parameters;
  * equals/hashCode of the (top) parameter. One visible side-effect would be an
  * active reset-button, despite an unchanged matrix.
  *
- * @param <T> class of a persistent parameter.
+ * @param <T> class of a persistent parameter's value.
  */
-public class TransientFacadeParameter<T extends PersistentParameter> extends TransientParameterBase {
+public class TransientFacadeParameter<T> extends TransientParameterBase<T, Parameter.View> {
 
-	protected final T parameter;
+	protected final PersistentParameter<T> parameter;
 
 	/**
 	 * Creats a new transient facade parameter.
@@ -26,12 +26,12 @@ public class TransientFacadeParameter<T extends PersistentParameter> extends Tra
 	 * @param parameter the persistent parameter that should appear as transient
 	 * one.
 	 */
-	public TransientFacadeParameter(T parameter) {
+	public TransientFacadeParameter(PersistentParameter<T> parameter) {
 		this.parameter = parameter;
 	}
 
 	@Override
-	protected View newViewInstance() {
+	protected Parameter.View newViewInstance() {
 		return this.parameter.view();
 	}
 

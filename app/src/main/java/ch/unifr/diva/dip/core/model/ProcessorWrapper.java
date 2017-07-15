@@ -192,7 +192,8 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	/**
 	 * Checks whether the wrapped processor is available or not.
 	 *
-	 * @return True if the processor is available, False otherwise.
+	 * @return {@code true} if the processor is available, {@code false}
+	 * otherwise.
 	 */
 	public final boolean isAvailable() {
 		return availableProperty().get();
@@ -214,7 +215,8 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	 * be edited), otherwise the node is more compact and only shows the
 	 * minimum.
 	 *
-	 * @return True if the processor is in editing mode, False otherwise.
+	 * @return {@code true} if the processor is in editing mode, {@code false}
+	 * otherwise.
 	 */
 	public final boolean isEditing() {
 		return editingProperty().get();
@@ -319,8 +321,8 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	 * processor is initialized.
 	 *
 	 * @param forceInit forces initialization of the wrapped processor if set to
-	 * True. This is usually set to False, and only needed for hot-swapping of
-	 * processor services.
+	 * {@code true}. This is usually set to {@code false}, and only needed for
+	 * hot-swapping of processor services.
 	 */
 	public void updateProcessor(boolean forceInit) {
 		final Processor newProcessor = getProcessor(pid, version);
@@ -340,30 +342,29 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 			// disconnecting the old processor might change its ports (repaint)
 			// so we can't do that while iterating over the inputs, which is most
 			// likely a LinkedHashMap, or we'll face a ConcurrentModificationException
-			final List<InputPort> disconnectMe = new ArrayList<>();
+			final List<InputPort<?>> disconnectMe = new ArrayList<>();
 			// similarly connecting dependent inputs to the new one likely removes
 			// the wire to the old proc, same problem, so...
-			final Map<InputPort, OutputPort> connectMe = new HashMap<>();
+			final Map<InputPort<?>, OutputPort<?>> connectMe = new HashMap<>();
 
-			for (Map.Entry<String, InputPort> e : processor.inputs().entrySet()) {
+			for (Map.Entry<String, InputPort<?>> e : processor.inputs().entrySet()) {
 				final String key = e.getKey();
-				final InputPort input = e.getValue();
+				final InputPort<?> input = e.getValue();
 				if (input.isConnected()) {
-					final OutputPort output = input.connection();
+					final OutputPort<?> output = input.connection();
 					disconnectMe.add(input);
-					final InputPort newInput = newProcessor.input(key);
+					final InputPort<?> newInput = newProcessor.input(key);
 					if (newInput != null) {
 						connectMe.put(newInput, output);
 					}
 				}
 			}
 
-			for (Map.Entry<String, Set<InputPort>> e : processor.dependentInputs().entrySet()) {
+			for (Map.Entry<String, Set<InputPort<?>>> e : processor.dependentInputs().entrySet()) {
 				final String key = e.getKey();
-				for (InputPort input : e.getValue()) {
-					final OutputPort output = input.connection();
+				for (InputPort<?> input : e.getValue()) {
 					disconnectMe.add(input);
-					final OutputPort newOutput = newProcessor.output(key);
+					final OutputPort<?> newOutput = newProcessor.output(key);
 					if (newOutput != null) {
 						connectMe.put(input, newOutput);
 					}
@@ -371,12 +372,12 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 			}
 
 			// disconnect old processor
-			for (InputPort port : disconnectMe) {
+			for (InputPort<?> port : disconnectMe) {
 				port.disconnect();
 			}
 
 			// and hook up new processor
-			for (Map.Entry<InputPort, OutputPort> e : connectMe.entrySet()) {
+			for (Map.Entry<InputPort<?>, OutputPort<?>> e : connectMe.entrySet()) {
 				e.getKey().connectTo(e.getValue());
 			}
 		}
@@ -434,11 +435,10 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 		for (Map.Entry<String, Object> e : this.parameters.entrySet()) {
 			final String key = e.getKey();
 			final Object value = e.getValue();
-			final Parameter p = processor.parameters().get(key);
+			final Parameter<?> p = processor.parameters().get(key);
 			if (p.isPersistent()) {
-				final PersistentParameter pp = (PersistentParameter) p;
 				try {
-					pp.set(value);
+					p.asPersitentParameter().setRaw(value);
 				} catch (ClassCastException ex) {
 					// this cast might go wrong upon having updated or replaced
 					// a processor - which is okay. The parameter is lost.
@@ -456,18 +456,18 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	}
 
 	private void addParameterListener(Processor processor) {
-		for (Parameter p : processor.parameters().values()) {
+		for (Parameter<?> p : processor.parameters().values()) {
 			if (p.isPersistent()) {
-				final PersistentParameter pp = (PersistentParameter) p;
+				final PersistentParameter<?> pp = (PersistentParameter) p;
 				this.modifiedProcessorProperty.addObservedProperty(pp.property());
 			}
 		}
 	}
 
 	private void removeParameterListener(Processor processor) {
-		for (Parameter p : processor.parameters().values()) {
+		for (Parameter<?> p : processor.parameters().values()) {
 			if (p.isPersistent()) {
-				final PersistentParameter pp = (PersistentParameter) p;
+				final PersistentParameter<?> pp = (PersistentParameter) p;
 				this.modifiedProcessorProperty.removeObservedProperty(pp.property());
 			}
 		}
@@ -628,11 +628,11 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	 *
 	 * @param p the parameter map to be copied.
 	 */
-	public void copyParameters(Map<String, Parameter> p) {
-		final Map<String, Parameter> q = this.processor().parameters();
+	public void copyParameters(Map<String, Parameter<?>> p) {
+		final Map<String, Parameter<?>> q = this.processor().parameters();
 		final List<String> secondPass = new ArrayList<>();
 
-		for (Map.Entry<String, Parameter> e : p.entrySet()) {
+		for (Map.Entry<String, Parameter<?>> e : p.entrySet()) {
 			final String key = e.getKey();
 			if (e.getValue().isPersistent()) {
 				if (q.containsKey(key) && q.get(key).isPersistent()) {
@@ -648,7 +648,7 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 		// could enable dependent parameters that weren't present during the
 		// first pass)
 		for (String key : secondPass) {
-			final Parameter pp = p.get(key);
+			final Parameter<?> pp = p.get(key);
 			if (pp.isPersistent() && q.containsKey(key) && q.get(key).isPersistent()) {
 				copyParameterValue(pp, q.get(key));
 			}
@@ -665,23 +665,22 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	 * @param parameters the new parameters.
 	 */
 	public void setParameters(Map<String, Object> parameters) {
-		final Map<String, Parameter> q = this.processor().parameters();
+		final Map<String, Parameter<?>> q = this.processor().parameters();
 		for (Map.Entry<String, Object> e : parameters.entrySet()) {
 			final String key = e.getKey();
 			if (q.containsKey(key)) {
-				final Parameter p = q.get(key);
+				final Parameter<?> p = q.get(key);
 				if (p.isPersistent()) {
-					final PersistentParameter pp = (PersistentParameter) p;
-					pp.set(IOUtils.deepClone(e.getValue()));
+					p.asPersitentParameter().setRaw(IOUtils.deepClone(e.getValue()));
 				}
 			}
 		}
 	}
 
-	private void copyParameterValue(Parameter from, Parameter to) {
-		final PersistentParameter p = (PersistentParameter) to;
-		final PersistentParameter q = (PersistentParameter) from;
-		p.set(IOUtils.deepClone(q.get()));
+	private void copyParameterValue(Parameter<?> from, Parameter<?> to) {
+		final PersistentParameter<?> p = (PersistentParameter) to;
+		final PersistentParameter<?> q = (PersistentParameter) from;
+		p.setRaw(IOUtils.deepClone(q.get()));
 	}
 
 	/**
@@ -690,7 +689,8 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	 *
 	 * @param <T> class of the processor.
 	 * @param p a processor.
-	 * @return true if the parameters are equal, false otherwise.
+	 * @return {@code true} if the parameters are equal, {@code false}
+	 * otherwise.
 	 */
 	public <T extends ProcessorWrapper> boolean equalParameters(T p) {
 		return equalParameters(this, p);
@@ -702,7 +702,8 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	 * @param <T> class of the processor.
 	 * @param p a processor.
 	 * @param q another processor.
-	 * @return true if both sets of parameters are equal, false otherwise.
+	 * @return {@code true} if both sets of parameters are equal, {@code false}
+	 * otherwise.
 	 */
 	public static <T extends ProcessorWrapper> boolean equalParameters(T p, T q) {
 		return equalParameters(p.processor().parameters(), q.processor().parameters());
@@ -713,22 +714,23 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	 *
 	 * @param p a parameter map.
 	 * @param q another parameter map.
-	 * @return true if both parameter maps are equal, false otherwise.
+	 * @return {@code true} if both parameter maps are equal, {@code false}
+	 * otherwise.
 	 */
-	public static boolean equalParameters(Map<String, Parameter> p, Map<String, Parameter> q) {
+	public static boolean equalParameters(Map<String, Parameter<?>> p, Map<String, Parameter<?>> q) {
 		if (p.size() != q.size()) {
 			return false;
 		}
 
-		for (Map.Entry<String, Parameter> e : p.entrySet()) {
+		for (Map.Entry<String, Parameter<?>> e : p.entrySet()) {
 			final String key = e.getKey();
 			// we don't really care about non-persistent parameters (i.e. labels and such...)
 			if (e.getValue().isPersistent()) {
 				if (!q.containsKey(key)) {
 					return false;
 				}
-				final PersistentParameter pp = (PersistentParameter) e.getValue();
-				final PersistentParameter pq = (PersistentParameter) q.get(key);
+				final PersistentParameter<?> pp = (PersistentParameter) e.getValue();
+				final PersistentParameter<?> pq = (PersistentParameter) q.get(key);
 				if (!pp.get().equals(pq.get())) {
 					return false;
 				}
@@ -762,18 +764,18 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	 * processors, this mapping is needed to retrieve processor id and key of an
 	 * output port.
 	 *
-	 * @param <T>
+	 * @param <T> class of the processor wrapper.
 	 * @param wrappers list of wrapped processors.
 	 * @return map of PortMapEntry indexed by OutputPort.
 	 */
-	public static <T extends ProcessorWrapper> Map<OutputPort, PortMapEntry> getOutputPortMap(List<T> wrappers) {
-		final Map<OutputPort, PortMapEntry> map = new HashMap<>();
+	public static <T extends ProcessorWrapper> Map<OutputPort<?>, PortMapEntry> getOutputPortMap(List<T> wrappers) {
+		final Map<OutputPort<?>, PortMapEntry> map = new HashMap<>();
 
 		for (ProcessorWrapper wrapper : wrappers) {
 			if (!wrapper.isAvailable()) {
 				continue;
 			}
-			for (Map.Entry<String, OutputPort> e : wrapper.processor().outputs().entrySet()) {
+			for (Map.Entry<String, OutputPort<?>> e : wrapper.processor().outputs().entrySet()) {
 				map.put(e.getValue(), new PortMapEntry(wrapper.id, e.getKey()));
 			}
 		}
@@ -791,11 +793,11 @@ public class ProcessorWrapper implements Modifiable, Localizable {
 	 * @param wrappers list of wrapped processors.
 	 * @return map of PortMapEntry indexed by InputPort.
 	 */
-	public static <T extends ProcessorWrapper> Map<InputPort, PortMapEntry> getInputPortMap(List<T> wrappers) {
-		final Map<InputPort, PortMapEntry> map = new HashMap<>();
+	public static <T extends ProcessorWrapper> Map<InputPort<?>, PortMapEntry> getInputPortMap(List<T> wrappers) {
+		final Map<InputPort<?>, PortMapEntry> map = new HashMap<>();
 
 		for (ProcessorWrapper wrapper : wrappers) {
-			for (Map.Entry<String, InputPort> e : wrapper.processor().inputs().entrySet()) {
+			for (Map.Entry<String, InputPort<?>> e : wrapper.processor().inputs().entrySet()) {
 				map.put(e.getValue(), new PortMapEntry(wrapper.id, e.getKey()));
 			}
 		}

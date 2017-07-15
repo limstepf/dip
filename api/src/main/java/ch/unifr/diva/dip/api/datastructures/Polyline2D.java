@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
-public class Polyline2D {
+public class Polyline2D implements Cloneable {
 
 	@XmlElement(name = "point")
 	public final List<Point2D> points;

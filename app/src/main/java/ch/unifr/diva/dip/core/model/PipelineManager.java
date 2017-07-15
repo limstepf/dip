@@ -15,7 +15,6 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -44,7 +43,7 @@ public class PipelineManager implements Modifiable, Localizable {
 
 	private final ApplicationHandler handler;
 	private int maxPipelineId = 0;
-	private final ObservableList<Pipeline> pipelines;
+	private final ObservableList<Pipeline<ProcessorWrapper>> pipelines;
 	private final IntegerProperty defaultPipelineIdProperty = new SimpleIntegerProperty();
 	private final ModifiedProperty modifiedPipelinesProperty;
 
@@ -63,7 +62,7 @@ public class PipelineManager implements Modifiable, Localizable {
 
 		if (pds != null) {
 			for (PipelineData.Pipeline pd : pds) {
-				addPipeline(new Pipeline(handler, pd));
+				addPipeline(new Pipeline<>(handler, pd));
 				levelMaxPipelineId(pd.id);
 			}
 		}
@@ -79,7 +78,7 @@ public class PipelineManager implements Modifiable, Localizable {
 		this.handler.osgi.getProcessors().getServiceCollectionList().addListener(processorListener);
 	}
 
-	private final ListChangeListener<? super ServiceCollection<Processor>> processorListener = (ListChangeListener.Change<? extends ServiceCollection<Processor>> c) -> {
+	private final ListChangeListener<ServiceCollection<Processor>> processorListener = (ListChangeListener.Change<? extends ServiceCollection<Processor>> c) -> {
 		while (c.next()) {
 			if (c.wasReplaced()) {
 				for (ServiceCollection<Processor> collection : c.getRemoved()) {
@@ -130,7 +129,7 @@ public class PipelineManager implements Modifiable, Localizable {
 	 *
 	 * @return an observable list of all pipelines.
 	 */
-	public ObservableList<Pipeline> pipelines() {
+	public ObservableList<Pipeline<ProcessorWrapper>> pipelines() {
 		return pipelines;
 	}
 
@@ -141,7 +140,7 @@ public class PipelineManager implements Modifiable, Localizable {
 	 */
 	public Map<Integer, PipelineData.Pipeline> getBackupData() {
 		final HashMap<Integer, PipelineData.Pipeline> data = new HashMap<>();
-		for (Pipeline p : pipelines) {
+		for (Pipeline<?> p : pipelines) {
 			data.put(p.id, new PipelineData.Pipeline(p));
 		}
 		return data;
@@ -173,17 +172,18 @@ public class PipelineManager implements Modifiable, Localizable {
 	public Map<Integer, Set<Integer>> getUsedPipelines(boolean modifiedOnly) {
 		final Project project = handler.getProject();
 		if (project == null) {
-			return Collections.EMPTY_MAP;
+			return new HashMap<>();
 		}
 		final Map<Integer, Set<Integer>> usage = PipelineManager.pipelineUsage(project.pages());
 		if (usage.isEmpty()) {
-			return Collections.EMPTY_MAP;
+			return new HashMap<>();
 		}
 		final Map<Integer, Set<Integer>> used = new HashMap<>();
-		for (Integer id : usage.keySet()) {
-			final Pipeline pipeline = getPipeline(id);
+		for (Map.Entry<Integer, Set<Integer>> e : usage.entrySet()) {
+			final int id = e.getKey();
+			final Pipeline<?> pipeline = getPipeline(id);
 			if (!modifiedOnly || pipeline.isModified()) {
-				used.put(id, usage.get(id));
+				used.put(id, e.getValue());
 			}
 		}
 		return used;
@@ -195,8 +195,8 @@ public class PipelineManager implements Modifiable, Localizable {
 	 * @param id id of the pipeline.
 	 * @return the pipeline with given id, or null if no such pipeline is found.
 	 */
-	public Pipeline getPipeline(int id) {
-		for (Pipeline p : pipelines) {
+	public Pipeline<ProcessorWrapper> getPipeline(int id) {
+		for (Pipeline<ProcessorWrapper> p : pipelines) {
 			if (p.id == id) {
 				return p;
 			}
@@ -208,10 +208,11 @@ public class PipelineManager implements Modifiable, Localizable {
 	 * Checks whether a pipeline with the given id exists.
 	 *
 	 * @param id a pipeline id.
-	 * @return True if there is a pipeline with given id, False otherwise.
+	 * @return {@code true} if there is a pipeline with given id, {@code false}
+	 * otherwise.
 	 */
 	public boolean pipelineExists(int id) {
-		final Pipeline p = getPipeline(id);
+		final Pipeline<ProcessorWrapper> p = getPipeline(id);
 		return (p != null);
 	}
 
@@ -248,9 +249,9 @@ public class PipelineManager implements Modifiable, Localizable {
 	 * @param name name of the new pipeline.
 	 * @return the new pipeline.
 	 */
-	public Pipeline createPipeline(String name) {
+	public Pipeline<ProcessorWrapper> createPipeline(String name) {
 		final int id = newPipelineId();
-		final Pipeline pipeline = new Pipeline(handler, id, name);
+		final Pipeline<ProcessorWrapper> pipeline = new Pipeline<>(handler, id, name);
 		addPipeline(pipeline);
 		return pipeline;
 	}
@@ -261,22 +262,22 @@ public class PipelineManager implements Modifiable, Localizable {
 	 * @param pipeline the pipeline to be cloned.
 	 * @return the clone/a copy of the given pipeline.
 	 */
-	public Pipeline clonePipeline(Pipeline pipeline) {
-		final PipelineData.Pipeline data = new PipelineData.Pipeline<>(pipeline);
+	public Pipeline<ProcessorWrapper> clonePipeline(Pipeline<ProcessorWrapper> pipeline) {
+		final PipelineData.Pipeline data = new PipelineData.Pipeline(pipeline);
 		data.name = IOUtils.nameSuffixIncrement(data.name);
 		final int id = newPipelineId();
-		final Pipeline clone = new Pipeline(handler, data, id);
+		final Pipeline<ProcessorWrapper> clone = new Pipeline<>(handler, data, id);
 		addPipeline(clone);
 		return clone;
 	}
 
-	private void addAllPipelines(List<Pipeline> pipelines) {
-		for (Pipeline pipeline : pipelines) {
+	private void addAllPipelines(List<Pipeline<ProcessorWrapper>> pipelines) {
+		for (Pipeline<ProcessorWrapper> pipeline : pipelines) {
 			addPipeline(pipeline);
 		}
 	}
 
-	private void addPipeline(Pipeline pipeline) {
+	private void addPipeline(Pipeline<ProcessorWrapper> pipeline) {
 		this.modifiedPipelinesProperty.addManagedProperty(pipeline);
 		this.pipelines.add(pipeline);
 		if (this.pipelines.size() == 1) {
@@ -288,7 +289,8 @@ public class PipelineManager implements Modifiable, Localizable {
 	 * Removes a pipeline from the pipeline manager.
 	 *
 	 * @param id pipeline id of the pipeline which is to be removed.
-	 * @return True if the pipeline was deleted, False otherwise.
+	 * @return {@code true} if the pipeline was deleted, {@code false}
+	 * otherwise.
 	 */
 	public boolean deletePipeline(int id) {
 		return deletePipeline(getPipeline(id));
@@ -298,10 +300,11 @@ public class PipelineManager implements Modifiable, Localizable {
 	 * Removes a pipeline from the pipeline manager.
 	 *
 	 * @param pipeline pipeline to be removed.
-	 * @return True if the pipeline was deleted, False otherwise.
+	 * @return {@code true} if the pipeline was deleted, {@code false}
+	 * otherwise.
 	 */
-	public boolean deletePipeline(Pipeline pipeline) {
-		final List<Pipeline> list = Arrays.asList(pipeline);
+	public boolean deletePipeline(Pipeline<ProcessorWrapper> pipeline) {
+		final List<Pipeline<ProcessorWrapper>> list = Arrays.asList(pipeline);
 		return deletePipelines(list);
 	}
 
@@ -310,9 +313,10 @@ public class PipelineManager implements Modifiable, Localizable {
 	 * will be prompted for.
 	 *
 	 * @param selection list of pipelines to be removed.
-	 * @return True if the pipelines were deleted, False otherwise.
+	 * @return {@code true} if the pipelines were deleted, {@code false}
+	 * otherwise.
 	 */
-	public boolean deletePipelines(List<Pipeline> selection) {
+	public boolean deletePipelines(List<Pipeline<ProcessorWrapper>> selection) {
 		return deletePipelines(selection, true);
 	}
 
@@ -321,9 +325,10 @@ public class PipelineManager implements Modifiable, Localizable {
 	 *
 	 * @param selection list of pipelines to be removed.
 	 * @param confirm whether to prompt for user confirmation first.
-	 * @return True if the pipelines were deleted, False otherwise.
+	 * @return {@code true} if the pipelines were deleted, {@code false}
+	 * otherwise.
 	 */
-	public boolean deletePipelines(List<Pipeline> selection, boolean confirm) {
+	public boolean deletePipelines(List<Pipeline<ProcessorWrapper>> selection, boolean confirm) {
 		if (confirm) {
 			final String msg = formatDeletePipelineMessage(selection);
 			final Answer answer = handler.uiStrategy.getAnswer(msg);
@@ -336,7 +341,7 @@ public class PipelineManager implements Modifiable, Localizable {
 			}
 		}
 
-		for (Pipeline pipeline : selection) {
+		for (Pipeline<ProcessorWrapper> pipeline : selection) {
 			if (!pipelines.contains(pipeline)) {
 				continue;
 			}
@@ -360,12 +365,12 @@ public class PipelineManager implements Modifiable, Localizable {
 	 * otherwise.
 	 */
 	public boolean replacePipeline(PipelineData.Pipeline data) {
-		final Pipeline dst = getPipeline(data.id);
+		final Pipeline<ProcessorWrapper> dst = getPipeline(data.id);
 		if (dst == null) {
 			return false;
 		}
 		final int index = pipelines.indexOf(dst);
-		final Pipeline src = new Pipeline(handler, data);
+		final Pipeline<ProcessorWrapper> src = new Pipeline<>(handler, data);
 		this.modifiedPipelinesProperty.removeManagedProperty(dst);
 		this.modifiedPipelinesProperty.addManagedProperty(src);
 		pipelines.set(index, src);
@@ -378,9 +383,9 @@ public class PipelineManager implements Modifiable, Localizable {
 	 * @param selection the selection of pipelines to be deleted.
 	 * @return the delete pipelines confirmation message.
 	 */
-	static public String formatDeletePipelineMessage(List<Pipeline> selection) {
+	static public String formatDeletePipelineMessage(List<Pipeline<ProcessorWrapper>> selection) {
 		final List<String> names = new ArrayList<>();
-		for (Pipeline pipeline : selection) {
+		for (Pipeline<ProcessorWrapper> pipeline : selection) {
 			names.add(pipeline.getName());
 		}
 		return L10n.getInstance().getString(
@@ -398,7 +403,7 @@ public class PipelineManager implements Modifiable, Localizable {
 		for (PipelineData.PipelineItem item : items) {
 			final PipelineData.Pipeline pipeline = item.toPipelineData();
 			pipeline.id = newPipelineId();
-			addPipeline(new Pipeline(handler, pipeline));
+			addPipeline(new Pipeline<>(handler, pipeline));
 		}
 	}
 
@@ -410,7 +415,7 @@ public class PipelineManager implements Modifiable, Localizable {
 	 */
 	public int importPipeline(PipelineData.Pipeline data) {
 		final int id = newPipelineId();
-		final Pipeline pipeline = new Pipeline(handler, data, id);
+		final Pipeline<ProcessorWrapper> pipeline = new Pipeline<>(handler, data, id);
 		addPipeline(pipeline);
 		return id;
 	}
@@ -429,14 +434,14 @@ public class PipelineManager implements Modifiable, Localizable {
 	 * @return a list of pipelines.
 	 * @throws JAXBException
 	 */
-	public static List<Pipeline> importPipelines(ApplicationHandler handler, Path file, int startId) throws JAXBException {
+	public static List<Pipeline<ProcessorWrapper>> importPipelines(ApplicationHandler handler, Path file, int startId) throws JAXBException {
 		final PipelineData data = PipelineData.load(file);
-		final List<Pipeline> pipelines = new ArrayList<>();
+		final List<Pipeline<ProcessorWrapper>> pipelines = new ArrayList<>();
 		for (PipelineData.Pipeline pipeline : data.list) {
 			if (startId > -1) {
 				pipeline.id = startId++;
 			}
-			pipelines.add(new Pipeline(handler, pipeline));
+			pipelines.add(new Pipeline<>(handler, pipeline));
 		}
 		return pipelines;
 	}
@@ -466,7 +471,7 @@ public class PipelineManager implements Modifiable, Localizable {
 	 * @param stream output stream to write to.
 	 * @throws JAXBException
 	 */
-	public static void exportPipelines(List<Pipeline> pipelines, OutputStream stream) throws JAXBException {
+	public static void exportPipelines(List<Pipeline<ProcessorWrapper>> pipelines, OutputStream stream) throws JAXBException {
 		final PipelineData data = new PipelineData(pipelines);
 		XmlUtils.marshal(data, stream);
 	}
@@ -496,7 +501,7 @@ public class PipelineManager implements Modifiable, Localizable {
 	 * @param file pipeline file to write to.
 	 * @throws JAXBException
 	 */
-	public static void exportPipelines(List<Pipeline> pipelines, Path file) throws JAXBException {
+	public static void exportPipelines(List<Pipeline<ProcessorWrapper>> pipelines, Path file) throws JAXBException {
 		final PipelineData data = new PipelineData(pipelines);
 		XmlUtils.marshal(data, file);
 	}
@@ -507,8 +512,8 @@ public class PipelineManager implements Modifiable, Localizable {
 	 * @param pipelines list of pipelines.
 	 * @param x code to apply to the given pipelines.
 	 */
-	public static void forAllPipelines(List<Pipeline> pipelines, ProcessorWrapperRunnable x) {
-		for (Pipeline pipeline : pipelines) {
+	public static void forAllPipelines(List<Pipeline<ProcessorWrapper>> pipelines, ProcessorWrapperRunnable x) {
+		for (Pipeline<ProcessorWrapper> pipeline : pipelines) {
 			forAllProcessors(pipeline.processors(), x);
 		}
 	}
@@ -558,8 +563,8 @@ public class PipelineManager implements Modifiable, Localizable {
 	 * @param handler application handler.
 	 * @return a new, empty pipeline.
 	 */
-	public static Pipeline emptyPipeline(ApplicationHandler handler) {
-		final Pipeline pipeline = new Pipeline(
+	public static Pipeline<ProcessorWrapper> emptyPipeline(ApplicationHandler handler) {
+		final Pipeline<ProcessorWrapper> pipeline = new Pipeline<>(
 				handler,
 				0,
 				L10n.getInstance().getString("pipeline.new")
@@ -611,13 +616,13 @@ public class PipelineManager implements Modifiable, Localizable {
 	 * @param pipelines pipelines to populate the combo box with.
 	 * @return a combo box with the given pipelines.
 	 */
-	public static ComboBox<PipelineItem> getComboBox(List<Pipeline> pipelines) {
-		final ComboBox<PipelineItem> box = new ComboBox();
+	public static ComboBox<PipelineItem> getComboBox(List<Pipeline<ProcessorWrapper>> pipelines) {
+		final ComboBox<PipelineItem> box = new ComboBox<>();
 		box.setCellFactory((ListView<PipelineItem> p) -> new SimplePipelineCell());
 		box.setButtonCell(new SimplePipelineCell());
 
 		box.getItems().add(new PipelineItem(-1, ""));
-		for (Pipeline pipeline : pipelines) {
+		for (Pipeline<ProcessorWrapper> pipeline : pipelines) {
 			box.getItems().add(new PipelineItem(pipeline));
 		}
 
@@ -660,7 +665,7 @@ public class PipelineManager implements Modifiable, Localizable {
 		/**
 		 * Name of the empty pipeline.
 		 */
-		public static String emptyPipeline = L10n.getInstance().getString("none").toLowerCase();
+		public final static String emptyPipeline = L10n.getInstance().getString("none").toLowerCase();
 
 		/**
 		 * The pipeline id.
@@ -674,7 +679,7 @@ public class PipelineManager implements Modifiable, Localizable {
 
 		private final BooleanProperty disabledProperty;
 
-		public PipelineItem(Pipeline pipeline) {
+		public PipelineItem(Pipeline<ProcessorWrapper> pipeline) {
 			this(pipeline.id, pipeline.getName());
 		}
 

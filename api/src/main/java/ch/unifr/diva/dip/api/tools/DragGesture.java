@@ -15,7 +15,7 @@ import javafx.scene.input.MouseEvent;
  * mouse button is released.</li>
  * </ol>
  */
-public class DragGesture extends GestureBase<MouseEvent> {
+public class DragGesture extends GestureBase {
 
 	/**
 	 * Creates a new drag gesture without (mouse) movement event handlers.
@@ -41,15 +41,15 @@ public class DragGesture extends GestureBase<MouseEvent> {
 	public DragGesture(EventHandler<MouseEvent> onPressed, EventHandler<MouseEvent> onDragged, EventHandler<MouseEvent> onReleased, EventHandler<MouseEvent> onEntered, EventHandler<MouseEvent> onMoved, EventHandler<MouseEvent> onExited) {
 		super();
 
-		eventHandlers().add(new GestureEventHandler(
+		eventHandlers().add(new GestureEventHandler<>(
 				MouseEvent.MOUSE_PRESSED,
 				onPressed
 		));
-		eventHandlers().add(new GestureEventHandler(
+		eventHandlers().add(new GestureEventHandler<>(
 				MouseEvent.MOUSE_DRAGGED,
 				onDragged
 		));
-		eventHandlers().add(new GestureEventHandler(
+		eventHandlers().add(new GestureEventHandler<>(
 				MouseEvent.MOUSE_RELEASED,
 				onReleased
 		));

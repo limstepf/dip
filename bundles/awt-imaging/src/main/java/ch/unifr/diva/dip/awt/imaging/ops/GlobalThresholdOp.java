@@ -10,7 +10,7 @@ import java.awt.image.WritableRaster;
  * Global threshold filter. This filter operates on a single band in the source
  * image.
  */
-public class GlobalThresholdOp extends NullOp implements TileParallelizable {
+public class GlobalThresholdOp extends NullOp implements SimpleTileParallelizable {
 
 	private int band;
 	private int threshold;
@@ -212,7 +212,7 @@ public class GlobalThresholdOp extends NullOp implements TileParallelizable {
 		}
 
 		int threshold = 0;
-		float vMax = 0;
+		double vMax = 0;
 
 		int wB = 0;
 		int wF = 0;
@@ -234,11 +234,11 @@ public class GlobalThresholdOp extends NullOp implements TileParallelizable {
 			sumB += i * histogram.getValue(i);
 
 			// class mean levels (of back- and foreground)
-			final float mB = sumB / wB;
-			final float mF = (sum - sumB) / wF;
+			final double mB = sumB / (double) wB;
+			final double mF = (sum - sumB) / (double)  wF;
 
 			// between-class variance
-			final float v = wB * wF * (mB - mF) * (mB - mF);
+			final double v = wB * wF * (mB - mF) * (mB - mF);
 
 			if (v > vMax) {
 				vMax = v;

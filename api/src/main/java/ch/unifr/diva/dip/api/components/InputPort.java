@@ -10,11 +10,11 @@ import javafx.beans.property.SimpleBooleanProperty;
 /**
  * Input port. Input ports provide objects to DIP processors.
  *
- * @param <T> type of the port.
+ * @param <T> type of the value on the port (i.e. not the DataType).
  */
 public class InputPort<T> extends AbstractPort<T> {
 
-	private OutputPort output;
+	private OutputPort<T> output;
 
 	/**
 	 * Creates a new input port.
@@ -22,7 +22,7 @@ public class InputPort<T> extends AbstractPort<T> {
 	 * @param dataType data type of the port.
 	 * @param required flag if the port is absolutely required to work.
 	 */
-	public InputPort(DataType dataType, boolean required) {
+	public InputPort(DataType<T> dataType, boolean required) {
 		super(dataType, required);
 		setPortState(State.UNCONNECTED);
 	}
@@ -33,8 +33,8 @@ public class InputPort<T> extends AbstractPort<T> {
 	}
 
 	@Override
-	public Set<OutputPort> connections() {
-		final Set<OutputPort> outputs = new HashSet<>();
+	public Set<OutputPort<T>> connections() {
+		final Set<OutputPort<T>> outputs = new HashSet<>();
 		if (isConnected()) {
 			outputs.add(output);
 		}
@@ -47,7 +47,7 @@ public class InputPort<T> extends AbstractPort<T> {
 	 *
 	 * @return the output port connected to this input port, or null.
 	 */
-	public OutputPort connection() {
+	public OutputPort<T> connection() {
 		return output;
 	}
 
@@ -61,7 +61,7 @@ public class InputPort<T> extends AbstractPort<T> {
 			return null;
 		}
 
-		return (T) this.connection().getOutput();
+		return this.connection().getOutput();
 	}
 
 	// output-port signals once value/payload is ready, or reset
@@ -103,9 +103,10 @@ public class InputPort<T> extends AbstractPort<T> {
 	}
 
 	@Override
-	public void connectTo(Port port) {
+	@SuppressWarnings("unchecked")
+	public void connectTo(Port<?> port) {
 		if (port instanceof OutputPort) {
-			this.output = (OutputPort) port;
+			this.output = (OutputPort<T>) port;
 			setPortState(State.WAITING);
 			// always bind bi-directional, but prevent stack overflow ;)
 			if (!this.output.connections().contains(this)) {
@@ -115,7 +116,7 @@ public class InputPort<T> extends AbstractPort<T> {
 	}
 
 	@Override
-	public void disconnect(Port port) {
+	public void disconnect(Port<?> port) {
 		setPortState(State.UNCONNECTED);
 		// check that port is indeed this.output ommited... :)
 		if (this.output != null) {

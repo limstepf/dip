@@ -9,7 +9,7 @@ import javafx.scene.control.Label;
  * A label as parameter. This is a transient parameter (for display purposes
  * only). Nothing gets saved.
  */
-public class LabelParameter extends TransientParameterBase implements SingleRowParameter {
+public class LabelParameter extends TransientParameterBase<String, Parameter.View> implements SingleRowParameter<String> {
 
 	protected final String label;
 

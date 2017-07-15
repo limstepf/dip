@@ -15,13 +15,19 @@ public class ProcessorViewTopDown extends ProcessorView {
 	protected final HBox outputPane = new HBox();
 	protected final BorderPane infoPane = new BorderPane();
 
+	/**
+	 * Creates a new top-down processor view.
+	 *
+	 * @param editor the pipeline editor.
+	 * @param wrapper the processor.
+	 */
 	public ProcessorViewTopDown(PipelineEditor editor, ProcessorWrapper wrapper) {
 		super(editor, wrapper);
 
 		this.setTop(inputPane);
 		inputPane.setAlignment(Pos.CENTER);
 		inputPane.getStyleClass().add("dip-processor-top");
-		for (PortView v : this.inputPorts) {
+		for (PortView<?> v : this.inputPorts) {
 			inputPane.getChildren().add(v);
 		}
 
@@ -33,7 +39,7 @@ public class ProcessorViewTopDown extends ProcessorView {
 		this.setBottom(outputPane);
 		outputPane.setAlignment(Pos.CENTER);
 		outputPane.getStyleClass().add("dip-processor-bottom");
-		for (PortView v : this.outputPorts) {
+		for (PortView<?> v : this.outputPorts) {
 			outputPane.getChildren().add(v);
 		}
 

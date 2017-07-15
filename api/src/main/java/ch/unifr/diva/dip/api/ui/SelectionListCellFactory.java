@@ -18,11 +18,11 @@ import javafx.util.Callback;
  * don't change their content (or items/cells their indices respectively). Also
  * make sure to have a new, dedicated factory per control.
  *
- * @param <T>
+ * @param <T> type of the objects stored in the ListView/ListCell.
  */
 public class SelectionListCellFactory<T> implements Callback<ListView<T>, ListCell<T>> {
 
-	private ListView listView = null;
+	private ListView<T> listView = null;
 	// TODO: if support for dynamic/modifiable lists is ever needed we'd need to
 	// listen to changes and bookkeep these indices
 	private final BitSet separators = new BitSet();
@@ -51,7 +51,7 @@ public class SelectionListCellFactory<T> implements Callback<ListView<T>, ListCe
 	 * selected.
 	 *
 	 * @param index index of the item/cell.
-	 * @param disable True to disable, False to enable.
+	 * @param disable {@code true} to disable, {@code false} to enable.
 	 */
 	public void setDisable(Integer index, boolean disable) {
 		if (disable) {
@@ -114,13 +114,13 @@ public class SelectionListCellFactory<T> implements Callback<ListView<T>, ListCe
 				});
 			});
 		}
-		return new Cell(separators, disabled);
+		return new Cell<>(separators, disabled);
 	}
 
 	/**
 	 * Extended cell.
 	 *
-	 * @param <T>
+	 * @param <T> type of the item contained within the ListCell.
 	 */
 	public static class Cell<T> extends ListCell<T> {
 

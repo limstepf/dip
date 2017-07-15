@@ -13,7 +13,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
-public class DoubleMatrix extends Matrix {
+public class DoubleMatrix extends Matrix<DoubleMatrix> {
 
 	/**
 	 * Continous doubles of the matrix.
@@ -284,7 +284,7 @@ public class DoubleMatrix extends Matrix {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		final StringMatrix other = (StringMatrix) obj;
+		final DoubleMatrix other = (DoubleMatrix) obj;
 		if (!Objects.equals(rows, other.rows)) {
 			return false;
 		}

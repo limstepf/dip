@@ -66,6 +66,7 @@ public abstract class BrushTool<T extends Brush> extends SimpleTool {
 	 * @param glyph the glyph of the tool.
 	 * @param brushes the brushes.
 	 */
+	@SafeVarargs
 	public BrushTool(String name, NamedGlyph glyph, T... brushes) {
 		this(null, name, glyph, brushes);
 	}
@@ -102,6 +103,7 @@ public abstract class BrushTool<T extends Brush> extends SimpleTool {
 	 * @param glyph the glyph of the tool.
 	 * @param brushes the brushes.
 	 */
+	@SuppressWarnings({"unchecked", "varargs"})
 	public BrushTool(EditorLayerOverlay editorOverlay, String name, NamedGlyph glyph, T... brushes) {
 		this(editorOverlay, name, glyph, Arrays.asList(brushes));
 	}
@@ -127,7 +129,7 @@ public abstract class BrushTool<T extends Brush> extends SimpleTool {
 		// setup tool options
 		// TO CONSIDER: this might not scale too well with too many brushes, maybe
 		// offer a dropdown menu instead of a glyph toggle (optional/dynamic).
-		this.brushOption = new GlyphToggleGroupParameter("Brush", 0);
+		this.brushOption = new GlyphToggleGroupParameter<>("Brush", 0);
 		for (int i = 0; i < this.brushes.size(); i++) {
 			final T brush = this.brushes.get(i);
 			brushOption.add(i, brush.getGlyph(), brush.getName());
@@ -202,7 +204,8 @@ public abstract class BrushTool<T extends Brush> extends SimpleTool {
 	/**
 	 * Checks whether an editor overlay has been registered.
 	 *
-	 * @return True if the editor overlay is available, False otherwise.
+	 * @return {@code true} if the editor overlay is available, {@code false}
+	 * otherwise.
 	 */
 	protected boolean hasOverlay() {
 		return editorOverlay != null;
@@ -221,7 +224,8 @@ public abstract class BrushTool<T extends Brush> extends SimpleTool {
 	/**
 	 * Toggles the visibility of the (custom) mouse cursor.
 	 *
-	 * @param visible True to show the (custom) mouse cursor, False otherwise.
+	 * @param visible {@code true} to show the (custom) mouse cursor,
+	 * {@code false} otherwise.
 	 */
 	protected void setCursorVisible(boolean visible) {
 		currentBrush.getCursor().setVisible(visible);

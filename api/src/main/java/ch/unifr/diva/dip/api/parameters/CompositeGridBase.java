@@ -240,11 +240,11 @@ public abstract class CompositeGridBase<T> extends CompositeBase<T, CompositeGri
 	protected abstract void updateChildValues(T value);
 
 	@Override
-	protected GridView newViewInstance() {
-		return new GridView(this);
+	protected GridView<? extends CompositeGridBase<T>, T> newViewInstance() {
+		return new GridView<>(this);
 	}
 
-	protected final List<ViewHook> viewHooks = new ArrayList<>();
+	protected final List<ViewHook<GridPane>> viewHooks = new ArrayList<>();
 
 	/**
 	 * Adds a view hook to customize the grid pane. This method is only called
@@ -296,7 +296,7 @@ public abstract class CompositeGridBase<T> extends CompositeBase<T, CompositeGri
 			int i = 0; // index for all children
 			int j = 0; // index for persistent children only
 
-			for (Parameter p : parameter.getChildren()) {
+			for (Parameter<?> p : parameter.getChildren()) {
 				final Node node = p.view().node();
 				final int col = col(i, width);
 				final int row = row(i, width);
@@ -309,7 +309,7 @@ public abstract class CompositeGridBase<T> extends CompositeBase<T, CompositeGri
 						(col > 0)
 				);
 				if (p.isPersistent()) {
-					final PersistentParameter pp = (PersistentParameter) p;
+					final PersistentParameter<?> pp = (PersistentParameter) p;
 					final int index = j;
 					pp.property().addListener((obs, oldV, newV) -> {
 						parameter.updateValue(index);

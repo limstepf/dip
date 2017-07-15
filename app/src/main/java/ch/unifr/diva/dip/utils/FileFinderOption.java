@@ -5,7 +5,7 @@ import java.util.EnumSet;
 import java.util.Set;
 
 /**
- * FinderOptions define the FileFinder visiting method.
+ * File finder options define the {@code FileFinder} visiting method.
  */
 public enum FileFinderOption {
 
@@ -26,15 +26,34 @@ public enum FileFinderOption {
 	 */
 	FOLLOWSYMLINK(Integer.MAX_VALUE, EnumSet.of(FileVisitOption.FOLLOW_LINKS));
 
+	/**
+	 * The maximum depth.
+	 */
 	public final int maxDepth;
+
+	/**
+	 * The visit options.
+	 */
 	public final Set<FileVisitOption> visitOption;
 
+	/**
+	 * Creates a new file finder option.
+	 *
+	 * @param maxDepth the maximum depth.
+	 */
 	FileFinderOption(int maxDepth) {
 		this(maxDepth, EnumSet.noneOf(FileVisitOption.class));
 	}
 
+	/**
+	 * Creates a new file finder option.
+	 *
+	 * @param maxDepth the maximum depth.
+	 * @param visitOption the visit options.
+	 */
 	FileFinderOption(int maxDepth, Set<FileVisitOption> visitOption) {
 		this.maxDepth = maxDepth;
 		this.visitOption = visitOption;
 	}
+
 }

@@ -231,7 +231,7 @@ public class MenuBarPresenter implements Presenter, Localizable {
 		viewSideBar.selectedProperty().bindBidirectional(handler.settings.primaryStage.sideBarVisibility);
 
 		final Menu viewToolBar = new Menu(localize("view.toolbar"));
-		final ToggleGroupValue toolBarGroup = new ToggleGroupValue();
+		final ToggleGroupValue<String> toolBarGroup = new ToggleGroupValue<>();
 		for (VisibilityMode mode : VisibilityMode.values()) {
 			final RadioMenuItem item = new RadioMenuItem(mode.label());
 			toolBarGroup.add(item, mode.name());
@@ -240,7 +240,7 @@ public class MenuBarPresenter implements Presenter, Localizable {
 		toolBarGroup.valueProperty().bindBidirectional(handler.settings.primaryStage.toolBarVisibility);
 
 		final Menu viewOptionsBar = new Menu(localize("view.optionsbar"));
-		final ToggleGroupValue optionsBarGroup = new ToggleGroupValue();
+		final ToggleGroupValue<String> optionsBarGroup = new ToggleGroupValue<>();
 		for (VisibilityMode mode : VisibilityMode.values()) {
 			final RadioMenuItem item = new RadioMenuItem(mode.label());
 			optionsBarGroup.add(item, mode.name());

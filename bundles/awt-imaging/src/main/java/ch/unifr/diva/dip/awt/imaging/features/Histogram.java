@@ -115,7 +115,7 @@ public class Histogram {
 	public double[] getNormalizedHistogram() {
 		final double[] result = new double[this.counts.length];
 		for (int i = 0; i < this.counts.length; i++) {
-			result[i] = (this.counts[i] / this.totalSamples);
+			result[i] = (this.counts[i] / (double) this.totalSamples);
 		}
 		return result;
 	}

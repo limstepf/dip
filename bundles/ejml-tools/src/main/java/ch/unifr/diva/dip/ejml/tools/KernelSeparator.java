@@ -66,15 +66,15 @@ public class KernelSeparator extends ProcessableBase {
 		this.errorThreshold.setTooltipFormat("Current value: %f. Error check is disabled with a value <= 0.");
 		this.parameters.put("singularity-error", this.errorThreshold);
 
-		this.input_float = new InputPort(new ch.unifr.diva.dip.api.datatypes.FloatMatrix(), false);
-		this.input_double = new InputPort(new ch.unifr.diva.dip.api.datatypes.DoubleMatrix(), false);
+		this.input_float = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.FloatMatrix(), false);
+		this.input_double = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.DoubleMatrix(), false);
 
-		this.output_float = new OutputPort(new ch.unifr.diva.dip.api.datatypes.FloatMatrix());
-		this.output_float_row = new OutputPort(new ch.unifr.diva.dip.api.datatypes.FloatMatrix());
-		this.output_float_column = new OutputPort(new ch.unifr.diva.dip.api.datatypes.FloatMatrix());
-		this.output_double = new OutputPort(new ch.unifr.diva.dip.api.datatypes.DoubleMatrix());
-		this.output_double_row = new OutputPort(new ch.unifr.diva.dip.api.datatypes.DoubleMatrix());
-		this.output_double_column = new OutputPort(new ch.unifr.diva.dip.api.datatypes.DoubleMatrix());
+		this.output_float = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.FloatMatrix());
+		this.output_float_row = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.FloatMatrix());
+		this.output_float_column = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.FloatMatrix());
+		this.output_double = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.DoubleMatrix());
+		this.output_double_row = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.DoubleMatrix());
+		this.output_double_column = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.DoubleMatrix());
 
 		enableAllInputs();
 		enableAllOutputs();
@@ -231,7 +231,7 @@ public class KernelSeparator extends ProcessableBase {
 				);
 			}
 
-			final SimpleSVD svd = matrix.svd();
+			final SimpleSVD<?> svd = matrix.svd();
 			// svd.rank() uses a ridiculously small/conservative singularity
 			// threshold, so we rather use our own here
 			final double singThresh = this.singularityThreshold.getDouble();

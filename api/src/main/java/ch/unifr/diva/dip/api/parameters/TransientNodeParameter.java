@@ -10,7 +10,7 @@ import javafx.scene.Node;
  *
  * @param <T> class extending JavaFX node.
  */
-public class TransientNodeParameter<T extends Node> extends TransientParameterBase {
+public class TransientNodeParameter<T extends Node> extends TransientParameterBase<T, Parameter.View> {
 
 	protected final T node;
 	protected final View nodeView;

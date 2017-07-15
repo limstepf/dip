@@ -119,7 +119,8 @@ public class ZoomPaneWithOverlay extends ZoomPaneSimple {
 	/**
 	 * Check whether the overlay pane is empty.
 	 *
-	 * @return True if the overlay pane is empty, False otherwise.
+	 * @return {@code true} if the overlay pane is empty, {@code false}
+	 * otherwise.
 	 */
 	public boolean isOverlayEmpty() {
 		return this.overlayContentPane.getChildren().isEmpty();

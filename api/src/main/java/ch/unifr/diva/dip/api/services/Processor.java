@@ -203,7 +203,7 @@ public interface Processor {
 	 *
 	 * @return a map of the parameters of the processor indexed by their keys.
 	 */
-	default Map<String, Parameter> parameters() {
+	default Map<String, Parameter<?>> parameters() {
 		return Collections.emptyMap();
 	}
 
@@ -213,7 +213,7 @@ public interface Processor {
 	 *
 	 * @return a composite parameter of all parameters.
 	 */
-	default ReadOnlyObjectProperty getCompositeProperty() {
+	default ReadOnlyObjectProperty<?> getCompositeProperty() {
 		final CompositeGrid composite = new CompositeGrid(parameters().values());
 		return composite.property();
 	}
@@ -221,7 +221,8 @@ public interface Processor {
 	/**
 	 * Checks whether the processor has parameters or not.
 	 *
-	 * @return True if the processor has parameters, False otherwise.
+	 * @return {@code true} if the processor has parameters, {@code false}
+	 * otherwise.
 	 */
 	default boolean hasParameters() {
 		return !parameters().isEmpty();
@@ -233,7 +234,7 @@ public interface Processor {
 	 * @param key key of the input port.
 	 * @return an input port, or null if not defined.
 	 */
-	default InputPort input(String key) {
+	default InputPort<?> input(String key) {
 		return inputs().get(key);
 	}
 
@@ -243,7 +244,7 @@ public interface Processor {
 	 *
 	 * @return a map of all inputs indexed by their keys.
 	 */
-	public Map<String, InputPort> inputs();
+	public Map<String, InputPort<?>> inputs();
 
 	/**
 	 * Returns a list of all input port keys with the given data type.
@@ -251,7 +252,7 @@ public interface Processor {
 	 * @param dataType the data type.
 	 * @return list of input port keys.
 	 */
-	default List<String> inputs(DataType dataType) {
+	default List<String> inputs(DataType<?> dataType) {
 		return inputs(dataType.getClass().getName());
 	}
 
@@ -263,7 +264,7 @@ public interface Processor {
 	 */
 	default List<String> inputs(String dataType) {
 		final List<String> ports = new ArrayList<>();
-		for (Map.Entry<String, InputPort> item : inputs().entrySet()) {
+		for (Map.Entry<String, InputPort<?>> item : inputs().entrySet()) {
 			final String t = item.getValue().getDataType().getClass().getName();
 			if (dataType.equals(t)) {
 				ports.add(item.getKey());
@@ -278,9 +279,9 @@ public interface Processor {
 	 * @param ports list of ports.
 	 * @return list of port datatypes.
 	 */
-	default List<String> portTypes(Map<String, ? extends Port> ports) {
+	default List<String> portTypes(Map<String, ? extends Port<?>> ports) {
 		final List<String> types = new ArrayList<>();
-		for (Port input : ports.values()) {
+		for (Port<?> input : ports.values()) {
 			types.add(input.getDataType().getClass().getName());
 		}
 		return types;
@@ -296,11 +297,11 @@ public interface Processor {
 	 * @return a map of sets of dependent inputs, indexed by the key of the
 	 * output port they're connected to.
 	 */
-	default Map<String, Set<InputPort>> dependentInputs() {
-		final Map<String, Set<InputPort>> ports = new HashMap<>();
-		for (Map.Entry<String, OutputPort> e : outputs().entrySet()) {
+	default Map<String, Set<InputPort<?>>> dependentInputs() {
+		final Map<String, Set<InputPort<?>>> ports = new HashMap<>();
+		for (Map.Entry<String, OutputPort<?>> e : outputs().entrySet()) {
 			final String key = e.getKey();
-			final OutputPort output = e.getValue();
+			final OutputPort<?> output = e.getValue();
 			ports.put(key, output.connections());
 		}
 		return ports;
@@ -312,7 +313,7 @@ public interface Processor {
 	 * @param key key of the output port.
 	 * @return an output port, or null if not defined.
 	 */
-	default OutputPort output(String key) {
+	default OutputPort<?> output(String key) {
 		return outputs().get(key);
 	}
 
@@ -322,7 +323,7 @@ public interface Processor {
 	 *
 	 * @return a map of all outputs indexed by their keys.
 	 */
-	public Map<String, OutputPort> outputs();
+	public Map<String, OutputPort<?>> outputs();
 
 	/**
 	 * Returns a list of all output port keys with the given data type.
@@ -330,7 +331,7 @@ public interface Processor {
 	 * @param dataType the data type.
 	 * @return list of output port keys.
 	 */
-	default List<String> outputs(DataType dataType) {
+	default List<String> outputs(DataType<?> dataType) {
 		return outputs(dataType.getClass().getName());
 	}
 
@@ -342,7 +343,7 @@ public interface Processor {
 	 */
 	default List<String> outputs(String dataType) {
 		final List<String> ports = new ArrayList<>();
-		for (Map.Entry<String, OutputPort> item : outputs().entrySet()) {
+		for (Map.Entry<String, OutputPort<?>> item : outputs().entrySet()) {
 			final String t = item.getValue().getDataType().getClass().getName();
 			if (dataType.equals(t)) {
 				ports.add(item.getKey());
@@ -355,10 +356,10 @@ public interface Processor {
 	 * Disconnects all inputs and outputs of the processor.
 	 */
 	default void disconnect() {
-		for (InputPort input : inputs().values()) {
+		for (InputPort<?> input : inputs().values()) {
 			input.disconnect();
 		}
-		for (OutputPort output : outputs().values()) {
+		for (OutputPort<?> output : outputs().values()) {
 			output.disconnect();
 		}
 	}
@@ -366,7 +367,8 @@ public interface Processor {
 	/**
 	 * Checks whether the processor is in an invalid state.
 	 *
-	 * @return True if the processor is in an invalid state, False otherwise.
+	 * @return {@code true} if the processor is in an invalid state,
+	 * {@code false} otherwise.
 	 */
 	default boolean isError() {
 		return false;
@@ -375,10 +377,11 @@ public interface Processor {
 	/**
 	 * Checks if all required inputs are connected to some outputs.
 	 *
-	 * @return True if all required inputs are connected, False otherwise.
+	 * @return {@code true} if all required inputs are connected, {@code false}
+	 * otherwise.
 	 */
 	default boolean isConnected() {
-		for (InputPort input : inputs().values()) {
+		for (InputPort<?> input : inputs().values()) {
 			if (input.isRequired() && !input.isConnected()) {
 				return false;
 			}
@@ -393,8 +396,9 @@ public interface Processor {
 	 * processors (and their inputs) got reset while this processor remains
 	 * ready.
 	 *
-	 * @return True if all outputs the inputs are connected to are READY, or if
-	 * the processor is ready even with inputs not ready yet, False otherwise.
+	 * @return {@code true} if all outputs the inputs are connected to are
+	 * READY, or if the processor is ready even with inputs not ready yet,
+	 * {@code false} otherwise.
 	 */
 	default boolean isWaiting() {
 
@@ -405,7 +409,7 @@ public interface Processor {
 			return false;
 		}
 
-		for (InputPort input : inputs().values()) {
+		for (InputPort<?> input : inputs().values()) {
 			if (input.isConnected()
 					&& !input.connection().getPortState().equals(Port.State.READY)) {
 				return true;
@@ -417,9 +421,10 @@ public interface Processor {
 	/**
 	 * Checks if all input parameters are available/can be consumed. By default
 	 * no such parameters are defined, so unless overwritten this method always
-	 * returns False.
+	 * returns {@code false}.
 	 *
-	 * @return True if some input parameters are not available, False otherwise.
+	 * @return {@code true} if some input parameters are not available,
+	 * {@code false} otherwise.
 	 */
 	default boolean isWaitingOnInputParams() {
 		return false;
@@ -431,15 +436,15 @@ public interface Processor {
 	 * as ready. Otherwise all connected outputs must be set/ready to consider
 	 * the processer as ready.
 	 *
-	 * @return True if all connected outputs (or all outputs if none are
-	 * connected) are READY, False otherwise.
+	 * @return {@code true} if all connected outputs (or all outputs if none are
+	 * connected) are READY, {@code false} otherwise.
 	 */
 	default boolean isReady() {
 
 		int numConnected = 0;
 		int numReady = 0;
 
-		for (OutputPort output : outputs().values()) {
+		for (OutputPort<?> output : outputs().values()) {
 			if (output.isConnected()) {
 				// if outputs are connected, they must be set/ready to consider
 				// this processor as ready
@@ -467,9 +472,10 @@ public interface Processor {
 	/**
 	 * Checks whether all output parameters are set/satisfied. By default no
 	 * such parameters are defined, so unless overwritten this method always
-	 * returns True.
+	 * returns {@code true}.
 	 *
-	 * @return True if all output parameters are set/satisfied, False otherwise.
+	 * @return {@code true} if all output parameters are set/satisfied,
+	 * {@code false} otherwise.
 	 */
 	default boolean isReadyOutputParams() {
 		return true;
@@ -540,8 +546,8 @@ public interface Processor {
 	 * PageGenerator that only serves an image does not process anything and is
 	 * immediately READY.
 	 *
-	 * @return True if the processor (generally) has something to be processed,
-	 * False otherwise.
+	 * @return {@code true} if the processor (generally) has something to be
+	 * processed, {@code false} otherwise.
 	 */
 	default boolean canProcess() {
 		return (this instanceof Processable);
@@ -550,7 +556,8 @@ public interface Processor {
 	/**
 	 * Checks whether the processor offers reset functionality.
 	 *
-	 * @return True if the processor (generally) can be reset, False otherwise.
+	 * @return {@code true} if the processor (generally) can be reset,
+	 * {@code false} otherwise.
 	 */
 	default boolean canReset() {
 		return (this instanceof Resetable);
@@ -559,8 +566,8 @@ public interface Processor {
 	/**
 	 * Checks whether the processor has manual editing functionality.
 	 *
-	 * @return True if the processor has manual editing functionality, False
-	 * otherwise.
+	 * @return {@code true} if the processor has manual editing functionality,
+	 * {@code false} otherwise.
 	 */
 	default boolean canEdit() {
 		return (this instanceof Editable);
@@ -570,7 +577,8 @@ public interface Processor {
 	 * Checks whether this is a hybrid processor with processing and manual
 	 * editing functionality.
 	 *
-	 * @return True if this is a hybrid processor, False otherwise.
+	 * @return {@code true} if this is a hybrid processor, {@code false}
+	 * otherwise.
 	 */
 	default boolean isHybrid() {
 		return canEdit() && canProcess();
@@ -579,7 +587,8 @@ public interface Processor {
 	/**
 	 * Checks whether the processor has manual editing tools, or not.
 	 *
-	 * @return True if the processor has manual editing tools, false otherwise.
+	 * @return {@code true} if the processor has manual editing tools,
+	 * {@code false} otherwise.
 	 */
 	default boolean hasTools() {
 		if (!(this instanceof Editable)) {
@@ -596,6 +605,7 @@ public interface Processor {
 	 * @param <T> class of a resetable processor.
 	 * @return a resetable processor.
 	 */
+	@SuppressWarnings("unchecked")
 	default <T extends Processor & Resetable> T asResetableProcessor() {
 		return (T) this;
 	}
@@ -607,6 +617,7 @@ public interface Processor {
 	 * @param <T> class of a processable processor.
 	 * @return a processable processor.
 	 */
+	@SuppressWarnings("unchecked")
 	default <T extends Processor & Processable> T asProcessableProcessor() {
 		return (T) this;
 	}
@@ -618,6 +629,7 @@ public interface Processor {
 	 * @param <T> class of an editable processor.
 	 * @return an editable processor.
 	 */
+	@SuppressWarnings("unchecked")
 	default <T extends Processor & Editable> T asEditableProcessor() {
 		return (T) this;
 	}
@@ -629,6 +641,7 @@ public interface Processor {
 	 * @param <T> class of a processable and editable processor.
 	 * @return a processable and editable processor.
 	 */
+	@SuppressWarnings("unchecked")
 	default <T extends Processor & Processable & Editable> T asHybridProcessor() {
 		return (T) this;
 	}

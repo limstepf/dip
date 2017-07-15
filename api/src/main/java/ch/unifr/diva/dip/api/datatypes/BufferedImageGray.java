@@ -3,20 +3,23 @@ package ch.unifr.diva.dip.api.datatypes;
 import javafx.scene.input.DataFormat;
 
 /**
- * A {@code BufferedImage} with a gray scale color space.
+ * Data type for a {@code BufferedImage} with a gray scale color space.
  */
-public class BufferedImageGray implements DataType {
+public class BufferedImageGray extends AbstractDataType<java.awt.image.BufferedImage> {
 
-	public final static Class type = java.awt.image.BufferedImage.class;
-	public final static DataFormat dataFormat = new DataFormat("dip-datatype/buffered-image-gray");
+	private final static DataFormat dataFormat = new DataFormat("dip-datatype/buffered-image-gray");
 
-	@Override
-	public Class type() {
-		return type;
+	/**
+	 * Creates a new data type for a {@code BufferedImage} with a gray scale
+	 * color space.
+	 */
+	public BufferedImageGray() {
+		super(java.awt.image.BufferedImage.class);
 	}
 
 	@Override
 	public DataFormat dataFormat() {
 		return dataFormat;
 	}
+
 }

@@ -3,16 +3,18 @@ package ch.unifr.diva.dip.api.datatypes;
 import javafx.scene.input.DataFormat;
 
 /**
- * A {@code BufferedImage} with an YUV color space.
+ * Data type for a {@code BufferedMatrix} with an YUV color space.
  */
-public class BufferedImageYuv implements DataType {
+public class BufferedImageYuv extends AbstractDataType<ch.unifr.diva.dip.api.datastructures.BufferedMatrix> {
 
-	public final static Class type = ch.unifr.diva.dip.api.datastructures.BufferedMatrix.class;
-	public final static DataFormat dataFormat = new DataFormat("dip-datatype/buffered-matrix-yuv");
+	private final static DataFormat dataFormat = new DataFormat("dip-datatype/buffered-matrix-yuv");
 
-	@Override
-	public Class type() {
-		return type;
+	/**
+	 * Creates a new data type for a {@code BufferedMatrix} with an YUV color
+	 * space.
+	 */
+	public BufferedImageYuv() {
+		super(ch.unifr.diva.dip.api.datastructures.BufferedMatrix.class);
 	}
 
 	@Override

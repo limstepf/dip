@@ -93,7 +93,7 @@ public class ConvolutionBenchmark {
 	@BenchmarkMode({Mode.AverageTime})
 	@OutputTimeUnit(TimeUnit.MILLISECONDS)
 	public BufferedImage onePassConvolution(Resources r) {
-		final ConvolutionOp op = new ConvolutionOp(
+		final ConvolutionOp<FloatMatrix> op = new ConvolutionOp<>(
 				kernel, null, padder,
 				null, gain, bias, min, max, precision
 		);
@@ -104,12 +104,12 @@ public class ConvolutionBenchmark {
 	@BenchmarkMode({Mode.AverageTime})
 	@OutputTimeUnit(TimeUnit.MILLISECONDS)
 	public BufferedImage twoPassConvolution(Resources r) {
-		ConvolutionOp op = new ConvolutionOp(
+		ConvolutionOp<FloatMatrix> op = new ConvolutionOp<>(
 				columnVector, null, padder,
 				null, gain, bias, min, max, precision
 		);
 		BufferedImage tmp = Filter.filter(Resources.dtp, op, r.image, null);
-		op = new ConvolutionOp(
+		op = new ConvolutionOp<>(
 				rowVector, null, padder,
 				null, gain, bias, min, max, precision
 		);

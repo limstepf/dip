@@ -101,8 +101,8 @@ public class Glyph extends Label {
 	 * or similar.
 	 *
 	 * <p>
-	 * This property is to be set to true to disable hover, and to false to
-	 * indicate active hover.
+	 * This property is to be set to {@code true} to disable hover, and to
+	 * {@code false} to indicate active hover.
 	 *
 	 * @return the constantHoverEffect property.
 	 */
@@ -173,7 +173,8 @@ public class Glyph extends Label {
 	/**
 	 * Enables/disables a hover effect on the glyph.
 	 *
-	 * @param enable True to enable the hover effect, False to disable.
+	 * @param enable {@code true} to enable the hover effect, {@code false} to
+	 * disable.
 	 * @return the modified glyph.
 	 */
 	public Glyph enableHoverEffect(boolean enable) {

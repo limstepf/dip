@@ -127,8 +127,7 @@ public class ExpMatrixParameter extends PersistentParameterBase<StringMatrix, Ex
 		this.maxCellWidth = maxCellWidth;
 
 		if (view != null) {
-			final StringMatrixView matview = (StringMatrixView) this.view;
-			matview.updateCellWidth(minCellWidth, prefCellWidth, maxCellWidth);
+			view.updateCellWidth(minCellWidth, prefCellWidth, maxCellWidth);
 		}
 	}
 
@@ -151,8 +150,7 @@ public class ExpMatrixParameter extends PersistentParameterBase<StringMatrix, Ex
 		this.cellSpacing = cellSpacing;
 
 		if (view != null) {
-			final StringMatrixView matview = (StringMatrixView) this.view;
-			matview.updateCellSpacing(cellSpacing);
+			view.updateCellSpacing(cellSpacing);
 		}
 	}
 

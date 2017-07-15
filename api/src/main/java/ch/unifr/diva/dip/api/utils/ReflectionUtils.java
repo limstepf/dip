@@ -46,7 +46,7 @@ public class ReflectionUtils {
 	 * Checks whether the Java class given by its canonical name exists.
 	 *
 	 * @param name canonical name of the Java class.
-	 * @return True if the class exists, False otherwise.
+	 * @return {@code true} if the class exists, {@code false} otherwise.
 	 */
 	public static boolean classExists(String name) {
 		try {

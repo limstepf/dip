@@ -334,7 +334,11 @@ public class Project implements Modifiable, Localizable {
 	 * @return the projects filename.
 	 */
 	public String getFilename() {
-		return file.getFileName().toString();
+		final Path p = file.getFileName();
+		if (p == null) {
+			return "";
+		}
+		return p.toString();
 	}
 
 	/**
@@ -345,7 +349,11 @@ public class Project implements Modifiable, Localizable {
 	 * @return the path to the project's export directory.
 	 */
 	public Path getExportDirectory() {
-		return file.getParent().resolve(getFilename() + EXPORT_DIRECTORY_SUFFIX);
+		final Path parent = file.getParent();
+		if (parent == null) {
+			return null;
+		}
+		return parent.resolve(getFilename() + EXPORT_DIRECTORY_SUFFIX);
 	}
 
 	/**
@@ -403,7 +411,8 @@ public class Project implements Modifiable, Localizable {
 	 * Shows/hides the project's pipeline editor.
 	 *
 	 * @param stage the parent stage.
-	 * @param show True to show, False to hide the pipeline editor.
+	 * @param show {@code true} to show, {@code false} to hide the pipeline
+	 * editor.
 	 */
 	public void openPipelineEditor(Stage stage, boolean show) {
 		final PipelineEditor ed = getPipelineEditor(stage);
@@ -439,8 +448,8 @@ public class Project implements Modifiable, Localizable {
 	}
 
 	/**
-	 * The canProcessSelectedPage property. True if the selected page can be
-	 * (further) processed.
+	 * The canProcessSelectedPage property. {@code true} if the selected page
+	 * can be (further) processed.
 	 *
 	 * @return the canProcessSelectedPageProperty.
 	 */
@@ -561,7 +570,8 @@ public class Project implements Modifiable, Localizable {
 	 * Adds a page to the project.
 	 *
 	 * @param page the new project page.
-	 * @param setModified True to mark the project as modified, False otherwise.
+	 * @param setModified {@code true} to mark the project as modified,
+	 * {@code false} otherwise.
 	 */
 	final public void addPage(ProjectPage page, boolean setModified) {
 		this.modifiedProjectProperty.addManagedProperty(page);
@@ -576,7 +586,7 @@ public class Project implements Modifiable, Localizable {
 
 	// pipeline usage by pages; maps pipelineId -> usage counter
 	private final Map<Integer, IntegerProperty> pipelineUsageMap = new HashMap<>();
-	private final ChangeListener<? super Number> pipelineUsageListener = (obs, oldId, newId) -> {
+	private final ChangeListener<Number> pipelineUsageListener = (obs, oldId, newId) -> {
 		if (oldId != null) {
 			addToPipelineUsage(oldId.intValue(), -1);
 		}
@@ -651,8 +661,8 @@ public class Project implements Modifiable, Localizable {
 	 * Removes a list of pages from the project.
 	 *
 	 * @param selection the list of pages.
-	 * @param confirm True to ask for confirmation first, False to directly
-	 * remove the pages, no questions asked.
+	 * @param confirm {@code true} to ask for confirmation first, {@code false}
+	 * to directly remove the pages, no questions asked.
 	 */
 	public void deletePages(List<ProjectPage> selection, boolean confirm) {
 		if (confirm) {

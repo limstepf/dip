@@ -3,20 +3,23 @@ package ch.unifr.diva.dip.api.datatypes;
 import javafx.scene.input.DataFormat;
 
 /**
- * A {@code BufferedImage} with a HSV/HSB color space.
+ * Data type for a {@code BufferedMatrix} with a HSV/HSB color space.
  */
-public class BufferedImageHsv implements DataType {
+public class BufferedImageHsv extends AbstractDataType<ch.unifr.diva.dip.api.datastructures.BufferedMatrix> {
 
-	public final static Class type = ch.unifr.diva.dip.api.datastructures.BufferedMatrix.class;
-	public final static DataFormat dataFormat = new DataFormat("dip-datatype/buffered-matrix-hsv");
+	private final static DataFormat dataFormat = new DataFormat("dip-datatype/buffered-matrix-hsv");
 
-	@Override
-	public Class type() {
-		return type;
+	/**
+	 * Creates a new data type for a {@code BufferedMatrix} with a HSV/HSB color
+	 * space.
+	 */
+	public BufferedImageHsv() {
+		super(ch.unifr.diva.dip.api.datastructures.BufferedMatrix.class);
 	}
 
 	@Override
 	public DataFormat dataFormat() {
 		return dataFormat;
 	}
+
 }

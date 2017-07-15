@@ -31,7 +31,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -64,7 +63,7 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 	private final RunnableProcessor runnable;
 	private final ProcessorWrapper prototype;
 	private final ProcessorView.ProcessorHead head;
-	private final ProcessorView.ParameterViewBase parameterView;
+	private final ProcessorView.ParameterViewBase<? extends Parent> parameterView;
 	private final PreviewWidget previewWidget;
 	private final InvalidationListener valueListener;
 	private final BooleanProperty patchedProperty;
@@ -87,7 +86,7 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 		this.handler = handler;
 		this.runnable = runnable;
 
-		final Pipeline pipelinePrototype = handler.getProject().getSelectedPage().getPipelinePrototype();
+		final Pipeline<ProcessorWrapper> pipelinePrototype = handler.getProject().getSelectedPage().getPipelinePrototype();
 		this.prototype = pipelinePrototype.getProcessor(runnable.id);
 
 		this.patchedProperty = new SimpleBooleanProperty();
@@ -132,8 +131,8 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 			this.root.setLeft(this.previewWidget.getNode());
 
 			// listen to input changes
-			final Collection<InputPort> inputs = runnable.processor().inputs().values();
-			for (InputPort input : inputs) {
+			final Collection<InputPort<?>> inputs = runnable.processor().inputs().values();
+			for (InputPort<?> input : inputs) {
 				input.valueChangedProperty().addListener(valueListener);
 			}
 		} else {
@@ -164,8 +163,8 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 
 	private void onClose(WindowEvent e) {
 		if (this.valueListener != null) {
-			final Collection<InputPort> inputs = runnable.processor().inputs().values();
-			for (InputPort input : inputs) {
+			final Collection<InputPort<?>> inputs = runnable.processor().inputs().values();
+			for (InputPort<?> input : inputs) {
 				input.valueChangedProperty().removeListener(valueListener);
 			}
 		}
@@ -224,7 +223,8 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 		/**
 		 * Checks whether this is a valid preview context or not.
 		 *
-		 * @return True if the preview context is valid, False otherwise.
+		 * @return {@code true} if the preview context is valid, {@code false}
+		 * otherwise.
 		 */
 		public boolean isValid() {
 			return source != null;
@@ -339,7 +339,7 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 			// TODO/VERIFY: what about repainting procs? Would they change params?
 			// Should we re-listen? Or should repainting procs that actually do
 			// change params overwrite getCompositeProperty? Maybe easier...
-			final ReadOnlyObjectProperty p = previewContext.runnable.processor().getCompositeProperty();
+			final ReadOnlyObjectProperty<?> p = previewContext.runnable.processor().getCompositeProperty();
 			p.addListener((e) -> onParamChanged());
 			onParamChanged();
 

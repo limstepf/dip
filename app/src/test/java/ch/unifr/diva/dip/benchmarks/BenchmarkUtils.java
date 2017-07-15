@@ -1,9 +1,5 @@
 package ch.unifr.diva.dip.benchmarks;
 
-//import ch.unifr.diva.dip.api.imaging.scanners.Location;
-//import ch.unifr.diva.dip.api.imaging.scanners.RasterScanner;
-import java.awt.image.BufferedImage;
-import java.awt.image.WritableRaster;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -62,37 +58,22 @@ public class BenchmarkUtils {
 	}
 
 	/**
-	 * Creates a new BufferedImage with randomly initialized samples.
+	 * Creates a new random, square image.
 	 *
 	 * @param size width and height of the image.
-	 * @param type type of the image.
 	 * @return a random image.
 	 */
-//	public static BufferedImage newRandomImage(int size, int type) {
-//		return newRandomImage(size, size, type);
-//	}
-
-	/**
-	 * Creates a new BufferedImage with randomly initialized samples.
-	 *
-	 * @param width width of the image.
-	 * @param height height of the image.
-	 * @param type type of the image.
-	 * @return a random image.
-	 */
-//	public static BufferedImage newRandomImage(int width, int height, int type) {
-//		final BufferedImage image = new BufferedImage(width, height, type);
-//		final WritableRaster raster = image.getRaster();
-//		for (Location pt : new RasterScanner(image, true)) {
-//			raster.setSample(pt.col, pt.row, pt.band, random255());
-//		}
-//		return image;
-//	}
-
 	public static WritableImage newRandomFxImage(int size) {
 		return newRandomFxImage(size, size);
 	}
 
+	/**
+	 * Creates a new random image.
+	 *
+	 * @param width width of the image.
+	 * @param height height of the image.
+	 * @return a random image.
+	 */
 	public static WritableImage newRandomFxImage(int width, int height) {
 		final WritableImage image = new WritableImage(width, height);
 		final int[] buffer = new int[width * height];
@@ -102,6 +83,11 @@ public class BenchmarkUtils {
 		return image;
 	}
 
+	/**
+	 * Returns a random int in the range of {@code [0, 255]}.
+	 *
+	 * @return a random int in the range of {@code [0, 255]}.
+	 */
 	public static int random255() {
 		return (int) (Math.random() * 255);
 	}

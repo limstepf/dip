@@ -281,14 +281,12 @@ public class ZoomPaneSimple implements Pannable {
 
 	protected final InvalidationListener zoomListener = (e) -> onZoom();
 	protected final InvalidationListener panningListener = (e) -> onPanning();
-	protected double lastS;
 	protected Point2D lastCenterPixel;
 
 	protected void onZoom() {
 		final double s1 = this.zoom.get();
 
 		if (lastCenterPixel == null) {
-			lastS = s1;
 			lastCenterPixel = getCenterPixel();
 		}
 
@@ -304,7 +302,6 @@ public class ZoomPaneSimple implements Pannable {
 
 		moveToPixel(lastCenterPixel);
 
-		lastS = s1;
 		lastCenterPixel = getCenterPixel();
 	}
 

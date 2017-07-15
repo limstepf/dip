@@ -30,7 +30,7 @@ public class PipelineImportDialog extends DataItemDialogBase<PipelineData.Pipeli
 		setListLabel(localize("pipelines"));
 		setSelectionMode(SelectionMode.MULTIPLE);
 		initFile();
-		
+
 		dataItemList.hasSelectionProperty.addListener(updateListener);
 	}
 

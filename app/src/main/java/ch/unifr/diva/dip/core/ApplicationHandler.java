@@ -387,8 +387,8 @@ public class ApplicationHandler implements Localizable {
 	 * Checks whether there is temporary data of a damaged or repaired project,
 	 * or not.
 	 *
-	 * @return True if temporary data of a damaged or repaired project is
-	 * around, False otherwise.
+	 * @return {@code true} if temporary data of a damaged or repaired project
+	 * is around, {@code false} otherwise.
 	 */
 	public boolean hasRepairData() {
 		return (this.projectData != null && this.projectValidation != null);
@@ -566,15 +566,15 @@ public class ApplicationHandler implements Localizable {
 	/**
 	 * Checks whether a project is opened or not.
 	 *
-	 * @return True if a project is opened, false otherwise.
+	 * @return {@code true} if a project is opened, {@code false} otherwise.
 	 */
 	public boolean hasProject() {
 		return hasProjectProperty.get();
 	}
 
 	/**
-	 * The has project property. This property is True if a project is opened,
-	 * false otherwise.
+	 * The has project property. This property is {@code true} if a project is
+	 * opened, {@code false} otherwise.
 	 *
 	 * @return the has project property.
 	 */
@@ -613,7 +613,8 @@ public class ApplicationHandler implements Localizable {
 	/**
 	 * Checks whether the project has been modified since opening.
 	 *
-	 * @return True if the project has been modified, False otherwise.
+	 * @return {@code true} if the project has been modified, {@code false}
+	 * otherwise.
 	 */
 	public boolean isProjectModified() {
 		if (!hasProject()) {
@@ -635,7 +636,7 @@ public class ApplicationHandler implements Localizable {
 	/**
 	 * Writes application settings back to disk.
 	 *
-	 * @return True in case of success, false otherwise.
+	 * @return {@code true} in case of success, {@code false} otherwise.
 	 */
 	public boolean saveUserSettings() {
 		try {

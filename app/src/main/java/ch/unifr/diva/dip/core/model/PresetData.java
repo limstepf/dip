@@ -279,7 +279,7 @@ public class PresetData {
 			this.preset = preset;
 			this.wrapper = wrapper;
 			this.nameProperty = new SimpleStringProperty();
-			this.glyphProperty = new SimpleObjectProperty();
+			this.glyphProperty = new SimpleObjectProperty<>();
 			if (isNewItem()) {
 				this.glyphProperty.set(MaterialDesignIcons.FLOPPY);
 				this.nameProperty.setValue(localize("preset.new"));
@@ -302,7 +302,8 @@ public class PresetData {
 		 * Checks whether this preset item refers to a new preset (to be
 		 * exported/saved), or to an existing one.
 		 *
-		 * @return true if this item refers to a new preset, false otherwise.
+		 * @return {@code true} if this item refers to a new preset,
+		 * {@code false} otherwise.
 		 */
 		final public boolean isNewItem() {
 			return this.wrapper != null;

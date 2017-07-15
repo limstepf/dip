@@ -149,7 +149,7 @@ public interface ProcessorContext {
 	 * Checks whether all keys are set on the persistent map of objects.
 	 *
 	 * @param keys keys that need to be set.
-	 * @return True if all keys are set, False otherwise.
+	 * @return {@code true} if all keys are set, {@code false} otherwise.
 	 */
 	default boolean hasKeys(String... keys) {
 		for (String key : keys) {

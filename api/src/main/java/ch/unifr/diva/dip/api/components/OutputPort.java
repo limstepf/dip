@@ -7,19 +7,19 @@ import java.util.Set;
 /**
  * Output port. DIP processors provide objects to output ports.
  *
- * @param <T> type of the port.
+ * @param <T> type of the value on the port (i.e. not the DataType).
  */
 public class OutputPort<T> extends AbstractPort<T> {
 
 	private volatile T value;
-	private final Set<InputPort> inputs = new HashSet<>();
+	private final Set<InputPort<?>> inputs = new HashSet<>();
 
 	/**
 	 * Creates a new output port.
 	 *
 	 * @param dataType the data type of the port.
 	 */
-	public OutputPort(DataType dataType) {
+	public OutputPort(DataType<T> dataType) {
 		super(dataType, false);
 	}
 
@@ -45,7 +45,7 @@ public class OutputPort<T> extends AbstractPort<T> {
 	}
 
 	private void signalInputs(boolean ready) {
-		for (InputPort input : inputs) {
+		for (InputPort<?> input : inputs) {
 			input.setReady(ready);
 		}
 	}
@@ -55,7 +55,7 @@ public class OutputPort<T> extends AbstractPort<T> {
 	}
 
 	public T getOutput() {
-		return (T) value;
+		return value;
 	}
 
 	@Override
@@ -64,14 +64,15 @@ public class OutputPort<T> extends AbstractPort<T> {
 	}
 
 	@Override
-	public Set<InputPort> connections() {
+	public Set<InputPort<?>> connections() {
 		return inputs;
 	}
 
 	@Override
-	public void connectTo(Port port) {
+	@SuppressWarnings("unchecked")
+	public void connectTo(Port<?> port) {
 		if (port instanceof InputPort) {
-			InputPort input = (InputPort) port;
+			InputPort<T> input = (InputPort<T>) port;
 			// always bind bi-directional, but prevent stack overflow ;)
 			if (!input.isConnected() && !input.connection().equals(this)) {
 				input.connectTo(this);
@@ -85,9 +86,10 @@ public class OutputPort<T> extends AbstractPort<T> {
 	}
 
 	@Override
-	public void disconnect(Port port) {
+	@SuppressWarnings("unchecked")
+	public void disconnect(Port<?> port) {
 		if (port instanceof InputPort) {
-			final InputPort input = (InputPort) port;
+			final InputPort<T> input = (InputPort<T>) port;
 			// always unbind bi-directional, but prevent stack overflow ;)
 			if (input.isConnected() && input.connection().equals(this)) {
 				input.disconnect(this);
@@ -102,7 +104,7 @@ public class OutputPort<T> extends AbstractPort<T> {
 
 	@Override
 	public void disconnect() {
-		for (InputPort input : inputs) {
+		for (InputPort<?> input : inputs) {
 			disconnect(input);
 		}
 	}

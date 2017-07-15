@@ -20,7 +20,7 @@ public class GestureEventHandler<T extends Event> {
 	/**
 	 * The event handler.
 	 */
-	public final EventHandler<? super Event> eventHandler;
+	public final EventHandler<T> eventHandler;
 
 	/**
 	 * Creates a new gesture event handler.
@@ -30,13 +30,13 @@ public class GestureEventHandler<T extends Event> {
 	 */
 	public GestureEventHandler(EventType<T> eventType, EventHandler<T> eventHandler) {
 		this.eventType = eventType;
-		this.eventHandler = (EventHandler<Event>) eventHandler; // safe, or is it?
+		this.eventHandler = eventHandler;
 	}
 
 	/**
 	 * Checks whether this handler's event type is a key event.
 	 *
-	 * @return True if this is a key event, False otherwise.
+	 * @return {@code true} if this is a key event, {@code false} otherwise.
 	 */
 	public boolean isKeyEvent() {
 		return isKeyEvent(this.eventType);
@@ -46,9 +46,9 @@ public class GestureEventHandler<T extends Event> {
 	 * Checks whether the given event type is a key event.
 	 *
 	 * @param t the event type.
-	 * @return True if this is a key event, False otherwise.
+	 * @return {@code true} if this is a key event, {@code false} otherwise.
 	 */
-	public static boolean isKeyEvent(EventType t) {
+	public static boolean isKeyEvent(EventType<?> t) {
 		if (t == null) {
 			return false;
 		}
@@ -61,7 +61,7 @@ public class GestureEventHandler<T extends Event> {
 	/**
 	 * Checks whether this handler's event type is a mouse event.
 	 *
-	 * @return True if this is a mouse event, False otherwise.
+	 * @return {@code true} if this is a mouse event, {@code false} otherwise.
 	 */
 	public boolean isMouseEvent() {
 		return isMouseEvent(this.eventType);
@@ -71,9 +71,9 @@ public class GestureEventHandler<T extends Event> {
 	 * Checks whether the given event type is a mouse event.
 	 *
 	 * @param t the event type.
-	 * @return True if this is a mouse event, False otherwise.
+	 * @return {@code true} if this is a mouse event, {@code false} otherwise.
 	 */
-	public static boolean isMouseEvent(EventType t) {
+	public static boolean isMouseEvent(EventType<?> t) {
 		if (t == null) {
 			return false;
 		}

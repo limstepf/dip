@@ -50,11 +50,11 @@ public abstract class PersistentParameterBase<T, V extends PersistentParameter.V
 			@Override
 			public void set(T value) {
 				final T newVal = filterValueProperty(value);
-				final T val = get();
+				final T val = super.get();
 				if ((val == null && newVal != null) || (val != null && !val.equals(newVal))) {
 					super.set(newVal);
 					if (!changeIsLocal && view != null) {
-						view.set(get());
+						view.set(super.get());
 					}
 				}
 				onValuePropertySet();

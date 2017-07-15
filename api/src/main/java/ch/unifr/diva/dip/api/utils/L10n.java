@@ -115,7 +115,8 @@ public class L10n {
 	 * wont be fully affected by a call to this.
 	 *
 	 * @param locale the application-wide {@code Locale} to be used.
-	 * @return True in case of success, False if the locale is not supported.
+	 * @return {@code true} in case of success, {@code false} if the locale is
+	 * not supported.
 	 */
 	public static boolean setLocale(Locale locale) {
 		if (!availableLocales.contains(locale)) {

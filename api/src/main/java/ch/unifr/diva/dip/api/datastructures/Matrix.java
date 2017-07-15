@@ -22,8 +22,10 @@ import javax.xml.bind.annotation.XmlAttribute;
  * matrix, or mask). And as such, only small matrices should be stored/passed
  * encoded by XML.</li>
  * </ul>
+ *
+ * @param <T> subclass of {@code MatrixBase}.
  */
-public abstract class Matrix {
+public abstract class Matrix<T> {
 
 	/**
 	 * The layout defines how the matrix is stored in the continuous/linear
@@ -125,7 +127,7 @@ public abstract class Matrix {
 	/**
 	 * Checks whether the matrix is square or not.
 	 *
-	 * @return True if the matrix is square, False otherwise.
+	 * @return {@code true} if the matrix is square, {@code false} otherwise.
 	 */
 	public boolean isSquare() {
 		return this.rows == this.columns;
@@ -134,7 +136,7 @@ public abstract class Matrix {
 	/**
 	 * Checks whether the matrix is a vector.
 	 *
-	 * @return True if the matrix is a vector, False otherwise.
+	 * @return {@code true} if the matrix is a vector, {@code false} otherwise.
 	 */
 	public boolean isVector() {
 		return isRowVector() || isColumnVector();
@@ -143,7 +145,8 @@ public abstract class Matrix {
 	/**
 	 * Checks whether the matrix is a row vector.
 	 *
-	 * @return True if the matrix is a row vector, False otherwise.
+	 * @return {@code true} if the matrix is a row vector, {@code false}
+	 * otherwise.
 	 */
 	public boolean isRowVector() {
 		return this.rows == 1;
@@ -152,7 +155,8 @@ public abstract class Matrix {
 	/**
 	 * Checks whether the matrix is a column vector.
 	 *
-	 * @return True if the matrix is a column vector, False otherwise.
+	 * @return {@code true} if the matrix is a column vector, {@code false}
+	 * otherwise.
 	 */
 	public boolean isColumnVector() {
 		return this.columns == 1;
@@ -162,9 +166,10 @@ public abstract class Matrix {
 	 * Checks whether a matrix has the same dimensions as this one.
 	 *
 	 * @param mat another matrix.
-	 * @return True if both matrices have the same dimensions, False otherwise.
+	 * @return {@code true} if both matrices have the same dimensions,
+	 * {@code false} otherwise.
 	 */
-	public boolean equalSize(Matrix mat) {
+	public boolean equalSize(Matrix<?> mat) {
 		return equalSize(this, mat);
 	}
 
@@ -173,43 +178,40 @@ public abstract class Matrix {
 	 *
 	 * @param a the first matrix.
 	 * @param b the second matrix.
-	 * @return True if both matrices have the same dimensions, False otherwise.
+	 * @return {@code true} if both matrices have the same dimensions,
+	 * {@code false} otherwise.
 	 */
-	public static boolean equalSize(Matrix a, Matrix b) {
+	public static boolean equalSize(Matrix<?> a, Matrix<?> b) {
 		return (a.rows == b.rows) && (a.columns == b.columns);
 	}
 
 	/**
 	 * Returns a copy (or clone) of this matrix.
 	 *
-	 * @param <T> subclass of {@code MatrixBase}.
 	 * @return a copy of this matrix.
 	 */
-	public abstract <T extends Matrix> T copy();
+	public abstract T copy();
 
 	/**
 	 * Returns a transposed copy of this matrix.
 	 *
-	 * @param <T> subclass of {@code MatrixBase}.
 	 * @return a transposed copy of this matrix.
 	 */
-	public abstract <T extends Matrix> T transpose();
+	public abstract T transpose();
 
 	/**
 	 * Returns the matrix in column major order.
 	 *
-	 * @param <T> subclass of {@code MatrixBase}.
 	 * @return the matrix in column major order.
 	 */
-	public abstract <T extends Matrix> T toColumnMajor();
+	public abstract T toColumnMajor();
 
 	/**
 	 * Returns the matrix in row major order.
 	 *
-	 * @param <T> subclass of {@code MatrixBase}.
 	 * @return the matrix in row major order.
 	 */
-	public abstract <T extends Matrix> T toRowMajor();
+	public abstract T toRowMajor();
 
 	/**
 	 * Returns a pretty printed string representation of the matrix.

@@ -3,6 +3,7 @@ package ch.unifr.diva.dip.awt.components;
 import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.components.ProcessorContext;
+import ch.unifr.diva.dip.api.datastructures.BufferedMatrix;
 import ch.unifr.diva.dip.api.datastructures.ValueListSelection;
 import ch.unifr.diva.dip.api.parameters.EnumParameter;
 import ch.unifr.diva.dip.api.parameters.Parameter;
@@ -49,8 +50,8 @@ public class ColorPortsUnit<T extends Processor> {
 	protected final OutputPort<BufferedImage> output_binary;
 	protected final InputPort<BufferedImage> input_byte;
 	protected final OutputPort<BufferedImage> output_byte;
-	protected final InputPort<BufferedImage> input_float;
-	protected final OutputPort<BufferedImage> output_float;
+	protected final InputPort<BufferedMatrix> input_float;
+	protected final OutputPort<BufferedMatrix> output_float;
 	// color-typed ports
 	protected final List<InputColorPort> input_colors;
 	protected final List<OutputColorPort> output_colors;
@@ -65,7 +66,9 @@ public class ColorPortsUnit<T extends Processor> {
 	protected boolean portInsetPositionTop = true;
 	protected boolean disableInputPorts = false;
 	protected boolean disableOutputPorts = false;
+	@SuppressWarnings("rawtypes")
 	protected InputPort input_selected;
+	@SuppressWarnings("rawtypes")
 	protected OutputPort output_selected;
 	protected String key_selected;
 	protected ValueListSelection vs;
@@ -105,15 +108,15 @@ public class ColorPortsUnit<T extends Processor> {
 		this.STORAGE_IMAGE = name + ".png";
 		this.STORAGE_MAT = name + ".bmat";
 
-		this.input = new InputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImage(), false);
-		this.output = new OutputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImage());
+		this.input = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImage(), false);
+		this.output = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImage());
 
-		final List<Parameter> options = new ArrayList<>();
+		final List<Parameter<?>> options = new ArrayList<>();
 		int index = 0;
 
 		if (enableBinaryPorts) {
-			this.input_binary = new InputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImageBinary(), false);
-			this.output_binary = new OutputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImageBinary());
+			this.input_binary = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImageBinary(), false);
+			this.output_binary = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImageBinary());
 			this.index_binary = index++;
 			options.add(new TextParameter("BIT"));
 		} else {
@@ -123,8 +126,8 @@ public class ColorPortsUnit<T extends Processor> {
 		}
 
 		if (enableBytePorts) {
-			this.input_byte = new InputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImageGray(), false);
-			this.output_byte = new OutputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImageGray());
+			this.input_byte = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImageGray(), false);
+			this.output_byte = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImageGray());
 			this.index_byte = index++;
 			options.add(new TextParameter("BYTE"));
 		} else {
@@ -134,8 +137,8 @@ public class ColorPortsUnit<T extends Processor> {
 		}
 
 		if (enableFloatPorts) {
-			this.input_float = new InputPort(new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat(), false);
-			this.output_float = new OutputPort(new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat());
+			this.input_float = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat(), false);
+			this.output_float = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat());
 			this.index_float = index++;
 			options.add(new TextParameter("FLOAT"));
 		} else {
@@ -179,13 +182,13 @@ public class ColorPortsUnit<T extends Processor> {
 		// attach config listener
 		this.config.property().addListener(configListener);
 		// attach input listeners
-		final List<InputPort> ports = Arrays.asList(
+		final List<InputPort<?>> ports = Arrays.asList(
 				input,
 				input_binary,
 				input_byte,
 				input_float
 		);
-		for (InputPort port : ports) {
+		for (InputPort<?> port : ports) {
 			if (port != null) {
 				port.portStateProperty().addListener(inputListener);
 			}
@@ -203,7 +206,8 @@ public class ColorPortsUnit<T extends Processor> {
 		this.processor.repaint();
 	}
 
-	protected InputPort<BufferedImage> currentInput;
+	@SuppressWarnings("rawtypes")
+	protected InputPort currentInput;
 
 	protected void setCurrentInput() {
 		if (this.currentInput != null) {
@@ -277,6 +281,7 @@ public class ColorPortsUnit<T extends Processor> {
 	 * @return the connected input, or the untyped input if no input is
 	 * connected.
 	 */
+	@SuppressWarnings("unchecked")
 	public InputPort<BufferedImage> getConnectedInput() {
 		if (this.input_selected != null && this.input_selected.isConnected()) {
 			return this.input_selected;
@@ -288,7 +293,8 @@ public class ColorPortsUnit<T extends Processor> {
 	 * Checks whether the used input port of the color ports unit is connected,
 	 * or not.
 	 *
-	 * @return True if the used input port is connected, False otherwise.
+	 * @return {@code true} if the used input port is connected, {@code false}
+	 * otherwise.
 	 */
 	public boolean isConnected() {
 		return getConnectedInput().isConnected();
@@ -308,7 +314,7 @@ public class ColorPortsUnit<T extends Processor> {
 	 *
 	 * @return the configuration parameter of the color ports unit.
 	 */
-	public Parameter getParameter() {
+	public XorParameter getParameter() {
 		return this.config;
 	}
 
@@ -317,8 +323,8 @@ public class ColorPortsUnit<T extends Processor> {
 	 * in a linked hash map, we may (re-)insert the ports of this unit either at
 	 * the top (default), or at the bottom.
 	 *
-	 * @param top ports of the unit are (re-)inserted at the top if True, at the
-	 * bottom otherwise.
+	 * @param top ports of the unit are (re-)inserted at the top if
+	 * {@code true}, at the bottom otherwise.
 	 */
 	public void setPortInsertPosition(boolean top) {
 		this.portInsetPositionTop = top;
@@ -328,8 +334,9 @@ public class ColorPortsUnit<T extends Processor> {
 	 * Checks whether the color ports unit is set to process single-channel
 	 * images with binary sample precision.
 	 *
-	 * @return True if the color ports unit is set to process single-channel
-	 * images with binary sample precision, False otherwise.
+	 * @return {@code true} if the color ports unit is set to process
+	 * single-channel images with binary sample precision, {@code false}
+	 * otherwise.
 	 */
 	public boolean isBinaryColor() {
 		return (this.vs.selection == this.index_binary);
@@ -339,8 +346,9 @@ public class ColorPortsUnit<T extends Processor> {
 	 * Checks whether the color ports unit is set to process single-channel
 	 * images with byte sample precision.
 	 *
-	 * @return True if the color ports unit is set to process single-channel
-	 * images with byte sample precision, False otherwise.
+	 * @return {@code true} if the color ports unit is set to process
+	 * single-channel images with byte sample precision, {@code false}
+	 * otherwise.
 	 */
 	public boolean isByteColor() {
 		return (this.vs.selection == this.index_byte);
@@ -350,8 +358,9 @@ public class ColorPortsUnit<T extends Processor> {
 	 * Checks whether the color ports unit is set to process single-channel
 	 * images with float sample precision.
 	 *
-	 * @return True if the color ports unit is set to process single-channel
-	 * images with float sample precision, False otherwise.
+	 * @return {@code true} if the color ports unit is set to process
+	 * single-channel images with float sample precision, {@code false}
+	 * otherwise.
 	 */
 	public boolean isFloatColor() {
 		return (this.vs.selection == this.index_float);
@@ -359,11 +368,11 @@ public class ColorPortsUnit<T extends Processor> {
 
 	/**
 	 * Checks whether the color ports unit is set to process images with a
-	 * specified color model. If True, the color model can be retrieved with a
-	 * call to {@code getColorModel()}.
+	 * specified color model. If {@code true}, the color model can be retrieved
+	 * with a call to {@code getColorModel()}.
 	 *
-	 * @return True if the color ports unit is set to process images with a
-	 * specified color model, False otherwise.
+	 * @return {@code true} if the color ports unit is set to process images
+	 * with a specified color model, {@code false} otherwise.
 	 */
 	public boolean hasColorModel() {
 		return (this.vs.selection == this.index_colors);
@@ -387,8 +396,8 @@ public class ColorPortsUnit<T extends Processor> {
 	 * {@code BufferedMatrix} for storage. This applies to all images with float
 	 * sample precision.
 	 *
-	 * @return True if the color ports unit is set to process images in float
-	 * sample precision, False otherwise.
+	 * @return {@code true} if the color ports unit is set to process images in
+	 * float sample precision, {@code false} otherwise.
 	 */
 	public boolean isBufferedMatrix() {
 		if (this.vs.selection == this.index_float) {
@@ -407,8 +416,8 @@ public class ColorPortsUnit<T extends Processor> {
 	 * parent processor, or a call to {@code updatePorts()} has to be made if
 	 * called at some later point.
 	 *
-	 * @param disableInputPorts True to disable all input ports, False to
-	 * (re-)enable them.
+	 * @param disableInputPorts {@code true} to disable all input ports,
+	 * {@code false} to (re-)enable them.
 	 */
 	public void disableInputPorts(boolean disableInputPorts) {
 		this.disableInputPorts = disableInputPorts;
@@ -419,8 +428,8 @@ public class ColorPortsUnit<T extends Processor> {
 	 * parent processor, or a call to {@code updatePorts()} has to be made if
 	 * called at some later point.
 	 *
-	 * @param disableOutputPorts True to disable all output ports, , False to
-	 * (re-)enable them.
+	 * @param disableOutputPorts {@code true} to disable all output ports,
+	 * {@code false} to (re-)enable them.
 	 */
 	public void disableOutputPorts(boolean disableOutputPorts) {
 		this.disableOutputPorts = disableOutputPorts;
@@ -445,14 +454,14 @@ public class ColorPortsUnit<T extends Processor> {
 		enableInputs(null);
 	}
 
-	protected void enableInputs(InputPort port) {
+	protected void enableInputs(InputPort<?> port) {
 		removeAllInputs();
 
 		if (this.disableInputPorts) {
 			return;
 		}
 
-		final Map<String, InputPort> reinsert;
+		final Map<String, InputPort<?>> reinsert;
 		if (this.portInsetPositionTop) {
 			reinsert = extractPorts(this.processor.inputs());
 		} else {
@@ -460,7 +469,7 @@ public class ColorPortsUnit<T extends Processor> {
 		}
 
 		// only show single connected port
-		final InputPort in = getConnectedInput();
+		final InputPort<?> in = getConnectedInput();
 		if (port != null && in.isConnected()) {
 			this.processor.inputs().put(this.key_selected, in);
 			return;
@@ -486,7 +495,7 @@ public class ColorPortsUnit<T extends Processor> {
 		}
 
 		if (reinsert != null) {
-			for (Map.Entry<String, InputPort> e : reinsert.entrySet()) {
+			for (Map.Entry<String, InputPort<?>> e : reinsert.entrySet()) {
 				this.processor.inputs().put(e.getKey(), e.getValue());
 			}
 		}
@@ -514,14 +523,14 @@ public class ColorPortsUnit<T extends Processor> {
 		enableOutputs(null);
 	}
 
-	protected void enableOutputs(OutputPort port) {
+	protected void enableOutputs(OutputPort<?> port) {
 		removeAllOutputs();
 
 		if (this.disableOutputPorts) {
 			return;
 		}
 
-		final Map<String, OutputPort> reinsert;
+		final Map<String, OutputPort<?>> reinsert;
 		if (this.portInsetPositionTop) {
 			reinsert = extractPorts(this.processor.outputs());
 		} else {
@@ -546,7 +555,7 @@ public class ColorPortsUnit<T extends Processor> {
 		}
 
 		if (reinsert != null) {
-			for (Map.Entry<String, OutputPort> e : reinsert.entrySet()) {
+			for (Map.Entry<String, OutputPort<?>> e : reinsert.entrySet()) {
 				this.processor.outputs().put(e.getKey(), e.getValue());
 			}
 		}
@@ -622,7 +631,7 @@ public class ColorPortsUnit<T extends Processor> {
 			this.output_byte.setOutput(value);
 		}
 		if (this.output_float != null) {
-			this.output_float.setOutput(value);
+			this.output_float.setOutput((BufferedMatrix) value);
 		}
 		for (OutputColorPort out : this.output_colors) {
 			out.port.setOutput(value);
@@ -633,7 +642,8 @@ public class ColorPortsUnit<T extends Processor> {
 	 * Restores the output ports. Does not provide an image layer.
 	 *
 	 * @param context the processor context of the parent processor.
-	 * @return True if the outputs could be restored, False otherwise.
+	 * @return {@code true} if the outputs could be restored, {@code false}
+	 * otherwise.
 	 */
 	public boolean restoreOutputs(ProcessorContext context) {
 		return restoreOutputs(context, null, false);
@@ -643,9 +653,10 @@ public class ColorPortsUnit<T extends Processor> {
 	 * Restores the output ports.
 	 *
 	 * @param context the processor context of the parent processor.
-	 * @param provideLayer True to provide image layer (if possible/not float
-	 * sample precision), False to not do that.
-	 * @return True if the outputs could be restored, False otherwise.
+	 * @param provideLayer {@code true} to provide image layer (if possible/not
+	 * float sample precision), {@code false} to not do that.
+	 * @return {@code true} if the outputs could be restored, {@code false}
+	 * otherwise.
 	 */
 	public boolean restoreOutputs(ProcessorContext context, boolean provideLayer) {
 		return restoreOutputs(context, null, provideLayer);
@@ -657,13 +668,14 @@ public class ColorPortsUnit<T extends Processor> {
 	 * @param context the processor context of the parent processor.
 	 * @param processedImage the processed image, or null. If no processed image
 	 * is given then the method tries to load it from the persistant storage.
-	 * @param provideLayer True to provide image layer (if possible/not float
-	 * sample precision), False to not do that.
-	 * @return True if the outputs could be set/restored (either if the
+	 * @param provideLayer {@code true} to provide image layer (if possible/not
+	 * float sample precision), {@code false} to not do that.
+	 * @return {@code true} if the outputs could be set/restored (either if the
 	 * processed image has been supplied as parameter, or if it could be loaded
-	 * from the persistent storage), False otherwise (if no processed image has
-	 * been supplied, and persistent storage was empty).
+	 * from the persistent storage), {@code false} otherwise (if no processed
+	 * image has been supplied, and persistent storage was empty).
 	 */
+	@SuppressWarnings("unchecked")
 	public boolean restoreOutputs(ProcessorContext context, BufferedImage processedImage, boolean provideLayer) {
 		final BufferedImage image;
 		if (processedImage == null) {

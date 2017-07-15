@@ -12,7 +12,7 @@ import javafx.scene.shape.StrokeLineCap;
  */
 public class ConnectionViewCubic extends ConnectionViewBase<CubicCurve> {
 
-	public ConnectionViewCubic(InputPort input) {
+	public ConnectionViewCubic(InputPort<?> input) {
 		super(input, newWire());
 
 		this.wire.layoutBoundsProperty().addListener((e) -> updateControlPoints());

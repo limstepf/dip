@@ -2,7 +2,7 @@ package ch.unifr.diva.dip.gui.layout;
 
 import ch.unifr.diva.dip.api.parameters.Parameter;
 import ch.unifr.diva.dip.api.parameters.PersistentParameter;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
@@ -61,8 +61,13 @@ public class FormGridPane extends GridPane {
 	 * @param <T> a node class.
 	 * @param nodes nodes that make up the row, a cell/column per node.
 	 */
-	public <T extends Node> void addRow(T... nodes) {
-		addRow(Arrays.asList(nodes));
+	@SafeVarargs
+	public final <T extends Node> void addRow(T... nodes) {
+		final List<T> list = new ArrayList<>();
+		for (T node : nodes) {
+			list.add(node);
+		}
+		addRow(list);
 	}
 
 	/**
@@ -124,10 +129,16 @@ public class FormGridPane extends GridPane {
 	 * Adds parameters to the form grid, one row per parameter. This needs a
 	 * grid of 2 columns: one for the label, the other for the parameter view.
 	 *
+	 * @param <T> class of the parameter's value.
 	 * @param parameters DIP parameters.
 	 */
-	public void addParameters(Parameter... parameters) {
-		addParameters(Arrays.asList(parameters));
+	@SafeVarargs
+	public final <T> void addParameters(Parameter<T>... parameters) {
+		final List<Parameter<T>> list = new ArrayList<>();
+		for (Parameter<T> p : parameters) {
+			list.add(p);
+		}
+		addParameters(list);
 	}
 
 	/**
@@ -135,13 +146,14 @@ public class FormGridPane extends GridPane {
 	 * needs a grid of 2 columns: one for the label, the other for the parameter
 	 * view.
 	 *
+	 * @param <T> class of the parameter's value.
 	 * @param parameters a list of DIP parameters.
 	 */
-	public void addParameters(List<Parameter> parameters) {
-		for (Parameter p : parameters) {
+	public <T> void addParameters(List<Parameter<T>> parameters) {
+		for (Parameter<T> p : parameters) {
 			final Label label;
 			if (p.isPersistent()) {
-				final PersistentParameter pp = (PersistentParameter) p;
+				final PersistentParameter<T> pp = (PersistentParameter<T>) p;
 				label = newLabel((pp.label().isEmpty()) ? "" : pp.label() + ":");
 			} else {
 				label = newLabel("");

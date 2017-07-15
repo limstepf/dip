@@ -4,11 +4,12 @@ package ch.unifr.diva.dip.api.parameters;
  * Transient parameter base class. Transient parameters are for display purposes
  * only. Nothing gets saved.
  *
- * @param <T> class of the parameter's view.
+ * @param <T> class of a parameter's value.
+ * @param <V> class of the parameter's view.
  */
-public abstract class TransientParameterBase<T extends Parameter.View> implements Parameter {
+public abstract class TransientParameterBase<T, V extends Parameter.View> implements Parameter<T> {
 
-	protected T view;
+	protected V view;
 	protected boolean isHidden;
 
 	/**
@@ -26,10 +27,10 @@ public abstract class TransientParameterBase<T extends Parameter.View> implement
 		}
 	}
 
-	protected abstract T newViewInstance();
+	protected abstract V newViewInstance();
 
 	@Override
-	public Parameter.View view() {
+	public V view() {
 		if (view == null) {
 			view = newViewInstance();
 			view.setHide(this.isHidden);

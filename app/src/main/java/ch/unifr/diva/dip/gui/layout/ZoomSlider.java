@@ -64,7 +64,7 @@ public class ZoomSlider {
 
 		this.sliderListener = (ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
 			if (!changeIsLocal) {
-				zoomable.setZoom(sliderToZoomVal(newValue.doubleValue()));
+				this.zoomable.setZoom(sliderToZoomVal(newValue.doubleValue()));
 			}
 		};
 		this.slider = new Slider();

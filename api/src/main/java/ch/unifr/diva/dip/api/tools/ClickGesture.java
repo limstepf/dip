@@ -7,7 +7,7 @@ import javafx.scene.input.MouseEvent;
  * A click gesture. Fires already on {@code MOUSE_PRESSED}, that is, we don't
  * wait for a {@code MOUSE_RELEASED}.
  */
-public class ClickGesture extends GestureBase<MouseEvent> {
+public class ClickGesture extends GestureBase {
 
 	/**
 	 * Creates a new click gesture without (mouse) movement event handlers.
@@ -29,7 +29,7 @@ public class ClickGesture extends GestureBase<MouseEvent> {
 	public ClickGesture(EventHandler<MouseEvent> onClick, EventHandler<MouseEvent> onEntered, EventHandler<MouseEvent> onMoved, EventHandler<MouseEvent> onExited) {
 		super();
 
-		eventHandlers().add(new GestureEventHandler(
+		eventHandlers().add(new GestureEventHandler<>(
 				MouseEvent.MOUSE_PRESSED,
 				onClick
 		));

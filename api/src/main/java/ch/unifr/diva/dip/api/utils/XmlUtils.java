@@ -69,9 +69,9 @@ public class XmlUtils {
 	 * @param clazz class of the object to be unmarshalled.
 	 * @return an array of classes.
 	 */
-	private static Class[] getClasses(Class clazz) {
+	private static Class<?>[] getClasses(Class<?> clazz) {
 		final int n = seeAlsoClasses.size();
-		final Class[] classes = new Class[n + 1];
+		final Class<?>[] classes = new Class<?>[n + 1];
 		for (int i = 0; i < n; i++) {
 			classes[i] = seeAlsoClasses.get(i);
 		}
@@ -85,7 +85,7 @@ public class XmlUtils {
 	 */
 	private static final HashMap<Class<?>, JAXBContext> jaxbContexts = new HashMap<>();
 
-	private static JAXBContext getContext(Class clazz) throws JAXBException {
+	private static JAXBContext getContext(Class<?> clazz) throws JAXBException {
 		if (!jaxbContexts.containsKey(clazz)) {
 			final JAXBContext context = JAXBContext.newInstance(getClasses(clazz));
 			jaxbContexts.put(clazz, context);
@@ -102,6 +102,7 @@ public class XmlUtils {
 	 * @return The unmarshalled Java object of type T.
 	 * @throws JAXBException
 	 */
+	@SuppressWarnings("unchecked")
 	public static <T> T unmarshal(Class<T> clazz, Path file) throws JAXBException {
 		final Unmarshaller m = getUnmarshaller(clazz);
 		return (T) m.unmarshal(file.toFile());
@@ -116,6 +117,7 @@ public class XmlUtils {
 	 * @return The unmarshalled Java object of type T.
 	 * @throws JAXBException
 	 */
+	@SuppressWarnings("unchecked")
 	public static <T> T unmarshal(Class<T> clazz, InputStream stream) throws JAXBException {
 		final Unmarshaller m = getUnmarshaller(clazz);
 		return (T) m.unmarshal(stream);
@@ -128,7 +130,7 @@ public class XmlUtils {
 	 * @return an unmarshaller for objects of type clazz.
 	 * @throws JAXBException
 	 */
-	public static Unmarshaller getUnmarshaller(Class clazz) throws JAXBException {
+	public static Unmarshaller getUnmarshaller(Class<?> clazz) throws JAXBException {
 		final JAXBContext c = getContext(clazz);
 		return c.createUnmarshaller();
 	}

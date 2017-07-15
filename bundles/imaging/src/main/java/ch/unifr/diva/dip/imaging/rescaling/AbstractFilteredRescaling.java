@@ -89,8 +89,8 @@ public abstract class AbstractFilteredRescaling {
 	 *
 	 * @param srcWidth width of the source image.
 	 * @param srcHeight height of the source image.
-	 * @return True if pixel contributions have to be (re-)calculated, False if
-	 * they can be reused.
+	 * @return {@code true} if pixel contributions have to be (re-)calculated,
+	 * {@code false} if they can be reused.
 	 */
 	protected boolean mustBeInvalidated(double srcWidth, double srcHeight) {
 		return mustBeInvalidated((int) srcWidth, (int) srcHeight);
@@ -101,8 +101,8 @@ public abstract class AbstractFilteredRescaling {
 	 *
 	 * @param srcWidth width of the source image.
 	 * @param srcHeight height of the source image.
-	 * @return True if pixel contributions have to be (re-)calculated, False if
-	 * they can be reused.
+	 * @return {@code true} if pixel contributions have to be (re-)calculated,
+	 * {@code false} if they can be reused.
 	 */
 	protected boolean mustBeInvalidated(int srcWidth, int srcHeight) {
 		if (X == null) {

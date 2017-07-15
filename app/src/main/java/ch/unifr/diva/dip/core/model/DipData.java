@@ -53,7 +53,7 @@ public class DipData {
 	/**
 	 * Checks whether preset data is available.
 	 *
-	 * @return true if there are presets, false otherwise.
+	 * @return {@code true} if there are presets, {@code false} otherwise.
 	 */
 	public boolean hasPresetData() {
 		return this.presets != null;
@@ -99,7 +99,7 @@ public class DipData {
 	/**
 	 * Checks whether pipeline data is available.
 	 *
-	 * @return true if there are pipelines, false otherwise.
+	 * @return {@code true} if there are pipelines, {@code false} otherwise.
 	 */
 	public boolean hasPipelineData() {
 		return this.pipelines != null;
@@ -144,7 +144,7 @@ public class DipData {
 	 * Checks whether or not a file is a dip data file.
 	 *
 	 * @param file path to the file.
-	 * @return true if it is a dip data file, false otherwise.
+	 * @return {@code true} if it is a dip data file, {@code false} otherwise.
 	 */
 	public static boolean isDipDataFile(Path file) {
 		if (Files.exists(file)) {
@@ -161,7 +161,7 @@ public class DipData {
 	 * Checks whether or not the input stream is a dip data file.
 	 *
 	 * @param is the input stream.
-	 * @return true if it is a dip data file, false otherwise.
+	 * @return {@code true} if it is a dip data file, {@code false} otherwise.
 	 */
 	public static boolean isDipDataStream(InputStream is) {
 		final Element root = IOUtils.getRootElement(is);

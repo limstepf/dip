@@ -71,7 +71,8 @@ public class OptionsBar implements Presenter {
 	 * @param optionMaps option maps, usually one of the processor, and another
 	 * from the selected tool. May be null.
 	 */
-	public void build(Map<String, SingleRowParameter>... optionMaps) {
+	@SafeVarargs
+	public final void build(Map<String, SingleRowParameter<?>>... optionMaps) {
 		clear();
 
 		final VisibilityMode mode = readVisibilityMode();
@@ -79,7 +80,7 @@ public class OptionsBar implements Presenter {
 			return;
 		}
 
-		for (Map<String, SingleRowParameter> map : optionMaps) {
+		for (Map<String, SingleRowParameter<?>> map : optionMaps) {
 			if (map != null) {
 				add(map, false);
 			}
@@ -93,12 +94,12 @@ public class OptionsBar implements Presenter {
 	 *
 	 * @param options an option map.
 	 */
-	public void add(Map<String, SingleRowParameter> options) {
+	public void add(Map<String, SingleRowParameter<?>> options) {
 		add(options, true);
 	}
 
-	private void add(Map<String, SingleRowParameter> options, boolean setPadding) {
-		for (Map.Entry<String, SingleRowParameter> opt : options.entrySet()) {
+	private void add(Map<String, SingleRowParameter<?>> options, boolean setPadding) {
+		for (Map.Entry<String, SingleRowParameter<?>> opt : options.entrySet()) {
 			add(opt.getKey(), opt.getValue(), false);
 		}
 
@@ -113,13 +114,13 @@ public class OptionsBar implements Presenter {
 	 * @param key key of the option.
 	 * @param option the option.
 	 */
-	public void add(String key, SingleRowParameter option) {
+	public void add(String key, SingleRowParameter<?> option) {
 		add(key, option, true);
 	}
 
-	private void add(String key, SingleRowParameter option, boolean setPadding) {
+	private void add(String key, SingleRowParameter<?> option, boolean setPadding) {
 		if (option.isPersistent()) {
-			final PersistentParameter pp = (PersistentParameter) option;
+			final PersistentParameter<?> pp = option.asPersitentParameter();
 			if (!pp.label().isEmpty()) {
 				final Label label = newLabel(pp.label() + ": ");
 				bar.getChildren().add(label);
