@@ -7,35 +7,35 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * A 2D polyline defined by a list of {@code Point2D}s.
+ * A list of 2D points.
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
-public class Polyline2D extends AbstractList<Point2D> {
+public class Points2D extends AbstractList<Point2D> {
 
 	/**
-	 * Creates a new, empty polyline.
+	 * Creates a new, empty list.
 	 */
-	public Polyline2D() {
+	public Points2D() {
 		this(new ArrayList<>());
 	}
 
 	/**
-	 * Creates a new polyline.
+	 * Creates a new list of 2D points.
 	 *
-	 * @param points points of the polyline.
+	 * @param elements the list items.
 	 */
-	public Polyline2D(List<Point2D> points) {
-		super(points);
+	public Points2D(List<Point2D> elements) {
+		super(elements);
 	}
 
 	/**
-	 * Returns a copy of the polyline.
+	 * Returns a copy of the points.
 	 *
-	 * @return a copy of the polyline.
+	 * @return a copy of the points.
 	 */
-	public Polyline2D copy() {
-		final Polyline2D copy = new Polyline2D();
+	public Points2D copy() {
+		final Points2D copy = new Points2D();
 		for (Point2D point : elements) {
 			copy.add(point); // no need to copy; points are final
 		}

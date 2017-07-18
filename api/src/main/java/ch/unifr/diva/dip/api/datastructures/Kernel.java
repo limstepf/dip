@@ -1,6 +1,12 @@
 package ch.unifr.diva.dip.api.datastructures;
 
+import ch.unifr.diva.dip.api.utils.jaxb.RectangleAdapter;
 import java.awt.Rectangle;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * KernelBase is a simple wrapper around a matrix. For the kernel we shift the
@@ -23,10 +29,16 @@ import java.awt.Rectangle;
  *
  * @param <T> class of the wrapped matrix.
  */
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.NONE)
 public abstract class Kernel<T extends Matrix<T>> {
 
-	protected final T matrix;
-	protected final Rectangle bounds;
+	@XmlElement(name = "matrix")
+	public final T matrix;
+
+	@XmlElement(name = "bounds")
+	@XmlJavaTypeAdapter(RectangleAdapter.class)
+	public final Rectangle bounds;
 
 	/**
 	 * Available kernel precisions.
@@ -41,6 +53,12 @@ public abstract class Kernel<T extends Matrix<T>> {
 		 * Double floating-point precision.
 		 */
 		DOUBLE;
+	}
+
+	@SuppressWarnings("unused")
+	public Kernel() {
+		this.matrix = null;
+		this.bounds = null;
 	}
 
 	/**

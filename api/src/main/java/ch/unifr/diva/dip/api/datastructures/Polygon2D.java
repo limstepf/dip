@@ -1,5 +1,6 @@
 package ch.unifr.diva.dip.api.datastructures;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -14,7 +15,7 @@ public class Polygon2D extends Polyline2D {
 
 	@SuppressWarnings("unused")
 	public Polygon2D() {
-		this(null);
+		this(new ArrayList<>());
 	}
 
 	/**
@@ -24,6 +25,20 @@ public class Polygon2D extends Polyline2D {
 	 */
 	public Polygon2D(List<Point2D> points) {
 		super(points);
+	}
+
+	/**
+	 * Returns a copy of the polygon.
+	 *
+	 * @return a copy of the polygon.
+	 */
+	@Override
+	public Polygon2D copy() {
+		final Polygon2D copy = new Polygon2D();
+		for (Point2D point : elements) {
+			copy.add(point); // no need to copy; points are final
+		}
+		return copy;
 	}
 
 }

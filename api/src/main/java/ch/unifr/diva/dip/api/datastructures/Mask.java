@@ -1,12 +1,23 @@
 package ch.unifr.diva.dip.api.datastructures;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * A mask is a special type of kernel backed by a {@code BooleanMatrix}.
  * Primarily used to mark the neighbours of a pixel in some pattern (e.g. for a
  * rank filter), where {@code true} means inclusion, {@code false} exclusion. As
  * with a kernel, a mask is centered, s.t. rows and columns may be negative.
  */
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.NONE)
 public class Mask extends Kernel<BooleanMatrix> {
+
+	@SuppressWarnings("unused")
+	public Mask() {
+		this(0, 0);
+	}
 
 	/**
 	 * Creates a new, empty m-by-n mask with specified shape.

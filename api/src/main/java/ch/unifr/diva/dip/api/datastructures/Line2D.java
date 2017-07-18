@@ -11,16 +11,17 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
-public class Line2D implements Cloneable {
+public class Line2D {
 
 	@XmlElement
 	public final Point2D end;
+
 	@XmlElement
 	public final Point2D start;
 
 	@SuppressWarnings("unused")
 	public Line2D() {
-		this(null, null);
+		this(new Point2D(), new Point2D());
 	}
 
 	/**
@@ -49,15 +50,12 @@ public class Line2D implements Cloneable {
 	@Override
 	public String toString() {
 		return this.getClass().getSimpleName()
+				+ "@"
+				+ Integer.toHexString(hashCode())
 				+ "{"
 				+ "start=" + start
 				+ ", end=" + end
 				+ "}";
-	}
-
-	@Override
-	public Object clone() throws CloneNotSupportedException {
-		return super.clone();
 	}
 
 	@Override

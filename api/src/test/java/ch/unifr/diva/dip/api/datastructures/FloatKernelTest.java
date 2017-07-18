@@ -1,14 +1,21 @@
 package ch.unifr.diva.dip.api.datastructures;
 
 import ch.unifr.diva.dip.api.TestUtils.Shape;
+import java.io.IOException;
 import java.util.BitSet;
+import javax.xml.bind.JAXBException;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
 
 /**
  * Float kernel unit tests.
  */
 public class FloatKernelTest extends KernelTestBase {
+
+	@Rule
+	public final TemporaryFolder parent = new TemporaryFolder();
 
 	@Test
 	public void eyeTest() {
@@ -36,6 +43,18 @@ public class FloatKernelTest extends KernelTestBase {
 			assertEquals(s.count, bitSet.nextClearBit(0));
 			assertEquals(s.count, sum);
 		}
+	}
+
+	@Test
+	public void testMarshaller() throws IOException, JAXBException {
+		TestMarshaller<FloatKernel> tm = new TestMarshaller<FloatKernel>(FloatKernel.class, parent) {
+			@Override
+			public FloatKernel newInstance() {
+				final FloatMatrix mat = new FloatMatrix(3, 4).fill(1);
+				return new FloatKernel(mat);
+			}
+		};
+		tm.test();
 	}
 
 }

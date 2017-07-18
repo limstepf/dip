@@ -425,19 +425,18 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 
 		final String keyC = dataType.dataFormat().toString();
 		final String keyS = dataType.type().getCanonicalName();
-		final String keyD = dataType.getCollectionType().name();
 
 		final int k = keyC.length();
 		final int j = (k > 8) ? k - 9 : 0;
 		final String keyM = keyC.substring(j, k);
 
 		int[] channels = {
-			255 - IOUtils.hash(keyC, 233),
-			IOUtils.hash(keyM + keyD, 251) + 5,
+			255 - IOUtils.hash(keyS, 233),
+			IOUtils.hash(keyC, 251) + 5,
 			IOUtils.hash(keyM + keyS, 251) + 5
 		};
 
-		int hashS = IOUtils.hash(keyS, 4049);
+		int hashS = IOUtils.hash(keyM, 4049);
 		ArrayUtils.shuffleArray(channels, hashS);
 
 		final Color color = Color.rgb(channels[0], channels[1], channels[2]);

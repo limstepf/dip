@@ -96,7 +96,8 @@ public class ValueListSelection extends ValueList {
 	@Override
 	public String toString() {
 		return this.getClass().getSimpleName()
-				+ "@" + Integer.toHexString(this.hashCode())
+				+ "@"
+				+ Integer.toHexString(this.hashCode())
 				+ "{"
 				+ "list=" + this.list
 				+ ", selected=" + this.selection

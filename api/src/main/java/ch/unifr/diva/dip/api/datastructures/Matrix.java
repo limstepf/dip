@@ -270,7 +270,8 @@ public abstract class Matrix<T> {
 	@Override
 	public String toString() {
 		return this.getClass().getSimpleName()
-				+ "@" + Integer.toHexString(this.hashCode())
+				+ "@"
+				+ Integer.toHexString(this.hashCode())
 				+ "{"
 				+ "rows=" + this.rows
 				+ ", columns=" + this.rows

@@ -1,13 +1,20 @@
 package ch.unifr.diva.dip.api.datastructures;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import javax.xml.bind.JAXBException;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 /**
  * DoubleMatrix unit tests.
  */
 public class DoubleMatrixTest extends MatrixTestBase {
+
+	@Rule
+	public final TemporaryFolder parent = new TemporaryFolder();
 
 	public static class TransposeTestData extends TransposeTestDataBase {
 
@@ -93,4 +100,16 @@ public class DoubleMatrixTest extends MatrixTestBase {
 		};
 		DoubleMatrix mat = new DoubleMatrix(data);
 	}
+
+	@Test
+	public void testMarshaller() throws IOException, JAXBException {
+		TestMarshaller<DoubleMatrix> tm = new TestMarshaller<DoubleMatrix>(DoubleMatrix.class, parent) {
+			@Override
+			public DoubleMatrix newInstance() {
+				return new DoubleMatrix(5, 5).fill(1);
+			}
+		};
+		tm.test();
+	}
+
 }

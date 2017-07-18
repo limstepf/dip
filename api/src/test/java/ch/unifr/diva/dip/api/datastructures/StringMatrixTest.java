@@ -1,14 +1,21 @@
 package ch.unifr.diva.dip.api.datastructures;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import javax.xml.bind.JAXBException;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 /**
  * StringMatrix unit tests. Strings are assumed to be math. expressions, and
  * we mostly test conversion to Double-/FloatMatrix.
  */
 public class StringMatrixTest extends MatrixTestBase {
+
+	@Rule
+	public final TemporaryFolder parent = new TemporaryFolder();
 
 	public static class TestData {
 		public final String[][] expressions;
@@ -63,4 +70,16 @@ public class StringMatrixTest extends MatrixTestBase {
 			verifyEqualData(matF.transpose().data, t.floats);
 		}
 	}
+
+	@Test
+	public void testMarshaller() throws IOException, JAXBException {
+		TestMarshaller<StringMatrix> tm = new TestMarshaller<StringMatrix>(StringMatrix.class, parent) {
+			@Override
+			public StringMatrix newInstance() {
+				return new StringMatrix(3, 2).fill("val");
+			}
+		};
+		tm.test();
+	}
+
 }

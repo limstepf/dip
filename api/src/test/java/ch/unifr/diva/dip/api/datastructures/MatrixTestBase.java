@@ -7,9 +7,6 @@ import static org.junit.Assert.assertEquals;
  */
 public class MatrixTestBase {
 
-	private static final double DOUBLE_DELTA = 1e-15;
-	private static final float FLOAT_DELTA = 5.96e-08f;
-
 	// the linear array of the transpose of a matrix in column-major order
 	// equals the linear array of the same matrix given in row-major order
 	// and vice versa. Returns the transpose.
@@ -42,7 +39,7 @@ public class MatrixTestBase {
 		// verify by public accessor method
 		for (int i = 0; i < mat.rows; i++) {
 			for (int j = 0; j < mat.columns; j++) {
-				assertEquals(mat.get(i, j), transpose.get(j, i), FLOAT_DELTA);
+				assertEquals(mat.get(i, j), transpose.get(j, i), TestUtils.FLOAT_DELTA);
 			}
 		}
 
@@ -58,7 +55,7 @@ public class MatrixTestBase {
 		// verify by public accessor method
 		for (int i = 0; i < mat.rows; i++) {
 			for (int j = 0; j < mat.columns; j++) {
-				assertEquals(mat.get(i, j), transpose.get(j, i), DOUBLE_DELTA);
+				assertEquals(mat.get(i, j), transpose.get(j, i), TestUtils.DOUBLE_DELTA);
 			}
 		}
 
@@ -81,12 +78,12 @@ public class MatrixTestBase {
 		}
 	}
 
-	public void assertEqualDouble(double a, double b) {
-		assertEquals(b, a, DOUBLE_DELTA);
+	public static void assertEqualDouble(double a, double b) {
+		assertEquals(b, a, TestUtils.DOUBLE_DELTA);
 	}
 
-	public void assertEqualFloat(float a, float b) {
-		assertEquals(b, a, FLOAT_DELTA);
+	public static void assertEqualFloat(float a, float b) {
+		assertEquals(b, a, TestUtils.FLOAT_DELTA);
 	}
 
 }

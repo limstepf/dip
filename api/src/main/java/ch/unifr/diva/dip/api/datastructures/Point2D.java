@@ -11,10 +11,11 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
-public class Point2D implements Cloneable {
+public class Point2D {
 
 	@XmlAttribute
 	public final double x;
+
 	@XmlAttribute
 	public final double y;
 
@@ -37,15 +38,12 @@ public class Point2D implements Cloneable {
 	@Override
 	public String toString() {
 		return this.getClass().getSimpleName()
+				+ "@"
+				+ Integer.toHexString(hashCode())
 				+ "{"
 				+ "x=" + x
 				+ ", y=" + y
 				+ "}";
-	}
-
-	@Override
-	public Object clone() throws CloneNotSupportedException {
-		return super.clone();
 	}
 
 	@Override

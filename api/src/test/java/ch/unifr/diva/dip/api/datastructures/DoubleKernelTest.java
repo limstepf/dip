@@ -1,15 +1,22 @@
 package ch.unifr.diva.dip.api.datastructures;
 
 import ch.unifr.diva.dip.api.TestUtils;
+import java.io.IOException;
 import java.util.BitSet;
+import javax.xml.bind.JAXBException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 /**
  * Double kernel unit tests.
  */
 public class DoubleKernelTest extends KernelTestBase {
+
+	@Rule
+	public final TemporaryFolder parent = new TemporaryFolder();
 
 	@Test
 	public void eyeTest() {
@@ -37,6 +44,18 @@ public class DoubleKernelTest extends KernelTestBase {
 			assertEquals(s.count, bitSet.nextClearBit(0));
 			assertEquals(s.count, sum);
 		}
+	}
+
+	@Test
+	public void testMarshaller() throws IOException, JAXBException {
+		TestMarshaller<DoubleKernel> tm = new TestMarshaller<DoubleKernel>(DoubleKernel.class, parent) {
+			@Override
+			public DoubleKernel newInstance() {
+				final DoubleMatrix mat = new DoubleMatrix(5, 5).fill(1);
+				return new DoubleKernel(mat);
+			}
+		};
+		tm.test();
 	}
 
 }
