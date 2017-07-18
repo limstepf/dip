@@ -83,6 +83,53 @@ public class FxColor {
 		this.opacity = opacity;
 	}
 
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName()
+				+ "@"
+				+ Integer.toHexString(hashCode())
+				+ "{"
+				+ "red: " + red
+				+ ", green: " + green
+				+ ", blue: " + blue
+				+ ", opacity: " + opacity
+				+ "}";
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 17;
+		hash = 31 * hash + Integer.hashCode(red);
+		hash = 31 * hash + Integer.hashCode(green);
+		hash = 31 * hash + Integer.hashCode(blue);
+		hash = 31 * hash + Integer.hashCode(opacity);
+		return hash;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final FxColor other = (FxColor) obj;
+		if (this.red != other.red) {
+			return false;
+		}
+		if (this.green != other.green) {
+			return false;
+		}
+		if (this.blue != other.blue) {
+			return false;
+		}
+		if (this.opacity != other.opacity) {
+			return false;
+		}
+		return true;
+	}
+
 	/**
 	 * Returns a JavaFX {@code Color} object.
 	 *
