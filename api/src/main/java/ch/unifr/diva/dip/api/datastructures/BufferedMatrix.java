@@ -1,5 +1,6 @@
 package ch.unifr.diva.dip.api.datastructures;
 
+import ch.unifr.diva.dip.api.utils.ArrayUtils;
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
 import java.awt.image.BandedSampleModel;
@@ -8,7 +9,12 @@ import java.awt.image.ColorModel;
 import java.awt.image.ComponentColorModel;
 import java.awt.image.SampleModel;
 import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferByte;
+import java.awt.image.DataBufferDouble;
 import java.awt.image.DataBufferFloat;
+import java.awt.image.DataBufferInt;
+import java.awt.image.DataBufferShort;
+import java.awt.image.DataBufferUShort;
 import java.awt.image.PixelInterleavedSampleModel;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
@@ -223,7 +229,7 @@ public class BufferedMatrix extends BufferedImage {
 	}
 
 	/**
-	 * Constructs a {@code BufferedMatrix}. Samples are of single-precision
+	 * Creates a {@code BufferedMatrix}. Samples are of single-precision
 	 * floating points (32-bit floats) using a Band-Sequential (BSQ) interleave
 	 * raster/data buffer.
 	 *
@@ -242,7 +248,7 @@ public class BufferedMatrix extends BufferedImage {
 	}
 
 	/**
-	 * Constructs a {@code BufferedMatrix}.
+	 * Creates a {@code BufferedMatrix}.
 	 *
 	 * @param width width of the created image.
 	 * @param height height of the created image.
@@ -270,6 +276,110 @@ public class BufferedMatrix extends BufferedImage {
 		this.width = width;
 		this.height = height;
 		this.bands = bands;
+	}
+
+	/**
+	 * Creates a new {@code BufferedMatrix} with single-precision floats and
+	 * Band-Sequential (BSQ) interleave.
+	 *
+	 * @param samples a 2D array of samples.
+	 * @return a single-band BufferedMatrix of the size
+	 * {@code samples.length * samples[0].length}.
+	 */
+	public static BufferedMatrix createBufferedMatrix(float[][] samples) {
+		final int rows = samples.length;
+		final int columns = (rows > 0) ? samples[0].length : 0;
+		final BufferedMatrix mat = new BufferedMatrix(
+				columns,
+				rows,
+				1,
+				DataType.FLOAT,
+				Interleave.BSQ
+		);
+		final float[] flat = ArrayUtils.flatten(samples);
+		mat.getRaster().setSamples(0, 0, columns, rows, 0, flat);
+		return mat;
+	}
+
+	/**
+	 * Returns a 2D array of the sample values of a the first band in
+	 * single-precision floats.
+	 *
+	 * @return a 2D array of the sample values of a the first band in
+	 * single-precision floats.
+	 */
+	public float[][] toFloat2D() {
+		return toFloat2D(0);
+	}
+
+	/**
+	 * Returns a 2D array of the sample values of a single band in
+	 * single-precision floats.
+	 *
+	 * @param band the band of the matrix.
+	 * @return a 2D array of the sample values of a single band in
+	 * single-precision floats.
+	 */
+	public float[][] toFloat2D(int band) {
+		final float[][] samples = new float[height][width];
+		final WritableRaster raster = getRaster();
+		for (int y = 0; y < height; y++) {
+			samples[y] = new float[width];
+			raster.getSamples(0, y, width, 1, band, samples[y]);
+		}
+		return samples;
+	}
+
+	/**
+	 * Creates a new {@code BufferedMatrix} with double-precision floats and
+	 * Band-Sequential (BSQ) interleave.
+	 *
+	 * @param samples a 2D array of samples.
+	 * @return a single-band BufferedMatrix of the size
+	 * {@code samples.length * samples[0].length}.
+	 */
+	public static BufferedMatrix createBufferedMatrix(double[][] samples) {
+		final int rows = samples.length;
+		final int columns = (rows > 0) ? samples[0].length : 0;
+		final BufferedMatrix mat = new BufferedMatrix(
+				columns,
+				rows,
+				1,
+				DataType.DOUBLE,
+				Interleave.BSQ
+		);
+		final double[] flat = ArrayUtils.flatten(samples);
+		mat.getRaster().setSamples(0, 0, columns, rows, 0, flat);
+		return mat;
+	}
+
+	/**
+	 * Returns a 2D array of the sample values of the first band in
+	 * double-precision floats.
+	 *
+	 * @return a 2D array of the sample values of the first band in
+	 * double-precision floats.
+	 */
+	public double[][] toDouble2D() {
+		return toDouble2D(0);
+	}
+
+	/**
+	 * Returns a 2D array of the sample values of a single band in
+	 * double-precision floats.
+	 *
+	 * @param band the band of the matrix.
+	 * @return a 2D array of the sample values of a single band in
+	 * double-precision floats.
+	 */
+	public double[][] toDouble2D(int band) {
+		final double[][] samples = new double[height][width];
+		final WritableRaster raster = getRaster();
+		for (int y = 0; y < height; y++) {
+			samples[y] = new double[width];
+			raster.getSamples(0, y, width, 1, band, samples[y]);
+		}
+		return samples;
 	}
 
 	/**
@@ -332,7 +442,7 @@ public class BufferedMatrix extends BufferedImage {
 	private static WritableRaster newMatrixRaster(int width, int height, int bands, int dataType, Interleave interleave) {
 		return Raster.createWritableRaster(
 				newMatrixSampleModel(width, height, bands, dataType, interleave),
-				newMatrixDataBuffer(width, height, bands, interleave),
+				newMatrixDataBuffer(width, height, bands, dataType, interleave),
 				null
 		);
 	}
@@ -377,13 +487,25 @@ public class BufferedMatrix extends BufferedImage {
 	/**
 	 * DataBuffer.
 	 */
-	private static DataBuffer newMatrixDataBuffer(int width, int height, int bands, Interleave interleave) {
-		switch (interleave) {
-			case BSQ:
+	private static DataBuffer newMatrixDataBuffer(int width, int height, int bands, int dataType, Interleave interleave) {
+		switch (dataType) {
+			case 0:
+				return new DataBufferByte(width * height, bands);
+			case 1:
+				return new DataBufferUShort(width * height, bands);
+			case 2:
+				return new DataBufferShort(width * height, bands);
+			case 3:
+				return new DataBufferInt(width * height, bands);
+			case 4:
 				return new DataBufferFloat(width * height, bands);
-			case BIP:
+			case 5:
+				return new DataBufferDouble(width * height, bands);
+			case 32:
 			default:
-				return new DataBufferFloat(width * height * bands);
+				throw new IllegalArgumentException(
+						"undefined data buffer ordinal: " + dataType
+				);
 		}
 	}
 }
