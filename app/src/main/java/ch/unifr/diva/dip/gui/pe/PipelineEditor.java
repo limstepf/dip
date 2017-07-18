@@ -2,6 +2,7 @@ package ch.unifr.diva.dip.gui.pe;
 
 import ch.unifr.diva.dip.api.components.Port;
 import ch.unifr.diva.dip.api.datatypes.DataType;
+import ch.unifr.diva.dip.api.utils.ArrayUtils;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.UserSettings;
 import ch.unifr.diva.dip.core.model.Pipeline;
@@ -437,7 +438,7 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 		};
 
 		int hashS = IOUtils.hash(keyS, 4049);
-		IOUtils.shuffleArray(channels, hashS);
+		ArrayUtils.shuffleArray(channels, hashS);
 
 		final Color color = Color.rgb(channels[0], channels[1], channels[2]);
 		hashColors.put(dataType, color);

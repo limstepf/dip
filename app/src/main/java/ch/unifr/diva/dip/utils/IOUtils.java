@@ -14,7 +14,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
@@ -26,8 +25,6 @@ import org.xml.sax.SAXException;
 
 /**
  * I/O utilities.
- *
- * TODO: this is more of a mixed bag than I/O utilities, eh?
  */
 public class IOUtils {
 
@@ -312,29 +309,4 @@ public class IOUtils {
 		return hash;
 	}
 
-	/**
-	 * Shuffles an array of int (Fisher-Yates shuffle).
-	 *
-	 * @param a an array of int.
-	 */
-	public static void shuffleArray(int[] a) {
-		shuffleArray(a, -1);
-	}
-
-	/**
-	 * Shuffles an array of int (Fisher-Yates shuffle).
-	 *
-	 * @param a an array of int.
-	 * @param seed a random seed, or a negative number to not set it
-	 */
-	public static void shuffleArray(int[] a, int seed) {
-		final Random r = (seed > -1) ? new Random(seed) : new Random();
-
-		for (int i = a.length - 1; i > 0; i--) {
-			int j = r.nextInt(i + 1);
-			int m = a[j];
-			a[j] = a[i];
-			a[i] = m;
-		}
-	}
 }
