@@ -17,7 +17,7 @@
 	<packaging>pom</packaging>
 
 	<properties>
-        <!-- Intended to be used one multi-module deeper (e.g. in 'bundles', or 
+        <!-- Intended to be used one multi-module deeper (e.g. in 'bundles', or
         'third-party') -->
 		<app.core.bundledir>../../app/target/bundles-core</app.core.bundledir>
 		<app.plugin.bundledir>../../app/target/bundles</app.plugin.bundledir>
@@ -38,6 +38,11 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
 		</dependency>
 
 		<dependency>
