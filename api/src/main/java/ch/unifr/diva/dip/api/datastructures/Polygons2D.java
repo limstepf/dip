@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
-public class Polygons2D extends AbstractList<Polygon2D> implements Cloneable {
+public class Polygons2D extends AbstractList<Polygon2D> {
 
 	/**
 	 * Creates a new, empty list.

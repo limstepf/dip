@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
-public class Polylines2D extends AbstractList<Polyline2D> implements Cloneable {
+public class Polylines2D extends AbstractList<Polyline2D> {
 
 	/**
 	 * Creates a new, empty list.
