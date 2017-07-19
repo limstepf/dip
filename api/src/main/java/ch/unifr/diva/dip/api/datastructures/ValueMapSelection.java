@@ -59,4 +59,29 @@ public class ValueMapSelection extends ValueMap {
 		return sb.toString();
 	}
 
+	@Override
+	public int hashCode() {
+		int hash = super.hashCode();
+		hash = 31 * hash + selection.hashCode();
+		return hash;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final ValueMapSelection other = (ValueMapSelection) obj;
+		if (!this.selection.equals(other.selection)) {
+			return false;
+		}
+		if (!this.map.equals(other.map)) {
+			return false;
+		}
+		return true;
+	}
+
 }

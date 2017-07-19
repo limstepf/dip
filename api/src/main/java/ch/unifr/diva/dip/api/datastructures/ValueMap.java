@@ -3,6 +3,7 @@ package ch.unifr.diva.dip.api.datastructures;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -80,6 +81,26 @@ public class ValueMap {
 			}
 		}
 		sb.append(']');
+	}
+
+	@Override
+	public int hashCode() {
+		return map.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final ValueMap other = (ValueMap) obj;
+		if (!this.map.equals(other.map)) {
+			return false;
+		}
+		return true;
 	}
 
 }
