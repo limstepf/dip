@@ -1,5 +1,7 @@
 package ch.unifr.diva.dip.api.utils;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 /**
  * Mathematical utility methods.
  */
@@ -7,6 +9,17 @@ public class MathUtils {
 
 	private MathUtils() {
 		// nope.
+	}
+
+	/**
+	 * Returns a random {@code int} within given range.
+	 *
+	 * @param minInclusive lower bound (inclusive).
+	 * @param maxExclusive upper bound (exclusive).
+	 * @return a random {@code int} within given range.
+	 */
+	public static int randomInt(int minInclusive, int maxExclusive) {
+		return ThreadLocalRandom.current().nextInt(minInclusive, maxExclusive);
 	}
 
 	/**
