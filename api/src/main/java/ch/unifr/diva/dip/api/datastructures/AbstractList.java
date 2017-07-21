@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Objects;
 import java.util.RandomAccess;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -53,7 +54,6 @@ public abstract class AbstractList<T> implements List<T>, RandomAccess {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public boolean equals(Object obj) {
 		if (obj == null) {
 			return false;
@@ -61,8 +61,8 @@ public abstract class AbstractList<T> implements List<T>, RandomAccess {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		final AbstractList<T> other = (AbstractList<T>) obj;
-		return this.elements.equals(other.elements);
+		final AbstractList<?> other = (AbstractList<?>) obj;
+		return Objects.equals(elements, other.elements);
 	}
 
 	/*

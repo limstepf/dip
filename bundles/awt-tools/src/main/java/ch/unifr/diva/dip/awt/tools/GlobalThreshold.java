@@ -207,11 +207,11 @@ public class GlobalThreshold extends ProcessableBase implements Previewable {
 		final ValueListSelection vs = this.thresholdParameter.get();
 		switch (vs.selection) {
 			case 1: // manual/fixed threshold
-				return (int) vs.list.get(vs.selection);
+				return (int) vs.get(vs.selection);
 
 			default:
 			case 0: // adaptive threshold
-				final String mname = (String) vs.list.get(vs.selection);
+				final String mname = (String) vs.get(vs.selection);
 				final AdaptiveMethod method = EnumParameter.valueOf(
 						mname,
 						AdaptiveMethod.class,

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -13,12 +12,11 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "value-list")
 @XmlAccessorType(XmlAccessType.NONE)
-public class ValueList {
+public class ValueList extends AbstractList<Object> {
 
-	@XmlElement
-	public final List<Object> list;
-
-	@SuppressWarnings("unused")
+	/**
+	 * Creates a new, empty value list.
+	 */
 	public ValueList() {
 		this(new ArrayList<>());
 	}
@@ -29,57 +27,7 @@ public class ValueList {
 	 * @param values the objects of the value list.
 	 */
 	public ValueList(List<Object> values) {
-		this.list = values;
-	}
-
-	/**
-	 * Returns an object of the value list.
-	 *
-	 * @param index the index of the object in the value list.
-	 * @return the object at the given index.
-	 */
-	public Object get(int index) {
-		return this.list.get(index);
-	}
-
-	/**
-	 * Sets/updates an object of the value list.
-	 *
-	 * @param index the index of the object in the value list.
-	 * @param obj the new object.
-	 */
-	public void set(int index, Object obj) {
-		this.list.set(index, obj);
-	}
-
-	@Override
-	public int hashCode() {
-		return list.hashCode();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		final ValueList other = (ValueList) obj;
-		if (!this.list.equals(other.list)) {
-			return false;
-		}
-		return true;
-	}
-
-	@Override
-	public String toString() {
-		return this.getClass().getSimpleName()
-				+ "@"
-				+ Integer.toHexString(this.hashCode())
-				+ "{"
-				+ "list=" + this.list
-				+ "}";
+		super(values);
 	}
 
 }

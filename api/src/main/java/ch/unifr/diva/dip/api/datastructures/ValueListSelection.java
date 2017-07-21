@@ -40,7 +40,7 @@ public class ValueListSelection extends ValueList {
 	 * @return the currently selected object.
 	 */
 	public Object getSelectedValue() {
-		if (this.selection > this.list.size()) {
+		if (this.selection > size()) {
 			return null;
 		}
 
@@ -62,7 +62,7 @@ public class ValueListSelection extends ValueList {
 	 * @param index index of the selected object.
 	 */
 	public void setSelection(int index) {
-		if (index >= this.list.size()) {
+		if (index >= size()) {
 			return;
 		}
 		this.selection = index;
@@ -87,7 +87,7 @@ public class ValueListSelection extends ValueList {
 		if (this.selection != other.selection) {
 			return false;
 		}
-		if (!this.list.equals(other.list)) {
+		if (!this.elements.equals(other.elements)) {
 			return false;
 		}
 		return true;
@@ -99,7 +99,7 @@ public class ValueListSelection extends ValueList {
 				+ "@"
 				+ Integer.toHexString(this.hashCode())
 				+ "{"
-				+ "list=" + this.list
+				+ "list=" + this.elements
 				+ ", selected=" + this.selection
 				+ "}";
 	}

@@ -43,20 +43,35 @@ public class ValueMapSelection extends ValueMap {
 		return this.map.get(this.selection);
 	}
 
+	/**
+	 * Returns the key of the currently selected map entry.
+	 *
+	 * @return the key of the currently selected map entry.
+	 */
+	public String getSelectedKey() {
+		return this.selection;
+	}
+
+	/**
+	 * Selects a different map entry.
+	 *
+	 * @param key key of the map entry to be selected.
+	 */
+	public void setSelection(String key) {
+		if (this.map.containsKey(key)) {
+			this.selection = key;
+		}
+	}
+
 	@Override
 	public String toString() {
-		final StringBuilder sb = new StringBuilder();
-		sb.append(this.getClass().getSimpleName());
-		sb.append('@');
-		sb.append(Integer.toHexString(this.hashCode()));
-		sb.append('{');
-
-		printMap(sb);
-		sb.append(", selected=");
-		sb.append(this.selection);
-
-		sb.append('}');
-		return sb.toString();
+		return this.getClass().getSimpleName()
+				+ "@"
+				+ Integer.toHexString(hashCode())
+				+ "{"
+				+ "selected=" + selection + "; "
+				+ mapToString()
+				+ "}";
 	}
 
 	@Override
