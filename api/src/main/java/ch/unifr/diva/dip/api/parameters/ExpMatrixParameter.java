@@ -65,7 +65,7 @@ public class ExpMatrixParameter extends PersistentParameterBase<StringMatrix, Ex
 	 * @param defaultValue default string matrix.
 	 */
 	public ExpMatrixParameter(String label, StringMatrix defaultValue) {
-		super(label, defaultValue);
+		super(label, StringMatrix.class, defaultValue);
 	}
 
 	/**
@@ -341,6 +341,11 @@ public class ExpMatrixParameter extends PersistentParameterBase<StringMatrix, Ex
 
 		protected String format(String value) {
 			return (value == null) ? Double.toString(parameter.get().getNullValue()) : value;
+		}
+
+		@Override
+		public StringMatrix get() {
+			throw new UnsupportedOperationException();
 		}
 
 		@Override

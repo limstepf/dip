@@ -43,7 +43,7 @@ public class IntegerSliderParameter extends PersistentParameterBase<Integer, Int
 	 * @param maxValue maximum value (inclusive).
 	 */
 	public IntegerSliderParameter(String label, int defaultValue, int minValue, int maxValue) {
-		super(label, defaultValue);
+		super(label, Integer.class, defaultValue);
 
 		this.minValue = minValue;
 		this.maxValue = maxValue;
@@ -185,7 +185,8 @@ public class IntegerSliderParameter extends PersistentParameterBase<Integer, Int
 			parameter.set(parameter.get() - 1);
 		}
 
-		protected final Integer get() {
+		@Override
+		public final Integer get() {
 			return (int) slider.getValue();
 		}
 

@@ -67,7 +67,7 @@ public class EnumParameter extends PersistentParameterBase<String, EnumParameter
 	 * @param defaultValue name of the default enumeration option.
 	 */
 	public EnumParameter(String label, List<String> options, List<String> labels, String defaultValue) {
-		super(label, defaultValue);
+		super(label, String.class, defaultValue);
 
 		this.options = options;
 		this.labels = (labels == null) ? options : labels;
@@ -221,7 +221,8 @@ public class EnumParameter extends PersistentParameterBase<String, EnumParameter
 			root.layout();
 		}
 
-		protected final String get() {
+		@Override
+		public final String get() {
 			final int index = root.getSelectionModel().getSelectedIndex();
 			return parameter.options.get(index);
 		}

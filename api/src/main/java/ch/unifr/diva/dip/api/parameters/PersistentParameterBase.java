@@ -1,8 +1,8 @@
 package ch.unifr.diva.dip.api.parameters;
 
 import ch.unifr.diva.dip.api.utils.ParentObjectProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.scene.Node;
+import org.slf4j.LoggerFactory;
 
 /**
  * Persistent parameter base class. Implements most boilerplate code of a
@@ -19,6 +19,8 @@ import javafx.scene.Node;
  */
 public abstract class PersistentParameterBase<T, V extends PersistentParameter.View<T>> implements PersistentParameter<T> {
 
+	protected static final org.slf4j.Logger log = LoggerFactory.getLogger(PersistentParameterBase.class);
+	protected final Class<T> valueClass;
 	protected V view;
 	protected boolean isHidden;
 	protected final String label;
@@ -30,22 +32,25 @@ public abstract class PersistentParameterBase<T, V extends PersistentParameter.V
 	 * Creates a new persistent parameter base.
 	 *
 	 * @param label the label of the parameter.
+	 * @param valueClass the parameter's value class {@code T}.
 	 * @param defaultValue the default value.
 	 */
-	public PersistentParameterBase(String label, T defaultValue) {
-		this(label, defaultValue, defaultValue);
+	public PersistentParameterBase(String label, Class<T> valueClass, T defaultValue) {
+		this(label, valueClass, defaultValue, defaultValue);
 	}
 
 	/**
 	 * Creates a new persistent parameter base.
 	 *
 	 * @param label the label of the parameter.
+	 * @param valueClass the parameter's value class {@code T}.
 	 * @param defaultValue the default value.
 	 * @param initialValue the initial value.
 	 */
-	public PersistentParameterBase(String label, T defaultValue, T initialValue) {
+	public PersistentParameterBase(String label, Class<T> valueClass, T defaultValue, T initialValue) {
 		this.label = label;
 		this.defaultValue = defaultValue;
+		this.valueClass = valueClass;
 		this.valueProperty = new ParentObjectProperty<T>(initialValue) {
 			@Override
 			public void set(T value) {
@@ -56,59 +61,28 @@ public abstract class PersistentParameterBase<T, V extends PersistentParameter.V
 					if (!changeIsLocal && view != null) {
 						view.set(super.get());
 					}
+					onValuePropertySet(true);
+				} else {
+					onValuePropertySet(false);
 				}
-				onValuePropertySet();
 			}
 		};
 	}
 
-	/**
-	 * Invalidates the parameter's value property. The value property doesn't
-	 * get invalidated if the new value is the same as the old one. But with
-	 * more complex value objects it's often convenient to retrieve the value
-	 * (or rather data structure) and alter it, thus also altering the already
-	 * set value (without invalidating the property). Trying to set this value
-	 * will not invalidate the property, since it's the same as the current
-	 * value, so... in such a situation a call to this method will do the trick,
-	 * and also update the view (if present).
-	 *
-	 * <h4>Example:</h4>
-	 * <pre>
-	 * <code>
-	 * ExpMatrixParameter matrix = new ExpMatrixParameter("mat", new StringMatrix(3,3));
-	 * // ...
-	 * // retrieve the value of the property, a StringMatrix in this case,
-	 * // and alter it directly, followed by a call to invalidate() instead of
-	 * // trying to set the value of the parameter.
-	 * matrix.get().fill("e");
-	 * matrix.invalidate();
-	 * </code>
-	 * </pre>
-	 *
-	 * <p>
-	 * In the same situation, the following:
-	 * <pre>
-	 * <code>
-	 * // ...
-	 * matrix.set(matrix.get().fill("e"));
-	 * </code>
-	 * </pre> ...would not work. The call to set would be ignored/not have the
-	 * desired effect, since that value is already set. Alternatively we could
-	 * create a new StringMatrix from scratch, or (deep-)clone the current
-	 * matrix before altering it, but that's rather stupid...
-	 */
+	@Override
 	public void invalidate() {
 		this.valueProperty.invalidate();
 		if (!changeIsLocal && view != null) {
 			view.set(get());
 		}
-		onValuePropertySet();
+		onValuePropertySet(true);
 	}
 
 	/**
 	 * A filter applied before setting the value property. As is, this is just a
 	 * pass-through, but can be overwritten if needed (e.g. to validate the new
-	 * value first).
+	 * value first). The new value may be simply ignored by returning the
+	 * current value by a call to {@code get()}.
 	 *
 	 * @param value the new value.
 	 * @return the new, filtered value.
@@ -119,11 +93,15 @@ public abstract class PersistentParameterBase<T, V extends PersistentParameter.V
 
 	/**
 	 * Hook method that gets called after the value property has been
-	 * set/updated. In case the {@code filterValueProperty} method is used to
-	 * disable some listeners first, this method can be overwritten to re-enable
-	 * them (or whatever). As is this method does nothing.
+	 * set/updated. As is, this method does nothing. Primarily used to propagate
+	 * a changed value to child-parameters (if {@code changed} is {@code true}).
+	 *
+	 * @param changed {@code true} if the value actually changed ({@code set()}
+	 * might ignore the value, or if explicitly {@code invalidate()}d,
+	 * {@code false} otherwise, that is {@code set()} got called, but the value
+	 * has been ignored (for being invalid or equal to the current value).
 	 */
-	protected void onValuePropertySet() {
+	protected void onValuePropertySet(boolean changed) {
 
 	}
 
@@ -147,6 +125,11 @@ public abstract class PersistentParameterBase<T, V extends PersistentParameter.V
 		this.valueProperty.set(value);
 	}
 
+	@Override
+	public Class<T> getValueClass() {
+		return this.valueClass;
+	}
+
 	/**
 	 * Set method to be used by the views to update the parameter.
 	 *
@@ -159,7 +142,7 @@ public abstract class PersistentParameterBase<T, V extends PersistentParameter.V
 	}
 
 	@Override
-	public ObjectProperty<T> property() {
+	public ParentObjectProperty<T> property() {
 		return this.valueProperty;
 	}
 

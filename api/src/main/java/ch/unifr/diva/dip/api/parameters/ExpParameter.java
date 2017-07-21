@@ -77,7 +77,7 @@ public class ExpParameter extends PersistentParameterBase<String, ExpParameter.E
 	 * @param defaultValue default value.
 	 */
 	public ExpParameter(String label, String defaultValue) {
-		super(label, defaultValue);
+		super(label, String.class, defaultValue);
 	}
 
 	@Override
@@ -210,7 +210,8 @@ public class ExpParameter extends PersistentParameterBase<String, ExpParameter.E
 			tooltip.setText(msg);
 		}
 
-		protected final String get() {
+		@Override
+		public final String get() {
 			return root.getText();
 		}
 

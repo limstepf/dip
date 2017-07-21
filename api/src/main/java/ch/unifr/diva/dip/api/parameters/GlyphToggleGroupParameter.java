@@ -22,12 +22,35 @@ public class GlyphToggleGroupParameter<T> extends PersistentParameterBase<T, Gly
 	 * Creates a new glyph toggle group parameter.
 	 *
 	 * @param label the label.
+	 * @param valueClass the parameter's value class {@code T}.
 	 * @param defaultValue the default value/key.
 	 */
-	public GlyphToggleGroupParameter(String label, T defaultValue) {
-		super(label, defaultValue);
+	public GlyphToggleGroupParameter(String label, Class<T> valueClass, T defaultValue) {
+		super(label, valueClass, defaultValue);
 
 		this.toggles = new ArrayList<>();
+	}
+
+	/**
+	 * Returns a new glyph toggle group parameter with {@code String} values.
+	 *
+	 * @param label the label.
+	 * @param defaultValue the default value/key.
+	 * @return a new glyph toggle group parameter.
+	 */
+	public static GlyphToggleGroupParameter<String> newInstance(String label, String defaultValue) {
+		return new GlyphToggleGroupParameter<>(label, String.class, defaultValue);
+	}
+
+	/**
+	 * Returns a new glyph toggle group parameter with {@code Integer} values.
+	 *
+	 * @param label the label.
+	 * @param defaultValue the default value/key.
+	 * @return a new glyph toggle group parameter.
+	 */
+	public static GlyphToggleGroupParameter<Integer> newInstance(String label, Integer defaultValue) {
+		return new GlyphToggleGroupParameter<>(label, Integer.class, defaultValue);
 	}
 
 	@Override
@@ -97,7 +120,8 @@ public class GlyphToggleGroupParameter<T> extends PersistentParameterBase<T, Gly
 			);
 		}
 
-		protected final T get() {
+		@Override
+		public final T get() {
 			return toggle.getSelected();
 		}
 

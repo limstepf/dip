@@ -36,7 +36,7 @@ public class BooleanParameter extends PersistentParameterBase<Boolean, BooleanPa
 	 * @param falseLabel label of the false (or off) option.
 	 */
 	public BooleanParameter(String label, boolean defaultValue, String trueLabel, String falseLabel) {
-		super(label, defaultValue);
+		super(label, Boolean.class, defaultValue);
 
 		this.trueLabel = trueLabel;
 		this.falseLabel = falseLabel;
@@ -132,7 +132,8 @@ public class BooleanParameter extends PersistentParameterBase<Boolean, BooleanPa
 			});
 		}
 
-		protected final Boolean get() {
+		@Override
+		public final Boolean get() {
 			if (group.getSelectedToggle() == null) {
 				return Boolean.FALSE;
 			}

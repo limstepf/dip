@@ -25,7 +25,7 @@ public class OptionParameter extends PersistentParameterBase<Integer, OptionPara
 	 * @param defaultValue index of the default option.
 	 */
 	public OptionParameter(String label, List<String> options, int defaultValue) {
-		super(label, defaultValue);
+		super(label, Integer.class, defaultValue);
 
 		this.options = options;
 	}
@@ -90,7 +90,8 @@ public class OptionParameter extends PersistentParameterBase<Integer, OptionPara
 			});
 		}
 
-		protected final Integer get() {
+		@Override
+		public final Integer get() {
 			return root.getSelectionModel().getSelectedIndex();
 		}
 

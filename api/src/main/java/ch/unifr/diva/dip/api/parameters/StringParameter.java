@@ -25,7 +25,7 @@ public class StringParameter extends PersistentParameterBase<String, StringParam
 	 * @param defaultValue default value/string.
 	 */
 	public StringParameter(String label, String defaultValue) {
-		super(label, defaultValue);
+		super(label, String.class, defaultValue);
 	}
 
 	@Override
@@ -87,7 +87,8 @@ public class StringParameter extends PersistentParameterBase<String, StringParam
 			});
 		}
 
-		protected final String get() {
+		@Override
+		public final String get() {
 			return root.getText();
 		}
 

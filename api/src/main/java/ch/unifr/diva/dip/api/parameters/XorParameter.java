@@ -43,10 +43,14 @@ public class XorParameter extends CompositeBase<ValueListSelection, XorParameter
 	 * selected/used.
 	 */
 	public XorParameter(String label, List<Parameter<?>> parameters, int defaultSelection) {
-		super(label, initValue(parameters, defaultSelection), initValue(parameters, defaultSelection));
+		super(
+				label,
+				ValueListSelection.class,
+				initValue(parameters, defaultSelection),
+				initValue(parameters, defaultSelection)
+		);
 
 		this.children = parameters;
-
 		addChildListeners(Parameter.filterPersistent(this.children));
 	}
 
@@ -96,28 +100,101 @@ public class XorParameter extends CompositeBase<ValueListSelection, XorParameter
 	@Override
 	protected void invalidateChildParameter(PersistentParameter<?> p) {
 		final ValueListSelection vs = get();
+
 		for (int i = 0; i < this.children.size(); i++) {
 			final Parameter<?> pi = this.children.get(i);
 			if (p.equals(pi)) {
-				vs.list.set(i, p.get());
+				vs.set(i, p.get());
 				break;
 			}
 		}
 		this.valueProperty.invalidate();
 	}
 
-	@Override
-	protected ValueListSelection filterValueProperty(ValueListSelection value) {
-		enableChildListeners(false);
-
-		for (int i = 0; i < this.children.size(); i++) {
+	/**
+	 * Checks whether the given value list selection matches this parameter's
+	 * child-parameter types. A mismatch means that the given value can't be
+	 * assigned to this parameter (e.g. caused by a newer version with modified
+	 * child-parameters leading to an outdated value).
+	 *
+	 * @param value a value list selection.
+	 * @return {@code true} if the value list selection matches this parameter's
+	 * child-parameter types, {@code false} otherwise.
+	 */
+	public boolean isMatchingValueList(ValueListSelection value) {
+		if (value == null || value.size() != children.size()) {
+			return false;
+		}
+		for (int i = 0; i < children.size(); i++) {
 			final Parameter<?> p = this.children.get(i);
 			if (p.isPersistent()) {
-				p.asPersitentParameter().setRaw(value.get(i));
+				if (!p.asPersitentParameter().isAssignable(value.get(i))) {
+					return false;
+				}
 			}
+		}
+		return true;
+	}
+
+	protected String persistentChildrenToString() {
+		final List<String> params = new ArrayList<>();
+		for (Parameter<?> p : children) {
+			if (p.isPersistent()) {
+				params.add(p.asPersitentParameter().getValueClass().getSimpleName());
+			}
+		}
+		return String.join(", ", params);
+	}
+
+	protected String valuesToString(ValueListSelection value) {
+		if (value == null) {
+			return "null";
+		}
+		final List<String> values = new ArrayList<>();
+		for (Object obj : value.elements) {
+			values.add(obj.getClass().getSimpleName());
+		}
+		return String.join(", ", values);
+	}
+
+	@Override
+	protected ValueListSelection filterValueProperty(ValueListSelection value) {
+		/*
+		 * for now mismatches are simply ignored. We might consider implementing
+		 * an alignment algorithm based on minimum edit distance (of the two
+		 * class/type sequences), although a matched class/type might still be
+		 * a mismatch afterall...
+		 */
+		if (!isMatchingValueList(value)) {
+			log.warn(
+					"ValueListSelection mismatch in filterValueProperty: {}"
+					+ ",\n expected: [{}]"
+					+ ",\n given:    [{}]",
+					this,
+					persistentChildrenToString(),
+					valuesToString(value)
+			);
+			return get(); // ignore given value alltogether
 		}
 
 		return value;
+	}
+
+	@Override
+	protected void onValuePropertySet(boolean changed) {
+		if (changed) { // propagate changed values to child-parameters
+			enableChildListeners(false);
+
+			final ValueListSelection value = get();
+			for (int i = 0; i < this.children.size(); i++) {
+				final Parameter<?> p = this.children.get(i);
+				if (p.isPersistent()) {
+					p.asPersitentParameter().setRaw(value.get(i));
+				}
+			}
+
+			enableChildListeners(true);
+		}
 	}
 
 	@Override
@@ -163,6 +240,17 @@ public class XorParameter extends CompositeBase<ValueListSelection, XorParameter
 			this.radio.setUserData(index);
 			this.parent = parent;
 		}
+
+		@Override
+		public String toString() {
+			return this.getClass().getSimpleName()
+					+ "@"
+					+ Integer.toHexString(hashCode())
+					+ "{"
+					+ view
+					+ "}";
+		}
+
 	}
 
 	/**
@@ -189,7 +277,7 @@ public class XorParameter extends CompositeBase<ValueListSelection, XorParameter
 			// listen to xor selection
 			toggleGroup.selectedToggleProperty().addListener((obs) -> {
 				final ValueListSelection v = parameter.get();
-				v.selection = (int) toggleGroup.getSelectedToggle().getUserData();
+				v.selection = getSelectedIndex();
 				parameter.valueProperty.invalidate();
 				updateItems();
 			});
@@ -217,7 +305,7 @@ public class XorParameter extends CompositeBase<ValueListSelection, XorParameter
 				if (p.isPersistent()) {
 					final XorViewItem<PersistentParameter.View<?>> item = new XorViewItem<>(index, p, box, this.toggleGroup);
 					item.view.parameter().property().addListener((obs) -> {
-						parameter.get().list.set(index, item.view.parameter().get());
+						parameter.get().set(index, item.view.parameter().get());
 						if (item.radio.isSelected()) {
 							parameter.valueProperty.invalidate();
 						} else {
@@ -231,7 +319,6 @@ public class XorParameter extends CompositeBase<ValueListSelection, XorParameter
 					addItem(pane, box, item);
 				} else {
 					final XorViewItem<Parameter.View> item = new XorViewItem<>(index, p, box, this.toggleGroup);
-					this.items.add(item);
 					p.view().node().setOnMouseClicked((e) -> {
 						item.radio.setSelected(true);
 					});
@@ -250,16 +337,39 @@ public class XorParameter extends CompositeBase<ValueListSelection, XorParameter
 		}
 
 		@Override
+		public ValueListSelection get() {
+			// not needed; the list is static, we use getSelectedIndex for testing
+			throw new UnsupportedOperationException();
+		}
+
+		/**
+		 * Returns the selected index (straight from the toggle group).
+		 *
+		 * @return the selected index.
+		 */
+		public final int getSelectedIndex() {
+			return (int) toggleGroup.getSelectedToggle().getUserData();
+		}
+
+		@Override
 		@SuppressWarnings({"rawtypes", "unchecked"})
 		public final void set(ValueListSelection value) {
-			for (int i = 0; i < value.list.size(); i++) {
+			for (int i = 0; i < value.size(); i++) {
 				final XorViewItem item = this.items.get(i);
 				if (item.view instanceof PersistentParameter.View) {
 					final XorViewItem<PersistentParameter.View<?>> pitem = item;
-					pitem.view.parameter().setRaw(value.list.get(i));
+					pitem.view.parameter().setRaw(value.get(i));
 				}
 			}
-			this.items.get(value.selection).radio.setSelected(true);
+
+			// select item if in valid range, otherwise try to select first element
+			if (value.selection >= 0 && value.selection < items.size()) {
+				this.items.get(value.selection).radio.setSelected(true);
+			} else {
+				if (items.size() > 0) {
+					items.get(0).radio.setSelected(true);
+				}
+			}
 		}
 
 	}

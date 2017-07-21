@@ -45,7 +45,7 @@ public class CheckboxParameter extends PersistentParameterBase<Boolean, Checkbox
 	 * @param checkboxLabel label of the checkbox (postfix label).
 	 */
 	public CheckboxParameter(String label, boolean defaultValue, String checkboxLabel) {
-		super(label, defaultValue);
+		super(label, Boolean.class, defaultValue);
 
 		this.checkboxLabel = checkboxLabel;
 	}
@@ -87,7 +87,8 @@ public class CheckboxParameter extends PersistentParameterBase<Boolean, Checkbox
 			return new CheckBox(label);
 		}
 
-		protected final Boolean get() {
+		@Override
+		public final Boolean get() {
 			return this.root.isSelected();
 		}
 

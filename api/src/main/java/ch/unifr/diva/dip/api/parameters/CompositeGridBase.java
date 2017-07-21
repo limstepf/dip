@@ -32,11 +32,12 @@ public abstract class CompositeGridBase<T> extends CompositeBase<T, CompositeGri
 	 * Creates a composite grid.
 	 *
 	 * @param label label.
+	 * @param valueClass the parameter's value class {@code T}.
 	 * @param defaultValue default value.
 	 * @param initialValue initial value.
 	 */
-	public CompositeGridBase(String label, T defaultValue, T initialValue) {
-		super(label, defaultValue, initialValue);
+	public CompositeGridBase(String label, Class<T> valueClass, T defaultValue, T initialValue) {
+		super(label, valueClass, defaultValue, initialValue);
 
 		this.columnConstraints = new ArrayList<>();
 		this.rowConstraints = new ArrayList<>();
@@ -231,14 +232,6 @@ public abstract class CompositeGridBase<T> extends CompositeBase<T, CompositeGri
 	 */
 	protected abstract void updateValue(int index);
 
-	/**
-	 * Sets/updates all child parameters of the composite.
-	 *
-	 * @param value new values of the child parameters. This collection might be
-	 * empty (keep the default then), so handle the update gracefully.
-	 */
-	protected abstract void updateChildValues(T value);
-
 	@Override
 	protected GridView<? extends CompositeGridBase<T>, T> newViewInstance() {
 		return new GridView<>(this);
@@ -281,7 +274,6 @@ public abstract class CompositeGridBase<T> extends CompositeBase<T, CompositeGri
 		public GridView(P parameter) {
 			super(parameter, new GridPane());
 
-			set(parameter.get());
 			initGrid();
 			PersistentParameter.applyViewHooks(root, parameter.viewHooks);
 		}
@@ -304,8 +296,8 @@ public abstract class CompositeGridBase<T> extends CompositeBase<T, CompositeGri
 				setSpacing(
 						node,
 						(row > 0),
-						(col+1 < width),
-						(row+1 < numRows),
+						(col + 1 < width),
+						(row + 1 < numRows),
 						(col > 0)
 				);
 				if (p.isPersistent()) {
@@ -360,8 +352,13 @@ public abstract class CompositeGridBase<T> extends CompositeBase<T, CompositeGri
 		}
 
 		@Override
+		public T get() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
 		public final void set(T value) {
-			parameter.updateChildValues(value);
+			// no-op: child-parameters are set/updated with onValuePropertySet
 		}
 
 	}

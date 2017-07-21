@@ -33,7 +33,7 @@ public class FloatParameter extends PersistentParameterBase<Float, FloatParamete
 	 * @param maxValue maximum value (inclusive).
 	 */
 	public FloatParameter(String label, float defaultValue, float minValue, float maxValue) {
-		super(label, defaultValue);
+		super(label, Float.class, defaultValue);
 
 		this.minValue = minValue;
 		this.maxValue = maxValue;
@@ -129,7 +129,8 @@ public class FloatParameter extends PersistentParameterBase<Float, FloatParamete
 			});
 		}
 
-		protected final Float get() {
+		@Override
+		public final Float get() {
 			try {
 				return Float.parseFloat(root.getText());
 			} catch (NumberFormatException ex) {

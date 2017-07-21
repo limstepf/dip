@@ -29,11 +29,12 @@ public abstract class CompositeBase<T, V extends PersistentParameter.View<T>> ex
 	 * Composite base constructor.
 	 *
 	 * @param label label.
+	 * @param valueClass the parameter's value class {@code T}.
 	 * @param defaultValue default value.
 	 * @param initialValue initial value.
 	 */
-	public CompositeBase(String label, T defaultValue, T initialValue) {
-		super(label, defaultValue, initialValue);
+	public CompositeBase(String label, Class<T> valueClass, T defaultValue, T initialValue) {
+		super(label, valueClass, defaultValue, initialValue);
 	}
 
 	/**
@@ -74,36 +75,6 @@ public abstract class CompositeBase<T, V extends PersistentParameter.View<T>> ex
 	 * @param p the persistent child parameter that has been changed.
 	 */
 	protected abstract void invalidateChildParameter(PersistentParameter<?> p);
-
-	/**
-	 * A filter applied before setting the value property. Composite parameters
-	 * need to propagate changes to persistent child parameters, and therefore
-	 * can't simply set the new value and be done with it. It might be wise
-	 * anyways to do some validation instead of setting the composite value
-	 * directly (children might be outdated or missing...).
-	 *
-	 * <p>
-	 * It is highly recommended to disable the invalidation listeners on child
-	 * parameters first (in this method by calling
-	 * {@code enableChildListeners(false);}), update the children, and re-enable
-	 * the listeners at the end (by overwriting the hook method
-	 * {@code onValuePropertySet()}), s.t. the composite parameter (parent)
-	 * fires/invalidates the valueProperty just a single time.<br />
-	 *
-	 * In case the object of the valueProperty is still the same (i.e. has the
-	 * same hash code), the valueProperty should be invalidated manually (e.g.
-	 * in case of a list or map whose values changed).
-	 *
-	 * @param value the new value.
-	 * @return the new, filtered value.
-	 */
-	@Override
-	protected abstract T filterValueProperty(T value);
-
-	@Override
-	protected void onValuePropertySet() {
-		enableChildListeners(true);
-	}
 
 	/**
 	 * Returns a list of all child parameters.

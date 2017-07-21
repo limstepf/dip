@@ -43,7 +43,7 @@ public class ColorPickerParameter extends PersistentParameterBase<FxColor, Color
 	 * @param defaultValue the default color.
 	 */
 	public ColorPickerParameter(String label, FxColor defaultValue) {
-		super(label, defaultValue);
+		super(label, FxColor.class, defaultValue);
 	}
 
 	@Override
@@ -197,7 +197,8 @@ public class ColorPickerParameter extends PersistentParameterBase<FxColor, Color
 			);
 		}
 
-		protected final FxColor get() {
+		@Override
+		public final FxColor get() {
 			return new FxColor(picker.colorProperty().get());
 		}
 

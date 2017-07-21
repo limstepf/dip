@@ -1,9 +1,9 @@
 package ch.unifr.diva.dip.api.parameters;
 
+import ch.unifr.diva.dip.api.utils.ParentObjectProperty;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javafx.beans.property.ObjectProperty;
 import javafx.css.PseudoClass;
 
 /**
@@ -40,11 +40,22 @@ public interface PersistentParameter<T> extends Parameter<T> {
 	public T get();
 
 	/**
-	 * Sets the value of the parameter.
+	 * Sets the value of the parameter. Note that a call to this method might
+	 * not have the expected side-effect of updating the view in case the value
+	 * is equal to the current value of the parameter. This might happen with
+	 * complex objects/values that were retrieved with {@code get()}, modified,
+	 * followed by a call to this method. In such cases
 	 *
 	 * @param value the new value.
 	 */
 	public void set(T value);
+
+	/**
+	 * Invalidates the parameter's value property. This updates the view, and
+	 * fires the {@code onValuePropertySet()} hook method. Should be called in
+	 * case calling {@code set()} would fail to do so.
+	 */
+	public void invalidate();
 
 	/**
 	 * Sets the (raw/untyped) value of the parameter.
@@ -57,11 +68,35 @@ public interface PersistentParameter<T> extends Parameter<T> {
 	}
 
 	/**
-	 * Returns a read-only property to listen for (manual) changes.
+	 * Returns the class of the parameter's value.
 	 *
-	 * @return a read-only property.
+	 * @return the class of the parameter's value.
 	 */
-	public ObjectProperty<T> property();
+	public Class<T> getValueClass();
+
+	/**
+	 * Checks whether the given value can be assigned to this parameter.
+	 *
+	 * @param value some (untyped) value.
+	 * @return {@code true} if this value can be set on this parameter,
+	 * {@code false} otherwise.
+	 */
+	default boolean isAssignable(Object value) {
+		if (value == null) {
+			return false;
+		}
+		return getValueClass().equals(value.getClass());
+	}
+
+	/**
+	 * Returns the value property of the persistent parameter.
+	 *
+	 * @return the value property of the persistent parameter.
+	 */
+	public ParentObjectProperty<T> property();
+
+	@Override
+	public View<T> view();
 
 	/**
 	 * A view of a persistent parameter.
@@ -83,6 +118,16 @@ public interface PersistentParameter<T> extends Parameter<T> {
 		 * @param value the new value.
 		 */
 		public void set(T value);
+
+		/**
+		 * Returns the current value of the view. This method exists mostly for
+		 * testing purposes (if implemented at all!). Usually you're going to
+		 * retrieve the value on the parameter itself.
+		 *
+		 * @return the current value of the view.
+		 * @throws UnsupportedOperationException
+		 */
+		public T get();
 
 		/**
 		 * Returns the underlying parameter.

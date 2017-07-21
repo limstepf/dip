@@ -11,8 +11,8 @@ import javafx.scene.Node;
  * display (the idea here is to be able to easily mix custom UI controls with
  * actual parameters to create nicer/more elaborate parameter views). No value
  * will be saved or restored. Still, the view is expected to be lazily
- * initialized, s.t. no UI controls are initialized if not needed. A ViewHook
- * can be used to customize UI controls (once initialized).
+ * initialized, s.t. no UI controls are initialized if not needed. A
+ * {@code ViewHook} can be used to customize UI controls (once initialized).
  *
  * @param <T> class of the parameter's value.
  */
@@ -120,4 +120,5 @@ public interface Parameter<T> {
 		}
 		return filtered;
 	}
+
 }

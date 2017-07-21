@@ -41,7 +41,7 @@ public class FileParameter extends PersistentParameterBase<FileReference, FilePa
 	 * @param mode dialog mode.
 	 */
 	public FileParameter(String label, String action, Mode mode) {
-		super(label, null);
+		super(label, FileReference.class, null);
 
 		this.action = action;
 		this.mode = mode;
@@ -120,7 +120,8 @@ public class FileParameter extends PersistentParameterBase<FileReference, FilePa
 			parameter.setLocal(get());
 		}
 
-		protected final FileReference get() {
+		@Override
+		public final FileReference get() {
 			return this.file;
 		}
 

@@ -129,7 +129,7 @@ public abstract class BrushTool<T extends Brush> extends SimpleTool {
 		// setup tool options
 		// TO CONSIDER: this might not scale too well with too many brushes, maybe
 		// offer a dropdown menu instead of a glyph toggle (optional/dynamic).
-		this.brushOption = new GlyphToggleGroupParameter<>("Brush", 0);
+		this.brushOption = GlyphToggleGroupParameter.newInstance("Brush", 0);
 		for (int i = 0; i < this.brushes.size(); i++) {
 			final T brush = this.brushes.get(i);
 			brushOption.add(i, brush.getGlyph(), brush.getName());

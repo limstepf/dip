@@ -36,7 +36,7 @@ public class CompositeGridMap extends CompositeGridBase<ValueMap> {
 	 * @param parameters child parameters to populate the grid with.
 	 */
 	public CompositeGridMap(String label, Map<String, Parameter<?>> parameters) {
-		super(label, initValue(parameters), initValue(parameters));
+		super(label, ValueMap.class, initValue(parameters), initValue(parameters));
 
 		this.children = new ArrayList<>(parameters.values());
 		this.persistentChildren = new ArrayList<>();
@@ -66,13 +66,7 @@ public class CompositeGridMap extends CompositeGridBase<ValueMap> {
 
 	// since we're storing the map in two lists (for reasons...)
 	protected int getIndexFromKey(String key) {
-		final int n = this.persistentKeys.size();
-		for (int i = 0; i < n; i++) {
-			if (this.persistentKeys.get(i).equals(key)) {
-				return i;
-			}
-		}
-		return -1;
+		return persistentKeys.indexOf(key);
 	}
 
 	@Override
@@ -90,17 +84,7 @@ public class CompositeGridMap extends CompositeGridBase<ValueMap> {
 		final String key = this.persistentKeys.get(index);
 		final ValueMap v = get();
 		v.map.put(key, this.persistentChildren.get(index).get());
-		this.setLocal(v);
-	}
-
-	@Override
-	protected void updateChildValues(ValueMap value) {
-		for (Map.Entry<String, Object> e : value.map.entrySet()) {
-			final int index = getIndexFromKey(e.getKey());
-			if (index >= 0) {
-				persistentChildren.get(index).asPersitentParameter().setRaw(e.getValue());
-			}
-		}
+		setLocal(v);
 	}
 
 	@Override
@@ -110,7 +94,7 @@ public class CompositeGridMap extends CompositeGridBase<ValueMap> {
 			final PersistentParameter<?> pi = this.persistentChildren.get(i);
 			if (p.equals(pi)) {
 				final String key = this.persistentKeys.get(i);
-				vm.set(key, p.get());
+				vm.put(key, p.get());
 				break;
 			}
 		}
@@ -119,18 +103,92 @@ public class CompositeGridMap extends CompositeGridBase<ValueMap> {
 
 	@Override
 	protected ValueMap filterValueProperty(ValueMap value) {
-		enableChildListeners(false);
-
-		// value can't be trusted (might have invalid/outdated, or worse: missing keys)
-		// so we copy the entries individually
-		final ValueMap v = get();
+		// we need a shollow copy here, or set() will reject the value for
+		// being the same as the current one...
+		final ValueMap filtered = get().shallowCopy();
+		PersistentParameter<?> p;
+		int idx;
 		for (Map.Entry<String, Object> e : value.map.entrySet()) {
-			v.map.put(e.getKey(), e.getValue());
-			final int index = getIndexFromKey(e.getKey());
-			persistentChildren.get(index).asPersitentParameter().setRaw(e.getValue());
+			idx = getIndexFromKey(e.getKey());
+			if (idx < 0) {
+				log.warn(
+						"ValueMap mismatch in filterValueProperty: {}"
+						+ ",\n invalid key: {}",
+						this,
+						e.getKey()
+				);
+				continue; // ignore value
+			}
+			p = persistentChildren.get(idx);
+			if (!p.isAssignable(e.getValue())) {
+				log.warn(
+						"ValueMap mismatch in filterValueProperty: {}"
+						+ ",\n key: {}"
+						+ ",\n unassignable value: {}"
+						+ ",\n expected: {}",
+						this,
+						e.getKey(),
+						e.getValue().getClass().getSimpleName(),
+						p.getValueClass().getSimpleName()
+				);
+				continue; // ignore value
+			}
+			filtered.put(e.getKey(), e.getValue());
 		}
 
-		return v;
+		return filtered;
+	}
+
+	@Override
+	protected void onValuePropertySet(boolean changed) {
+		if (changed) { // propagate changed values to child-parameters
+			enableChildListeners(false);
+
+			final ValueMap value = get();
+			int idx;
+			for (Map.Entry<String, Object> e : value.map.entrySet()) {
+				idx = getIndexFromKey(e.getKey());
+				persistentChildren.get(idx).setRaw(e.getValue());
+			}
+
+			enableChildListeners(true);
+		}
+	}
+
+	/**
+	 * A grid view. Extended/overwritten for the sake of testability.
+	 */
+	public static class GridMapView extends CompositeGridBase.GridView<CompositeGridMap, ValueMap> {
+
+		/**
+		 * Creates a new grid view.
+		 *
+		 * @param parameter the parameter.
+		 */
+		public GridMapView(CompositeGridMap parameter) {
+			super(parameter);
+		}
+
+		@Override
+		public ValueMap get() {
+			final ValueMap map = new ValueMap();
+			PersistentParameter<?> p;
+			String key;
+			PersistentParameter.View<?> view;
+			for (int i = 0; i < parameter.persistentKeys.size(); i++) {
+				p = parameter.persistentChildren.get(i);
+				key = parameter.persistentKeys.get(i);
+				view = (PersistentParameter.View<?>) p.view();
+				map.put(key, view.get());
+			}
+			return map;
+		}
+
+	}
+
+	@Override
+	protected GridMapView newViewInstance() {
+		return new GridMapView(this);
 	}
 
 }

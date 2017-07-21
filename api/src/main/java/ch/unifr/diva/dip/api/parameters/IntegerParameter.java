@@ -36,7 +36,7 @@ public class IntegerParameter extends PersistentParameterBase<Integer, IntegerPa
 	 * @param maxValue maximum value (inclusive).
 	 */
 	public IntegerParameter(String label, int defaultValue, int minValue, int maxValue) {
-		super(label, defaultValue);
+		super(label, Integer.class, defaultValue);
 
 		this.minValue = minValue;
 		this.maxValue = maxValue;
@@ -162,7 +162,8 @@ public class IntegerParameter extends PersistentParameterBase<Integer, IntegerPa
 			parameter.set(parameter.get() - 1);
 		}
 
-		protected final Integer get() {
+		@Override
+		public final Integer get() {
 			try {
 				return Integer.parseInt(root.getText());
 			} catch (NumberFormatException ex) {

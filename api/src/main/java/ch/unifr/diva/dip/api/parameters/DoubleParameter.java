@@ -33,7 +33,7 @@ public class DoubleParameter extends PersistentParameterBase<Double, DoubleParam
 	 * @param maxValue maximum value (inclusive).
 	 */
 	public DoubleParameter(String label, double defaultValue, double minValue, double maxValue) {
-		super(label, defaultValue);
+		super(label, Double.class, defaultValue);
 
 		this.minValue = minValue;
 		this.maxValue = maxValue;
@@ -129,7 +129,8 @@ public class DoubleParameter extends PersistentParameterBase<Double, DoubleParam
 			});
 		}
 
-		protected final Double get() {
+		@Override
+		public final Double get() {
 			try {
 				return Double.parseDouble(root.getText());
 			} catch (NumberFormatException ex) {
