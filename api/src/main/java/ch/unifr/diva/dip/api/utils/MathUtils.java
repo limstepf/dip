@@ -12,6 +12,15 @@ public class MathUtils {
 	}
 
 	/**
+	 * Returns a random {@code boolean}.
+	 *
+	 * @return a random {@code boolean}.
+	 */
+	public static boolean randomBool() {
+		return ThreadLocalRandom.current().nextBoolean();
+	}
+
+	/**
 	 * Returns a random {@code int} within given range.
 	 *
 	 * @param minInclusive lower bound (inclusive).
