@@ -9,23 +9,47 @@
 	</parent>
 
 	<groupId>ch.unifr.diva.dip.libs</groupId>
-	<artifactId>tw.edu.ntu.csie.libsvm</artifactId>
-	<version>3.17</version>
+	<artifactId>org.openimaj.clustering</artifactId>
+	<version>1.3.5</version>
 
-	<name>LIBSVM</name>
+	<name>OpenIMAJ clustering (extended)</name>
 	<description>
-		A Library for Support Vector Machines.
+		OpenIMAJ is an award-winning set of libraries and tools for multimedia
+		(images, text, video, audio, etc.) content analysis and content generation.
+
+		This bundle also includes: nearest-neighbour.
 	</description>
 	<packaging>bundle</packaging>
 
+	<repositories>
+		<repository>
+			<id>maven-central</id>
+			<url>http://repo1.maven.org/maven2</url>
+		</repository>
+		<!-- some older dependencies (e.g. jal) are only available from here -->
+		<repository>
+			<id>openimaj-maven</id>
+			<url>http://maven.openimaj.org/</url>
+		</repository>
+	</repositories>
+
+	<!--
+		 We have to deal with *split packages* here, and do so by merging:
+			- clustering
+			- nearest-neighbour
+
+		 see: https://github.com/openimaj/openimaj/issues/130
+	-->
+
 	<properties>
+		<openimaj.version>1.3.5</openimaj.version>
 		<app.plugin.bundledir>../../app/target/bundles</app.plugin.bundledir>
 		<osgi.bundle.filename>${project.artifactId}-${project.version}.jar</osgi.bundle.filename>
 		<osgi.bundle.symbolicName>${project.groupId}.${project.artifactId}</osgi.bundle.symbolicName>
 		<osgi.bundle.version>${project.version}</osgi.bundle.version>
 		<osgi.bundle.exportPackage>
-			libsvm,
-			*
+			org.openimaj*,		
+			!*
 		</osgi.bundle.exportPackage>
 		<osgi.bundle.importPackage>
 			*
@@ -33,7 +57,6 @@
 		<osgi.bundle.embedDependency>!*</osgi.bundle.embedDependency>
 		<osgi.bundle.embedTransitive>false</osgi.bundle.embedTransitive>
 		<osgi.bundle.excludeTransitive>true</osgi.bundle.excludeTransitive>
-		<libsvm.version>3.17</libsvm.version>
 	</properties>
 
 	<build>
@@ -42,7 +65,7 @@
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>unpack-jdom</id>
+						<id>unpack-dependencies</id>
 						<phase>compile</phase>
 						<goals>
 							<goal>unpack</goal>
@@ -50,9 +73,20 @@
 						<configuration>
 							<artifactItems>
 								<artifactItem>
-									<groupId>tw.edu.ntu.csie</groupId>
-									<artifactId>libsvm</artifactId>
-									<version>${libsvm.version}</version>
+									<groupId>org.openimaj</groupId>
+									<artifactId>nearest-neighbour</artifactId>
+									<version>${openimaj.version}</version>
+									<outputDirectory>
+										${project.build.directory}/classes
+									</outputDirectory>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+								</artifactItem>
+
+								<artifactItem>
+									<groupId>org.openimaj</groupId>
+									<artifactId>clustering</artifactId>
+									<version>${openimaj.version}</version>
 									<outputDirectory>
 										${project.build.directory}/classes
 									</outputDirectory>
@@ -60,6 +94,7 @@
 									<overWrite>false</overWrite>
 								</artifactItem>
 							</artifactItems>
+							<excludeTransitive>true</excludeTransitive>
 							<overWriteReleases>true</overWriteReleases>
 							<overWriteSnapshots>true</overWriteSnapshots>
 						</configuration>
@@ -90,28 +125,6 @@
 			</plugin>
 
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<!-- remove classes from the root package -->
-						<id>fix-jdom</id>
-						<phase>process-classes</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<target>
-								<delete>
-									<fileset dir="${project.build.directory}/classes" includes="*.class"/>
-								</delete>
-							</target>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
 				<extensions>true</extensions>
@@ -131,5 +144,6 @@
 
 		</plugins>
 	</build>
+
 
 </project>

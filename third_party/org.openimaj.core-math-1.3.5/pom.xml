@@ -9,31 +9,68 @@
 	</parent>
 
 	<groupId>ch.unifr.diva.dip.libs</groupId>
-	<artifactId>tw.edu.ntu.csie.libsvm</artifactId>
-	<version>3.17</version>
+	<artifactId>org.openimaj.core-math</artifactId>
+	<version>1.3.5</version>
 
-	<name>LIBSVM</name>
+	<name>OpenIMAJ core-math (extended)</name>
 	<description>
-		A Library for Support Vector Machines.
+		OpenIMAJ is an award-winning set of libraries and tools for multimedia
+		(images, text, video, audio, etc.) content analysis and content generation.
+
+		This bundle also includes: core-feature, image-local-features, machine-learning,
+		and mtj 1.0.2.
 	</description>
 	<packaging>bundle</packaging>
 
+	<repositories>
+		<repository>
+			<id>maven-central</id>
+			<url>http://repo1.maven.org/maven2</url>
+		</repository>
+		<!-- some older dependencies (e.g. jal) are only available from here -->
+		<repository>
+			<id>openimaj-maven</id>
+			<url>http://maven.openimaj.org/</url>
+		</repository>
+	</repositories>
+
+	<!--
+		 We have to deal with *split packages* here, and do so by merging:
+			- core-math
+			- core-feature
+			- image-local-features
+			- machine-learning
+			- mtj (matrix toolkits java)
+		 into an extended core-math bundle. We explicitly embed mtj 1.0.2 
+		 here (as demanded by OpenIMAJ 1.3.5), while mtj 1.0.4 is available 
+		 in its own, proper bundle. So other bundles should be able to easily
+		 deal with this situation.
+
+		 see: https://github.com/openimaj/openimaj/issues/130
+	-->
+
 	<properties>
+		<openimaj.version>1.3.5</openimaj.version>
+		<mtj.version>1.0.2</mtj.version>
 		<app.plugin.bundledir>../../app/target/bundles</app.plugin.bundledir>
 		<osgi.bundle.filename>${project.artifactId}-${project.version}.jar</osgi.bundle.filename>
 		<osgi.bundle.symbolicName>${project.groupId}.${project.artifactId}</osgi.bundle.symbolicName>
 		<osgi.bundle.version>${project.version}</osgi.bundle.version>
 		<osgi.bundle.exportPackage>
-			libsvm,
-			*
+			<!-- split package: core-feature also has a org.openimaj.math packages! -->
+			org.openimaj*,		
+			<!-- split package: core-math also has a no.uib.cipr.matrix package (exported by mtj) -->
+			no.uib.cipr.matrix*;version="${mtj.version}",
+			!*
 		</osgi.bundle.exportPackage>
 		<osgi.bundle.importPackage>
+			javax.xml.parsers;version="[0.0,1)", <!-- mtj -->
+			no.uib.cipr.matrix*;version="${mtj.version}",
 			*
 		</osgi.bundle.importPackage>
 		<osgi.bundle.embedDependency>!*</osgi.bundle.embedDependency>
 		<osgi.bundle.embedTransitive>false</osgi.bundle.embedTransitive>
 		<osgi.bundle.excludeTransitive>true</osgi.bundle.excludeTransitive>
-		<libsvm.version>3.17</libsvm.version>
 	</properties>
 
 	<build>
@@ -42,7 +79,7 @@
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>unpack-jdom</id>
+						<id>unpack-dependencies</id>
 						<phase>compile</phase>
 						<goals>
 							<goal>unpack</goal>
@@ -50,9 +87,53 @@
 						<configuration>
 							<artifactItems>
 								<artifactItem>
-									<groupId>tw.edu.ntu.csie</groupId>
-									<artifactId>libsvm</artifactId>
-									<version>${libsvm.version}</version>
+									<groupId>org.openimaj</groupId>
+									<artifactId>machine-learning</artifactId>
+									<version>${openimaj.version}</version>
+									<outputDirectory>
+										${project.build.directory}/classes
+									</outputDirectory>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+								</artifactItem>
+
+								<artifactItem>
+									<groupId>org.openimaj</groupId>
+									<artifactId>image-local-features</artifactId>
+									<version>${openimaj.version}</version>
+									<outputDirectory>
+										${project.build.directory}/classes
+									</outputDirectory>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+								</artifactItem>
+
+								<artifactItem>
+									<groupId>org.openimaj</groupId>
+									<artifactId>core-feature</artifactId>
+									<version>${openimaj.version}</version>
+									<outputDirectory>
+										${project.build.directory}/classes
+									</outputDirectory>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+								</artifactItem>
+
+								<artifactItem>
+									<groupId>org.openimaj</groupId>
+									<artifactId>core-math</artifactId>
+									<version>${openimaj.version}</version>
+									<outputDirectory>
+										${project.build.directory}/classes
+									</outputDirectory>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+								</artifactItem>
+
+								<artifactItem>
+									<groupId>com.googlecode.matrix-toolkits-java</groupId>
+									<artifactId>mtj</artifactId>
+									<version>${mtj.version}</version>
 									<outputDirectory>
 										${project.build.directory}/classes
 									</outputDirectory>
@@ -60,6 +141,7 @@
 									<overWrite>false</overWrite>
 								</artifactItem>
 							</artifactItems>
+							<excludeTransitive>true</excludeTransitive>
 							<overWriteReleases>true</overWriteReleases>
 							<overWriteSnapshots>true</overWriteSnapshots>
 						</configuration>
@@ -84,28 +166,6 @@
 							<excludeTransitive>${osgi.bundle.excludeTransitive}</excludeTransitive>
 							<overWriteSnapshots>true</overWriteSnapshots>
 							<overWriteIfNewer>true</overWriteIfNewer>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<!-- remove classes from the root package -->
-						<id>fix-jdom</id>
-						<phase>process-classes</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<target>
-								<delete>
-									<fileset dir="${project.build.directory}/classes" includes="*.class"/>
-								</delete>
-							</target>
 						</configuration>
 					</execution>
 				</executions>
