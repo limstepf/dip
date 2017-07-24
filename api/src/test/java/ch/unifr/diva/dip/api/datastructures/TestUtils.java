@@ -68,6 +68,14 @@ public class TestUtils {
 		return data;
 	}
 
+	public static MultiFloats2D newMultiFloats2D(int bands, int m, int n) {
+		final MultiFloats2D data = new MultiFloats2D();
+		for (int i = 0; i < bands; i++) {
+			data.add(newFloats2D(m, n));
+		}
+		return data;
+	}
+
 	public static float[] newFloats(int n) {
 		final float[] data = new float[n];
 		for (int i = 0; i < n; i++) {
