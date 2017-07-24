@@ -69,6 +69,7 @@ public class ExpParameter extends PersistentParameterBase<String, ExpParameter.E
 	// see: http://www.objecthunter.net/exp4j/#Evaluating_an_expression
 	private Double expressionValue;
 	private String tooltipFormat;
+	private DoubleValidator validator;
 
 	/**
 	 * Creates an expression parameter.
@@ -88,6 +89,15 @@ public class ExpParameter extends PersistentParameterBase<String, ExpParameter.E
 	/**
 	 * Evaluates the value of the expression.
 	 *
+	 * @return the value of the expression, or {@code Float.NaN}.
+	 */
+	public float getFloat() {
+		return (float) getDouble();
+	}
+
+	/**
+	 * Evaluates the value of the expression.
+	 *
 	 * @return the value of the expression, or {@code Double.NaN}.
 	 */
 	public double getDouble() {
@@ -102,16 +112,49 @@ public class ExpParameter extends PersistentParameterBase<String, ExpParameter.E
 		try {
 			Expression exp = new ExpressionBuilder(expression.toLowerCase()).build();
 			if (exp.validate().isValid()) {
-				this.expressionValue = exp.evaluate();
+				if (validator != null) {
+					expressionValue = validator.validate(exp.evaluate());
+					if (expressionValue == null || Double.isNaN(expressionValue)) {
+						expressionValue = Double.NaN;
+						return false;
+					}
+				} else {
+					expressionValue = exp.evaluate();
+				}
 				return true;
 			} else {
-				this.expressionValue = Double.NaN;
+				expressionValue = Double.NaN;
 				return false;
 			}
 		} catch (Exception ex) {
-			this.expressionValue = Double.NaN;
+			expressionValue = Double.NaN;
 			return false;
 		}
+	}
+
+	/**
+	 * Sets a double validator. May reject input values as invalid.
+	 *
+	 * @param validator a double validator.
+	 */
+	public void setDoubleValidator(DoubleValidator validator) {
+		this.validator = validator;
+	}
+
+	/**
+	 * A double validator.
+	 */
+	public interface DoubleValidator {
+
+		/**
+		 * Validates a double. E.g. by imposing min and max values.
+		 *
+		 * @param value the value to be validated.
+		 * @return the validated value, or {@code null} to reject the value
+		 * (i.e. the current value will be marked as invalid).
+		 */
+		public Double validate(double value);
+
 	}
 
 	/**
