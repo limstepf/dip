@@ -1,8 +1,6 @@
 package ch.unifr.diva.dip.api.components;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
