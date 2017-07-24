@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 /**
- * Lines2D unit tests.
+ * {@code Lines2D} unit tests.
  */
 public class Lines2DTest {
 

@@ -1,6 +1,5 @@
 package ch.unifr.diva.dip.api.datastructures;
 
-import ch.unifr.diva.dip.api.TestUtils;
 import java.io.IOException;
 import java.util.BitSet;
 import javax.xml.bind.JAXBException;
@@ -11,16 +10,16 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 /**
- * Double kernel unit tests.
+ * {@code DoubleKernel} unit tests.
  */
-public class DoubleKernelTest extends KernelTestBase {
+public class DoubleKernelTest {
 
 	@Rule
 	public final TemporaryFolder parent = new TemporaryFolder();
 
 	@Test
 	public void eyeTest() {
-		for (TestUtils.Shape s : eyes) {
+		for (TestShape s : TestShape.eyes()) {
 			final DoubleMatrix mat = new DoubleMatrix(s.rows, s.columns).fill(1);
 			final DoubleKernel kernel = new DoubleKernel(mat);
 			final int length = mat.data.length;

@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 /**
- * Floats1D unit tests.
+ * {@code Floats1D} unit tests.
  */
 public class Floats1DTest {
 

@@ -3,7 +3,7 @@ package ch.unifr.diva.dip.api.datastructures;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Base class to test subclasses of MatrixBase.
+ * Base class to test subclasses of {@code MatrixBase}.
  */
 public class MatrixTestBase {
 

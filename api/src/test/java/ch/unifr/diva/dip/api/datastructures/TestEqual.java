@@ -5,10 +5,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 /**
- * Equality tester for collection datastructures used as values for parameters,
- * where same datastructures need to be equal to each other.
+ * Equality tester for collection data structures used as values for parameters,
+ * where distinct object with the same content need to be equal to each other.
  *
- * @param <C> type of the datastructure to test.
+ * @param <C> type of the data structure to test.
  */
 public abstract class TestEqual<C> {
 
@@ -16,7 +16,7 @@ public abstract class TestEqual<C> {
 	public C b;
 
 	/**
-	 * Creates a new equality tester for collection datastructures.
+	 * Creates a new equality tester for collection data structures.
 	 */
 	public TestEqual() {
 

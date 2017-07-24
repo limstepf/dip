@@ -11,7 +11,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 /**
- * BufferedMatrix unit tests.
+ * {@code BufferedMatrix} unit tests.
  */
 public class BufferedMatrixTest {
 

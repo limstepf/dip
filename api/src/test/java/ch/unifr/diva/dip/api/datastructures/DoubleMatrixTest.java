@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 /**
- * DoubleMatrix unit tests.
+ * {@code DoubleMatrix} unit tests.
  */
 public class DoubleMatrixTest extends MatrixTestBase {
 

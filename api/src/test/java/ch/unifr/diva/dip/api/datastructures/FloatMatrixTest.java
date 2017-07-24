@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 /**
- * FloatMatrix unit tests.
+ * {@code FloatMatrix} unit tests.
  */
 public class FloatMatrixTest extends MatrixTestBase {
 

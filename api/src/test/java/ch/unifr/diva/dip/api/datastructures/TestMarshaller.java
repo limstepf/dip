@@ -11,13 +11,13 @@ import org.junit.rules.TemporaryFolder;
  * and asserts that the original object equals the unmarshalled one.
  *
  * <ul>
- * <li>Make sure to put marshallable classes into the datastructures package of
+ * <li>Make sure to put marshallable classes into the data structures package of
  * the API, since these classes get added automatically to {@code JAXBContext}s
  * (see {@code getClasses} and {@code getContext} in {@code XmlUtils}).</li>
  *
  * <li>Getting {@code IllegalAnnotationExceptions}? Try to clean(!) and rebuild
  * the project. Erroneous JAXB annotations/configurations tend to stick
- * around...</li>
+ * around.</li>
  * </ul>
  *
  * @param <T> class of the object to be marshalled/unmarshalled.

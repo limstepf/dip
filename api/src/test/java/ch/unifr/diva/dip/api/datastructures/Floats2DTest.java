@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 /**
- * Floats2D unit tests.
+ * {@code Floats2D} unit tests.
  */
 public class Floats2DTest {
 
@@ -30,6 +30,8 @@ public class Floats2DTest {
 	@Test
 	public void testCopy() {
 		final Floats2D floats = TestUtils.newFloats2D(3, 4);
+		assertEquals("expected number of rows", 3, floats.getNumRows());
+		assertEquals("expected number of columns", 4, floats.getNumColumns());
 		final Floats2D copy = floats.copy();
 		assertEquals("copy equals original", floats, copy);
 		copy.data[1][2] = copy.data[1][2] * 2;
@@ -43,7 +45,7 @@ public class Floats2DTest {
 		final Floats2D floats = TestUtils.newFloats2D(m, n);
 		final float sum = TestUtils.sum(floats.data);
 		final float[] flat = floats.flatten();
-		assertEquals("same number of elements", flat.length, m*n);
+		assertEquals("same number of elements", flat.length, m * n);
 		final float fsum = TestUtils.sum(flat);
 		assertEquals("same sum of elements", sum, fsum, TestUtils.FLOAT_DELTA);
 	}
@@ -59,7 +61,7 @@ public class Floats2DTest {
 		});
 		final float sum = TestUtils.sum(floats.data);
 		final float[] flat = floats.flatten();
-		assertEquals("expected number of elements", flat.length, m*n);
+		assertEquals("expected number of elements", flat.length, m * n);
 		final float fsum = TestUtils.sum(flat);
 		assertEquals("same sum of elements", sum, fsum, TestUtils.FLOAT_DELTA);
 	}

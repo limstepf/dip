@@ -1,6 +1,5 @@
 package ch.unifr.diva.dip.api.datastructures;
 
-import ch.unifr.diva.dip.api.TestUtils.Shape;
 import java.io.IOException;
 import java.util.BitSet;
 import javax.xml.bind.JAXBException;
@@ -10,16 +9,16 @@ import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 
 /**
- * Float kernel unit tests.
+ * {@code FloatKernel} unit tests.
  */
-public class FloatKernelTest extends KernelTestBase {
+public class FloatKernelTest {
 
 	@Rule
 	public final TemporaryFolder parent = new TemporaryFolder();
 
 	@Test
 	public void eyeTest() {
-		for (Shape s : eyes) {
+		for (TestShape s : TestShape.eyes()) {
 			final FloatMatrix mat = new FloatMatrix(s.rows, s.columns).fill(1);
 			final FloatKernel kernel = new FloatKernel(mat);
 			final int length = mat.data.length;

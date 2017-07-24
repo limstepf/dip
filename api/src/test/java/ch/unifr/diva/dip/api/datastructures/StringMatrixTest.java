@@ -9,8 +9,8 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 /**
- * StringMatrix unit tests. Strings are assumed to be math. expressions, and
- * we mostly test conversion to Double-/FloatMatrix.
+ * {@code StringMatrix} unit tests. Strings are assumed to be math. expressions,
+ * and we mostly test conversion to Double-/FloatMatrix.
  */
 public class StringMatrixTest extends MatrixTestBase {
 
@@ -18,6 +18,7 @@ public class StringMatrixTest extends MatrixTestBase {
 	public final TemporaryFolder parent = new TemporaryFolder();
 
 	public static class TestData {
+
 		public final String[][] expressions;
 		public final double[] doubles;
 		public final float[] floats;
@@ -38,10 +39,10 @@ public class StringMatrixTest extends MatrixTestBase {
 							{"pi", "e", "illegal"}
 						},
 						new double[]{
-							3, 4.5, 255.0/2.0, Math.PI, Math.E, Double.NaN
+							3, 4.5, 255.0 / 2.0, Math.PI, Math.E, Double.NaN
 						},
 						new float[]{
-							3, 4.5f, 255.0f/2.0f, (float)Math.PI, (float)Math.E, Float.NaN
+							3, 4.5f, 255.0f / 2.0f, (float) Math.PI, (float) Math.E, Float.NaN
 						}
 				),
 				new TestData(

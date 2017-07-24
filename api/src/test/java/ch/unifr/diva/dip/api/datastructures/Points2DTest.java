@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 /**
- * Points2D unit tests.
+ * {@code Points2D} unit tests.
  */
 public class Points2DTest {
 
