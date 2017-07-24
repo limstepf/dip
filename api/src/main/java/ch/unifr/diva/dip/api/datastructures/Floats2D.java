@@ -8,7 +8,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * A 1D array of {@code float}s.
+ * A 2D array of {@code float}s. Wrapper (or intermediate data structure)
+ * for {@code float[][]} backed data types such as OpenIMAJ's {@code FImage}.
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
@@ -42,20 +43,20 @@ public class Floats2D {
 	}
 
 	/**
-	 * Returns the number of rows in the 2D array.
+	 * Returns the number of rows (or height) in the 2D array.
 	 *
-	 * @return the number of rows.
+	 * @return the number of rows (or height).
 	 */
 	public int getNumRows() {
 		return data.length;
 	}
 
 	/**
-	 * Returns the number of columns in the 2D array. This methods assumes that
-	 * all rows have the same size. The number of columns of the first row is
-	 * returned.
+	 * Returns the number of columns (or width) in the 2D array. This methods
+	 * assumes that all rows have the same size. The number of columns of the
+	 * first row is returned.
 	 *
-	 * @return the number of columns.
+	 * @return the number of columns (or width).
 	 */
 	public int getNumColumns() {
 		if (data.length == 0) {
@@ -113,6 +114,16 @@ public class Floats2D {
 	 * @return a copy of the 2D array.
 	 */
 	public float[][] copyData() {
+		return copy(data);
+	}
+
+	/**
+	 * Returns a copy of a 2D array of floats.
+	 *
+	 * @param data a 2D array of floats.
+	 * @return a copy of a 2D array of floats.
+	 */
+	public static float[][] copy(float[][] data) {
 		final float[][] copy = new float[data.length][];
 		for (int i = 0; i < data.length; i++) {
 			copy[i] = data[i].clone();
