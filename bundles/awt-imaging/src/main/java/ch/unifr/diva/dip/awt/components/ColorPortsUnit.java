@@ -63,7 +63,7 @@ public class ColorPortsUnit<T extends Processor> {
 	protected final int index_float;
 	protected final int index_colors;
 
-	protected boolean portInsetPositionTop = true;
+	protected boolean portInsertPositionTop = true;
 	protected boolean disableInputPorts = false;
 	protected boolean disableOutputPorts = false;
 	@SuppressWarnings("rawtypes")
@@ -327,7 +327,7 @@ public class ColorPortsUnit<T extends Processor> {
 	 * {@code true}, at the bottom otherwise.
 	 */
 	public void setPortInsertPosition(boolean top) {
-		this.portInsetPositionTop = top;
+		this.portInsertPositionTop = top;
 	}
 
 	/**
@@ -462,7 +462,7 @@ public class ColorPortsUnit<T extends Processor> {
 		}
 
 		final Map<String, InputPort<?>> reinsert;
-		if (this.portInsetPositionTop) {
+		if (this.portInsertPositionTop) {
 			reinsert = extractPorts(this.processor.inputs());
 		} else {
 			reinsert = null;
@@ -531,7 +531,7 @@ public class ColorPortsUnit<T extends Processor> {
 		}
 
 		final Map<String, OutputPort<?>> reinsert;
-		if (this.portInsetPositionTop) {
+		if (this.portInsertPositionTop) {
 			reinsert = extractPorts(this.processor.outputs());
 		} else {
 			reinsert = null;
