@@ -409,13 +409,17 @@ public interface Processor {
 			return false;
 		}
 
+		if (isWaitingOnInputParams()) {
+			return true;
+		}
+
 		for (InputPort<?> input : inputs().values()) {
 			if (input.isConnected()
 					&& !input.connection().getPortState().equals(Port.State.READY)) {
 				return true;
 			}
 		}
-		return isWaitingOnInputParams();
+		return false;
 	}
 
 	/**
@@ -440,6 +444,9 @@ public interface Processor {
 	 * connected) are READY, {@code false} otherwise.
 	 */
 	default boolean isReady() {
+		if (!isReadyOutputParams()) {
+			return false;
+		}
 
 		int numConnected = 0;
 		int numReady = 0;
@@ -466,7 +473,7 @@ public interface Processor {
 			return false;
 		}
 
-		return isReadyOutputParams();
+		return true;
 	}
 
 	/**

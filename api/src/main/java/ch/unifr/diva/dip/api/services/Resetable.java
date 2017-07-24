@@ -1,4 +1,3 @@
-
 package ch.unifr.diva.dip.api.services;
 
 import ch.unifr.diva.dip.api.components.ProcessorContext;
@@ -10,8 +9,8 @@ public interface Resetable extends Processor {
 
 	/**
 	 * Resets the processor. This clears any persitent processor data and all
-	 * outputs, usually (re-)setting the processor state from READY (or ERROR)
-	 * to PROCESSING.
+	 * outputs, usually (re-)setting the processor state from {@code READY} (or
+	 * {@code ERROR}) to {@code PROCESSING}.
 	 *
 	 * @param context
 	 */

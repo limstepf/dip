@@ -1,12 +1,17 @@
 package ch.unifr.diva.dip.api.services;
 
 /**
- * ProcessableBase already implements some common bits of the {@code Processor}
+ * Processable base already implements some common bits of the {@code Processor}
  * interface, offers some helper methods, and implements the {@code Processable}
  * interface.
  */
 public abstract class ProcessableBase extends ProcessorBase implements Processable {
 
+	/**
+	 * Creates a new processable base processor.
+	 *
+	 * @param name the name of the processor.
+	 */
 	public ProcessableBase(String name) {
 		super(name);
 	}

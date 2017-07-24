@@ -12,7 +12,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.input.MouseEvent;
 
 /**
- * EditableBase already implements some common bits of the {@code Processor}
+ * Editable base already implements some common bits of the {@code Processor}
  * interface, offers some helper methods, and implements the {@code Editable}
  * interface.
  */
@@ -22,7 +22,7 @@ public abstract class EditableBase extends ProcessorBase implements Editable {
 	protected final LinkedHashMap<String, SingleRowParameter<?>> options;
 
 	/**
-	 * Creates the base of a new editable processor.
+	 * Creates a new editable base processor.
 	 *
 	 * @param name name of the processor.
 	 */

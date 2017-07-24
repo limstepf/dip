@@ -8,7 +8,10 @@ import ch.unifr.diva.dip.api.components.ProcessorContext;
 import ch.unifr.diva.dip.api.parameters.Parameter;
 import ch.unifr.diva.dip.api.utils.BufferedIO;
 import ch.unifr.diva.dip.api.datastructures.BufferedMatrix;
+import ch.unifr.diva.dip.api.utils.XmlUtils;
 import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -26,7 +29,7 @@ import javax.imageio.ImageIO;
 import org.slf4j.LoggerFactory;
 
 /**
- * ProcessorBase already implements some common bits of the {@code Processor}
+ * Processor base already implements some common bits of the {@code Processor}
  * interface, and offers some helper methods as well.
  */
 public abstract class ProcessorBase implements Processor {
@@ -61,7 +64,7 @@ public abstract class ProcessorBase implements Processor {
 	protected final BooleanProperty repaintProperty = new SimpleBooleanProperty();
 
 	/**
-	 * Creates a new processor base.
+	 * Creates a new base processor.
 	 *
 	 * @param name name of the processor.
 	 */
@@ -102,6 +105,15 @@ public abstract class ProcessorBase implements Processor {
 		for (OutputPort<?> output : outputs.values()) {
 			output.setOutput(null);
 		}
+	}
+
+	/**
+	 * Clears/empties the processor's object map.
+	 *
+	 * @param context the processor context.
+	 */
+	public static void resetObjects(ProcessorContext context) {
+		context.getObjects().clear();
 	}
 
 	/**
@@ -164,6 +176,45 @@ public abstract class ProcessorBase implements Processor {
 		final EditorLayerPane layer = context.getLayer().newLayerPane(name);
 		layer.add(new ImageView(image));
 		return layer;
+	}
+
+	/**
+	 * Writes an object to the savefile.
+	 *
+	 * @param <T> type of the object.
+	 * @param context the processor context.
+	 * @param filename the filename of the image.
+	 * @param obj the object. Must be marshallable with JAXB.
+	 */
+	public static <T> void writeObject(ProcessorContext context, String filename, T obj) {
+		final Path file = context.getDirectory().resolve(filename);
+		deleteFile(file);
+		try (OutputStream stream = new BufferedOutputStream(Files.newOutputStream(file))) {
+			XmlUtils.marshal(obj, stream);
+		} catch (Exception ex) {
+			log.warn("failed to write {} to file: {}", obj, file, ex);
+		}
+	}
+
+	/**
+	 * Reads an object from the savefile.
+	 *
+	 * @param <T> type of the object.
+	 * @param context the processor context.
+	 * @param filename the filename of the image.
+	 * @param clazz class of the object.
+	 * @return the object, or null.
+	 */
+	public static <T> T readObject(ProcessorContext context, String filename, Class<T> clazz) {
+		final Path file = context.getDirectory().resolve(filename);
+		if (Files.exists(file)) {
+			try (InputStream stream = new BufferedInputStream(Files.newInputStream(file))) {
+				return XmlUtils.unmarshal(clazz, stream);
+			} catch (Exception ex) {
+				log.warn("failed to read file: {}", file, ex);
+			}
+		}
+		return null;
 	}
 
 	/**
