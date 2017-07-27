@@ -345,7 +345,23 @@ public class ParameterTest {
 				return Arrays.asList(
 						Processor.State.WAITING.name(),
 						Processor.State.PROCESSING.name(),
+						Processor.State.UNAVAILABLE.name(),
 						Processor.State.READY.name()
+				);
+			}
+
+			@Override
+			public void postSetTest(String val) {
+				// also test the getEnumValue method
+				final Processor.State state = EnumParameter.valueOf(
+						val,
+						Processor.State.class,
+						Processor.State.ERROR
+				);
+				assertEquals(
+						"equal enum",
+						state,
+						parameter.getEnumValue(Processor.State.class)
 				);
 			}
 		};

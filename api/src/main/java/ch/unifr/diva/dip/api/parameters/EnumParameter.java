@@ -155,6 +155,17 @@ public class EnumParameter extends PersistentParameterBase<String, EnumParameter
 		return this.options.indexOf(option);
 	}
 
+	/**
+	 * Returns the current value as en enumeration item.
+	 *
+	 * @param <E> type of the enumeration.
+	 * @param clazz class of the enumeration.
+	 * @return the current value.
+	 */
+	public <E extends Enum<E>> E getEnumValue(Class<E> clazz) {
+		return valueOf(get(), clazz, clazz.getEnumConstants()[0]);
+	}
+
 	@Override
 	protected EnumView newViewInstance() {
 		return new EnumView(this);
