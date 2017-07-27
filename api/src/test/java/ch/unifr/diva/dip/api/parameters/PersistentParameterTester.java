@@ -68,6 +68,7 @@ public abstract class PersistentParameterTester<T, P extends PersistentParameter
 			parameter.set(val);
 			assertEquals("changed parameter value", val, parameter.get());
 			assertEquals("changed view value", val, view.get());
+			postSetTest(val);
 		}
 
 		parameter.property().removeListener(listener);
@@ -79,8 +80,18 @@ public abstract class PersistentParameterTester<T, P extends PersistentParameter
 	}
 
 	/**
-	 * Verifies that a composite parameter gets invalidated if one of its child-parameter
-	 * changes.
+	 * Optional post set test. Gets called after a value from {@code values()}
+	 * has just been set on the parameter.
+	 *
+	 * @param val the value that just has been set.
+	 */
+	public void postSetTest(T val) {
+
+	}
+
+	/**
+	 * Verifies that a composite parameter gets invalidated if one of its
+	 * child-parameter changes.
 	 *
 	 * @param child the child parameter of this composite parameter.
 	 * @param value a new value for the child parameter.
