@@ -3,6 +3,7 @@ package ch.unifr.diva.dip.gui.pe;
 import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.ProcessorContext;
 import ch.unifr.diva.dip.api.parameters.EnumParameter;
+import ch.unifr.diva.dip.api.parameters.Parameter;
 import ch.unifr.diva.dip.api.services.Previewable;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.utils.DipThreadPool;
@@ -20,7 +21,9 @@ import ch.unifr.diva.dip.gui.layout.ZoomPaneBresenham;
 import ch.unifr.diva.dip.gui.layout.ZoomSlider;
 import ch.unifr.diva.dip.gui.layout.Zoomable;
 import java.awt.Rectangle;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
@@ -63,7 +66,7 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 	private final RunnableProcessor runnable;
 	private final PrototypeProcessor prototype;
 	private final ProcessorView.ProcessorHead head;
-	private final ProcessorView.ParameterViewBase<? extends Parent> parameterView;
+	private ProcessorView.ParameterViewBase<? extends Parent> parameterView;
 	private final PreviewWidget previewWidget;
 	private final InvalidationListener valueListener;
 	private final BooleanProperty patchedProperty;
@@ -88,9 +91,10 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 
 		final Pipeline<PrototypeProcessor> pipelinePrototype = handler.getProject().getSelectedPage().getPipelinePrototype();
 		this.prototype = pipelinePrototype.getProcessor(runnable.id);
-
 		this.patchedProperty = new SimpleBooleanProperty();
-		this.runnable.processor().getCompositeProperty().addListener((c) -> updatePatchedProperty());
+		this.runnable.processor().repaintProperty().addListener(repaintListener);
+
+		onRepaint();
 		updatePatchedProperty();
 
 		final double b = UIStrategyGUI.Stage.insets;
@@ -99,10 +103,7 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 		this.head = new ProcessorView.ProcessorHead(handler, runnable);
 		BorderPane.setMargin(head.getNode(), insets);
 		this.root.setTop(head.getNode());
-
 		this.root.setPadding(insets);
-		this.parameterView = new ProcessorView.GridParameterView(runnable.processor());
-		this.root.setCenter(this.parameterView.node());
 
 		final VBox sideBox = new VBox();
 		sideBox.setMinWidth(96);
@@ -144,6 +145,42 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 		}
 
 		this.setOnCloseRequest((e) -> onClose(e));
+	}
+
+	private final InvalidationListener repaintListener = (c) -> onRepaint();
+
+	// keep track of parameters since a different set might appear upon repaint()
+	private final List<ReadOnlyObjectProperty<?>> paramProperties = new ArrayList<>();
+
+	final protected void onRepaint() {
+		// new parameter view
+		this.parameterView = new ProcessorView.GridParameterView(runnable.processor());
+		this.root.setCenter(this.parameterView.node());
+
+		// remove old parameter listeners
+		for (ReadOnlyObjectProperty<?> prop : paramProperties) {
+			prop.removeListener(paramListener);
+		}
+		paramProperties.clear();
+
+		// listen to new set of parameters
+		for (Parameter<?> p : runnable.processor().parameters().values()) {
+			if (p.isPersistent()) {
+				final ReadOnlyObjectProperty<?> property = p.asPersitentParameter().property();
+				property.addListener(paramListener);
+				paramProperties.add(property);
+			}
+		}
+	}
+
+	private final InvalidationListener paramListener = (c) -> onParamChanged();
+
+	final protected void onParamChanged() {
+		updatePatchedProperty();
+
+		if (previewWidget != null) {
+			previewWidget.onParamChanged();
+		}
 	}
 
 	private void updatePatchedProperty() {
@@ -336,11 +373,6 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 			vbox.setSpacing(b);
 			vbox.getChildren().addAll(zoomPane.getNode(), gridPane);
 
-			// TODO/VERIFY: what about repainting procs? Would they change params?
-			// Should we re-listen? Or should repainting procs that actually do
-			// change params overwrite getCompositeProperty? Maybe easier...
-			final ReadOnlyObjectProperty<?> p = previewContext.runnable.processor().getCompositeProperty();
-			p.addListener((e) -> onParamChanged());
 			onParamChanged();
 
 			// Center the preview clipping assuming a larger image, but dont set

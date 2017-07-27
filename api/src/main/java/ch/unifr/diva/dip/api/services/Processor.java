@@ -208,17 +208,6 @@ public interface Processor {
 	}
 
 	/**
-	 * Returns a property of a composite parameter of all parameters. A property
-	 * to listen to any parameter changes.
-	 *
-	 * @return a composite parameter of all parameters.
-	 */
-	default ReadOnlyObjectProperty<?> getCompositeProperty() {
-		final CompositeGrid composite = new CompositeGrid(parameters().values());
-		return composite.property();
-	}
-
-	/**
 	 * Checks whether the processor has parameters or not.
 	 *
 	 * @return {@code true} if the processor has parameters, {@code false}
