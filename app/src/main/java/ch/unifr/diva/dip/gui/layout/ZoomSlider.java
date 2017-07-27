@@ -179,7 +179,11 @@ public class ZoomSlider {
 	}
 
 	protected final double getZoomValueFromTextField() {
-		return 0.01 * Double.parseDouble(text.getText().replace("%", ""));
+		try {
+			return 0.01 * Double.parseDouble(text.getText().replace("%", ""));
+		} catch (Exception ex) {
+			return 1.0;
+		}
 	}
 
 	protected static double sliderToZoomVal(double value) {
