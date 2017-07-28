@@ -222,19 +222,19 @@ public class ProcessorsWidget extends AbstractWidget {
 			this.selectedProperty().removeListener(glyphListener);
 
 			if (!empty) {
-				this.focusedProperty().addListener(glyphListener);
-				this.selectedProperty().addListener(glyphListener);
-
 				final OSGiServiceCollection.FxContext<Processor> fx = collection.getFxContext();
 				final OSGiService<Processor> s = fx.getSelectedVersion();
 
-				name.setText(s.serviceObject.name());
-				description.setText(collection.pid());
-				setVersionLabelText(collection);
+				if (s != null) {
+					this.focusedProperty().addListener(glyphListener);
+					this.selectedProperty().addListener(glyphListener);
 
-				pane.setLeft(getGlyph(s.serviceObject));
-				setGraphic(pane);
-
+					name.setText(s.serviceObject.name());
+					description.setText(collection.pid());
+					setVersionLabelText(collection);
+					pane.setLeft(getGlyph(s.serviceObject));
+					setGraphic(pane);
+				}
 			}
 		}
 
