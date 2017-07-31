@@ -18,6 +18,11 @@ public class BufferedImageCmy extends AbstractDataType<java.awt.image.BufferedIm
 	}
 
 	@Override
+	public String label() {
+		return "CMY";
+	}
+
+	@Override
 	public DataFormat dataFormat() {
 		return dataFormat;
 	}

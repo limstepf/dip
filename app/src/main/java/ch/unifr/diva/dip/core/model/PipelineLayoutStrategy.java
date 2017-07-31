@@ -1,6 +1,8 @@
 package ch.unifr.diva.dip.core.model;
 
+import ch.unifr.diva.dip.api.components.Port;
 import ch.unifr.diva.dip.gui.pe.PipelineEditor;
+import ch.unifr.diva.dip.gui.pe.PortView;
 import ch.unifr.diva.dip.gui.pe.ProcessorView;
 import ch.unifr.diva.dip.gui.pe.ProcessorViewLeftRight;
 import ch.unifr.diva.dip.gui.pe.ProcessorViewTopDown;
@@ -9,6 +11,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import javafx.scene.layout.Region;
 
 /**
  * Pipeline layout strategies. A pipeline layout strategy defines the layout of
@@ -48,12 +51,13 @@ public enum PipelineLayoutStrategy {
 				@Override
 				public void arrange(Pipeline<PrototypeProcessor> pipeline, Map<PrototypeProcessor, ProcessorView> views) {
 					final Pipeline.PipelineStages<PrototypeProcessor> stages = new Pipeline.PipelineStages<>(pipeline);
-					double x = hspace;
+					double x = 0;
 					double y;
 					double width = 0;
+					double w;
 
 					for (Pipeline.Stage<PrototypeProcessor> stage : stages) {
-						y = vspace;
+						y = 0;
 
 						final List<ProcessorView> processors = new ArrayList<>();
 						for (PrototypeProcessor p : stage.processors) {
@@ -65,16 +69,38 @@ public enum PipelineLayoutStrategy {
 							view.setLayoutY(y);
 
 							doLayout(view);
+							w = view.getWidth() - view.getHorizontalPadding();
 
-							if (view.getWidth() > width) {
-								width = view.getWidth();
+							if (w > width) {
+								width = w;
 							}
-							y += view.getHeight() + vspace;
+							y += view.getHeight() - view.getVerticalPadding();
 						}
 
-						x += width + hspace;
+						x += width;
 						width = 0;
 					}
+				}
+
+				@Override
+				public double getLabelRotation() {
+					return 0;
+				}
+
+				@Override
+				public <T extends Port<?>> void setPortLabelPosition(Region node, PortView<T> port, boolean isInputPort) {
+					if (isInputPort) {
+						node.setLayoutX(clipPosition(
+										port.centerXProperty().get() - 19 - node.getWidth()
+								));
+					} else {
+						node.setLayoutX(clipPosition(
+										port.centerXProperty().get() + 20
+								));
+					}
+					node.setLayoutY(clipPosition(
+									port.centerYProperty().get() - 10
+							));
 				}
 
 				@Override
@@ -97,11 +123,12 @@ public enum PipelineLayoutStrategy {
 				public void arrange(Pipeline<PrototypeProcessor> pipeline, Map<PrototypeProcessor, ProcessorView> views) {
 					final Pipeline.PipelineStages<PrototypeProcessor> stages = new Pipeline.PipelineStages<>(pipeline);
 					double x;
-					double y = vspace;
+					double y = 0;
 					double height = 0;
+					double h;
 
 					for (Pipeline.Stage<PrototypeProcessor> stage : stages) {
-						x = hspace;
+						x = 0;
 
 						final List<ProcessorView> processors = new ArrayList<>();
 						for (PrototypeProcessor p : stage.processors) {
@@ -113,18 +140,41 @@ public enum PipelineLayoutStrategy {
 							view.setLayoutY(y);
 
 							doLayout(view);
+							h = view.getHeight() - view.getVerticalPadding();
 
-							if (view.getHeight() > height) {
-								height = view.getHeight();
+							if (h > height) {
+								height = h;
 							}
-							x += view.getWidth() + hspace;
+							x += view.getWidth() - view.getHorizontalPadding();
 						}
 
-						y += height + vspace;
+						y += height;
 						height = 0;
 					}
 
 					// TODO: second pass to center, or offer additional TOPDOWNCENTER strategy?
+				}
+
+				@Override
+				public double getLabelRotation() {
+					return -90;
+				}
+
+				@Override
+				public <T extends Port<?>> void setPortLabelPosition(Region node, PortView<T> port, boolean isInputPort) {
+					final double w = node.getWidth() * .5;
+					node.setLayoutX(clipPosition(
+									port.centerXProperty().get() - w
+							));
+					if (isInputPort) {
+						node.setLayoutY(clipPosition(
+										port.centerYProperty().get() - w - 27
+								));
+					} else {
+						node.setLayoutY(clipPosition(
+										port.centerYProperty().get() + w + 11
+								));
+					}
 				}
 
 				@Override
@@ -144,9 +194,6 @@ public enum PipelineLayoutStrategy {
 		view.applyCss();
 		view.layout();
 	}
-
-	private static final double hspace = 55.0;
-	private static final double vspace = 34.0;
 
 	/**
 	 * Safely returns a valid pipeline layout strategy.
@@ -206,4 +253,38 @@ public enum PipelineLayoutStrategy {
 	 * @return a processor view for the given processor wrapper.
 	 */
 	public abstract ProcessorView newProcessorView(PipelineEditor editor, PrototypeProcessor wrapper);
+
+	/**
+	 * Returns the rotation that needs to be applied to all port labels. Note
+	 * that rotation is applied after all other transforms, with the center of
+	 * the node's untransformed layoutBounds as pivot point.
+	 *
+	 * @return the port label rotation.
+	 */
+	public abstract double getLabelRotation();
+
+	/**
+	 * Sets/updates the port label position ({@literal w.r.t.} the port).
+	 *
+	 * @param <T> type of the port.
+	 * @param node the port label (pane; not the actual label).
+	 * @param port the port.
+	 * @param isInputPort {@code true} if the port is an input port, {
+	 * @false} if the port is an output port.
+	 */
+	public abstract <T extends Port<?>> void setPortLabelPosition(Region node, PortView<T> port, boolean isInputPort);
+
+	/**
+	 * Clips the (port label) position. Prevents bumping of the processor view.
+	 *
+	 * @param value the value.
+	 * @return the clipped value.
+	 */
+	private static double clipPosition(double value) {
+		if (value < 0) {
+			value = 0;
+		}
+		return value;
+	}
+
 }

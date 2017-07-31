@@ -15,12 +15,22 @@ public class OutputPort<T> extends AbstractPort<T> {
 	private final Set<InputPort<?>> inputs = new HashSet<>();
 
 	/**
-	 * Creates a new output port.
+	 * Creates a new output port with a default label.
 	 *
 	 * @param dataType the data type of the port.
 	 */
 	public OutputPort(DataType<T> dataType) {
-		super(dataType, false);
+		this("", dataType);
+	}
+
+	/**
+	 * Creates a new output port.
+	 *
+	 * @param label a custom port label (short and descriptive).
+	 * @param dataType the data type of the port.
+	 */
+	public OutputPort(String label, DataType<T> dataType) {
+		super(label, dataType, false);
 	}
 
 	/**

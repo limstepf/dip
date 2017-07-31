@@ -68,14 +68,38 @@ public class ConvolutionFilter extends ProcessableBase implements Previewable {
 		public KernelInput(Class<T> clazz) {
 			if (clazz.equals(DoubleMatrix.class)) {
 				this.postfix = "d";
-				this.kernel = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.DoubleMatrix(), false);
-				this.rowVector = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.DoubleMatrix(), false);
-				this.columnVector = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.DoubleMatrix(), false);
+				this.kernel = new InputPort<>(
+						"Kernel",
+						new ch.unifr.diva.dip.api.datatypes.DoubleMatrix(),
+						false
+				);
+				this.rowVector = new InputPort<>(
+						"RowVector",
+						new ch.unifr.diva.dip.api.datatypes.DoubleMatrix(),
+						false
+				);
+				this.columnVector = new InputPort<>(
+						"ColumnVector",
+						new ch.unifr.diva.dip.api.datatypes.DoubleMatrix(),
+						false
+				);
 			} else {
 				this.postfix = "f";
-				this.kernel = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.FloatMatrix(), false);
-				this.rowVector = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.FloatMatrix(), false);
-				this.columnVector = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.FloatMatrix(), false);
+				this.kernel = new InputPort<>(
+						"Kernel",
+						new ch.unifr.diva.dip.api.datatypes.FloatMatrix(),
+						false
+				);
+				this.rowVector = new InputPort<>(
+						"RowVector",
+						new ch.unifr.diva.dip.api.datatypes.FloatMatrix(),
+						false
+				);
+				this.columnVector = new InputPort<>(
+						"ColumnVector",
+						new ch.unifr.diva.dip.api.datatypes.FloatMatrix(),
+						false
+				);
 			}
 		}
 
@@ -138,8 +162,14 @@ public class ConvolutionFilter extends ProcessableBase implements Previewable {
 		this.kernelFloat = new KernelInput<>(FloatMatrix.class);
 		this.kernelDouble = new KernelInput<>(DoubleMatrix.class);
 
-		this.input = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImage(), false);
-		this.input_float = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat(), false);
+		this.input = new InputPort<>(
+				new ch.unifr.diva.dip.api.datatypes.BufferedImage(),
+				false
+		);
+		this.input_float = new InputPort<>(
+				new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat(),
+				false
+		);
 
 		enableAllInputs();
 		enableAllOutputs();

@@ -186,7 +186,7 @@
 	-fx-background-insets: 0 0 0 0, 1 0 0 0;
 }
 
-.dip-status-bar Label {
+.dip-status-bar > Label {
 
 }
 
@@ -200,10 +200,24 @@
 
 .dip-processor {
 	-fx-background-color: transparent;
+	-fx-border-width: 0;
+	/* padding is set programmatically in ProcessorView! */
+}
+
+.dip-processor-port-label {
+
+}
+
+.dip-processor-port-label > Label {
+	-fx-padding: 0.166667em 0.666667em 0.166667em 0.666667em;
+	-fx-font-size: 0.75em;
+	-fx-font-weight: 900;
+	-fx-text-fill: white;
 }
 
 .dip-processor-leftright,
 .dip-processor-topdown {
+	-fx-background-insets: 0;
 	-fx-background-color: -fx-body-color;
     -fx-padding: 0.416em;
 	-fx-border-color: -fx-outer-border;
@@ -223,6 +237,7 @@
 .dip-processor-left {
     -fx-padding: 0.416em;
     -fx-spacing: 0.416em;
+	-fx-background-insets: 0;
 	-fx-background-color: -fx-body-color;
 	-fx-border-color: -fx-outer-border;
 }
@@ -236,12 +251,22 @@
 	-fx-background-radius: 0.833em 0.833em 0 0;
 	-fx-border-radius: 0.833em 0.833em 0 0;
 	-fx-border-width: 1px 1px 0 1px;
+
+	/* fix small gap between BorderPane nodes of ProcessorView */
+	/* occurs at most zoom levels other than 100% (set background color of */
+	/* dip-processor to see where the gap is coming from). Not sure if there */
+	/* isn't some css property I'm missing, or if this is some kind of snap */
+	/* to pixel bug or what not... */
+    -fx-translate-y: 0.075em;
 }
 
 .dip-processor-right {
 	-fx-background-radius: 0 0.833em 0.833em 0;
 	-fx-border-radius: 0 0.833em 0.833em 0;
 	-fx-border-width: 1px 1px 1px 0;
+
+	/* fix small gap between BorderPane nodes of ProcessorView */
+    -fx-translate-x: -0.075em;
 }
 
 .dip-processor-bottom {
@@ -249,12 +274,18 @@
 	-fx-background-radius: 0 0 0.833em 0.833em;
 	-fx-border-radius: 0 0 0.833em 0.833em;
 	-fx-border-width: 0 1px 1px 1px;
+
+	/* fix small gap between BorderPane nodes of ProcessorView */
+    -fx-translate-y: -0.075em;
 }
 
 .dip-processor-left {
 	-fx-background-radius: 0.833em 0 0 0.833em;
 	-fx-border-radius: 0.833em 0 0 0.833em;
 	-fx-border-width: 1px 0 1px 1px;
+
+	/* fix small gap between BorderPane nodes of ProcessorView */
+    -fx-translate-x: 0.075em;
 }
 
 .dip-processor:selected .dip-processor-top,
@@ -319,12 +350,11 @@
 
 
 .dip-wire {
-	//-fx-effect: dropshadow( gaussian , black , 3, 0, 1, 1 );
+
 }
 
 .dip-rubberband {
 	-fx-stroke: -fx-accent;
-	//-fx-effect: dropshadow( gaussian , black , 3, 0, 1, 1 );
 }
 
 .dip-shadow {

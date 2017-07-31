@@ -17,13 +17,24 @@ public class InputPort<T> extends AbstractPort<T> {
 	private OutputPort<T> output;
 
 	/**
-	 * Creates a new input port.
+	 * Creates a new input port with a default label.
 	 *
 	 * @param dataType data type of the port.
 	 * @param required flag if the port is absolutely required to work.
 	 */
 	public InputPort(DataType<T> dataType, boolean required) {
-		super(dataType, required);
+		this("", dataType, required);
+	}
+
+	/**
+	 * Creates a new input port.
+	 *
+	 * @param label a custom port label (short and descriptive).
+	 * @param dataType data type of the port.
+	 * @param required flag if the port is absolutely required to work.
+	 */
+	public InputPort(String label, DataType<T> dataType, boolean required) {
+		super(label, dataType, required);
 		setPortState(State.UNCONNECTED);
 	}
 

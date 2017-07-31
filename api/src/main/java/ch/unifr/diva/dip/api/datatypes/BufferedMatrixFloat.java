@@ -21,6 +21,11 @@ public class BufferedMatrixFloat extends AbstractDataType<ch.unifr.diva.dip.api.
 	}
 
 	@Override
+	public String label() {
+		return "Float";
+	}
+
+	@Override
 	public DataFormat dataFormat() {
 		return dataFormat;
 	}

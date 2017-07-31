@@ -5,11 +5,14 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.event.EventHandler;
+import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
@@ -29,7 +32,7 @@ import javafx.scene.shape.Rectangle;
  * @param <T> class to select. Must extend from Node. Make it Node to select any
  * nodes in the pane, or something more specific if needed.
  */
-public class RubberBandSelector<T extends Node> {
+public class RubberBandSelector<T extends Region> {
 
 	private final Pane master;
 	private final Class<T> classFilter;
@@ -213,10 +216,7 @@ public class RubberBandSelector<T extends Node> {
 		return !cursor.equals(Cursor.DEFAULT);
 	}
 
-	// TODO: in future, or depending on use case, we might want to run this on a
-	// background thread instead. Seems to be quick enough with fewer nodes to
-	// run on the JavaFXApplication thread for now...
-	// ...keep in mind this method fires over and over again while dragging!
+	// keep in mind: this method fires over and over again while dragging!
 	private void updateSelection(MouseEvent e) {
 		for (Node node : master.getChildren()) {
 			if (node.equals(rect)) {
@@ -230,7 +230,7 @@ public class RubberBandSelector<T extends Node> {
 			@SuppressWarnings("unchecked")
 			final T typedNode = (T) node;
 
-			if (rect.getBoundsInParent().intersects(typedNode.getBoundsInParent())) {
+			if (intersects(typedNode)) {
 				if (e.isControlDown()) {
 					selection.remove(typedNode);
 				} else {
@@ -242,6 +242,24 @@ public class RubberBandSelector<T extends Node> {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Intersection test ignoring padding on the target node.
+	 *
+	 * @param node the target node.
+	 * @return {@code true} if {@code rect} intersects with the bounds of the
+	 * target node (minus padding), {@code false} otherwise.
+	 */
+	private boolean intersects(T node) {
+		final Insets padding = node.getPadding();
+		final Bounds bounds = node.getBoundsInParent();
+		return rect.getBoundsInParent().intersects(
+				bounds.getMinX() + padding.getLeft(),
+				bounds.getMinY() + padding.getTop(),
+				bounds.getWidth() - padding.getLeft() - padding.getRight(),
+				bounds.getHeight() - padding.getTop() - padding.getBottom()
+		);
 	}
 
 	/**

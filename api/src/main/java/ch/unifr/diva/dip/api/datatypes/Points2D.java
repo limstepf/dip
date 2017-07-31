@@ -7,7 +7,7 @@ import javafx.scene.input.DataFormat;
  */
 public class Points2D extends AbstractDataType<ch.unifr.diva.dip.api.datastructures.Points2D> {
 
-	private final static DataFormat dataFormat = new DataFormat("dip-datatype/points2d");
+	private final static DataFormat dataFormat = new DataFormat("dip-datatype/points-2d");
 
 	/**
 	 * Creates a new data type for a list of {@code Point2D}.

@@ -7,7 +7,7 @@ import javafx.scene.input.DataFormat;
  */
 public class Polygons2D extends AbstractDataType<ch.unifr.diva.dip.api.datastructures.Polygons2D> {
 
-	private final static DataFormat dataFormat = new DataFormat("dip-datatype/polygons2d");
+	private final static DataFormat dataFormat = new DataFormat("dip-datatype/polygons-2d");
 
 	/**
 	 * Creates a new data type for a list of {@code Polygons2D}.

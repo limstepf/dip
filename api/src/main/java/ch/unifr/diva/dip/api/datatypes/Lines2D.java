@@ -7,7 +7,7 @@ import javafx.scene.input.DataFormat;
  */
 public class Lines2D extends AbstractDataType<ch.unifr.diva.dip.api.datastructures.Lines2D> {
 
-	private final static DataFormat dataFormat = new DataFormat("dip-datatype/lines2d");
+	private final static DataFormat dataFormat = new DataFormat("dip-datatype/lines-2d");
 
 	/**
 	 * Creates a new data type for a list of {@code Line2D}.

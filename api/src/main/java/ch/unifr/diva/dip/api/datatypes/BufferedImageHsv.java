@@ -18,6 +18,11 @@ public class BufferedImageHsv extends AbstractDataType<ch.unifr.diva.dip.api.dat
 	}
 
 	@Override
+	public String label() {
+		return "HSV";
+	}
+
+	@Override
 	public DataFormat dataFormat() {
 		return dataFormat;
 	}

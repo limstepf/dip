@@ -18,6 +18,11 @@ public class BufferedImageBinary extends AbstractDataType<java.awt.image.Buffere
 	}
 
 	@Override
+	public String label() {
+		return "Binary";
+	}
+
+	@Override
 	public DataFormat dataFormat() {
 		return dataFormat;
 	}

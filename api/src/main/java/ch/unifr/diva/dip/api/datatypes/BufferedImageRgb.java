@@ -18,6 +18,11 @@ public class BufferedImageRgb extends AbstractDataType<java.awt.image.BufferedIm
 	}
 
 	@Override
+	public String label() {
+		return "RGB";
+	}
+
+	@Override
 	public DataFormat dataFormat() {
 		return dataFormat;
 	}

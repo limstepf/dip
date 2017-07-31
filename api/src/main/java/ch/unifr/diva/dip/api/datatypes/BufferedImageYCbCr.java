@@ -18,6 +18,11 @@ public class BufferedImageYCbCr extends AbstractDataType<java.awt.image.Buffered
 	}
 
 	@Override
+	public String label() {
+		return "YCbCr";
+	}
+
+	@Override
 	public DataFormat dataFormat() {
 		return dataFormat;
 	}

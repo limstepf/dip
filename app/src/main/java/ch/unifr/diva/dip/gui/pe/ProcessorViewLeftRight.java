@@ -63,7 +63,7 @@ public class ProcessorViewLeftRight extends ProcessorView {
 			infoPane.setCenter(this.parameterView().node());
 		} else {
 			infoPane.setCenter(null);
-			final ClosedParameterView closedView = this.closedParameterView();
+			final ParameterView closedView = this.closedParameterView();
 			if (closedView != null) {
 				infoPane.setCenter(closedView.node());
 			}

@@ -17,25 +17,32 @@ public interface Port<T> {
 	public enum State {
 
 		/**
-		 * An UNCONNECTED port is idling. Nothing to see, nothing to do.
+		 * An {@code UNCONNECTED} port is idling. Nothing to see, nothing to do.
 		 * However, note that an unconnected port might also be disabled (see
 		 * disabledProperty()). Disabled ports can not be connected to.
 		 */
 		UNCONNECTED,
 		/**
-		 * A WAITING port is blocking in case of an input port, and indicates
-		 * the requirement of a value/payload on an output port. Once an output
-		 * port has computed its value/payload it signals all connected input
-		 * ports to set them to the READY state.
+		 * A {@code WAITING} port is blocking in case of an input port, and
+		 * indicates the requirement of a value/payload on an output port. Once
+		 * an output port has computed its value/payload it signals all
+		 * connected input ports to set them to the {@code READY} state.
 		 */
 		WAITING,
 		/**
-		 * A READY port indicates that an input port can be used for further
-		 * processing, or that the value/payload of an output port is ready and
-		 * can be accessed.
+		 * A {@code READY} port indicates that an input port can be used for
+		 * further processing, or that the value/payload of an output port is
+		 * ready and can be accessed.
 		 */
 		READY
 	}
+
+	/**
+	 * Returns the label of the port. A short(!) and descriptive label.
+	 *
+	 * @return the label of the port.
+	 */
+	public String getLabel();
 
 	/**
 	 * Returns the DataType of the port. Only ports with the same DataType can

@@ -18,6 +18,11 @@ public class BufferedImageXyz extends AbstractDataType<ch.unifr.diva.dip.api.dat
 	}
 
 	@Override
+	public String label() {
+		return "XYZ";
+	}
+
+	@Override
 	public DataFormat dataFormat() {
 		return dataFormat;
 	}

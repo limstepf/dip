@@ -28,6 +28,9 @@ import org.osgi.service.component.annotations.Component;
 @Component(service = Processor.class)
 public class BandSplitter extends ProcessableBase {
 
+	/**
+	 * The layer option.
+	 */
 	private enum LayerOption {
 
 		/**
@@ -55,27 +58,47 @@ public class BandSplitter extends ProcessableBase {
 	private final InputColorPort input;
 	private final List<InputColorPort> inputColors;
 
-	// extended input color ports by band labels
+	/**
+	 * Extended input color port.
+	 */
 	private static class InputColorPort extends ch.unifr.diva.dip.awt.components.InputColorPort {
 
+		/**
+		 * Creates a new, extended input color port.
+		 */
 		public InputColorPort() {
 			super();
 		}
 
+		/**
+		 * Creates a new, extended input color port.
+		 *
+		 * @param cm the color model of the port.
+		 */
 		public InputColorPort(SimpleColorModel cm) {
 			super(cm);
 		}
 
+		/**
+		 * Returns the band label.
+		 *
+		 * @param band the band.
+		 * @return the band label.
+		 */
 		public String bandLabel(int band) {
 			if (this.cm == null) {
 				return String.format("Band %d", band);
 			}
 			return String.format("Band %d: %s", band, cm.bandDescription(band));
 		}
+
 	}
 
 	private final List<OutputBand> outputBands;
 
+	/**
+	 * A split output band.
+	 */
 	private static class OutputBand {
 
 		public final int num;
@@ -89,6 +112,11 @@ public class BandSplitter extends ProcessableBase {
 		public final String FLOAT_FILE;
 		public final String VIS_FILE;
 
+		/**
+		 * Creates a new, split output band.
+		 *
+		 * @param num the band.
+		 */
 		public OutputBand(int num) {
 			this.num = num;
 			this.key_bi = "band" + num;
@@ -97,16 +125,38 @@ public class BandSplitter extends ProcessableBase {
 			this.GRAY_FILE = this.key_bi + ".png";
 			this.FLOAT_FILE = this.key_bi + ".bmat";
 			this.VIS_FILE = this.key_bi + "-vis.png";
-			this.output_bi = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImage());
-			this.output_gray = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImageGray());
-			this.output_float = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat());
+			final String portLabel = "Band " + num;
+			this.output_bi = new OutputPort<>(
+					portLabel,
+					new ch.unifr.diva.dip.api.datatypes.BufferedImage()
+			);
+			this.output_gray = new OutputPort<>(
+					portLabel + ": Gray",
+					new ch.unifr.diva.dip.api.datatypes.BufferedImageGray()
+			);
+			this.output_float = new OutputPort<>(
+					portLabel + ": Float",
+					new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat()
+			);
 		}
 
+		/**
+		 * Checks whether any of the outputs of this split band is connected.
+		 *
+		 * @return {@code true} if at least one output of this split band is
+		 * connected, {@code false} otherwise.
+		 */
 		public boolean isConnected() {
-			return output_bi.isConnected() || output_gray.isConnected() || output_float.isConnected();
+			return output_bi.isConnected()
+					|| output_gray.isConnected()
+					|| output_float.isConnected();
 		}
+
 	}
 
+	/**
+	 * Creates a new band splitter.
+	 */
 	public BandSplitter() {
 		super("Band Splitter");
 

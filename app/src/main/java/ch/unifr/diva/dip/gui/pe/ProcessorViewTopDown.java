@@ -62,7 +62,7 @@ public class ProcessorViewTopDown extends ProcessorView {
 	protected void showParameters(boolean show) {
 		super.showParameters(show);
 
-		final ClosedParameterView closedView = this.closedParameterView();
+		final ParameterView closedView = this.closedParameterView();
 		if (show) {
 			infoPane.setCenter(this.parameterView().node());
 		} else {

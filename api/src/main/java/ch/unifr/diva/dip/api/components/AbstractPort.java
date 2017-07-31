@@ -24,18 +24,37 @@ public abstract class AbstractPort<T> implements Port<T> {
 	private final Class<T> type;
 	private final boolean required;
 	private final ObjectProperty<State> portStateProperty;
+	private final String label;
 
 	/**
 	 * Creates a new port.
 	 *
+	 * @param label a custom port label (short and descriptive), or an empty
+	 * string for a default label.
 	 * @param dataType data type of the port.
 	 * @param required flag if the port is absolutely required to work.
 	 */
-	public AbstractPort(DataType<T> dataType, boolean required) {
+	public AbstractPort(String label, DataType<T> dataType, boolean required) {
 		this.dataType = dataType;
 		this.type = this.dataType.type();
 		this.required = required;
+		this.label = makeLabel(dataType, label);
 		this.portStateProperty = new SimpleObjectProperty<>(State.UNCONNECTED);
+	}
+
+	private static <T> String makeLabel(DataType<T> dataType, String label) {
+		if (label == null || label.isEmpty()) {
+			if (!dataType.label().isEmpty()) {
+				return dataType.label();
+			}
+			return dataType.getClass().getSimpleName();
+		}
+		return label;
+	}
+
+	@Override
+	public String getLabel() {
+		return label;
 	}
 
 	@Override
@@ -57,7 +76,7 @@ public abstract class AbstractPort<T> implements Port<T> {
 	public ReadOnlyObjectProperty<State> portStateProperty() {
 		return portStateProperty;
 	}
-	
+
 	/**
 	 * Sets/udpates the port state. This method is only exposed to the package,
 	 * and to be used by the direct subclasses {@code InputPort} and

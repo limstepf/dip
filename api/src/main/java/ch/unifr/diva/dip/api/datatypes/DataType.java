@@ -23,4 +23,15 @@ public interface DataType<T> {
 	 */
 	DataFormat dataFormat();
 
+	/**
+	 * The default label used for default port labels. If this method isn't
+	 * overwritten then the data type's (simple) classname is used as a default
+	 * label. A good default label is short and descriptive.
+	 *
+	 * @return the default label, or an empty string.
+	 */
+	default String label() {
+		return "";
+	}
+
 }

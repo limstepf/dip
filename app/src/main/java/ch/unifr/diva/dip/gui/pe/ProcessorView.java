@@ -2,6 +2,7 @@ package ch.unifr.diva.dip.gui.pe;
 
 import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
+import ch.unifr.diva.dip.api.components.Port;
 import ch.unifr.diva.dip.api.parameters.Parameter;
 import ch.unifr.diva.dip.api.parameters.PersistentParameter;
 import ch.unifr.diva.dip.api.services.Processor;
@@ -20,6 +21,7 @@ import java.util.Set;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.geometry.Insets;
@@ -29,7 +31,6 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
-import javafx.scene.input.DataFormat;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BorderPane;
@@ -45,16 +46,16 @@ public abstract class ProcessorView extends BorderPane {
 
 	protected static final Logger log = LoggerFactory.getLogger(ProcessorView.class);
 
-	/**
-	 * Data format of a node in the pane of the pipeline editor. A node is the
-	 * view of a processor in the pipeline.
-	 */
-	public static final DataFormat PIPELINE_NODE = new DataFormat("pipeline-editor/node");
 	protected static final PseudoClass SELECTED = PseudoClass.getPseudoClass("selected");
 	protected static final PseudoClass UNAVAILABLE = PseudoClass.getPseudoClass("unavailable");
-
 	protected static final NamedGlyph IMPORT_GLYPH = MaterialDesignIcons.IMPORT;
 	protected static final NamedGlyph EXPORT_GLYPH = MaterialDesignIcons.EXPORT;
+
+	// we may want to make this a user setting in the future, but keep in mind that
+	// padding should be large enough to accommodate for port labels, and directly
+	// influences pipeline layout strategies/auto. arrangement of processors.
+	protected static final double verticalPadding = 64;
+	protected static final double horizontalPadding = verticalPadding * 1.667;
 
 	protected final PipelineEditor editor;
 	protected final PrototypeProcessor wrapper;
@@ -91,6 +92,13 @@ public abstract class ProcessorView extends BorderPane {
 		this.editor = editor;
 		this.wrapper = wrapper;
 
+		this.setPadding(new Insets(
+				verticalPadding,
+				horizontalPadding,
+				verticalPadding,
+				horizontalPadding
+		));
+
 		if (!wrapper.isAvailable()) {
 			this.pseudoClassStateChanged(UNAVAILABLE, true);
 		}
@@ -102,7 +110,7 @@ public abstract class ProcessorView extends BorderPane {
 			for (Map.Entry<String, InputPort<?>> e : wrapper.processor().inputs().entrySet()) {
 				final InputPort<?> input = e.getValue();
 				if (input != null) {
-					final PortView<InputPort<?>> view = new PortView<>(editor, e.getKey(), input);
+					final PortView<InputPort<?>> view = new PortView<>(this, e.getKey(), input);
 					editor.editorPane().registerPort(input, view);
 					inputPorts.add(view);
 				} else {
@@ -113,7 +121,7 @@ public abstract class ProcessorView extends BorderPane {
 			for (Map.Entry<String, OutputPort<?>> e : wrapper.processor().outputs().entrySet()) {
 				final OutputPort<?> output = e.getValue();
 				if (output != null) {
-					final PortView<OutputPort<?>> view = new PortView<>(editor, e.getKey(), output);
+					final PortView<OutputPort<?>> view = new PortView<>(this, e.getKey(), output);
 					editor.editorPane().registerPort(output, view);
 					outputPorts.add(view);
 				} else {
@@ -131,80 +139,6 @@ public abstract class ProcessorView extends BorderPane {
 		this.setBackground(Background.EMPTY);
 
 		this.head = new ProcessorHead(editor.applicationHandler(), wrapper);
-	}
-
-	/**
-	 * Processor head. Shows the title and generic processor functionality (e.g.
-	 * im-/export of presets).
-	 */
-	public static class ProcessorHead implements Localizable {
-
-		private final ApplicationHandler handler;
-		private final Window owner;
-		private final BorderPane pane;
-		private final HBox title;
-		private final HBox menu;
-
-		/**
-		 * Creates a new processor head.
-		 *
-		 * @param handler the application handler.
-		 * @param wrapper the processor wrapper.
-		 */
-		public ProcessorHead(ApplicationHandler handler, PrototypeProcessor wrapper) {
-			this.handler = handler;
-			this.owner = handler.uiStrategy.getStage();
-			this.pane = new BorderPane();
-			pane.setMaxWidth(Double.MAX_VALUE);
-
-			final Glyph glyph = UIStrategyGUI.Glyphs.newGlyph(wrapper.glyph(), Glyph.Size.NORMAL);
-			final Label label = new Label(
-					wrapper.isAvailable()
-							? wrapper.processor().name()
-							: wrapper.pid()
-			);
-			final Tooltip tooltip = new Tooltip(String.format(
-					"%s\nv.%s",
-					wrapper.pid(),
-					wrapper.version().toString()
-			));
-			label.setTooltip(tooltip);
-			this.title = new HBox();
-			title.setMaxWidth(Double.MAX_VALUE);
-			title.setSpacing(UIStrategyGUI.Stage.insets);
-			title.setAlignment(Pos.CENTER_LEFT);
-			title.getChildren().setAll(glyph, label);
-
-			final Glyph importGlyph = UIStrategyGUI.Glyphs.newGlyph(IMPORT_GLYPH, Glyph.Size.NORMAL);
-			importGlyph.enableHoverEffect(true);
-			importGlyph.setTooltip(localize("preset.load"));
-			importGlyph.setOnMouseClicked((e) -> {
-				final ProcessorPresetImportDialog dialog = new ProcessorPresetImportDialog(handler, wrapper);
-				dialog.show();
-			});
-			final Glyph exportGlyph = UIStrategyGUI.Glyphs.newGlyph(EXPORT_GLYPH, Glyph.Size.NORMAL);
-			exportGlyph.enableHoverEffect(true);
-			exportGlyph.setTooltip(localize("preset.save"));
-			exportGlyph.setOnMouseClicked((e) -> {
-				final ProcessorPresetExportDialog dialog = new ProcessorPresetExportDialog(handler, wrapper);
-				dialog.show();
-			});
-			this.menu = new HBox();
-			menu.setSpacing(UIStrategyGUI.Stage.insets);
-			menu.setAlignment(Pos.CENTER_RIGHT);
-			menu.getChildren().setAll(importGlyph, exportGlyph);
-
-			pane.setCenter(title);
-			pane.setRight(menu);
-		}
-
-		public Node getNode() {
-			return pane;
-		}
-
-		public void showMenu(boolean show) {
-			pane.setRight(show ? menu : null);
-		}
 	}
 
 	/**
@@ -226,6 +160,26 @@ public abstract class ProcessorView extends BorderPane {
 		if (wrapper.processor().hasRepaintProperty()) {
 			wrapper.processor().repaintProperty().addListener(repaintListener);
 		}
+	}
+
+	/**
+	 * Returns the horizontal padding. Applied to the right and left side of the
+	 * processor view.
+	 *
+	 * @return the horizontal padding.
+	 */
+	public double getHorizontalPadding() {
+		return horizontalPadding;
+	}
+
+	/**
+	 * Returns the vertical padding. Applied to the top and the bottom side of
+	 * the processor view.
+	 *
+	 * @return the vertical padding.
+	 */
+	public double getVerticalPadding() {
+		return verticalPadding;
 	}
 
 	// listen to selected/deselected processors
@@ -269,7 +223,7 @@ public abstract class ProcessorView extends BorderPane {
 		editor.repaint();
 	}
 
-	protected ClosedParameterView closedParameterView() {
+	protected ParameterView closedParameterView() {
 		if (!this.hasParameters()) {
 			return null;
 		}
@@ -304,7 +258,7 @@ public abstract class ProcessorView extends BorderPane {
 	// port's have positional properties to bind to, since their own layout
 	// porperties don't fire (ports aren't ever moving locally). Hence we
 	// need to update those extra properties from the parent node (i.e the
-	// processor wrapper) which actually moves.
+	// processor view) which actually moves.
 	protected final InvalidationListener portListener = (observable) -> {
 		updatePorts();
 	};
@@ -316,6 +270,18 @@ public abstract class ProcessorView extends BorderPane {
 		for (PortView<?> v : this.outputPorts) {
 			v.updateCenter();
 		}
+	}
+
+	protected boolean hasConnectedInputPortsOrNone() {
+		if (inputPorts.isEmpty()) {
+			return true;
+		}
+		for (PortView<InputPort<?>> pv : inputPorts) {
+			if (pv.port.isConnected()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public List<ConnectionView> wires() {
@@ -378,6 +344,11 @@ public abstract class ProcessorView extends BorderPane {
 		return this.editor;
 	}
 
+	/**
+	 * Returns the processor of this processor view.
+	 *
+	 * @return the processor.
+	 */
 	public final PrototypeProcessor wrapper() {
 		return this.wrapper;
 	}
@@ -404,7 +375,15 @@ public abstract class ProcessorView extends BorderPane {
 				onMouseExited(null);
 			}
 
-			if (editor.handler.settings.pipelineEditor.autoRearrangeOnProcessorFold) {
+			// auto-rearrange is fine and all, but not for unconnected processor views
+			// hanging around there... since they would be pushed to stage 1 (the front)
+			// which is confusing/annoying as hell... technically we should make sure
+			// to not do so for sub-pipelines/-graphs not fully connected to the root,
+			// even if this node has an input connection, one of its predecessors might
+			// not, ...but not sure if this is really worth the trouble? Well, if anyone
+			// should complain, here's the place to tweak this.
+			if (editor.handler.settings.pipelineEditor.autoRearrangeOnProcessorFold
+					&& hasConnectedInputPortsOrNone()) {
 				editor.editorPane().rearrangeProcessors();
 			}
 
@@ -417,6 +396,15 @@ public abstract class ProcessorView extends BorderPane {
 		if (this.closedParameterView != null) {
 			this.closedParameterView.glyph.disabledHoverEffectProperty().set(false);
 		}
+		addPortLabels();
+	}
+
+	protected void onMouseExited(MouseEvent e) {
+		editor.setCursor(Cursor.DEFAULT);
+		if (this.closedParameterView != null) {
+			this.closedParameterView.glyph.disabledHoverEffectProperty().set(true);
+		}
+		removePortLabels();
 	}
 
 	protected void onMousePressed(MouseEvent e) {
@@ -487,13 +475,6 @@ public abstract class ProcessorView extends BorderPane {
 		editor.setCursor(Cursor.OPEN_HAND);
 	}
 
-	protected void onMouseExited(MouseEvent e) {
-		editor.setCursor(Cursor.DEFAULT);
-		if (this.closedParameterView != null) {
-			this.closedParameterView.glyph.disabledHoverEffectProperty().set(true);
-		}
-	}
-
 	protected boolean hasParameters() {
 		if (!wrapper().isAvailable()) {
 			return false;
@@ -510,19 +491,143 @@ public abstract class ProcessorView extends BorderPane {
 		head.showMenu(show);
 	}
 
+	/**
+	 * The selected property. This property is {@code true} if the processor
+	 * view is currently selected.
+	 *
+	 * @return the selected property.
+	 */
 	public final BooleanProperty selectedProperty() {
 		return selectedProperty;
+	}
+
+	/**
+	 * Adds/shows port labels.
+	 */
+	public void addPortLabels() {
+		if (!isPortLabelsVisible()) {
+			addProcessorViewLabels(getInputPortLabels());
+			addProcessorViewLabels(getOutputPortLabels());
+			setPortLabelsVisible(true);
+		}
+	}
+
+	/**
+	 * Removes/hides port labels.
+	 */
+	public void removePortLabels() {
+		if (isPortLabelsVisible()) {
+			removeProcessorViewLabels(getInputPortLabels());
+			removeProcessorViewLabels(getOutputPortLabels());
+			setPortLabelsVisible(false);
+		}
+	}
+
+	protected <T extends Port<?>> void addProcessorViewLabels(List<PortView.Label<T>> labels) {
+		for (PortView.Label<T> label : labels) {
+			editor.editorPane().pane().getChildren().add(label);
+			label.bind();
+		}
+	}
+
+	protected <T extends Port<?>> void removeProcessorViewLabels(List<PortView.Label<T>> labels) {
+		for (PortView.Label<T> label : labels) {
+			label.unbind();
+			editor.editorPane().pane().getChildren().remove(label);
+		}
+	}
+
+	private boolean isPortLabelsVisible;
+
+	/**
+	 * Checks whether the port labels are currently visible.
+	 *
+	 * @return {@code true} if the port labels are visible, {@code false}
+	 * otherwise.
+	 */
+	public boolean isPortLabelsVisible() {
+		return isPortLabelsVisible;
+	}
+
+	/**
+	 * Sets the visibility of the port labels.
+	 *
+	 * @param visible {@code true} if the port labels are visible, {@code false}
+	 * otherwise.
+	 */
+	protected void setPortLabelsVisible(boolean visible) {
+		isPortLabelsVisible = visible;
+	}
+
+	private List<PortView.Label<InputPort<?>>> inputPortLabels;
+
+	/**
+	 * Returns the input port labels.
+	 *
+	 * @return the input port labels.
+	 */
+	protected List<PortView.Label<InputPort<?>>> getInputPortLabels() {
+		if (inputPortLabels == null) {
+			updatePorts();
+			inputPortLabels = new ArrayList<>();
+			for (PortView<InputPort<?>> pv : inputPorts) {
+				inputPortLabels.add(pv.getLabel());
+			}
+		}
+		return inputPortLabels;
+	}
+
+	private List<PortView.Label<OutputPort<?>>> outputPortLabels;
+
+	/**
+	 * Returns the output port labels.
+	 *
+	 * @return the output port labels.
+	 */
+	protected List<PortView.Label<OutputPort<?>>> getOutputPortLabels() {
+		if (outputPortLabels == null) {
+			updatePorts();
+			outputPortLabels = new ArrayList<>();
+			for (PortView<OutputPort<?>> pv : outputPorts) {
+				outputPortLabels.add(pv.getLabel());
+			}
+		}
+		return outputPortLabels;
+	}
+
+	/**
+	 * Parameter view interface.
+	 */
+	public static interface ParameterView {
+
+		/**
+		 * The root node of the parameter view.
+		 *
+		 * @return the root node of the parameter view.
+		 */
+		public Parent node();
+
+		/**
+		 * The children of the parameter view. S.t. we can check if there are
+		 * any parameters at all.
+		 *
+		 * @return the children of the parameter view.
+		 */
+		public ObservableList<Node> getChildren();
 	}
 
 	/**
 	 * Closed parameter view. Will only be used for processors that actually
 	 * have some parameters, and indicates exactly this.
 	 */
-	public static class ClosedParameterView {
+	public static class ClosedParameterView implements ParameterView {
 
 		protected final HBox hbox;
 		protected final Glyph glyph;
 
+		/**
+		 * Creates a new closed parameter view.
+		 */
 		public ClosedParameterView() {
 			glyph = UIStrategyGUI.Glyphs.newGlyph(
 					MaterialDesignIcons.CHEVRON_DOWN,
@@ -537,19 +642,16 @@ public abstract class ProcessorView extends BorderPane {
 			hbox.getChildren().add(glyph);
 		}
 
+		@Override
 		public Parent node() {
 			return hbox;
 		}
-	}
 
-	/**
-	 * Parameter view interface.
-	 */
-	public static interface ParameterView {
+		@Override
+		public ObservableList<Node> getChildren() {
+			return FXCollections.emptyObservableList();
+		}
 
-		public Parent node();
-
-		public ObservableList<Node> getChildren();
 	}
 
 	/**
@@ -561,6 +663,11 @@ public abstract class ProcessorView extends BorderPane {
 
 		protected final T root;
 
+		/**
+		 * Creates a new parameter view.
+		 *
+		 * @param root root node.
+		 */
 		public ParameterViewBase(T root) {
 			this.root = root;
 		}
@@ -648,6 +755,81 @@ public abstract class ProcessorView extends BorderPane {
 		@Override
 		public ObservableList<Node> getChildren() {
 			return root.getChildren();
+		}
+
+	}
+
+	/**
+	 * Processor head. Shows the title and generic processor functionality (e.g.
+	 * im-/export of presets).
+	 */
+	public static class ProcessorHead implements Localizable {
+
+		private final ApplicationHandler handler;
+		private final Window owner;
+		private final BorderPane pane;
+		private final HBox title;
+		private final HBox menu;
+
+		/**
+		 * Creates a new processor head.
+		 *
+		 * @param handler the application handler.
+		 * @param wrapper the processor wrapper.
+		 */
+		public ProcessorHead(ApplicationHandler handler, PrototypeProcessor wrapper) {
+			this.handler = handler;
+			this.owner = handler.uiStrategy.getStage();
+			this.pane = new BorderPane();
+			pane.setMaxWidth(Double.MAX_VALUE);
+
+			final Glyph glyph = UIStrategyGUI.Glyphs.newGlyph(wrapper.glyph(), Glyph.Size.NORMAL);
+			final Label label = new Label(
+					wrapper.isAvailable()
+							? wrapper.processor().name()
+							: wrapper.pid()
+			);
+			final Tooltip tooltip = new Tooltip(String.format(
+					"%s\nv.%s",
+					wrapper.pid(),
+					wrapper.version().toString()
+			));
+			label.setTooltip(tooltip);
+			this.title = new HBox();
+			title.setMaxWidth(Double.MAX_VALUE);
+			title.setSpacing(UIStrategyGUI.Stage.insets);
+			title.setAlignment(Pos.CENTER_LEFT);
+			title.getChildren().setAll(glyph, label);
+
+			final Glyph importGlyph = UIStrategyGUI.Glyphs.newGlyph(IMPORT_GLYPH, Glyph.Size.NORMAL);
+			importGlyph.enableHoverEffect(true);
+			importGlyph.setTooltip(localize("preset.load"));
+			importGlyph.setOnMouseClicked((e) -> {
+				final ProcessorPresetImportDialog dialog = new ProcessorPresetImportDialog(handler, wrapper);
+				dialog.show();
+			});
+			final Glyph exportGlyph = UIStrategyGUI.Glyphs.newGlyph(EXPORT_GLYPH, Glyph.Size.NORMAL);
+			exportGlyph.enableHoverEffect(true);
+			exportGlyph.setTooltip(localize("preset.save"));
+			exportGlyph.setOnMouseClicked((e) -> {
+				final ProcessorPresetExportDialog dialog = new ProcessorPresetExportDialog(handler, wrapper);
+				dialog.show();
+			});
+			this.menu = new HBox();
+			menu.setSpacing(UIStrategyGUI.Stage.insets);
+			menu.setAlignment(Pos.CENTER_RIGHT);
+			menu.getChildren().setAll(importGlyph, exportGlyph);
+
+			pane.setCenter(title);
+			pane.setRight(menu);
+		}
+
+		public Node getNode() {
+			return pane;
+		}
+
+		public void showMenu(boolean show) {
+			pane.setRight(show ? menu : null);
 		}
 	}
 

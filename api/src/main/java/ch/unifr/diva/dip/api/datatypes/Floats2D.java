@@ -7,7 +7,7 @@ import javafx.scene.input.DataFormat;
  */
 public class Floats2D extends AbstractDataType<ch.unifr.diva.dip.api.datastructures.Floats2D> {
 
-	private final static DataFormat dataFormat = new DataFormat("dip-datatype/floats2D");
+	private final static DataFormat dataFormat = new DataFormat("dip-datatype/floats-2d");
 
 	/**
 	 * Creates a new data type for a 2D array of floats.

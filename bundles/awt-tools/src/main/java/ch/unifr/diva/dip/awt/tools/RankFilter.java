@@ -69,8 +69,15 @@ public class RankFilter extends ProcessableBase implements Previewable {
 		this.parameters.put("rank", this.rankOption);
 		this.parameters.put("mask", this.maskOption);
 
-		this.input = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImage(), true);
-		this.mask = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.BooleanMatrix(), false);
+		this.input = new InputPort<>(
+				new ch.unifr.diva.dip.api.datatypes.BufferedImage(),
+				true
+		);
+		this.mask = new InputPort<>(
+				"Mask",
+				new ch.unifr.diva.dip.api.datatypes.BooleanMatrix(),
+				false
+		);
 		enableAllInputs();
 
 		this.output = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImage());

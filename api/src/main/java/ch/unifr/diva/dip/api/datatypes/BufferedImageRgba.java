@@ -18,6 +18,11 @@ public class BufferedImageRgba extends AbstractDataType<java.awt.image.BufferedI
 	}
 
 	@Override
+	public String label() {
+		return "RGBA";
+	}
+
+	@Override
 	public DataFormat dataFormat() {
 		return dataFormat;
 	}

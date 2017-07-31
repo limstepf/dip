@@ -25,7 +25,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -154,11 +153,20 @@ public class EditorPane {
 		final Bounds bounds = view.getBoundsInParent();
 		dot.relocate(bounds.getMaxX(), bounds.getMaxY());
 
+		final boolean isLabelVisible = view.isPortLabelsVisible();
+		if (isLabelVisible) {
+			view.removePortLabels();
+		}
+
 		pane.getChildren().remove(view);
 		pane.getChildren().add(view);
 		for (ConnectionView wire : view.wires()) {
 			pane.getChildren().remove(wire.node());
 			pane.getChildren().add(wire.node());
+		}
+
+		if (isLabelVisible) {
+			view.addPortLabels();
 		}
 
 		// remove dot
@@ -179,6 +187,9 @@ public class EditorPane {
 	 * Clears the editor pane.
 	 */
 	public void clear() {
+		for (ProcessorView view : processorViews.values()) {
+			view.removePortLabels();
+		}
 		pane().getChildren().clear();
 		processorViews.clear();
 		connections.clear();
@@ -505,8 +516,8 @@ public class EditorPane {
 	public void addProcessor(PrototypeProcessor wrapper) {
 		final ProcessorView view = this.editor.selectedPipeline().getLayoutStrategy().newProcessorView(editor, wrapper);
 		processorViews.put(wrapper, view);
-		view.init();
 		pane().getChildren().add(view);
+		view.init();
 	}
 
 	/**
@@ -517,6 +528,7 @@ public class EditorPane {
 	public void removeProcessor(PrototypeProcessor wrapper) {
 		final ProcessorView view = processorViews.get(wrapper);
 		if (view != null) {
+			view.removePortLabels(); // in case they still stick around (e.g. del selection)
 			pane().getChildren().remove(view);
 			removeConnections(wrapper);
 			unregisterPorts(wrapper);
@@ -585,12 +597,12 @@ public class EditorPane {
 		}
 
 		// remove wires and unregister old ports
+		oldView.removePortLabels(); // in case they still stick around (e.g. parameter change -> repaint)
 		oldView.unregister();
 
 		// replace with new view (conn. already hooked up, just need wires)
 		final ProcessorView newView = this.editor.selectedPipeline().getLayoutStrategy().newProcessorView(editor, wrapper);
 		processorViews.put(wrapper, newView);
-		newView.init();
 
 		if (!replaceNode(oldView, newView)) {
 			log.warn(
@@ -599,6 +611,8 @@ public class EditorPane {
 					newView
 			);
 		}
+
+		newView.init();
 
 		for (InputPort<?> input : wrapper.processor().inputs().values()) {
 			if (input.isConnected()) {
@@ -623,13 +637,7 @@ public class EditorPane {
 			updateProcessor(p);
 		}
 		if (editor.handler.settings.pipelineEditor.autoRearrangeOnChangedLayout) {
-			// we need some kind of delay here, or the layout will be wrong since
-			// not all processors have been placed yet, uh.
-			// ...and now the wires spazz out since the jiggling from the
-			// preceding view update is still running and now we jiggle again.
-			FxUtils.delay(Duration.millis(12), (e) -> {
-				editor.editorPane().rearrangeProcessors();
-			});
+			editor.editorPane().rearrangeProcessors();
 		}
 	}
 
@@ -637,6 +645,8 @@ public class EditorPane {
 	 * Rearrange all processors according to the pipeline's layout strategy.
 	 */
 	public void rearrangeProcessors() {
+		pane().applyCss();
+		pane().layout();
 		this.editor.selectedPipeline().getLayoutStrategy().arrange(
 				this.editor.selectedPipeline(),
 				this.processorViewMap()
@@ -669,12 +679,24 @@ public class EditorPane {
 			final OSGiServiceReference ref = (OSGiServiceReference) db.getContent(OSGI_SERVICE_PROCESSOR);
 			if (editor.selectedPipeline() != null) {
 				final Point2D p = editor.editorPane().sceneToPane(e);
-				editor.selectedPipeline().addProcessor(ref.pid, ref.version, p.getX(), p.getY());
+				editor.selectedPipeline().addProcessor(
+						ref.pid,
+						ref.version,
+						clipPosition(p.getX() - ProcessorView.horizontalPadding),
+						clipPosition(p.getY() - ProcessorView.verticalPadding)
+				);
 			}
 		}
 
 		e.setDropCompleted(true);
 		e.consume();
+	}
+
+	private double clipPosition(double value) {
+		if (value < 0) {
+			return 0;
+		}
+		return value;
 	}
 
 }

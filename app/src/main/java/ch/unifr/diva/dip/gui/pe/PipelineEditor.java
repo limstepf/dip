@@ -318,6 +318,8 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 			selectedPipelineProperty.set(null);
 			setDisableProcessorWidgets(true);
 		}
+
+		repaint();
 	}
 
 	/**

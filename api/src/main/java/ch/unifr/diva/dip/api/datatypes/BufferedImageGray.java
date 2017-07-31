@@ -3,7 +3,7 @@ package ch.unifr.diva.dip.api.datatypes;
 import javafx.scene.input.DataFormat;
 
 /**
- * Data type for a {@code BufferedImage} with a gray scale color space.
+ * Data type for a {@code BufferedImage} with a 8-bit gray scale color space.
  */
 public class BufferedImageGray extends AbstractDataType<java.awt.image.BufferedImage> {
 
@@ -15,6 +15,11 @@ public class BufferedImageGray extends AbstractDataType<java.awt.image.BufferedI
 	 */
 	public BufferedImageGray() {
 		super(java.awt.image.BufferedImage.class);
+	}
+
+	@Override
+	public String label() {
+		return "Gray";
 	}
 
 	@Override

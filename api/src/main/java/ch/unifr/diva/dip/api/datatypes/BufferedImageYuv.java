@@ -18,6 +18,11 @@ public class BufferedImageYuv extends AbstractDataType<ch.unifr.diva.dip.api.dat
 	}
 
 	@Override
+	public String label() {
+		return "YUV";
+	}
+
+	@Override
 	public DataFormat dataFormat() {
 		return dataFormat;
 	}
