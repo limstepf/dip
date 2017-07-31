@@ -5,6 +5,7 @@ import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.ui.UIStrategy;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import ch.unifr.diva.dip.core.UserSettings;
+import ch.unifr.diva.dip.core.ui.StylesheetManager;
 import ch.unifr.diva.dip.eventbus.EventBus;
 import ch.unifr.diva.dip.eventbus.EventBusGuava;
 import ch.unifr.diva.dip.gui.editor.EditorPresenter;
@@ -78,6 +79,7 @@ public class MainGUI extends Application {
 		final MainView view = new MainViewImpl();
 
 		// setup main presenter
+		StylesheetManager.getInstance().setSkin(context.settings.skin);
 		final MainPresenter presenter = new MainPresenter(
 				handler,
 				primaryStage,
@@ -112,6 +114,8 @@ public class MainGUI extends Application {
 	public void stop() {
 		// auto-save user settings on exit
 		UserSettings.saveStage(primaryStage, context.settings.primaryStage);
+		// auto-save current skin
+		context.settings.skin = StylesheetManager.getInstance().getSkin().name();
 
 		log.debug(
 				"saving user settings: {}",

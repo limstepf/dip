@@ -7,6 +7,7 @@ import ch.unifr.diva.dip.core.ImageFormat;
 import ch.unifr.diva.dip.core.UserSettings;
 import ch.unifr.diva.dip.core.model.Project;
 import ch.unifr.diva.dip.core.model.ProjectPage;
+import ch.unifr.diva.dip.core.ui.StylesheetManager;
 import ch.unifr.diva.dip.eventbus.EventBus;
 import ch.unifr.diva.dip.eventbus.events.ApplicationRequest;
 import ch.unifr.diva.dip.eventbus.events.ProjectNotification;
@@ -125,7 +126,7 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 		// resize editor and not the sideBar upon resizing the scene/window
 		SplitPane.setResizableWithParent(sideBar.getComponent(), false);
 
-		scene.getStylesheets().add(ApplicationSettings.stylesheet);
+		StylesheetManager.getInstance().init(scene);
 		stage.setScene(scene);
 		stage.setTitle(ApplicationSettings.applicationTitle);
 

@@ -5,6 +5,7 @@ import ch.unifr.diva.dip.api.utils.XmlUtils;
 import ch.unifr.diva.dip.api.utils.jaxb.BooleanPropertyAdapter;
 import ch.unifr.diva.dip.api.utils.jaxb.PathAdapter;
 import ch.unifr.diva.dip.api.utils.jaxb.StringPropertyAdapter;
+import ch.unifr.diva.dip.core.ui.StylesheetManager;
 import ch.unifr.diva.dip.gui.pe.PipelineLayoutStrategy;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import ch.unifr.diva.dip.gui.VisibilityMode;
@@ -77,6 +78,12 @@ public class UserSettings {
 		}
 		return new java.util.Locale(locale.language, locale.country);
 	}
+
+	/**
+	 * The skin (or stylesheet).
+	 */
+	@XmlElement
+	public String skin = StylesheetManager.Skin.getDefault().name();
 
 	/**
 	 * Main primary stage settings.

@@ -2,6 +2,7 @@ package ch.unifr.diva.dip.gui.layout;
 
 import ch.unifr.diva.dip.core.ApplicationSettings;
 import ch.unifr.diva.dip.core.ui.Localizable;
+import ch.unifr.diva.dip.core.ui.StylesheetManager;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
@@ -47,7 +48,7 @@ public abstract class AbstractStage implements Localizable {
 		root = new BorderPane();
 		root.getStyleClass().add("dip-stage");
 		scene = new Scene(root);
-		scene.getStylesheets().add(ApplicationSettings.stylesheet);
+		StylesheetManager.getInstance().init(scene);
 
 		stage.setTitle(title);
 		stage.setScene(scene);

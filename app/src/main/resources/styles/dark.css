@@ -1,0 +1,4 @@
+.root {
+	/* might need some tweaking */
+    -fx-base: rgba(60, 75, 80, 255);
+}

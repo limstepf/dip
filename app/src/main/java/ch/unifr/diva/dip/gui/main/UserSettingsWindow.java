@@ -7,6 +7,7 @@ import ch.unifr.diva.dip.api.parameters.LabelParameter;
 import ch.unifr.diva.dip.api.parameters.PersistentParameter;
 import ch.unifr.diva.dip.api.utils.L10n;
 import ch.unifr.diva.dip.core.ApplicationHandler;
+import ch.unifr.diva.dip.core.ui.StylesheetManager;
 import ch.unifr.diva.dip.gui.pe.PipelineLayoutStrategy;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import ch.unifr.diva.dip.eventbus.events.ApplicationRequest;
@@ -35,6 +36,7 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+import javafx.stage.Stage;
 import javafx.stage.Window;
 
 /**
@@ -85,6 +87,31 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 
 		/* General settings */
 		final Category general = new Category(localize("general"));
+
+		general.addItem(new Item<EnumParameter>() {
+			@Override
+			public EnumParameter parameter() {
+				if (this.parameter == null) {
+					this.parameter = new EnumParameter(
+							localize("skin"),
+							StylesheetManager.Skin.class,
+							handler.settings.skin
+					);
+				}
+				return this.parameter;
+			}
+
+			@Override
+			public void save() {
+				final String skin = this.parameter.get();
+				handler.settings.skin = skin;
+				StylesheetManager.getInstance().setSkin(skin);
+				final Stage stage = handler.uiStrategy.getStage();
+				if (stage != null) {
+					StylesheetManager.getInstance().init(stage.getScene());
+				}
+			}
+		});
 
 		// locale/language
 		general.addItem(new Item<EnumParameter>() {
