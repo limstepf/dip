@@ -178,7 +178,9 @@ public abstract class DataItemDialogBase<T extends DataItemListView.DataItem> ex
 			val.set(1, new FileReference(file.toString()));
 			this.currentFile = file;
 		}
-		this.dst.set(val);
+
+		this.dst.invalidate();
+
 		onSelectFile(this.currentFile);
 		update();
 
