@@ -55,7 +55,7 @@ public class SampleRescaler extends ProcessableBase implements Previewable {
 		this.parameters.put("config", configGrid);
 
 		this.input = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImage(), false);
-		this.input_float = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat(), false);
+		this.input_float = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImageFloat(), false);
 
 		enableAllInputs();
 		enableAllOutputs();

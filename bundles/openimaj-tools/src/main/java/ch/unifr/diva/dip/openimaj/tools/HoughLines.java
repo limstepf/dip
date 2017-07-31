@@ -119,7 +119,7 @@ public class HoughLines extends ProcessableBase {
 				false
 		);
 		this.input_float = new InputPort<>(
-				new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat(),
+				new ch.unifr.diva.dip.api.datatypes.BufferedImageFloat(),
 				false
 		);
 		this.input_xor = new XorInputPorts(this);

@@ -136,7 +136,7 @@ public class BandSplitter extends ProcessableBase {
 			);
 			this.output_float = new OutputPort<>(
 					portLabel + ": Float",
-					new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat()
+					new ch.unifr.diva.dip.api.datatypes.BufferedImageFloat()
 			);
 		}
 

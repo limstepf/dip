@@ -227,10 +227,10 @@ public class SampleInverter extends ProcessableBase {
 
 		this.input = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImage(), false);
 		this.input_binary = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImageBinary(), false);
-		this.input_float = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat(), false);
+		this.input_float = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImageFloat(), false);
 		this.output = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImage());
 		this.output_binary = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImageBinary());
-		this.output_float = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat());
+		this.output_float = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImageFloat());
 
 		this.inputColors = new ArrayList<>();
 		this.outputColors = new ArrayList<>();

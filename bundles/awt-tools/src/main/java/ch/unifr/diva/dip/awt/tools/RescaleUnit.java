@@ -130,7 +130,7 @@ public class RescaleUnit {
 		// outputs
 		this.output = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImage());
 		this.output_binary = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImageBinary());
-		this.output_float = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat());
+		this.output_float = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImageFloat());
 
 		this.outputPorts.put("buffered-image", this.output);
 		this.outputPorts.put("buffered-image-binary", this.output_binary);

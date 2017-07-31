@@ -137,8 +137,8 @@ public class ColorPortsUnit<T extends Processor> {
 		}
 
 		if (enableFloatPorts) {
-			this.input_float = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat(), false);
-			this.output_float = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat());
+			this.input_float = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImageFloat(), false);
+			this.output_float = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImageFloat());
 			this.index_float = index++;
 			options.add(new TextParameter("FLOAT"));
 		} else {

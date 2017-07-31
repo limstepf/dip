@@ -167,7 +167,7 @@ public class ConvolutionFilter extends ProcessableBase implements Previewable {
 				false
 		);
 		this.input_float = new InputPort<>(
-				new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat(),
+				new ch.unifr.diva.dip.api.datatypes.BufferedImageFloat(),
 				false
 		);
 

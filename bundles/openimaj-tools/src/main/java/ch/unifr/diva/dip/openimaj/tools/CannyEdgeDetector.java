@@ -98,17 +98,17 @@ public class CannyEdgeDetector extends ProcessableBase implements Previewable {
 				false
 		);
 		this.input_float = new InputPort<>(
-				new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat(),
+				new ch.unifr.diva.dip.api.datatypes.BufferedImageFloat(),
 				false
 		);
 		this.input_dx = new InputPort<>(
 				"dx",
-				new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat(),
+				new ch.unifr.diva.dip.api.datatypes.BufferedImageFloat(),
 				true
 		);
 		this.input_dy = new InputPort<>(
 				"dy",
-				new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat(),
+				new ch.unifr.diva.dip.api.datatypes.BufferedImageFloat(),
 				true
 		);
 		this.input_xor = new XorInputPortGroup(this);
@@ -130,7 +130,7 @@ public class CannyEdgeDetector extends ProcessableBase implements Previewable {
 				new ch.unifr.diva.dip.api.datatypes.BufferedImageBinary()
 		);
 		this.output_float = new OutputPort<>(
-				new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat()
+				new ch.unifr.diva.dip.api.datatypes.BufferedImageFloat()
 		);
 		outputs.put("buffered-image", output);
 		outputs.put("buffered-image-binary", output_binary);

@@ -51,7 +51,7 @@ public class SobelFilter extends ProcessableBase {
 				false
 		);
 		this.input_float = new InputPort<>(
-				new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat(),
+				new ch.unifr.diva.dip.api.datatypes.BufferedImageFloat(),
 				false
 		);
 		this.input_xor = new XorInputPorts(this);
@@ -61,11 +61,11 @@ public class SobelFilter extends ProcessableBase {
 
 		this.dx_float = new OutputPort<>(
 				"dx",
-				new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat()
+				new ch.unifr.diva.dip.api.datatypes.BufferedImageFloat()
 		);
 		this.dy_float = new OutputPort<>(
 				"dy",
-				new ch.unifr.diva.dip.api.datatypes.BufferedMatrixFloat()
+				new ch.unifr.diva.dip.api.datatypes.BufferedImageFloat()
 		);
 		outputs.put("dx-float", dx_float);
 		outputs.put("dy-float", dy_float);
