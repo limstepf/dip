@@ -499,13 +499,13 @@ public class PaddedRegion extends Region {
 			contentProperty = new LayoutObjectProperty<Node>() {
 				@Override
 				public void invalidated() {
-					super.invalidated();
 					final Node node = getContent();
 					if (node == null) {
 						getChildren().clear();
 					} else {
 						getChildren().setAll(node);
 					}
+					super.invalidated();
 				}
 			};
 		}
@@ -627,8 +627,9 @@ public class PaddedRegion extends Region {
 				return minBounds.getWidth();
 			}
 		}
+
 		setExtraHorizontalPadding(0);
-		return getRightPadding() + width + getLeftPadding();
+		return totalWidth;
 	}
 
 	@Override
@@ -640,6 +641,7 @@ public class PaddedRegion extends Region {
 	protected double computePrefHeight(double width) {
 		final double height = getContentHeight();
 		final double totalHeight = getTopPadding() + height + getBottomPadding();
+
 		if (hasMinBounds()) {
 			final Bounds minBounds = getMinBounds();
 			if (totalHeight < minBounds.getHeight()) {
@@ -647,6 +649,7 @@ public class PaddedRegion extends Region {
 				return minBounds.getHeight();
 			}
 		}
+
 		setExtraVerticalPadding(0);
 		return totalHeight;
 	}

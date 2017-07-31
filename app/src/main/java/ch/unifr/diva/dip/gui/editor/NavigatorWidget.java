@@ -207,34 +207,49 @@ public class NavigatorWidget<T extends Pannable> extends AbstractWidget {
 			final double offsetX = e.getSceneX() - x;
 			final double offsetY = e.getSceneY() - y;
 			final Bounds viewportBounds = pannable.getViewportBounds();
-			final Bounds scaledBounds = pannable.getScaledContentBounds();
+			/*
+			 * In a way, neither ScaledContentBounds, nor PaddedContentBounds are
+			 * the correct thing to take here, since padding is only visible in
+			 * the ScrollPane, but not in the NavigatorWidget. We take the latter,
+			 * since working with ScaledContentBounds leads to hard control jumps/
+			 * too quick movement with a low scale factor. The trade-off is that
+			 * panning by the NavigatorWidget becomes a little bit more slow/sluggish,
+			 * but that's much better.
+			 */
+			final Bounds scaledBounds = pannable.getPaddedContentBounds();
 			final double scrollableWidth = scaledBounds.getWidth() - viewportBounds.getWidth();
 			final double scrollableHeight = scaledBounds.getHeight() - viewportBounds.getHeight();
 			final double invScale = 1 / scale;
 			final double scaleFactor = invScale * pannable.getZoom();
 
-			final double hmin = pannable.getHmin();
-			final double hmax = pannable.getHmax();
-			final double hrange = pannable.getHrangeReal();
-			final double hppx = hrange / scrollableWidth;
-			double hpos = (offsetX * scaleFactor * hppx) + h;
+			double hpos = pannable.getHmin();
+			if (scrollableWidth > 0) {
+				final double hmin = pannable.getHmin();
+				final double hmax = pannable.getHmax();
+				final double hrange = pannable.getHrangeReal();
+				final double hppx = hrange / scrollableWidth;
+				hpos = (offsetX * scaleFactor * hppx) + h;
 
-			if (hpos < hmin) {
-				hpos = hmin;
-			} else if (hpos > hmax) {
-				hpos = hmax;
+				if (hpos < hmin || scrollableWidth < 0) {
+					hpos = hmin;
+				} else if (hpos > hmax) {
+					hpos = hmax;
+				}
 			}
 
-			final double vmin = pannable.getVmin();
-			final double vmax = pannable.getVmax();
-			final double vrange = pannable.getVrangeReal();
-			final double vppx = vrange / scrollableHeight;
-			double vpos = (offsetY * scaleFactor * vppx) + v;
+			double vpos = pannable.getVmin();
+			if (scrollableHeight > 0) {
+				final double vmin = pannable.getVmin();
+				final double vmax = pannable.getVmax();
+				final double vrange = pannable.getVrangeReal();
+				final double vppx = vrange / scrollableHeight;
+				vpos = (offsetY * scaleFactor * vppx) + v;
 
-			if (vpos < vmin) {
-				vpos = vmin;
-			} else if (hpos > vmax) {
-				vpos = vmax;
+				if (vpos < vmin || scrollableHeight < 0) {
+					vpos = vmin;
+				} else if (vpos > vmax) {
+					vpos = vmax;
+				}
 			}
 
 			pannable.setViewportPosition(hpos, vpos);

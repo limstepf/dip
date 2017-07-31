@@ -212,30 +212,28 @@ public class ZoomPaneSimple implements Pannable {
 				// effective padding is either viewport size - buffer size,
 				// where the buffer size is the part of the content still visible
 				// (if positive), or 0 s.t. minimum bounds will center the content
-				if (scaledBounds.getWidth() <= viewportBounds.getWidth()) {
+				if ((scaledBounds.getWidth() <= viewportBounds.getWidth())
+						|| (getPaddingBuffer() >= viewportBounds.getWidth())) {
 					horizontalPadding = 0;
 					setHminReal(getHmin());
 					setHmaxReal(getHmax());
 				} else {
-					horizontalPadding = Math.max(
-							viewportBounds.getWidth() - getPaddingBuffer(),
-							0
-					);
+					horizontalPadding = viewportBounds.getWidth() - getPaddingBuffer();
 					// setHminReal/setHmaxReal below with horizontalPadding > 0
 					// padding needs to be set first to get real padding
 				}
-				if (scaledBounds.getHeight() <= viewportBounds.getHeight()) {
+
+				if ((scaledBounds.getHeight() <= viewportBounds.getHeight())
+						|| (getPaddingBuffer() >= viewportBounds.getHeight())) {
 					verticalPadding = 0;
 					setVminReal(getVmin());
 					setVmaxReal(getVmax());
 				} else {
-					verticalPadding = Math.max(
-							viewportBounds.getHeight() - getPaddingBuffer(),
-							0
-					);
+					verticalPadding = viewportBounds.getHeight() - getPaddingBuffer();
 					// setVminReal/setVmaxReal below with verticalPadding > 0
 					// padding needs to be set first to get real padding
 				}
+
 				setPadding(verticalPadding, horizontalPadding);
 
 				if (horizontalPadding > 0) {
@@ -243,8 +241,9 @@ public class ZoomPaneSimple implements Pannable {
 					final double left = paddedRegion.getLeftPaddingReal();
 					final double right = paddedRegion.getRightPaddingReal();
 					final double width = left + scaledBounds.getWidth() + right;
-					setHminReal(left * rangeX / width);
-					setHmaxReal(getHmax() - (right * rangeX / width));
+					final double dx = rangeX / width;
+					setHminReal(left * dx);
+					setHmaxReal(getHmax() - (right * dx));
 				}
 
 				if (verticalPadding > 0) {
@@ -252,8 +251,9 @@ public class ZoomPaneSimple implements Pannable {
 					final double top = paddedRegion.getTopPaddingReal();
 					final double bottom = paddedRegion.getBottomPaddingReal();
 					final double height = top + scaledBounds.getHeight() + bottom;
-					setVminReal(top * rangeY / height);
-					setVmaxReal(getVmax() - (bottom * rangeY / height));
+					final double dy = rangeY / height;
+					setVminReal(top * dy);
+					setVmaxReal(getVmax() - (bottom * dy));
 				}
 				break;
 
@@ -301,8 +301,6 @@ public class ZoomPaneSimple implements Pannable {
 		changeIsLocal = false;
 
 		moveToPixel(lastCenterPixel);
-
-		lastCenterPixel = getCenterPixel();
 	}
 
 	protected void onPanning() {

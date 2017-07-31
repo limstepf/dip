@@ -1,6 +1,7 @@
 package ch.unifr.diva.dip.gui.layout;
 
 import javafx.beans.binding.Bindings;
+import javafx.geometry.Orientation;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
@@ -90,7 +91,40 @@ public class ZoomPaneWithOverlay extends ZoomPaneSimple {
 				paddedRegion.topPaddingRealProperty()
 		);
 
-		this.muxPane = new Pane();
+		/*
+		 * A default Pane will bug out sooner* or later, s.t. we end up with way
+		 * too much width/height, screwing up the ScrollPane and NavigatorWidget...
+		 * Not really sure why that is (or if it's even supposed to work like this).
+		 * Anyways: overwriting computePrefWidth/-Height fixes this problem.
+		 *
+		 * (*) to reproduce: use a plain Pane as muxPane, then start the app with
+		 * some large enough page, zoom to 555% (super large), and back to 35%
+		 * (small, s.t. only vertical scroll is available, while the full width of
+		 * the page is visible. Note how the width is far too large, and there's
+		 * also a horizontal scrollbar to scroll into the empty space...
+		 */
+		this.muxPane = new Pane() {
+			@Override
+			protected double computeMinWidth(double height) {
+				return paddedRegion.computeMinWidth(height);
+			}
+
+			@Override
+			protected double computeMinHeight(double width) {
+				return paddedRegion.computeMinHeight(width);
+			}
+
+			@Override
+			protected double computePrefWidth(double height) {
+				return paddedRegion.computePrefWidth(height);
+			}
+
+			@Override
+			protected double computePrefHeight(double width) {
+				return paddedRegion.computePrefHeight(width);
+			}
+		};
+
 		muxPane.getChildren().setAll(
 				paddedRegion,
 				overlayGroup
