@@ -40,7 +40,7 @@ public class PortView<T extends Port<?>> extends Pane {
 	private final DoubleProperty centerXProperty;
 	private final DoubleProperty centerYProperty;
 	private final Circle[] circles = new Circle[3];
-	private Label label;
+	private Label<T> label;
 
 	/**
 	 * The key of the port.
@@ -105,7 +105,7 @@ public class PortView<T extends Port<?>> extends Pane {
 	 */
 	public Label<T> getLabel() {
 		if (label == null) {
-			label = new Label(this, port.getLabel(), color);
+			label = new Label<>(this, port.getLabel(), color);
 		}
 		return label;
 	}
