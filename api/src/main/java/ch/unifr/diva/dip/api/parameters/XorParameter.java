@@ -152,7 +152,11 @@ public class XorParameter extends CompositeBase<ValueListSelection, XorParameter
 		}
 		final List<String> values = new ArrayList<>();
 		for (Object obj : value.elements) {
-			values.add(obj.getClass().getSimpleName());
+			if (obj == null) {
+				values.add("null");
+			} else {
+				values.add(obj.getClass().getSimpleName());
+			}
 		}
 		return String.join(", ", values);
 	}
