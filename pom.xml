@@ -31,7 +31,10 @@
 		<!-- OSGi packages (in-house bundles) -->
 		<module>bundles</module>
 
-	</modules>
+		<!-- OSGi bundle archtypes -->
+		<module>bundle-archetype</module>
+
+  </modules>
 
 	<build>
 		<plugins>
