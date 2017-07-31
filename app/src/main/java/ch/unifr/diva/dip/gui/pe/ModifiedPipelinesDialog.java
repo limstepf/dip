@@ -6,10 +6,9 @@ import ch.unifr.diva.dip.api.parameters.LabelParameter;
 import ch.unifr.diva.dip.api.parameters.XorParameter;
 import ch.unifr.diva.dip.api.utils.L10n;
 import ch.unifr.diva.dip.core.ApplicationHandler;
-import ch.unifr.diva.dip.core.model.Pipeline;
 import ch.unifr.diva.dip.core.model.PipelineData;
-import ch.unifr.diva.dip.core.model.PrototypeProcessor;
 import ch.unifr.diva.dip.core.model.ProjectPage;
+import ch.unifr.diva.dip.core.model.PrototypePipeline;
 import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.gui.dialogs.AbstractDialog;
 import static ch.unifr.diva.dip.gui.dialogs.AbstractDialog.getCancelButton;
@@ -264,7 +263,7 @@ public class ModifiedPipelinesDialog extends AbstractDialog {
 	private class ModifiedPipelineSection implements Localizable {
 
 		private final List<AffectedPage> affectedPages;
-		private final Pipeline<PrototypeProcessor> pipeline;
+		private final PrototypePipeline pipeline;
 		private final Set<Integer> pageids;
 		private final InvalidationListener resolutionListener;
 		private final Label cloneLabel;

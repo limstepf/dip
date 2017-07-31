@@ -2,12 +2,8 @@ package ch.unifr.diva.dip.gui.pe;
 
 import ch.unifr.diva.dip.api.components.Port;
 import ch.unifr.diva.dip.core.model.Pipeline;
+import ch.unifr.diva.dip.core.model.PrototypePipeline;
 import ch.unifr.diva.dip.core.model.PrototypeProcessor;
-import ch.unifr.diva.dip.gui.pe.PipelineEditor;
-import ch.unifr.diva.dip.gui.pe.PortView;
-import ch.unifr.diva.dip.gui.pe.ProcessorView;
-import ch.unifr.diva.dip.gui.pe.ProcessorViewLeftRight;
-import ch.unifr.diva.dip.gui.pe.ProcessorViewTopDown;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -51,7 +47,7 @@ public enum PipelineLayoutStrategy {
 				}
 
 				@Override
-				public void arrange(Pipeline<PrototypeProcessor> pipeline, Map<PrototypeProcessor, ProcessorView> views) {
+				public void arrange(PrototypePipeline pipeline, Map<PrototypeProcessor, ProcessorView> views) {
 					final Pipeline.PipelineStages<PrototypeProcessor> stages = new Pipeline.PipelineStages<>(pipeline);
 					double x = 0;
 					double y;
@@ -122,7 +118,7 @@ public enum PipelineLayoutStrategy {
 				}
 
 				@Override
-				public void arrange(Pipeline<PrototypeProcessor> pipeline, Map<PrototypeProcessor, ProcessorView> views) {
+				public void arrange(PrototypePipeline pipeline, Map<PrototypeProcessor, ProcessorView> views) {
 					final Pipeline.PipelineStages<PrototypeProcessor> stages = new Pipeline.PipelineStages<>(pipeline);
 					double x;
 					double y = 0;
@@ -244,7 +240,7 @@ public enum PipelineLayoutStrategy {
 	 * @param pipeline the pipeline.
 	 * @param views processor views.
 	 */
-	public abstract void arrange(Pipeline<PrototypeProcessor> pipeline, Map<PrototypeProcessor, ProcessorView> views);
+	public abstract void arrange(PrototypePipeline pipeline, Map<PrototypeProcessor, ProcessorView> views);
 
 	/**
 	 * Processor view factory. Creates a new processor view suitable for the

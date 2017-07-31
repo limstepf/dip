@@ -3,11 +3,11 @@ package ch.unifr.diva.dip.gui.pe;
 import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.components.Port;
-import ch.unifr.diva.dip.core.model.Pipeline;
 import ch.unifr.diva.dip.core.model.PrototypeProcessor;
 import static ch.unifr.diva.dip.gui.pe.ProcessorsWidget.ProcessorListCell.OSGI_SERVICE_PROCESSOR;
 import ch.unifr.diva.dip.osgi.OSGiServiceReference;
 import ch.unifr.diva.dip.api.utils.FxUtils;
+import ch.unifr.diva.dip.core.model.PrototypePipeline;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -201,7 +201,7 @@ public class EditorPane {
 	 *
 	 * @return the selected pipeline.
 	 */
-	private Pipeline<PrototypeProcessor> pipeline() {
+	private PrototypePipeline pipeline() {
 		return editor.selectedPipelineProperty().get();
 	}
 

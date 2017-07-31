@@ -26,12 +26,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Pipeline. A prototype of a pipeline to be used in the pipeline editor (can
- * not be run).
+ * Pipeline base class. Note that {@code Pipeline<PrototypeProcessor>} is pretty
+ * much equivalent to a {@code PrototypePipeline}. The latter is usually nicer
+ * to write and read than using parametric polymorphism/generics (historically
+ * this class wasn't always abstract, and PrototypePipeline didn't exist...).
+ * Also it lines up nicely with the processor wrappers
+ * {@code PrototypeProcessor} and {@code RunnableProcessor}. <br />
  *
- * @param <T> type of the processor wrapper; {@code PrototypeProcessor} or {@code RunnableProcessor}.
+ * Methods that need to take/work with both, {@code PrototypePipeline} and
+ * {@code RunnablePipeline}, can still program against {@code Pipeline<T>} where
+ * {@code <T extends PrototypeProcessor>} (granted, generics/type erasure with
+ * collections can be a bit of a pain in the ass...).
+ *
+ * @param <T> type of the processor wrapper; {@code PrototypeProcessor} or
+ * {@code RunnableProcessor}.
  */
-public class Pipeline<T extends PrototypeProcessor> implements Modifiable {
+public abstract class Pipeline<T extends PrototypeProcessor> implements Modifiable {
 
 	protected static final Logger log = LoggerFactory.getLogger(Pipeline.class);
 	protected final ApplicationHandler handler;
@@ -487,10 +497,7 @@ public class Pipeline<T extends PrototypeProcessor> implements Modifiable {
 	 *
 	 * @return a clone of the pipeline.
 	 */
-	public Pipeline<T> clonePipeline() {
-		final PipelineData.Pipeline data = new PipelineData.Pipeline(this);
-		return new Pipeline<>(handler, data);
-	}
+	public abstract Pipeline<T> clonePipeline();
 
 	/**
 	 * Clones/copies the pipeline as a {@code RunnablePipeline}. This returns a

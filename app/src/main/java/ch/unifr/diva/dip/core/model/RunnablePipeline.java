@@ -200,13 +200,8 @@ public class RunnablePipeline extends Pipeline<RunnableProcessor> {
 		updateState();
 	}
 
-	/**
-	 * Clones/copies the runnable pipeline. This returns a deep-copy of the
-	 * pipeline.
-	 *
-	 * @return a clone of the runnable pipeline.
-	 */
-	public RunnablePipeline cloneRunnablePipeline() {
+	@Override
+	public RunnablePipeline clonePipeline() {
 		final PipelineData.Pipeline data = new PipelineData.Pipeline(this);
 		return new RunnablePipeline(handler, page, data);
 	}
@@ -247,7 +242,7 @@ public class RunnablePipeline extends Pipeline<RunnableProcessor> {
 	private boolean savePipelinePatch() {
 		this.deletePipelinePatch();
 
-		final Pipeline<PrototypeProcessor> prototype = this.page.project().pipelineManager().getPipeline(id);
+		final PrototypePipeline prototype = this.page.project().pipelineManager().getPipeline(id);
 		final PipelinePatch patch = PipelinePatch.createPatch(prototype, this);
 
 		if (!patch.isEmpty()) {

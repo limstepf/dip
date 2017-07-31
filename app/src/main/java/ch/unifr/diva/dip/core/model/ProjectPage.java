@@ -185,7 +185,7 @@ public class ProjectPage implements Modifiable, Localizable {
 	 *
 	 * @return a new/fresh pipeline.
 	 */
-	public Pipeline<PrototypeProcessor> getPipelinePrototype() {
+	public PrototypePipeline getPipelinePrototype() {
 		return getPipelinePrototype(getPipelineId());
 	}
 
@@ -196,7 +196,7 @@ public class ProjectPage implements Modifiable, Localizable {
 	 * @param pipelineId pipeline id.
 	 * @return a new/fresh pipeline.
 	 */
-	private Pipeline<PrototypeProcessor> getPipelinePrototype(int pipelineId) {
+	private PrototypePipeline getPipelinePrototype(int pipelineId) {
 		return project.pipelineManager().getPipeline(pipelineId);
 	}
 
@@ -304,7 +304,7 @@ public class ProjectPage implements Modifiable, Localizable {
 	}
 
 	private String getPipelineNameFromPrototype() {
-		final Pipeline<PrototypeProcessor> pl = getPipelinePrototype(); // no need to have this page opened yet
+		final PrototypePipeline pl = getPipelinePrototype(); // no need to have this page opened yet
 		if (pl == null) {
 			return localize("none").toLowerCase();
 		}
@@ -471,7 +471,7 @@ public class ProjectPage implements Modifiable, Localizable {
 			return null;
 		}
 
-		final Pipeline<PrototypeProcessor> prototype = this.project().pipelineManager().getPipeline(pipelineId);
+		final PrototypePipeline prototype = this.project().pipelineManager().getPipeline(pipelineId);
 		if (prototype == null) {
 			return null;
 		}

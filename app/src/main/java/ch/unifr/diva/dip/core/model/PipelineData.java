@@ -49,19 +49,19 @@ public class PipelineData {
 	public List<Pipeline> list = new ArrayList<>();
 
 	/**
-	 * Empty constructor (needed for JAXB).
+	 * Creates an empty pipeline data instance.
 	 */
 	public PipelineData() {
 
 	}
 
 	/**
-	 * Creates a PipelineData instance from a list of Pipelines.
+	 * Creates a pipeline data instance from a list of Pipelines.
 	 *
 	 * @param pipelines a list of pipelines.
 	 */
-	public PipelineData(List<ch.unifr.diva.dip.core.model.Pipeline<PrototypeProcessor>> pipelines) {
-		for (ch.unifr.diva.dip.core.model.Pipeline<PrototypeProcessor> pipeline : pipelines) {
+	public PipelineData(List<PrototypePipeline> pipelines) {
+		for (PrototypePipeline pipeline : pipelines) {
 			this.list.add(new Pipeline(pipeline));
 		}
 	}
@@ -79,6 +79,16 @@ public class PipelineData {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Adds a prototype or runnable pipeline to the pipeline data.
+	 *
+	 * @param <T> type of the pipeline.
+	 * @param pipeline the pipeline.
+	 */
+	public <T extends PrototypeProcessor> void addPipeline(ch.unifr.diva.dip.core.model.Pipeline<T> pipeline) {
+		addPipeline(new Pipeline(pipeline));
 	}
 
 	/**
@@ -709,7 +719,7 @@ public class PipelineData {
 	 */
 	public static class PipelineItem implements Localizable, DataItemListView.DataItem {
 
-		final private ch.unifr.diva.dip.core.model.Pipeline<PrototypeProcessor> pipeline;
+		final private PrototypePipeline pipeline;
 		final private PipelineData.Pipeline data;
 		final private StringProperty nameProperty;
 		final private ObjectProperty<NamedGlyph> glyphProperty;
@@ -719,7 +729,7 @@ public class PipelineData {
 		 *
 		 * @param pipeline the pipeline.
 		 */
-		public PipelineItem(ch.unifr.diva.dip.core.model.Pipeline<PrototypeProcessor> pipeline) {
+		public PipelineItem(PrototypePipeline pipeline) {
 			this(pipeline, null);
 		}
 
@@ -738,7 +748,7 @@ public class PipelineData {
 		 * @param pipeline the pipeline, or null.
 		 * @param data the pipeline data, or null.
 		 */
-		private PipelineItem(ch.unifr.diva.dip.core.model.Pipeline<PrototypeProcessor> pipeline, PipelineData.Pipeline data) {
+		private PipelineItem(PrototypePipeline pipeline, PipelineData.Pipeline data) {
 			this.pipeline = pipeline;
 			this.data = data;
 			this.nameProperty = new SimpleStringProperty();

@@ -5,9 +5,9 @@ import ch.unifr.diva.dip.api.datatypes.DataType;
 import ch.unifr.diva.dip.api.utils.ArrayUtils;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.UserSettings;
-import ch.unifr.diva.dip.core.model.Pipeline;
 import ch.unifr.diva.dip.core.model.PipelineData;
 import ch.unifr.diva.dip.core.model.PipelineManager;
+import ch.unifr.diva.dip.core.model.PrototypePipeline;
 import ch.unifr.diva.dip.core.model.PrototypeProcessor;
 import ch.unifr.diva.dip.gui.Presenter;
 import ch.unifr.diva.dip.gui.editor.NavigatorWidget;
@@ -64,7 +64,7 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 	private final SideBarPresenter sideBar;
 	private final PipelineManager manager;
 	private final Map<Integer, PipelineData.Pipeline> backupData;
-	private final ObjectProperty<Pipeline<PrototypeProcessor>> selectedPipelineProperty = new SimpleObjectProperty<>();
+	private final ObjectProperty<PrototypePipeline> selectedPipelineProperty = new SimpleObjectProperty<>();
 	private final List<ProcessorsWidget> processorWidgets = new ArrayList<>();
 	private final ListChangeListener<PrototypeProcessor> processorListener;
 	private final RubberBandSelector<ProcessorView> rubberBandSelector;
@@ -157,7 +157,7 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 		processorWidgets.add(processorsWidget);
 		sideBar.addMainWidget(processorsWidget);
 
-		final Pipeline<PrototypeProcessor> firstPipeline = manager.pipelines().isEmpty()
+		final PrototypePipeline firstPipeline = manager.pipelines().isEmpty()
 				? null
 				: manager.pipelines().get(0);
 		selectPipeline(firstPipeline);
@@ -265,7 +265,7 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 	 *
 	 * @return the selected pipeline property.
 	 */
-	public ObjectProperty<Pipeline<PrototypeProcessor>> selectedPipelineProperty() {
+	public ObjectProperty<PrototypePipeline> selectedPipelineProperty() {
 		return selectedPipelineProperty;
 	}
 
@@ -274,7 +274,7 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 	 *
 	 * @return the selected pipeline.
 	 */
-	public final Pipeline<PrototypeProcessor> selectedPipeline() {
+	public final PrototypePipeline selectedPipeline() {
 		return selectedPipelineProperty.get();
 	}
 
@@ -292,7 +292,7 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 	 *
 	 * @param pipeline the pipeline to be selected.
 	 */
-	public final void selectPipeline(Pipeline<PrototypeProcessor> pipeline) {
+	public final void selectPipeline(PrototypePipeline pipeline) {
 		if (selectedPipeline() != null && selectedPipeline().equals(pipeline)) {
 			return;
 		}
@@ -340,7 +340,7 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 	 * @param name name of the new pipeline.
 	 */
 	public void createPipeline(String name) {
-		final Pipeline<PrototypeProcessor> pipeline = manager.createPipeline(name);
+		final PrototypePipeline pipeline = manager.createPipeline(name);
 		selectPipeline(pipeline);
 	}
 
@@ -349,8 +349,8 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 	 *
 	 * @param pipeline the pipeline to be cloned.
 	 */
-	public void clonePipeline(Pipeline<PrototypeProcessor> pipeline) {
-		final Pipeline<PrototypeProcessor> clone = manager.clonePipeline(pipeline);
+	public void clonePipeline(PrototypePipeline pipeline) {
+		final PrototypePipeline clone = manager.clonePipeline(pipeline);
 		selectPipeline(clone);
 	}
 

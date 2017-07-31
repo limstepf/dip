@@ -36,17 +36,17 @@ public class PipelineIT {
 				new EventBusGuava()
 		);
 
-		final Pipeline<PrototypeProcessor> theEmptyPipeline = PipelineManager.emptyPipeline(handler);
-		final List<Pipeline<PrototypeProcessor>> pipelines = new ArrayList<>();
+		final PrototypePipeline theEmptyPipeline = PipelineManager.emptyPipeline(handler);
+		final List<PrototypePipeline> pipelines = new ArrayList<>();
 		pipelines.add(theEmptyPipeline);
 
 		PipelineManager.exportPipelines(pipelines, file);
 
-		final List<Pipeline<PrototypeProcessor>> theSamePipelines = PipelineManager.importPipelines(handler, file, -1);
+		final List<PrototypePipeline> theSamePipelines = PipelineManager.importPipelines(handler, file, -1);
 		assertTrue("unserialized, previously serialized pipelines", theSamePipelines != null);
 		assertTrue("exactly one pipeline again", theSamePipelines.size() == 1);
 
-		final Pipeline<PrototypeProcessor> sameEmptyPipeline = theSamePipelines.get(0);
+		final PrototypePipeline sameEmptyPipeline = theSamePipelines.get(0);
 		assertEquals("equal id", theEmptyPipeline.id, sameEmptyPipeline.id);
 		assertEquals(
 				"equal name",

@@ -2,9 +2,8 @@ package ch.unifr.diva.dip.gui.main;
 
 import ch.unifr.diva.dip.api.utils.L10n;
 import ch.unifr.diva.dip.core.ApplicationHandler;
-import ch.unifr.diva.dip.core.model.Pipeline;
-import ch.unifr.diva.dip.core.model.PrototypeProcessor;
 import ch.unifr.diva.dip.core.model.ProjectPage;
+import ch.unifr.diva.dip.core.model.PrototypePipeline;
 import ch.unifr.diva.dip.gui.dialogs.AbstractDialog;
 import ch.unifr.diva.dip.gui.layout.VerticalSplitPane;
 import ch.unifr.diva.dip.gui.pe.DataItemListView;
@@ -72,7 +71,7 @@ public class ChangePipelineDialog extends AbstractDialog {
 		pipelineView.setSelectionMode(SelectionMode.SINGLE);
 		pipelineView.hasOneSelectedProperty().addListener((c) -> updateState());
 		pipelineView.getItems().add(new PipelineItem());
-		for (Pipeline<PrototypeProcessor> pipeline : handler.getProject().pipelineManager().pipelines()) {
+		for (PrototypePipeline pipeline : handler.getProject().pipelineManager().pipelines()) {
 			pipelineView.getItems().add(new PipelineItem(pipeline));
 		}
 
@@ -162,7 +161,7 @@ public class ChangePipelineDialog extends AbstractDialog {
 	private static class PipelineItem implements DataItemListView.DataItem {
 
 		final private StringProperty nameProperty;
-		final private Pipeline<PrototypeProcessor> pipeline;
+		final private PrototypePipeline pipeline;
 
 		/**
 		 * Creates a pipeline item for no (or the empty) pipeline.
@@ -179,7 +178,7 @@ public class ChangePipelineDialog extends AbstractDialog {
 		 *
 		 * @param pipeline the pipeline.
 		 */
-		public PipelineItem(Pipeline<PrototypeProcessor> pipeline) {
+		public PipelineItem(PrototypePipeline pipeline) {
 			this.pipeline = pipeline;
 			this.nameProperty = new SimpleStringProperty(pipeline.getName());
 		}
@@ -194,7 +193,7 @@ public class ChangePipelineDialog extends AbstractDialog {
 		 *
 		 * @return the pipeline, or {@code null} in case of the empty pipeline.
 		 */
-		public Pipeline<PrototypeProcessor> getPipeline() {
+		public PrototypePipeline getPipeline() {
 			return this.pipeline;
 		}
 

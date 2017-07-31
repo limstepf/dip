@@ -252,7 +252,7 @@ public class PipelinePatch {
 	 * @return a pipeline delta patch with including the difference between base
 	 * and revision.
 	 */
-	public static PipelinePatch createPatch(Pipeline<PrototypeProcessor> base, RunnablePipeline revision) {
+	public static PipelinePatch createPatch(PrototypePipeline base, RunnablePipeline revision) {
 		final PipelinePatch patch = new PipelinePatch();
 
 		final int n = base.processors().size();
