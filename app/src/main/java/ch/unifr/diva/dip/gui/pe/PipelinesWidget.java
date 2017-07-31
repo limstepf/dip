@@ -8,7 +8,6 @@ import ch.unifr.diva.dip.api.ui.MouseEventHandler.ClickCount;
 import ch.unifr.diva.dip.api.utils.L10n;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.model.Pipeline;
-import ch.unifr.diva.dip.core.model.PipelineLayoutStrategy;
 import ch.unifr.diva.dip.core.model.PrototypeProcessor;
 import ch.unifr.diva.dip.core.model.ProjectPage;
 import ch.unifr.diva.dip.core.ui.Localizable;

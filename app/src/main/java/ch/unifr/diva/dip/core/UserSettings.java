@@ -5,7 +5,7 @@ import ch.unifr.diva.dip.api.utils.XmlUtils;
 import ch.unifr.diva.dip.api.utils.jaxb.BooleanPropertyAdapter;
 import ch.unifr.diva.dip.api.utils.jaxb.PathAdapter;
 import ch.unifr.diva.dip.api.utils.jaxb.StringPropertyAdapter;
-import ch.unifr.diva.dip.core.model.PipelineLayoutStrategy;
+import ch.unifr.diva.dip.gui.pe.PipelineLayoutStrategy;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import ch.unifr.diva.dip.gui.VisibilityMode;
 import ch.unifr.diva.dip.gui.layout.Zoomable;

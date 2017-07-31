@@ -7,7 +7,7 @@ import ch.unifr.diva.dip.api.parameters.LabelParameter;
 import ch.unifr.diva.dip.api.parameters.PersistentParameter;
 import ch.unifr.diva.dip.api.utils.L10n;
 import ch.unifr.diva.dip.core.ApplicationHandler;
-import ch.unifr.diva.dip.core.model.PipelineLayoutStrategy;
+import ch.unifr.diva.dip.gui.pe.PipelineLayoutStrategy;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import ch.unifr.diva.dip.eventbus.events.ApplicationRequest;
 import ch.unifr.diva.dip.gui.Presenter;

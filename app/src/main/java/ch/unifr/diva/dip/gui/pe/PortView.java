@@ -3,7 +3,6 @@ package ch.unifr.diva.dip.gui.pe;
 import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.components.Port;
-import ch.unifr.diva.dip.core.model.PipelineLayoutStrategy;
 import static ch.unifr.diva.dip.gui.pe.PipelineEditor.PORT_RATIO;
 import static ch.unifr.diva.dip.gui.pe.PipelineEditor.WIRE_RADIUS;
 import static ch.unifr.diva.dip.gui.pe.PipelineEditor.hashColor;

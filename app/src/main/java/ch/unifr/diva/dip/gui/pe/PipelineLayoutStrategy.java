@@ -1,6 +1,8 @@
-package ch.unifr.diva.dip.core.model;
+package ch.unifr.diva.dip.gui.pe;
 
 import ch.unifr.diva.dip.api.components.Port;
+import ch.unifr.diva.dip.core.model.Pipeline;
+import ch.unifr.diva.dip.core.model.PrototypeProcessor;
 import ch.unifr.diva.dip.gui.pe.PipelineEditor;
 import ch.unifr.diva.dip.gui.pe.PortView;
 import ch.unifr.diva.dip.gui.pe.ProcessorView;

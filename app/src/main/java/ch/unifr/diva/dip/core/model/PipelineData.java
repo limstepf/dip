@@ -1,5 +1,6 @@
 package ch.unifr.diva.dip.core.model;
 
+import ch.unifr.diva.dip.gui.pe.PipelineLayoutStrategy;
 import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.datatypes.DataType;
