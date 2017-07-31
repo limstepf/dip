@@ -177,7 +177,11 @@ public class BufferedImageExporter extends ProcessableBase {
 		final ImageFormat format = getFormat();
 		final Path out = getExportFile(context, format);
 		if (out != null) {
-			ProcessorBase.deleteFile(out);
+			try {
+				deleteFile(out);
+			} catch (IOException ex) {
+				log.error("failed to remvoe file: {}", out, ex);
+			}
 			try (OutputStream os = Files.newOutputStream(out)) {
 				ImageIO.write(image, format.name(), os);
 			} catch (IOException ex) {

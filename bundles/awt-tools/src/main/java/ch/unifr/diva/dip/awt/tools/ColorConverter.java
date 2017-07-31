@@ -286,9 +286,9 @@ public class ColorConverter extends ProcessableBase {
 			final BufferedImage image = Filter.filter(context, op, src, op.createCompatibleDestImage(src, out.cm));
 
 			if (out.cm.requiresBufferedMatrix()) {
-				writeBufferedMatrix(context, out.STORAGE_FILE, (BufferedMatrix) image);
+				writeBufferedMatrix(context, (BufferedMatrix) image, out.STORAGE_FILE);
 			} else {
-				writeBufferedImage(context, out.STORAGE_FILE, out.STORAGE_FORMAT, image);
+				writeBufferedImage(context, image, out.STORAGE_FILE, out.STORAGE_FORMAT);
 			}
 
 			restoreOutputs(context, image);

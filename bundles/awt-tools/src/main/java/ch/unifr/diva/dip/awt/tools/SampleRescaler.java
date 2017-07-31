@@ -185,9 +185,9 @@ public class SampleRescaler extends ProcessableBase implements Previewable {
 			final BufferedImage rescaledImage = doProcess(context, src);
 
 			if (this.rescaleUnit.isBufferedMatrix()) {
-				writeBufferedMatrix(context, STORAGE_MAT, (BufferedMatrix) rescaledImage);
+				writeBufferedMatrix(context, (BufferedMatrix) rescaledImage, STORAGE_MAT);
 			} else {
-				writeBufferedImage(context, STORAGE_IMAGE, STORAGE_IMAGE_FORMAT, rescaledImage);
+				writeBufferedImage(context, rescaledImage, STORAGE_IMAGE, STORAGE_IMAGE_FORMAT);
 			}
 			restoreOutputs(context, rescaledImage);
 		}

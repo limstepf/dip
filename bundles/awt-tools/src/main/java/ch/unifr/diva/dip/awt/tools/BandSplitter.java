@@ -468,17 +468,17 @@ public class BandSplitter extends ProcessableBase {
 
 				if (source.cm == null) {
 					if (isBufferedMatrix) {
-						writeBufferedMatrix(context, band.FLOAT_FILE, (BufferedMatrix) images[i]);
+						writeBufferedMatrix(context, (BufferedMatrix) images[i], band.FLOAT_FILE);
 					} else {
-						writeBufferedImage(context, band.GRAY_FILE, STORAGE_FORMAT, images[i]);
+						writeBufferedImage(context, images[i], band.GRAY_FILE, STORAGE_FORMAT);
 					}
 					band.output_bi.setOutput(images[i]);
 				} else if (!source.cm.requiresBufferedMatrix()) {
-					writeBufferedImage(context, band.GRAY_FILE, STORAGE_FORMAT, images[i]);
+					writeBufferedImage(context, images[i], band.GRAY_FILE, STORAGE_FORMAT);
 					band.output_bi.setOutput(images[i]);
 					band.output_gray.setOutput(images[i]);
 				} else {
-					writeBufferedMatrix(context, band.FLOAT_FILE, (BufferedMatrix) images[i]);
+					writeBufferedMatrix(context, (BufferedMatrix) images[i], band.FLOAT_FILE);
 					band.output_bi.setOutput(images[i]);
 					band.output_float.setOutput((BufferedMatrix) images[i]);
 				}
@@ -510,7 +510,7 @@ public class BandSplitter extends ProcessableBase {
 						);
 
 						final OutputBand band = this.outputBands.get(i);
-						writeBufferedImage(context, band.VIS_FILE, STORAGE_FORMAT, layerImages[i]);
+						writeBufferedImage(context, layerImages[i], band.VIS_FILE, STORAGE_FORMAT);
 					}
 				}
 				break;

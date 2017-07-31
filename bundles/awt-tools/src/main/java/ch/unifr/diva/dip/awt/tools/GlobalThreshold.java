@@ -191,7 +191,7 @@ public class GlobalThreshold extends ProcessableBase implements Previewable {
 			final int band = this.bandParameter.get() - 1; // to index
 			final int threshold = computeThreshold(src, band);
 			binaryImage = doProcess(context, src, band, threshold);
-			writeBufferedImage(context, STORAGE_FILE, STORAGE_FORMAT, binaryImage);
+			writeBufferedImage(context, binaryImage, STORAGE_FILE, STORAGE_FORMAT);
 		}
 
 		setOutputs(context, binaryImage);

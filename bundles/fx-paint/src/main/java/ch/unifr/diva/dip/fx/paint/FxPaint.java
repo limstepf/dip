@@ -140,7 +140,7 @@ public class FxPaint extends HybridProcessorBase {
 		}
 
 		// try to restore modified image from disk
-		BufferedImage image = ProcessorBase.readBufferedImage(getContext(), STORAGE_IMAGE);
+		BufferedImage image = readBufferedImage(getContext(), STORAGE_IMAGE);
 		if (image == null) {
 			image = in;
 		}
@@ -174,7 +174,7 @@ public class FxPaint extends HybridProcessorBase {
 				return img;
 			});
 			final BufferedImage out = SwingFXUtils.fromFXImage(rendered, null);
-			ProcessorBase.writeBufferedImage(context, STORAGE_IMAGE, STORAGE_FORMAT, out);
+			writeBufferedImage(context, out, STORAGE_IMAGE, STORAGE_FORMAT);
 			isDirty = false;
 			return out;
 		} catch (Exception ex) {
@@ -212,7 +212,7 @@ public class FxPaint extends HybridProcessorBase {
 		if (isDirty) {
 			image = saveCanvas(context);
 		} else {
-			image = ProcessorBase.readBufferedImage(context, STORAGE_IMAGE);
+			image = readBufferedImage(context, STORAGE_IMAGE);
 			if (image == null) {
 				image = this.colorPortsUnit.getValue();
 			}

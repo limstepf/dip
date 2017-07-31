@@ -189,11 +189,11 @@ public class CannyEdgeDetector extends ProcessableBase implements Previewable {
 		}
 
 		final BufferedImage canny_image = OpenIMAJUtils.toBinaryBufferedImage(canny_out);
-		ProcessorBase.writeBufferedImage(context, STORAGE_IMAGE, STORAGE_IMAGE_FORMAT, canny_image);
+		writeBufferedImage(context, canny_image, STORAGE_IMAGE, STORAGE_IMAGE_FORMAT);
 		final BufferedMatrix canny_mat;
 		if (output_float.isConnected()) {
 			canny_mat = OpenIMAJUtils.toBufferedMatrix(canny_out);
-			ProcessorBase.writeBufferedMatrix(context, STORAGE_MAT, canny_mat);
+			writeBufferedMatrix(context, canny_mat, STORAGE_MAT);
 		} else {
 			canny_mat = null;
 		}

@@ -279,7 +279,7 @@ public class AdaptiveLocalThreshold extends ProcessableBase implements Previewab
 		m.process(this, fimage);
 
 		final BufferedImage image = OpenIMAJUtils.toBinaryBufferedImage(fimage);
-		ProcessorBase.writeBufferedImage(context, STORAGE_IMAGE, STORAGE_IMAGE_FORMAT, image);
+		writeBufferedImage(context, image, STORAGE_IMAGE, STORAGE_IMAGE_FORMAT);
 		setOutputs(context, image);
 	}
 

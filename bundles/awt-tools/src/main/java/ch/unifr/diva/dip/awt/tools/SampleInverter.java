@@ -435,9 +435,9 @@ public class SampleInverter extends ProcessableBase {
 
 			final BufferedImage invertedImage = Filter.filter(context, op, source);
 			if (this.config.isBufferedMatrix()) {
-				writeBufferedMatrix(context, STORAGE_MAT, (BufferedMatrix) invertedImage);
+				writeBufferedMatrix(context, (BufferedMatrix) invertedImage, STORAGE_MAT);
 			} else {
-				writeBufferedImage(context, STORAGE_IMAGE, STORAGE_IMAGE_FORMAT, invertedImage);
+				writeBufferedImage(context, invertedImage, STORAGE_IMAGE, STORAGE_IMAGE_FORMAT);
 			}
 
 			restoreOutputs(context, invertedImage);

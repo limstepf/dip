@@ -12,6 +12,7 @@ import ch.unifr.diva.dip.api.utils.XmlUtils;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -26,6 +27,7 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javax.imageio.ImageIO;
+import javax.xml.bind.JAXBException;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -183,16 +185,31 @@ public abstract class ProcessorBase implements Processor {
 	 *
 	 * @param <T> type of the object.
 	 * @param context the processor context.
-	 * @param filename the filename of the image.
 	 * @param obj the object. Must be marshallable with JAXB.
+	 * @param filename the filename of the image.
 	 */
-	public static <T> void writeObject(ProcessorContext context, String filename, T obj) {
+	public static <T> void writeObject(ProcessorContext context, T obj, String filename) {
 		final Path file = context.getDirectory().resolve(filename);
+		try {
+			writeObject(obj, file);
+		} catch (IOException | JAXBException ex) {
+			log.warn("failed to write {} to file: {}", obj, file, ex);
+		}
+	}
+
+	/**
+	 * Writes an object to a file.
+	 *
+	 * @param <T> type of the object.
+	 * @param obj the object. Must be marshallable with JAXB.
+	 * @param file the file to write to.
+	 * @throws IOException
+	 * @throws JAXBException
+	 */
+	public static <T> void writeObject(T obj, Path file) throws IOException, JAXBException {
 		deleteFile(file);
 		try (OutputStream stream = new BufferedOutputStream(Files.newOutputStream(file))) {
 			XmlUtils.marshal(obj, stream);
-		} catch (Exception ex) {
-			log.warn("failed to write {} to file: {}", obj, file, ex);
 		}
 	}
 
@@ -207,32 +224,64 @@ public abstract class ProcessorBase implements Processor {
 	 */
 	public static <T> T readObject(ProcessorContext context, String filename, Class<T> clazz) {
 		final Path file = context.getDirectory().resolve(filename);
+		try {
+			return readObject(file, clazz);
+		} catch (FileNotFoundException ex) {
+			return null;
+		} catch (IOException | JAXBException ex) {
+			log.warn("failed to read file: {}", file, ex);
+		}
+		return null;
+	}
+
+	/**
+	 * Reads an object from a file.
+	 *
+	 * @param <T> type of the object.
+	 * @param file the file to read from.
+	 * @param clazz class of the object.
+	 * @return the object.
+	 * @throws IOException
+	 * @throws JAXBException
+	 */
+	public static <T> T readObject(Path file, Class<T> clazz) throws IOException, JAXBException {
 		if (Files.exists(file)) {
 			try (InputStream stream = new BufferedInputStream(Files.newInputStream(file))) {
 				return XmlUtils.unmarshal(clazz, stream);
-			} catch (Exception ex) {
-				log.warn("failed to read file: {}", file, ex);
 			}
 		}
-		return null;
+		throw new FileNotFoundException();
 	}
 
 	/**
 	 * Writes a {@code BufferedImage} to the savefile.
 	 *
 	 * @param context the processor context.
+	 * @param image the image.
 	 * @param filename the filename of the image.
 	 * @param format the format (or extension) of the image (e.g. "PNG").
-	 * @param image the image.
 	 */
-	public static void writeBufferedImage(ProcessorContext context, String filename, String format, BufferedImage image) {
+	public static void writeBufferedImage(ProcessorContext context, BufferedImage image, String filename, String format) {
 		final Path file = context.getDirectory().resolve(filename);
-		deleteFile(file);
-
-		try (OutputStream os = Files.newOutputStream(file)) {
-			ImageIO.write(image, format, os);
+		try {
+			writeBufferedImage(image, format, file);
 		} catch (IOException ex) {
 			log.warn("failed to write file: {}", file, ex);
+		}
+	}
+
+	/**
+	 * Writes a {@code BufferedImage} to a file.
+	 *
+	 * @param image the image.
+	 * @param format the format (or extension) of the image (e.g. "PNG").
+	 * @param file the file to write to.
+	 * @throws IOException
+	 */
+	public static void writeBufferedImage(BufferedImage image, String format, Path file) throws IOException {
+		deleteFile(file);
+		try (OutputStream os = Files.newOutputStream(file)) {
+			ImageIO.write(image, format, os);
 		}
 	}
 
@@ -245,29 +294,57 @@ public abstract class ProcessorBase implements Processor {
 	 */
 	public static BufferedImage readBufferedImage(ProcessorContext context, String filename) {
 		final Path file = context.getDirectory().resolve(filename);
+		try {
+			return readBufferedImage(file);
+		} catch (FileNotFoundException ex) {
+			return null;
+		} catch (IOException ex) {
+			log.warn("failed to read file: {}", file, ex);
+		}
+		return null;
+	}
 
+	/**
+	 * Reads a {@code BufferedImage} from a file.
+	 *
+	 * @param file the file to read from.
+	 * @return the image.
+	 * @throws IOException
+	 */
+	public static BufferedImage readBufferedImage(Path file) throws IOException {
 		if (Files.exists(file)) {
 			try (InputStream is = Files.newInputStream(file)) {
 				return ImageIO.read(is);
-			} catch (IOException ex) {
-				log.warn("failed to read file: {}", file, ex);
 			}
 		}
-
-		return null;
+		throw new FileNotFoundException();
 	}
 
 	/**
 	 * Writes a {@code BufferedMatrix} to the savefile.
 	 *
 	 * @param context the processor context.
-	 * @param filename the filename of the image/matrix.
 	 * @param mat the image/matrix.
+	 * @param filename the filename of the image/matrix.
 	 */
-	public static void writeBufferedMatrix(ProcessorContext context, String filename, BufferedMatrix mat) {
+	public static void writeBufferedMatrix(ProcessorContext context, BufferedMatrix mat, String filename) {
 		final Path file = context.getDirectory().resolve(filename);
-		deleteFile(file);
+		try {
+			writeBufferedMatrix(mat, file);
+		} catch (IOException ex) {
+			log.warn("failed to write file: {}", file, ex);
+		}
+	}
 
+	/**
+	 * Writes a {@code BufferedMatrix} to a file.
+	 *
+	 * @param mat the image/matrix.
+	 * @param file the file to write to.
+	 * @throws IOException
+	 */
+	public static void writeBufferedMatrix(BufferedMatrix mat, Path file) throws IOException {
+		deleteFile(file);
 		/*
 		 We can't close the output stream here! Neither explicitly, nor by means
 		 of autoclosable/try-with-resource. Otherwise we end up with a bmat-file
@@ -293,13 +370,8 @@ public abstract class ProcessorBase implements Processor {
 
 		 ...meaning this should be fixed with the next major release (Java9).
 		 */
-		try {
-			OutputStream os = Files.newOutputStream(file);
-			BufferedIO.writeMat(mat, os);
-			// os.close(); // DON'T! (also no autoclose/try-with-resource)
-		} catch (IOException ex) {
-			log.warn("failed to write file: {}", file, ex);
-		}
+		OutputStream os = Files.newOutputStream(file); // DON'T os.close(); (also no autoclose/try-with-resource)
+		BufferedIO.writeMat(mat, os);
 	}
 
 	/**
@@ -311,34 +383,61 @@ public abstract class ProcessorBase implements Processor {
 	 */
 	public static BufferedMatrix readBufferedMatrix(ProcessorContext context, String filename) {
 		final Path file = context.getDirectory().resolve(filename);
+		try {
+			return readBufferedMatrix(file);
+		} catch (FileNotFoundException ex) {
+			return null;
+		} catch (IOException ex) {
+			log.warn("failed to read file: {}", file, ex);
+		}
+		return null;
+	}
 
+	/**
+	 * Reads a {@code BufferedMatrix} from a file.
+	 *
+	 * @param file the file to read.
+	 * @return the image/matrix.
+	 * @throws IOException
+	 */
+	public static BufferedMatrix readBufferedMatrix(Path file) throws IOException {
 		if (Files.exists(file)) {
 			try (InputStream is = Files.newInputStream(file)) {
 				return BufferedIO.readMat(is);
-			} catch (IOException ex) {
-				log.warn("failed to read file: {}", file, ex);
 			}
 		}
-
-		return null;
+		throw new FileNotFoundException();
 	}
 
 	/**
 	 * Writes an {@code Image} to the savefile.
 	 *
 	 * @param context the processor context.
+	 * @param image the image.
 	 * @param filename the filename of the image.
 	 * @param format the format (or extension) of the image (e.g. "PNG").
-	 * @param image the image.
 	 */
-	public static void writeImage(ProcessorContext context, String filename, String format, Image image) {
+	public static void writeImage(ProcessorContext context, Image image, String filename, String format) {
 		final Path file = context.getDirectory().resolve(filename);
-		deleteFile(file);
-
-		try (OutputStream os = Files.newOutputStream(file)) {
-			ImageIO.write(SwingFXUtils.fromFXImage(image, null), format, os);
+		try {
+			writeImage(image, format, file);
 		} catch (IOException ex) {
 			log.warn("failed to write file: {}", file, ex);
+		}
+	}
+
+	/**
+	 * Writes an {@code Image} to a file.
+	 *
+	 * @param image the image.
+	 * @param format the format (or extension) of the image (e.g. "PNG").
+	 * @param file the file to write to.
+	 * @throws IOException
+	 */
+	public static void writeImage(Image image, String format, Path file) throws IOException {
+		deleteFile(file);
+		try (OutputStream os = Files.newOutputStream(file)) {
+			ImageIO.write(SwingFXUtils.fromFXImage(image, null), format, os);
 		}
 	}
 
@@ -351,16 +450,30 @@ public abstract class ProcessorBase implements Processor {
 	 */
 	public static Image readImage(ProcessorContext context, String filename) {
 		final Path file = context.getDirectory().resolve(filename);
+		try {
+			return readImage(file);
+		} catch (FileNotFoundException ex) {
+			return null;
+		} catch (IOException ex) {
+			log.warn("failed to read file: {}", file, ex);
+		}
+		return null;
+	}
 
+	/**
+	 * Reads an {@code Image} from a file.
+	 *
+	 * @param file the file to read from.
+	 * @return the image.
+	 * @throws IOException
+	 */
+	public static Image readImage(Path file) throws IOException {
 		if (Files.exists(file)) {
 			try (InputStream is = Files.newInputStream(file)) {
 				return new Image(is);
-			} catch (IOException ex) {
-				log.warn("failed to read file: {}", file, ex);
 			}
 		}
-
-		return null;
+		throw new FileNotFoundException();
 	}
 
 	/**
@@ -373,7 +486,12 @@ public abstract class ProcessorBase implements Processor {
 	 */
 	public static boolean deleteFile(ProcessorContext context, String filename) {
 		final Path file = context.getDirectory().resolve(filename);
-		return deleteFile(file);
+		try {
+			return deleteFile(file);
+		} catch (IOException ex) {
+			log.warn("failed to remove processor file: {}", file, ex);
+		}
+		return false;
 	}
 
 	/**
@@ -382,14 +500,10 @@ public abstract class ProcessorBase implements Processor {
 	 * @param file the file.
 	 * @return {@code true} if the file was deleted by this method,
 	 * {@code false} otherwise.
+	 * @throws java.io.IOException
 	 */
-	public static boolean deleteFile(Path file) {
-		try {
-			return Files.deleteIfExists(file);
-		} catch (IOException ex) {
-			log.error("failed to remove processor file: {}", file, ex);
-			return false;
-		}
+	public static boolean deleteFile(Path file) throws IOException {
+		return Files.deleteIfExists(file);
 	}
 
 	/**

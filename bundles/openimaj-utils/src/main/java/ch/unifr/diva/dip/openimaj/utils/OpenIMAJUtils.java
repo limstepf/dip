@@ -377,11 +377,11 @@ public class OpenIMAJUtils {
 	 * Writes an {@code FImage} to the savefile. The file is written as
 	 * {@code BufferedMatrix}.
 	 *
-	 * @param fimage the image.
 	 * @param context the processor context.
+	 * @param fimage the image.
 	 * @param filename the filename of the image.
 	 */
-	public static void writeFImage(FImage fimage, ProcessorContext context, String filename) {
+	public static void writeFImage(ProcessorContext context, FImage fimage, String filename) {
 		final Path file = context.getDirectory().resolve(filename);
 		try {
 			writeFImage(fimage, file);
@@ -438,11 +438,11 @@ public class OpenIMAJUtils {
 	 * Writes an {@code MBFImage} to the savefile. The file is written as
 	 * {@code BufferedMatrix}.
 	 *
-	 * @param mbfimage the image.
 	 * @param context the processor context.
+	 * @param mbfimage the image.
 	 * @param filename the filename of the image.
 	 */
-	public static void writeMBFImage(MBFImage mbfimage, ProcessorContext context, String filename) {
+	public static void writeMBFImage(ProcessorContext context, MBFImage mbfimage, String filename) {
 		final Path file = context.getDirectory().resolve(filename);
 		try {
 			writeMBFImage(mbfimage, file);

@@ -437,9 +437,9 @@ public class ConvolutionFilter extends ProcessableBase implements Previewable {
 			final BufferedImage image = doProcess(context, src, cfg);
 
 			if (this.rescaleUnit.isBufferedMatrix()) {
-				writeBufferedMatrix(context, MATRIX_FILE, (BufferedMatrix) image);
+				writeBufferedMatrix(context, (BufferedMatrix) image, MATRIX_FILE);
 			} else {
-				writeBufferedImage(context, IMAGE_FILE, IMAGE_FORMAT, image);
+				writeBufferedImage(context, image, IMAGE_FILE, IMAGE_FORMAT);
 			}
 
 			restoreOutputs(context, image);

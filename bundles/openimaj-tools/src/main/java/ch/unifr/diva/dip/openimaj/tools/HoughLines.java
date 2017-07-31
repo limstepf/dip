@@ -193,7 +193,7 @@ public class HoughLines extends ProcessableBase {
 			));
 		}
 
-		ProcessorBase.writeObject(context, STORAGE_LINES_XML, lines);
+		writeObject(context, lines, STORAGE_LINES_XML);
 		context.getObjects().put("width", fimage.width);
 		context.getObjects().put("height", fimage.height);
 		setOutputs(context, lines);
@@ -225,7 +225,7 @@ public class HoughLines extends ProcessableBase {
 	}
 
 	protected void restoreOutputs(ProcessorContext context) {
-		final Lines2D lines = ProcessorBase.readObject(
+		final Lines2D lines = readObject(
 				context,
 				STORAGE_LINES_XML,
 				Lines2D.class

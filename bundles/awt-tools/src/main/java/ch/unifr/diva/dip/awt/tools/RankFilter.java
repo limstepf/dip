@@ -237,9 +237,9 @@ public class RankFilter extends ProcessableBase implements Previewable {
 			final BufferedImage image = doProcess(context, src, cfg);
 
 			if (isBufferedMatrix()) {
-				writeBufferedMatrix(context, MATRIX_FILE, (BufferedMatrix) image);
+				writeBufferedMatrix(context, (BufferedMatrix) image, MATRIX_FILE);
 			} else {
-				writeBufferedImage(context, IMAGE_FILE, IMAGE_FORMAT, image);
+				writeBufferedImage(context, image, IMAGE_FILE, IMAGE_FORMAT);
 			}
 
 			restoreOutputs(context, image);

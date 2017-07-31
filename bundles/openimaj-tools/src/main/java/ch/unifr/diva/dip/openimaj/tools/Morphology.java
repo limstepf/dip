@@ -246,7 +246,7 @@ public class Morphology extends ProcessableBase implements Previewable {
 		op.process(fimage, se.get(), repeat.get());
 
 		final BufferedImage image = OpenIMAJUtils.toBinaryBufferedImage(fimage);
-		ProcessorBase.writeBufferedImage(context, STORAGE_IMAGE, STORAGE_IMAGE_FORMAT, image);
+		writeBufferedImage(context, image, STORAGE_IMAGE, STORAGE_IMAGE_FORMAT);
 		setOutputs(context, image);
 	}
 

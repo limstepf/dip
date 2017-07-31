@@ -121,8 +121,8 @@ public class SobelFilter extends ProcessableBase {
 
 		final BufferedMatrix mat_dx = OpenIMAJUtils.toBufferedMatrix(fsobel.dx);
 		final BufferedMatrix mat_dy = OpenIMAJUtils.toBufferedMatrix(fsobel.dy);
-		ProcessorBase.writeBufferedMatrix(context, STORAGE_MAT_DX, mat_dx);
-		ProcessorBase.writeBufferedMatrix(context, STORAGE_MAT_DY, mat_dy);
+		writeBufferedMatrix(context, mat_dx, STORAGE_MAT_DX);
+		writeBufferedMatrix(context, mat_dy, STORAGE_MAT_DY);
 		setOutputs(context, mat_dx, mat_dy);
 	}
 

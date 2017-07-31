@@ -55,7 +55,7 @@ public class BufferedImageConverter extends ProcessableBase {
 			final BufferedImage source = input.getValue();
 			image = SwingFXUtils.toFXImage(source, null);
 
-			writeImage(context, STORAGE_FILE, STORAGE_FORMAT, image);
+			writeImage(context, image, STORAGE_FILE, STORAGE_FORMAT);
 		}
 
 		this.output.setOutput(image);
