@@ -26,7 +26,8 @@ public interface Previewable {
 	 * Returns the source image that is being modified by the processor.
 	 *
 	 * @param context the processor context.
-	 * @return the source image, or null if no source image can be displayed.
+	 * @return the source image, or {@code null} if no source image can be
+	 * displayed.
 	 */
 	public Image previewSource(ProcessorContext context);
 
@@ -42,8 +43,8 @@ public interface Previewable {
 	 *
 	 * @param context the processor context.
 	 * @param bounds the bounds (or region) to be previewed.
-	 * @return the processed preview image, or null if no preview image can be
-	 * displayed.
+	 * @return the processed preview image, or {@code null} if no preview image
+	 * can be displayed.
 	 */
 	public Image preview(ProcessorContext context, Rectangle bounds);
 

@@ -46,7 +46,7 @@ public interface UIStrategy {
 	/**
 	 * Returns the stage.
 	 *
-	 * @return the stage, or null.
+	 * @return the stage, or {@code null}.
 	 */
 	default Stage getStage() {
 		return null;

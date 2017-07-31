@@ -15,7 +15,7 @@ public class ErrorDialog extends AbstractAlert {
 	/**
 	 * ErrorDialog constructor.
 	 *
-	 * @param throwable An exception, an error or null.
+	 * @param throwable An exception, an error or {@code null}.
 	 */
 	public ErrorDialog(Throwable throwable) {
 		this(null, throwable);
@@ -24,8 +24,8 @@ public class ErrorDialog extends AbstractAlert {
 	/**
 	 * ErrorDialog constructor.
 	 *
-	 * @param error Custom error message or null.
-	 * @param throwable An exception, an error or null.
+	 * @param error Custom error message or {@code null}.
+	 * @param throwable An exception, an error or {@code null}.
 	 */
 	public ErrorDialog(String error, Throwable throwable) {
 		super(new Alert(AlertType.ERROR));

@@ -67,11 +67,11 @@ public class ConvolutionOp<T extends Matrix<T>> extends NullOp implements Padded
 	 *
 	 * @param rowVector the kernel (single-pass convolution), or the row vector
 	 * for double-pass convolution with a separable kernel.
-	 * @param columnVector null (single-pass convolution), or the column vector
-	 * for double-pass convolution with a separable kernel.
+	 * @param columnVector {@code null} (single-pass convolution), or the column
+	 * vector for double-pass convolution with a separable kernel.
 	 * @param padder an image padder for edge handling.
 	 * @param abs take the absolute value of the sample first (per band). Can be
-	 * null.
+	 * {@code null}.
 	 * @param gain gain per band.
 	 * @param bias bias per band.
 	 * @param min minimum value per band used for clamping.

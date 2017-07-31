@@ -162,7 +162,7 @@ public class ApplicationHandler implements Localizable {
 	 * Returns the most recently accessed DIP data file. A DIP data file holds
 	 * presets and/or pipelines.
 	 *
-	 * @return the most recently accessed DIP data file, or null.
+	 * @return the most recently accessed DIP data file, or {@code null}.
 	 */
 	public Path getRecentDataFile() {
 		return getRecentDataFile(null);
@@ -172,8 +172,8 @@ public class ApplicationHandler implements Localizable {
 	 * Returns the most recently accessed DIP data file. A DIP data file holds
 	 * presets and/or pipelines.
 	 *
-	 * @param fallback a fallback file (or null) to be returned in case there is
-	 * no recently accessed DIP data file.
+	 * @param fallback a fallback file (or {@code null}) to be returned in case
+	 * there is no recently accessed DIP data file.
 	 * @return the most recently accessed DIP data file, or the given fallback
 	 * file.
 	 */
@@ -189,10 +189,10 @@ public class ApplicationHandler implements Localizable {
 	 *
 	 * @param name the name of the new project.
 	 * @param saveFile path to the savefile of the new project.
-	 * @param imageSet the initial set of images/pages, or null.
-	 * @param pipelines the initial set of pipelines, or null.
+	 * @param imageSet the initial set of images/pages, or {@code null}.
+	 * @param pipelines the initial set of pipelines, or {@code null}.
 	 * @param defaultPipeline the default pipeline (an object included in the
-	 * initial set of pipelines!), or null.
+	 * initial set of pipelines!), or {@code null}.
 	 * @return the thread doing the job.
 	 */
 	public Thread newProject(String name, Path saveFile, List<Path> imageSet, List<PipelineData.Pipeline> pipelines, PipelineData.Pipeline defaultPipeline) {
@@ -397,7 +397,8 @@ public class ApplicationHandler implements Localizable {
 	/**
 	 * Returns the temporary project data of a damaged or repaired project.
 	 *
-	 * @return temporary project data of a damaged or repaired project, or null.
+	 * @return temporary project data of a damaged or repaired project, or
+	 * {@code null}.
 	 */
 	public ProjectData getRepairData() {
 		return this.projectData;
@@ -408,7 +409,7 @@ public class ApplicationHandler implements Localizable {
 	 * a damaged or repaired project.
 	 *
 	 * @return the validation result associated to the temporary project data of
-	 * a damaged or repaired project, or null.
+	 * a damaged or repaired project, or {@code null}.
 	 */
 	public ProjectData.ValidationResult getRepairValidation() {
 		return this.projectValidation;
@@ -557,7 +558,7 @@ public class ApplicationHandler implements Localizable {
 	/**
 	 * Returns the current project.
 	 *
-	 * @return the current project, or null.
+	 * @return the current project, or {@code null}.
 	 */
 	public Project getProject() {
 		return project;

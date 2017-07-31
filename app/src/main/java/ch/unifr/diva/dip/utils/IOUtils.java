@@ -204,7 +204,7 @@ public class IOUtils {
 	 * Returns the root element of an XML document.
 	 *
 	 * @param file path to some file.
-	 * @return the root element of an XML document, or null.
+	 * @return the root element of an XML document, or {@code null}.
 	 */
 	public static Element getRootElement(Path file) {
 		if (Files.exists(file)) {
@@ -220,7 +220,7 @@ public class IOUtils {
 	 * Returns the root element of an XML document.
 	 *
 	 * @param is input stream of some file.
-	 * @return the root element of an XML document, or null.
+	 * @return the root element of an XML document, or {@code null}.
 	 */
 	public static Element getRootElement(InputStream is) {
 		try {

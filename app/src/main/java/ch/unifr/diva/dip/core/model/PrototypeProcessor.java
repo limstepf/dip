@@ -44,8 +44,8 @@ import org.slf4j.LoggerFactory;
  * <li>{@code RunnableProcessor}s.</li>
  * </ol>
  *
- * The firmer are used by {@code Pipeline}s in the pipeline editor. The latter
- * are a subclass of {@code PrototypeProcessor} and get instantiated by a
+ * The firmer are used by {@code PrototypePipeline}s in the pipeline editor. The
+ * latter are a subclass of {@code PrototypeProcessor} and get instantiated by a
  * {@code RunnablePipeline} assigned to some {@code ProjectPage}.
  *
  * <p>
@@ -60,9 +60,9 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 	protected final ApplicationHandler handler;
 
 	/**
-	 * Unique id of the PrototypeProcessor. This id is unique with respect to its
-	 * parent pipeline, that is among the set of all PrototypeProcessors in the
-	 * particular pipeline. Not to be confused with the pid of the wrapped
+	 * Unique id of the PrototypeProcessor. This id is unique with respect to
+	 * its parent pipeline, that is among the set of all PrototypeProcessors in
+	 * the particular pipeline. Not to be confused with the pid of the wrapped
 	 * processor (service).
 	 */
 	public final int id;
@@ -103,8 +103,8 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 	/**
 	 * Constructs a new instance.
 	 *
-	 * @param id new, unique id of the PrototypeProcessor, usually assigned by the
-	 * parent pipeline.
+	 * @param id new, unique id of the PrototypeProcessor, usually assigned by
+	 * the parent pipeline.
 	 * @param pid pid of the wrapped processor.
 	 * @param version version of the wrapped processor.
 	 * @param x x position of the processor view.
@@ -513,7 +513,7 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 	 * Returns a new instance of a host processor.
 	 *
 	 * @param clazz class of the host processor.
-	 * @return new instance of a host processor, or null.
+	 * @return new instance of a host processor, or {@code null}.
 	 */
 	private Processor newHostProcessor(Class<?> clazz) {
 		try {
@@ -537,7 +537,7 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 	 * Returns a new instance of a processor.
 	 *
 	 * @param pid pid of the processor.
-	 * @return new instance of a processor, or null.
+	 * @return new instance of a processor, or {@code null}.
 	 */
 	private Processor newProcessor(String pid, Version version) {
 		final OSGiService<Processor> service = handler.osgi.getProcessor(
@@ -597,7 +597,7 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 	 * not.
 	 *
 	 * @param pid the pid of the host processor.
-	 * @return the class of the host processor, or null if not found.
+	 * @return the class of the host processor, or {@code null} if not found.
 	 */
 	protected final Class<?> getHostProcessorClass(String pid) {
 		Class<?> clazz = ReflectionUtils.getClass(pid);
@@ -751,10 +751,11 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 	/**
 	 * Searches a list of processor wrappers by id.
 	 *
-	 * @param <T> type of the processor wrapper ({@code PrototypeProcessor} or {@code RunnableProcessor}).
+	 * @param <T> type of the processor wrapper ({@code PrototypeProcessor} or
+	 * {@code RunnableProcessor}).
 	 * @param id id of the processor wrapper.
 	 * @param wrappers a list of processor wrappers.
-	 * @return the processor wrapper with the given id, or null if not
+	 * @return the processor wrapper with the given id, or {@code null} if not
 	 * found.
 	 */
 	public static <T extends PrototypeProcessor> T getProcessorWrapper(int id, List<T> wrappers) {

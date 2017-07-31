@@ -20,9 +20,9 @@ import java.awt.image.BufferedImage;
  *
  * <p>
  * Implementing ops will have to check if the raster of the destination image
- * has a parent raster (if {@code dst.getRaster().getParent()} is not null),
- * meaning that the filter runs in parallel. In this case the tile offset can be
- * retrieved from the destination raster with calls to
+ * has a parent raster (if {@code dst.getRaster().getParent()} is not
+ * {@code null}), meaning that the filter runs in parallel. In this case the
+ * tile offset can be retrieved from the destination raster with calls to
  * {@code raster.getSampleModelTranslateX()} and
  * {@code raster.getSampleModelTranslateY()}. Those guys need to be
  * substracted(!) from the destination location before doing the mapping

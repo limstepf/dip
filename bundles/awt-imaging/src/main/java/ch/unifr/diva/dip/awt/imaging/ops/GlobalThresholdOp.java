@@ -93,7 +93,7 @@ public class GlobalThresholdOp extends NullOp implements SimpleTileParallelizabl
 					pt.col,
 					pt.row,
 					0,
-					(sample > this.threshold) ? 0 : 1
+					(sample > this.threshold) ? 1 : 0
 			);
 		}
 
@@ -106,7 +106,8 @@ public class GlobalThresholdOp extends NullOp implements SimpleTileParallelizabl
 	 * @param src the image.
 	 * @param band the band to compute the histogram from.
 	 * @param histogram the histogram of the image (if already computed), or
-	 * null (can be used if you need a pointer to the generated histogram).
+	 * {@code null} (can be used if you need a pointer to the generated
+	 * histogram).
 	 * @return an optimal threshold.
 	 */
 	public static int computeMean(BufferedImage src, int band, Histogram histogram) {
@@ -135,7 +136,8 @@ public class GlobalThresholdOp extends NullOp implements SimpleTileParallelizabl
 	 * @param src the image.
 	 * @param band the band to compute the histogram from.
 	 * @param histogram the histogram of the image (if already computed), or
-	 * null (can be used if you need a pointer to the generated histogram).
+	 * {@code null} (can be used if you need a pointer to the generated
+	 * histogram).
 	 * @return an optimal threshold.
 	 */
 	public static int computeMoments(BufferedImage src, int band, Histogram histogram) {
@@ -197,7 +199,8 @@ public class GlobalThresholdOp extends NullOp implements SimpleTileParallelizabl
 	 * @param src the image.
 	 * @param band the band to compute the histogram from.
 	 * @param histogram the histogram of the image (if already computed), or
-	 * null (can be used if you need a pointer to the generated histogram).
+	 * {@code null} (can be used if you need a pointer to the generated
+	 * histogram).
 	 * @return an optimal threshold.
 	 */
 	public static int computeOtsu(BufferedImage src, int band, Histogram histogram) {
@@ -235,7 +238,7 @@ public class GlobalThresholdOp extends NullOp implements SimpleTileParallelizabl
 
 			// class mean levels (of back- and foreground)
 			final double mB = sumB / (double) wB;
-			final double mF = (sum - sumB) / (double)  wF;
+			final double mF = (sum - sumB) / (double) wF;
 
 			// between-class variance
 			final double v = wB * wF * (mB - mF) * (mB - mF);

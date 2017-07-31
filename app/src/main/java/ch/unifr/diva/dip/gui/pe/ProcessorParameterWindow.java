@@ -224,8 +224,8 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 	/**
 	 * Preview context. A preview context is only valid if we manage to retireve
 	 * the source image (to be previewed). Even if a processor implements
-	 * previewable it is still free to return null here to abort the preview
-	 * (for whatever reason).
+	 * previewable it is still free to return {@code null} here to abort the
+	 * preview (for whatever reason).
 	 */
 	public static class PreviewContext {
 

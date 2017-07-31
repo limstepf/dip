@@ -220,7 +220,7 @@ public abstract class ProcessorBase implements Processor {
 	 * @param context the processor context.
 	 * @param filename the filename of the image.
 	 * @param clazz class of the object.
-	 * @return the object, or null.
+	 * @return the object, or {@code null}.
 	 */
 	public static <T> T readObject(ProcessorContext context, String filename, Class<T> clazz) {
 		final Path file = context.getDirectory().resolve(filename);
@@ -290,7 +290,7 @@ public abstract class ProcessorBase implements Processor {
 	 *
 	 * @param context the processor context.
 	 * @param filename the filename of the image.
-	 * @return the image, or null.
+	 * @return the image, or {@code null}.
 	 */
 	public static BufferedImage readBufferedImage(ProcessorContext context, String filename) {
 		final Path file = context.getDirectory().resolve(filename);
@@ -379,7 +379,7 @@ public abstract class ProcessorBase implements Processor {
 	 *
 	 * @param context the processor context.
 	 * @param filename the filename of the image/matrix.
-	 * @return the image/matrix, or null.
+	 * @return the image/matrix, or {@code null}.
 	 */
 	public static BufferedMatrix readBufferedMatrix(ProcessorContext context, String filename) {
 		final Path file = context.getDirectory().resolve(filename);
@@ -446,7 +446,7 @@ public abstract class ProcessorBase implements Processor {
 	 *
 	 * @param context the processor context.
 	 * @param filename the filename of the image.
-	 * @return the image, or null.
+	 * @return the image, or {@code null}.
 	 */
 	public static Image readImage(ProcessorContext context, String filename) {
 		final Path file = context.getDirectory().resolve(filename);

@@ -32,7 +32,7 @@ public class GlyphButton extends Button {
 	 * Creates a glyph button.
 	 *
 	 * @param glyph the glyph of the button.
-	 * @param label the label of the button, or null.
+	 * @param label the label of the button, or {@code null}.
 	 * @param contentDisplay the position to place the glyph within the button.
 	 */
 	public GlyphButton(Glyph glyph, String label, ContentDisplay contentDisplay) {

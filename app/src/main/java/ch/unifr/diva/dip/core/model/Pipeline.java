@@ -375,7 +375,7 @@ public abstract class Pipeline<T extends PrototypeProcessor> implements Modifiab
 	 * Returns a processor by id.
 	 *
 	 * @param id unique id of the processor.
-	 * @return the processor (if found), or null.
+	 * @return the processor (if found), or {@code null}.
 	 */
 	public T getProcessor(int id) {
 		for (T wrapper : processors()) {

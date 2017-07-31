@@ -5,7 +5,6 @@ import ch.unifr.diva.dip.api.utils.DipThreadPool;
 import ch.unifr.diva.dip.api.utils.MathUtils;
 import ch.unifr.diva.dip.awt.imaging.ops.ConcurrentTileOp;
 import ch.unifr.diva.dip.awt.imaging.ops.Parallelizable;
-import ch.unifr.diva.dip.awt.imaging.ops.TileParallelizable;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
@@ -53,13 +52,13 @@ public class Filter {
 	 * (overriding it is fine, since the method on the given image filter will
 	 * be called if wrapped by {@code ConcurrentOp}). So if the filter depends
 	 * on another method (with a different signature) to create a compatible
-	 * destination image, better don't pass null here.
+	 * destination image, better don't pass {@code null} here.
 	 *
 	 * @param context the processor context.
 	 * @param op the image filter (hopefully implementing the
 	 * {@code Parallelizable} interface).
 	 * @param src the source image.
-	 * @param dest the destination image, or null.
+	 * @param dest the destination image, or {@code null}.
 	 * @return the filtered image.
 	 */
 	public static BufferedImage filter(ProcessorContext context, BufferedImageOp op, BufferedImage src, BufferedImage dest) {
@@ -79,13 +78,13 @@ public class Filter {
 	 * (overriding it is fine, since the method on the given image filter will
 	 * be called if wrapped by {@code ConcurrentOp}). So if the filter depends
 	 * on another method (with a different signature) to create a compatible
-	 * destination image, better don't pass null here.
+	 * destination image, better don't pass {@code null} here.
 	 *
 	 * @param threadPool application wide thread pool/executor service
 	 * @param op the image filter (hopefully implementing the
 	 * {@code Parallelizable} interface).
 	 * @param src the source image.
-	 * @param dest the destination image, or null.
+	 * @param dest the destination image, or {@code null}.
 	 * @return the filtered image.
 	 */
 	@SuppressWarnings({"rawtypes", "unchecked"})
@@ -166,10 +165,10 @@ public class Filter {
 		 *
 		 * As a solution we'd like to fix the tile size to be a power of two if
 		 * we're dealing with a binary destination image. But since the destination
-		 * image at this point might still be null, we can't reliably know that.
-		 * Thanksfully the tile size doesn't matter much anyways, so we fix it in
-		 * any case, while also making sure to not produce smaller tiles at the
-		 * border, but larger ones an iteration earlier.
+		 * image at this point might still be {@code null}, we can't reliably know
+		 * that. Thanksfully the tile size doesn't matter much anyways, so we fix
+		 * it in any case, while also making sure to not produce smaller tiles at
+		 * the border, but larger ones an iteration earlier.
 		 */
 		// 1) a power of two
 		final int w = MathUtils.nextPowerOfTwo(src.getWidth() / (numThreads + 1));

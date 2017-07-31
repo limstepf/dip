@@ -22,9 +22,9 @@ public class ClickGesture extends GestureBase {
 	 * Creates a new click gesture with (mouse) movement event handlers.
 	 *
 	 * @param onClick the click handler.
-	 * @param onEntered the entered handler, or null.
-	 * @param onMoved the moved handler, or null.
-	 * @param onExited the exited handler, or null.
+	 * @param onEntered the entered handler, or {@code null}.
+	 * @param onMoved the moved handler, or {@code null}.
+	 * @param onExited the exited handler, or {@code null}.
 	 */
 	public ClickGesture(EventHandler<MouseEvent> onClick, EventHandler<MouseEvent> onEntered, EventHandler<MouseEvent> onMoved, EventHandler<MouseEvent> onExited) {
 		super();

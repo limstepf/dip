@@ -144,7 +144,7 @@ public class StatusBarPresenter implements Presenter {
 	 * transitions are stopped first.
 	 *
 	 * @param t already existing transition on the same node (optional, can be
-	 * null).
+	 * {@code null}).
 	 * @param node node to be faded out.
 	 * @return the new transition.
 	 */

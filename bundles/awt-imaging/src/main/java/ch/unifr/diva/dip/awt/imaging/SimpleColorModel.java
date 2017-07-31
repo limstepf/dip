@@ -935,7 +935,8 @@ public enum SimpleColorModel {
 	 * @param cm target/destination color model.
 	 * @param from source pixel data.
 	 * @param to pre-allocated destination array for the converted pixel data.
-	 * Can not be null, and needs to be of the size of {@code cm.numBands}.
+	 * Can not be {@code null}, and needs to be of the size of
+	 * {@code cm.numBands}.
 	 * @return the converted pixel data (the {@code to} array).
 	 */
 	public float[] convertTo(SimpleColorModel cm, float[] from, float[] to) {

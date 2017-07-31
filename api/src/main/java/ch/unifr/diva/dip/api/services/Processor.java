@@ -5,7 +5,6 @@ import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.components.Port;
 import ch.unifr.diva.dip.api.components.ProcessorContext;
 import ch.unifr.diva.dip.api.datatypes.DataType;
-import ch.unifr.diva.dip.api.parameters.CompositeGrid;
 import ch.unifr.diva.dip.api.parameters.Parameter;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.api.utils.L10n;
@@ -16,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
 
 /**
  * Processor interface. The processor interface is the core interface of a DIP
@@ -44,7 +42,7 @@ import javafx.beans.property.ReadOnlyObjectProperty;
  *
  * <li>Non-runnable (or passive/latent) instances (used in the pipeline editor)
  * are spawned with a call to {@code newInstance()}, and initialized
- * {@code init()} with no (or a null) processor context.</li>
+ * {@code init()} with no (or a {@code null}) processor context.</li>
  *
  * <li>Runnable processor instances are spawned with a call to
  * {@code newInstance()} and initialized {@code init()} with a valid processor
@@ -175,10 +173,10 @@ public interface Processor {
 	 * </ul>
 	 *
 	 * @param context the processor context used to save and restore the
-	 * internal processor state, or null. Note that the context is {@code null}
-	 * for processors used in the pipeline editor by a {@code Pipeline} (as
-	 * opposed to be used in an {@code RunnablePipeline}), so an implementation
-	 * of this hook needs to handle this case gracefully!
+	 * internal processor state, or {@code null}. Note that the context is
+	 * {@code null} for processors used in the pipeline editor by a
+	 * {@code Pipeline} (as opposed to be used in an {@code RunnablePipeline}),
+	 * so an implementation of this hook needs to handle this case gracefully!
 	 */
 	void init(ProcessorContext context);
 
@@ -192,7 +190,8 @@ public interface Processor {
 	/**
 	 * Returns the glyph of the processor.
 	 *
-	 * @return the glyph of the processor, or null (for no special glyph).
+	 * @return the glyph of the processor, or {@code null} (for no special
+	 * glyph).
 	 */
 	default NamedGlyph glyph() {
 		return null;
@@ -221,7 +220,7 @@ public interface Processor {
 	 * Returns an input port addressed by its key.
 	 *
 	 * @param key key of the input port.
-	 * @return an input port, or null if not defined.
+	 * @return an input port, or {@code null} if not defined.
 	 */
 	default InputPort<?> input(String key) {
 		return inputs().get(key);
@@ -300,7 +299,7 @@ public interface Processor {
 	 * Returns an output port addressed by its key.
 	 *
 	 * @param key key of the output port.
-	 * @return an output port, or null if not defined.
+	 * @return an output port, or {@code null} if not defined.
 	 */
 	default OutputPort<?> output(String key) {
 		return outputs().get(key);
@@ -509,7 +508,8 @@ public interface Processor {
 	 * the view, and reinitialize the processor (e.g. connections, since ports
 	 * might have changed).
 	 *
-	 * @return the repaint "property" (or toggle), or null if not implemented.
+	 * @return the repaint "property" (or toggle), or {@code null} if not
+	 * implemented.
 	 */
 	default BooleanProperty repaintProperty() {
 		return null;

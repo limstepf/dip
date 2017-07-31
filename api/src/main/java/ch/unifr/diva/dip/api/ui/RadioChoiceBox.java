@@ -100,7 +100,7 @@ public class RadioChoiceBox extends VBox {
 	 * Removes a radio choice.
 	 *
 	 * @param node the node (or body) of the {@code RadioChoice}.
-	 * @return the removed radio choice, or null if not found.
+	 * @return the removed radio choice, or {@code null} if not found.
 	 */
 	public RadioChoice<Node> remove(Node node) {
 		final RadioChoice<Node> choice = getRadioChoice(node);
@@ -154,7 +154,8 @@ public class RadioChoiceBox extends VBox {
 	/**
 	 * Returns the selected radio choice/item.
 	 *
-	 * @return the selected radio choice/item, or null if none is selected.
+	 * @return the selected radio choice/item, or {@code null} if none is
+	 * selected.
 	 */
 	@SuppressWarnings("unchecked")
 	public RadioChoice<Node> selectedRadioChoice() {
@@ -192,7 +193,8 @@ public class RadioChoiceBox extends VBox {
 	 *
 	 * @param <T> type of the node used as body of the choice.
 	 * @param node the node (or body) of the choice.
-	 * @return the radio choice (wrapping the given node), or null if not found.
+	 * @return the radio choice (wrapping the given node), or {@code null} if
+	 * not found.
 	 */
 	@SuppressWarnings("unchecked")
 	public <T extends Node> RadioChoice<T> getRadioChoice(T node) {

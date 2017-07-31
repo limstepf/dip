@@ -115,8 +115,8 @@ public class ProjectData {
 	 *
 	 * @param name name of the project.
 	 * @param saveFile the project file.
-	 * @param images list of pages/images, or null.
-	 * @param pipelines list of pipelines, or null.
+	 * @param images list of pages/images, or {@code null}.
+	 * @param pipelines list of pipelines, or {@code null}.
 	 * @throws java.io.IOException
 	 */
 	public ProjectData(String name, Path saveFile, List<Path> images, List<PipelineData.Pipeline> pipelines) throws IOException {
@@ -167,7 +167,7 @@ public class ProjectData {
 	 * validated, or the assets have been manually loaded already by a call to
 	 * {@code loadAssets()}.
 	 *
-	 * @return the pipeline data list, or null if not loaded yet.
+	 * @return the pipeline data list, or {@code null} if not loaded yet.
 	 */
 	public List<PipelineData.Pipeline> pipelines() {
 		if (pipelines == null) {
@@ -180,7 +180,7 @@ public class ProjectData {
 	 * Returns the data of a single pipeline.
 	 *
 	 * @param id the pipeline id.
-	 * @return the pipeline data, or null.
+	 * @return the pipeline data, or {@code null}.
 	 */
 	public PipelineData.Pipeline getPipeline(int id) {
 		if (pipelines == null) {

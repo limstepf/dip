@@ -161,8 +161,8 @@ public class GlyphToggleGroup<T> {
 	}
 
 	/**
-	 * The selected property holds the key of the selected glyph, or null if no
-	 * glyph is selected.
+	 * The selected property holds the key of the selected glyph, or
+	 * {@code null} if no glyph is selected.
 	 *
 	 * @return the selected property.
 	 */
@@ -173,8 +173,8 @@ public class GlyphToggleGroup<T> {
 	/**
 	 * Selects a new glyph.
 	 *
-	 * @param key the key of the glyph, or null to deselect the currently
-	 * selected glyph.
+	 * @param key the key of the glyph, or {@code null} to deselect the
+	 * currently selected glyph.
 	 */
 	public void setSelected(T key) {
 		if (key == null) {
@@ -185,9 +185,10 @@ public class GlyphToggleGroup<T> {
 	}
 
 	/**
-	 * Returns the key of the selected glyph, or null if no glyph is selected.
+	 * Returns the key of the selected glyph, or {@code null} if no glyph is
+	 * selected.
 	 *
-	 * @return the key of the selected glyph, or null.
+	 * @return the key of the selected glyph, or {@code null}.
 	 */
 	public T getSelected() {
 		return this.selectedProperty.get();
@@ -198,7 +199,7 @@ public class GlyphToggleGroup<T> {
 	 *
 	 * @param key the key of the glyph.
 	 * @param glyph the named glyph.
-	 * @param tooltip the tooltip, or null.
+	 * @param tooltip the tooltip, or {@code null}.
 	 */
 	public void add(T key, NamedGlyph glyph, String tooltip) {
 		final Glyph g = newGlyph(glyph, tooltip);

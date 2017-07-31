@@ -59,7 +59,8 @@ public interface Editable extends Resetable {
 	 * gets called for active/currently selected processors, and once as a new
 	 * processor gets selected (no matter if the mask has actually changed).
 	 *
-	 * @param selectionMask the selection mask, or null if nothing is selected.
+	 * @param selectionMask the selection mask, or {@code null} if nothing is
+	 * selected.
 	 */
 	default void onSelectionMaskChanged(Shape selectionMask) {
 

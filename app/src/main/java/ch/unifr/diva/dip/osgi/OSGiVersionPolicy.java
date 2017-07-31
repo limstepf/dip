@@ -50,7 +50,7 @@ public enum OSGiVersionPolicy {
 	 * @param collection OSGi service collection of all versions of the service.
 	 * @param version desired version to retrieve.
 	 * @return a version of the service according to the given version policy,
-	 * or null if no version meeting the requirements is available.
+	 * or {@code null} if no version meeting the requirements is available.
 	 */
 	public <T> OSGiService<T> getService(ServiceCollection<T> collection, Version version) {
 		if (collection == null) {

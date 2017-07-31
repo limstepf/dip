@@ -260,7 +260,7 @@ public class FileFinderTask extends Task<Void> {
 		/**
 		 * Returns the path to the file.
 		 *
-		 * @return the path to the file, or null if not found.
+		 * @return the path to the file, or {@code null} if not found.
 		 */
 		public Path getFile() {
 			return file;

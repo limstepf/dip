@@ -34,8 +34,8 @@ public interface ServiceCollection<T> {
 	/**
 	 * Returns the latest available version of the service.
 	 *
-	 * @return the most recent version of the service, or null if none are
-	 * available.
+	 * @return the most recent version of the service, or {@code null} if none
+	 * are available.
 	 */
 	public OSGiService<T> getService();
 
@@ -43,8 +43,8 @@ public interface ServiceCollection<T> {
 	 * Returns the latest version within the given range.
 	 *
 	 * @param range semantic version range string.
-	 * @return the latest service within the given version range, or null if not
-	 * available.
+	 * @return the latest service within the given version range, or
+	 * {@code null} if not available.
 	 */
 	public OSGiService<T> getService(String range);
 
@@ -52,7 +52,8 @@ public interface ServiceCollection<T> {
 	 * Returns the service with the given version.
 	 *
 	 * @param version semantic version.
-	 * @return the service with the given version, or null if not available.
+	 * @return the service with the given version, or {@code null} if not
+	 * available.
 	 */
 	public OSGiService<T> getService(Version version);
 
@@ -60,8 +61,8 @@ public interface ServiceCollection<T> {
 	 * Returns the latest {@code major} version.
 	 *
 	 * @param major the major version.
-	 * @return the latest service with given major version, or null if not
-	 * available.
+	 * @return the latest service with given major version, or {@code null} if
+	 * not available.
 	 */
 	default OSGiService<T> getService(int major) {
 		final String range = String.format(
@@ -76,8 +77,8 @@ public interface ServiceCollection<T> {
 	 *
 	 * @param major the major version.
 	 * @param minor the minor version.
-	 * @return the latest service with given major and minor version, or null if
-	 * not available.
+	 * @return the latest service with given major and minor version, or
+	 * {@code null} if not available.
 	 */
 	default OSGiService<T> getService(int major, int minor) {
 		final String range = String.format(
@@ -93,8 +94,8 @@ public interface ServiceCollection<T> {
 	 * @param major the major version.
 	 * @param minor the minor version.
 	 * @param micro the micro version.
-	 * @return the service with given major, minor and micro version, or null if
-	 * not available.
+	 * @return the service with given major, minor and micro version, or
+	 * {@code null} if not available.
 	 */
 	default OSGiService<T> getService(int major, int minor, int micro) {
 		final String range = String.format(

@@ -26,7 +26,7 @@ public class RescaleOp extends NullOp implements SimpleTileParallelizable {
 	 * <pre>I'(x,y) = gain * I(x,y) + bias</pre>
 	 *
 	 * @param abs take the absolute value of the sample first (per band). Can be
-	 * null.
+	 * {@code null}.
 	 * @param gain gain per band.
 	 * @param bias bias per band.
 	 * @param min minimum value per band used for clamping.

@@ -45,7 +45,7 @@ public interface ServiceMonitor<T> {
 	 * Returns a service collection.
 	 *
 	 * @param pid the PID of the service collection.
-	 * @return the service collection, or null if not available.
+	 * @return the service collection, or {@code null} if not available.
 	 */
 	default OSGiServiceCollection<T> getServiceCollection(String pid) {
 		return getServiceCollectionMap().get(pid);
@@ -55,7 +55,7 @@ public interface ServiceMonitor<T> {
 	 * Returns the latest version of a service.
 	 *
 	 * @param pid the PID of the service.
-	 * @return the latest service, or null if not available.
+	 * @return the latest service, or {@code null} if not available.
 	 */
 	default OSGiService<T> getService(String pid) {
 		final OSGiServiceCollection<T> collection = getServiceCollection(pid);
@@ -81,8 +81,8 @@ public interface ServiceMonitor<T> {
 	 *
 	 * @param pid the PID of the service.
 	 * @param major the major version.
-	 * @return the latest service with given major version, or null if not
-	 * available.
+	 * @return the latest service with given major version, or {@code null} if
+	 * not available.
 	 */
 	default OSGiService<T> getService(String pid, int major) {
 		final OSGiServiceCollection<T> collection = getServiceCollection(pid);
@@ -110,8 +110,8 @@ public interface ServiceMonitor<T> {
 	 * @param pid the PID of the service.
 	 * @param major the major version.
 	 * @param minor the minor version.
-	 * @return the latest service with given major and minor version, or null if
-	 * not available.
+	 * @return the latest service with given major and minor version, or
+	 * {@code null} if not available.
 	 */
 	default OSGiService<T> getService(String pid, int major, int minor) {
 		final OSGiServiceCollection<T> collection = getServiceCollection(pid);
@@ -141,7 +141,7 @@ public interface ServiceMonitor<T> {
 	 * @param major the major version.
 	 * @param minor the minor version.
 	 * @param micro the micro version.
-	 * @return the requested service, or null if not available.
+	 * @return the requested service, or {@code null} if not available.
 	 */
 	default OSGiService<T> getService(String pid, int major, int minor, int micro) {
 		final OSGiServiceCollection<T> collection = getServiceCollection(pid);
@@ -156,7 +156,7 @@ public interface ServiceMonitor<T> {
 	 *
 	 * @param pid the PID of the service.
 	 * @param version the semantic version of the service.
-	 * @return the requested service, or null if not available.
+	 * @return the requested service, or {@code null} if not available.
 	 */
 	default OSGiService<T> getService(String pid, Version version) {
 		final OSGiServiceCollection<T> collection = getServiceCollection(pid);

@@ -69,7 +69,7 @@ public class OptionsBar implements Presenter {
 	 * (Re-)builds the options bar.
 	 *
 	 * @param optionMaps option maps, usually one of the processor, and another
-	 * from the selected tool. May be null.
+	 * from the selected tool. May be {@code null}.
 	 */
 	@SafeVarargs
 	public final void build(Map<String, SingleRowParameter<?>>... optionMaps) {

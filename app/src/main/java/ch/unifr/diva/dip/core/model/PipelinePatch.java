@@ -163,7 +163,7 @@ public class PipelinePatch {
 		}
 
 		/**
-		 * Checks whether the processor patch is empty (or null).
+		 * Checks whether the processor patch is empty (or {@code null}).
 		 *
 		 * @return {@code true} if the patch is empty (and must be ommited),
 		 * {@code false} otherwise.

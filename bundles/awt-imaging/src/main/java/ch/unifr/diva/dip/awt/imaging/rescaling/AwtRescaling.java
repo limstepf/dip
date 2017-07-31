@@ -89,7 +89,7 @@ public class AwtRescaling {
 	 * to a {@code BOX} filter.
 	 *
 	 * @param src the source image.
-	 * @param dst the destination image, or null to create a new one.
+	 * @param dst the destination image, or {@code null} to create a new one.
 	 * @param xscale the X scale factor.
 	 * @param yscale the Y scale factor.
 	 * @return the destination image.
@@ -103,7 +103,7 @@ public class AwtRescaling {
 	 * {@code TRIANGLE} filter.
 	 *
 	 * @param src the source image.
-	 * @param dst the destination image, or null to create a new one.
+	 * @param dst the destination image, or {@code null} to create a new one.
 	 * @param xscale the X scale factor.
 	 * @param yscale the Y scale factor.
 	 * @return the destination image.
@@ -117,7 +117,7 @@ public class AwtRescaling {
 	 * {@code CATMULL_ROM} filter.
 	 *
 	 * @param src the source image.
-	 * @param dst the destination image, or null to create a new one.
+	 * @param dst the destination image, or {@code null} to create a new one.
 	 * @param xscale the X scale factor.
 	 * @param yscale the Y scale factor.
 	 * @return the destination image.
@@ -130,7 +130,7 @@ public class AwtRescaling {
 	 * Resizes bitmaps.
 	 *
 	 * @param src the source image.
-	 * @param dst the destination image, or null to create a new one.
+	 * @param dst the destination image, or {@code null} to create a new one.
 	 * @param xscale the X scale factor.
 	 * @param yscale the Y scale factor.
 	 * @param interpolationHint the interpolation rendering hint.
@@ -173,7 +173,7 @@ public class AwtRescaling {
 	 * based on Bresenham's (line) algorithm.
 	 *
 	 * @param src the source image.
-	 * @param dst the destination image, or null to create a new one.
+	 * @param dst the destination image, or {@code null} to create a new one.
 	 * @param xscale the X scale factor.
 	 * @param yscale the Y scale factor.
 	 * @return the destination image.

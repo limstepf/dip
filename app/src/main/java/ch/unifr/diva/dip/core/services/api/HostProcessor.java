@@ -35,8 +35,8 @@ public interface HostProcessor extends Processor {
 	 * fully initialized by its wrapper.
 	 *
 	 * @param context the host processor context if the processor is part of a
-	 * {@code RunnablePipeline}, or null otherwise (if for a {@code Pipeline} in
-	 * the pipeline editor).
+	 * {@code RunnablePipeline}, or {@code null} otherwise (if for a
+	 * {@code Pipeline} in the pipeline editor).
 	 */
 	public void init(HostProcessorContext context);
 

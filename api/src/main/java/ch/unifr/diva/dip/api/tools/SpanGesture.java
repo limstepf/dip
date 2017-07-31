@@ -30,8 +30,8 @@ public class SpanGesture extends GestureBase {
 	 * Creates a new span gesture (with mouse movement handlers).
 	 *
 	 * @param onGesture the gesture event handler.
-	 * @param onEntered the entered handler, or null.
-	 * @param onMoved the moved (and dragged) handler, or null.
+	 * @param onEntered the entered handler, or {@code null}.
+	 * @param onMoved the moved (and dragged) handler, or {@code null}.
 	 * @param onExited the exited handler.
 	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})

@@ -55,8 +55,8 @@ public abstract class BrushTool<T extends Brush> extends SimpleTool {
 	 * Editable processors should set the editor overlay in their
 	 * {@code init(ProcessorContext context} method with a call to
 	 * {@code setEditorLayerOverlay(context.overlay)}, after checking that
-	 * {@code context} isn't null (which happens if called/used by the pipeline
-	 * editor).
+	 * {@code context} isn't {@code null} (which happens if called/used by the
+	 * pipeline editor).
 	 *
 	 * Note that it is not necessary to keep updating the overlay on context
 	 * switches of the processor, since the overlay is guaranteed to remain the
@@ -80,8 +80,8 @@ public abstract class BrushTool<T extends Brush> extends SimpleTool {
 	 * Editable processors should set the editor overlay in their
 	 * {@code init(ProcessorContext context} method with a call to
 	 * {@code setEditorLayerOverlay(context.overlay)}, after checking that
-	 * {@code context} isn't null (which happens if called/used by the pipeline
-	 * editor).
+	 * {@code context} isn't {@code null} (which happens if called/used by the
+	 * pipeline editor).
 	 *
 	 * Note that it is not necessary to keep updating the overlay on context
 	 * switches of the processor, since the overlay is guaranteed to remain the

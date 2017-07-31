@@ -485,8 +485,8 @@ public class PaddedRegion extends Region {
 	protected ObjectProperty<Node> contentProperty;
 
 	/**
-	 * The content property. This property holds the only child (or null) of the
-	 * padded region.
+	 * The content property. This property holds the only child (or
+	 * {@code null}) of the padded region.
 	 *
 	 * <p>
 	 * Note that you should put a {@code Group} here in case transformations on
@@ -524,7 +524,7 @@ public class PaddedRegion extends Region {
 	/**
 	 * Returns the content node.
 	 *
-	 * @return the content node, or null.
+	 * @return the content node, or {@code null}.
 	 */
 	public final Node getContent() {
 		return contentProperty().get();
@@ -560,8 +560,8 @@ public class PaddedRegion extends Region {
 	 * reported positions will be off (using the coordinate system of the actual
 	 * redispatch target).
 	 *
-	 * @return the redispatch target property. If set to null, the redispatch
-	 * filter will be disabled.
+	 * @return the redispatch target property. If set to {@code null}, the
+	 * redispatch filter will be disabled.
 	 */
 	public ObjectProperty<Node> redispatchTargetProperty() {
 		if (redispatchTargetProperty == null) {

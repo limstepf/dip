@@ -62,8 +62,8 @@ public class TreePrinter {
 	 *
 	 * @param node the root node.
 	 * @param extractor the extractor extracts name and children of arbitrary
-	 * objects. Can be null if all children (incl. the root node) are of type
-	 * {@code TreePrinter.Node} (can be mixed too).
+	 * objects. Can be {@code null} if all children (incl. the root node) are of
+	 * type {@code TreePrinter.Node} (can be mixed too).
 	 */
 	public void print(Object node, Extractor extractor) {
 		print(node, extractor, "", -1);
@@ -75,8 +75,8 @@ public class TreePrinter {
 	 * @param root the name of the root node.
 	 * @param children the children of the root node.
 	 * @param extractor the extractor extracts name and children of arbitrary
-	 * objects. Can be null if all children are of type {@code TreePrinter.Node}
-	 * (can be mixed too).
+	 * objects. Can be {@code null} if all children are of type
+	 * {@code TreePrinter.Node} (can be mixed too).
 	 */
 	public void print(String root, Collection<?> children, Extractor extractor) {
 		print(root, children.toArray(), extractor, "", -1);
@@ -88,8 +88,8 @@ public class TreePrinter {
 	 * @param root the name of the root node.
 	 * @param children the children of the root node.
 	 * @param extractor the extractor extracts name and children of arbitrary
-	 * objects. Can be null if all children are of type {@code TreePrinter.Node}
-	 * (can be mixed too).
+	 * objects. Can be {@code null} if all children are of type
+	 * {@code TreePrinter.Node} (can be mixed too).
 	 */
 	public void print(String root, Object[] children, Extractor extractor) {
 		print(root, children, extractor, "", -1);
@@ -290,7 +290,7 @@ public class TreePrinter {
 	 * @param dictionary the dictionary.
 	 * @return an array of TreePrinter node children.
 	 */
-	public static Object[] toChildren(Dictionary<?,?> dictionary) {
+	public static Object[] toChildren(Dictionary<?, ?> dictionary) {
 		return toChildren(dictionary, (key, val) -> {
 			return String.format("%s: %s", key, val);
 		});
@@ -303,7 +303,7 @@ public class TreePrinter {
 	 * @param mapper the dictionary (entry) mapper.
 	 * @return an array of TreePrinter node children.
 	 */
-	public static Object[] toChildren(Dictionary<?,?> dictionary, DictMapper mapper) {
+	public static Object[] toChildren(Dictionary<?, ?> dictionary, DictMapper mapper) {
 		final Object[] children = new Object[dictionary.size()];
 		int i = 0;
 		for (Enumeration<?> e = dictionary.keys(); e.hasMoreElements(); i++) {

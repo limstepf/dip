@@ -328,7 +328,7 @@ public class NewProjectDialog extends AbstractDialog {
 	/**
 	 * Returns the pipeline marked as default.
 	 *
-	 * @return the pipeline marked as default, or null.
+	 * @return the pipeline marked as default, or {@code null}.
 	 */
 	public PipelineData.Pipeline getDefaultPipeline() {
 		if (this.defaultPipeline == null) {

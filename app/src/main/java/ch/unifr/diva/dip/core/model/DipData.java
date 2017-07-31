@@ -32,13 +32,13 @@ public class DipData {
 	final public static String ROOT_TAG_NAME = "dip-data";
 
 	/**
-	 * Preset data. May be null.
+	 * Preset data. May be {@code null}.
 	 */
 	@XmlElement(name = "presets")
 	public PresetData presets;
 
 	/**
-	 * Pipeline data. May be null.
+	 * Pipeline data. May be {@code null}.
 	 */
 	@XmlElement(name = "pipelines")
 	public PipelineData pipelines;

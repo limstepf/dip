@@ -32,8 +32,8 @@ public class PolygonGesture extends GestureBase {
 	 * Creates a new polygon gesture.
 	 *
 	 * @param onGesture the gesture event handler.
-	 * @param onEntered the entered handler, or null.
-	 * @param onMoved the moved (and dragged) handler, or null.
+	 * @param onEntered the entered handler, or {@code null}.
+	 * @param onMoved the moved (and dragged) handler, or {@code null}.
 	 * @param onExited the exited handler.
 	 */
 	public PolygonGesture(GestureEventHandler.Handler<MouseEvent> onGesture, EventHandler<MouseEvent> onEntered, EventHandler<MouseEvent> onMoved, EventHandler<MouseEvent> onExited) {

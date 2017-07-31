@@ -56,7 +56,7 @@ public class InputPort<T> extends AbstractPort<T> {
 	 * Returns the connection of the port. Input ports can only have one
 	 * connection at max.
 	 *
-	 * @return the output port connected to this input port, or null.
+	 * @return the output port connected to this input port, or {@code null}.
 	 */
 	public OutputPort<T> connection() {
 		return output;
@@ -65,7 +65,7 @@ public class InputPort<T> extends AbstractPort<T> {
 	/**
 	 * Returns the value on the port.
 	 *
-	 * @return the value on the port, or null.
+	 * @return the value on the port, or {@code null}.
 	 */
 	public T getValue() {
 		if (this.connection() == null) {

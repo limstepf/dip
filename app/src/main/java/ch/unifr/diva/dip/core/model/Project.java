@@ -496,7 +496,7 @@ public class Project implements Modifiable, Localizable {
 	/**
 	 * Returns the currently selected page.
 	 *
-	 * @return the selected project page or null if no page is selected.
+	 * @return the selected project page or {@code null} if no page is selected.
 	 */
 	public ProjectPage getSelectedPage() {
 		if (getSelectedPageId() < 0) {
@@ -510,7 +510,7 @@ public class Project implements Modifiable, Localizable {
 	 * Returns a project page by id.
 	 *
 	 * @param id id of a project page.
-	 * @return a project page - or null if not found.
+	 * @return a project page - or {@code null} if not found.
 	 */
 	public ProjectPage getPage(int id) {
 		for (ProjectPage page : pages) {

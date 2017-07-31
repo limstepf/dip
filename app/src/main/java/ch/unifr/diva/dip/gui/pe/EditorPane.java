@@ -219,7 +219,7 @@ public class EditorPane {
 	 * wire currently used/dragged by the user, but not fully connected yet.
 	 * There can be only a single such active wire in the editor pane.
 	 *
-	 * @return the currently active wire, or null if there isn't any.
+	 * @return the currently active wire, or {@code null} if there isn't any.
 	 */
 	public ConnectionView wire() {
 		return selectedWire;
@@ -289,7 +289,7 @@ public class EditorPane {
 	 * Return the active/selected port. The active (or selected) port is the
 	 * port connected to the currently active wire.
 	 *
-	 * @return the active/selected port, or null if there isn't any.
+	 * @return the active/selected port, or {@code null} if there isn't any.
 	 */
 	public OutputPort<?> selectedPort() {
 		return this.selectedPort;

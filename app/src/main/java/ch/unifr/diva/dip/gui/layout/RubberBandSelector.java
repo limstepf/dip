@@ -295,8 +295,8 @@ public class RubberBandSelector<T extends Region> {
 	 * cursor is not the default one (indicating some ongoing action). In order
 	 * to make this work, the mouse cursor needs to be changed on the correct
 	 * node, that is where the mouse event will be coming from (event source);
-	 * otherwise the retrieved cursor likely will be null and nothing will ever
-	 * be suppressed at all.
+	 * otherwise the retrieved cursor likely will be {@code null} and nothing
+	 * will ever be suppressed at all.
 	 *
 	 * @return the suppressOnMouseCursorProperty.
 	 */

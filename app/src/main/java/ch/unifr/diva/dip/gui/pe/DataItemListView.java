@@ -281,7 +281,7 @@ public class DataItemListView<T extends DataItemListView.DataItem> implements Lo
 		 * Creates a new, selectable data item list cell.
 		 *
 		 * @param selectionCallback callback called upon selecting an item, or
-		 * null.
+		 * {@code null}.
 		 */
 		public SelectableDataItemListCell(Callback<T, Void> selectionCallback) {
 			this.selectionCallback = selectionCallback;
@@ -495,7 +495,7 @@ public class DataItemListView<T extends DataItemListView.DataItem> implements Lo
 		/**
 		 * The (optional) description property of the data item.
 		 *
-		 * @return the description property, or null.
+		 * @return the description property, or {@code null}.
 		 */
 		default StringProperty descriptionProperty() {
 			return null;
@@ -504,8 +504,8 @@ public class DataItemListView<T extends DataItemListView.DataItem> implements Lo
 		/**
 		 * The (optional) glyph property of the data item.
 		 *
-		 * @return the glyph property. Can be null, or an {@code ObjectProperty}
-		 * with a null value.
+		 * @return the glyph property. Can be {@code null}, or an
+		 * {@code ObjectProperty} with a {@code null} value.
 		 */
 		default ObjectProperty<NamedGlyph> glyphProperty() {
 			return null;

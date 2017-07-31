@@ -26,7 +26,7 @@ public interface Gesture {
 	 * @param <T> type of the event.
 	 * @param gesture the gesture.
 	 * @param eventType the event type.
-	 * @param eventHandler the event handler, or null.
+	 * @param eventHandler the event handler, or {@code null}.
 	 */
 	public static <T extends Event> void addEventHandler(Gesture gesture, EventType<T> eventType, EventHandler<T> eventHandler) {
 		if (eventHandler != null) {
@@ -41,9 +41,9 @@ public interface Gesture {
 	 * Adds (mouse) movement event handlers to the given gesture.
 	 *
 	 * @param gesture the gesture.
-	 * @param onEntered the entered handler, or null.
-	 * @param onMoved the moved handler, or null.
-	 * @param onExited the exited handler, or null.
+	 * @param onEntered the entered handler, or {@code null}.
+	 * @param onMoved the moved handler, or {@code null}.
+	 * @param onExited the exited handler, or {@code null}.
 	 */
 	public static void addMouseEventHandlers(Gesture gesture, EventHandler<MouseEvent> onEntered, EventHandler<MouseEvent> onMoved, EventHandler<MouseEvent> onExited) {
 		if (onEntered != null) {
@@ -71,7 +71,7 @@ public interface Gesture {
 	 *
 	 * @param gesture the gesture.
 	 * @param onKeyPressed the key event handler (triggered by
-	 * {@code KeyEvent.KEY_PRESSED}), or null.
+	 * {@code KeyEvent.KEY_PRESSED}), or {@code null}.
 	 */
 	public static void addKeyEventHandler(Gesture gesture, EventHandler<KeyEvent> onKeyPressed) {
 		if (onKeyPressed != null) {

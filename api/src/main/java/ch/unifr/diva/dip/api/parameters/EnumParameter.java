@@ -63,7 +63,7 @@ public class EnumParameter extends PersistentParameterBase<String, EnumParameter
 	 *
 	 * @param label label.
 	 * @param options list of option identifiers (or keys).
-	 * @param labels list of option labels (optional, can be null).
+	 * @param labels list of option labels (optional, can be {@code null}).
 	 * @param defaultValue name of the default enumeration option.
 	 */
 	public EnumParameter(String label, List<String> options, List<String> labels, String defaultValue) {

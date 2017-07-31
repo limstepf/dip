@@ -66,7 +66,7 @@ public class AwtFilteredRescaling extends AbstractFilteredRescaling {
 	 *
 	 * @param filterf the filter function.
 	 * @param src the source image.
-	 * @param dst the destination image. Must not be null.
+	 * @param dst the destination image. Must not be {@code null}.
 	 * @return the destination image.
 	 */
 	public static BufferedImage zoom(FilterFunction filterf, BufferedImage src, BufferedImage dst) {
@@ -101,7 +101,7 @@ public class AwtFilteredRescaling extends AbstractFilteredRescaling {
 	 * Rescales the source image.
 	 *
 	 * @param src the source image.
-	 * @param dst the destination image. Must not be null.
+	 * @param dst the destination image. Must not be {@code null}.
 	 * @return the destination image.
 	 */
 	public BufferedImage zoom(BufferedImage src, BufferedImage dst) {

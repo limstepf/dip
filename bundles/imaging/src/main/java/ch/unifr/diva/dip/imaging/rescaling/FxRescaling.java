@@ -80,7 +80,7 @@ public class FxRescaling {
 	 * to a {@code BOX} filter.
 	 *
 	 * @param src the source image.
-	 * @param dst the destination image, or null to create a new one.
+	 * @param dst the destination image, or {@code null} to create a new one.
 	 * @param xscale the X scale factor.
 	 * @param yscale the Y scale factor.
 	 * @return the destination image.
@@ -94,7 +94,7 @@ public class FxRescaling {
 	 * {@code TRIANGLE} filter.
 	 *
 	 * @param src the source image.
-	 * @param dst the destination image, or null to create a new one.
+	 * @param dst the destination image, or {@code null} to create a new one.
 	 * @param xscale the X scale factor.
 	 * @param yscale the Y scale factor.
 	 * @return the destination image.
@@ -108,7 +108,7 @@ public class FxRescaling {
 	 * {@code CATMULL_ROM} filter.
 	 *
 	 * @param src the source image.
-	 * @param dst the destination image, or null to create a new one.
+	 * @param dst the destination image, or {@code null} to create a new one.
 	 * @param xscale the X scale factor.
 	 * @param yscale the Y scale factor.
 	 * @return the destination image.
@@ -121,7 +121,7 @@ public class FxRescaling {
 	 * Resizes bitmaps.
 	 *
 	 * @param src the source image.
-	 * @param dst the destination image, or null to create a new one.
+	 * @param dst the destination image, or {@code null} to create a new one.
 	 * @param xscale the X scale factor.
 	 * @param yscale the Y scale factor.
 	 * @param interpolationHint the interpolation rendering hint.
@@ -200,7 +200,7 @@ public class FxRescaling {
 	 * based on Bresenham's (line) algorithm.
 	 *
 	 * @param src the source image.
-	 * @param dst the destination image, or null to create a new one.
+	 * @param dst the destination image, or {@code null} to create a new one.
 	 * @param xscale the X scale factor.
 	 * @param yscale the Y scale factor.
 	 * @return the destination image.
@@ -217,8 +217,8 @@ public class FxRescaling {
 	 * @param dst the destination image.
 	 * @param xscale the X scale factor.
 	 * @param yscale the Y scale factor.
-	 * @param srcBuffer the source buffer (to reuse), or null.
-	 * @param dstBuffer the destination buffer (to reuse), or null.
+	 * @param srcBuffer the source buffer (to reuse), or {@code null}.
+	 * @param dstBuffer the destination buffer (to reuse), or {@code null}.
 	 * @return the destination image.
 	 */
 	public static WritableImage bresenham(Image src, WritableImage dst, double xscale, double yscale, int[] srcBuffer, int[] dstBuffer) {
@@ -260,8 +260,8 @@ public class FxRescaling {
 	 *
 	 * @param src the source image.
 	 * @param dst the destination image.
-	 * @param srcBuffer the source buffer (to reuse), or null.
-	 * @param dstBuffer the destination buffer (to reuse), or null.
+	 * @param srcBuffer the source buffer (to reuse), or {@code null}.
+	 * @param dstBuffer the destination buffer (to reuse), or {@code null}.
 	 * @return the destination image.
 	 */
 	public static WritableImage bresenham(Image src, WritableImage dst, int[] srcBuffer, int[] dstBuffer) {
@@ -371,8 +371,8 @@ public class FxRescaling {
 	 * @param restX the rest of the repeated pixels on the x-axis.
 	 * @param shiftY number of the shifted repeated pixels on the y-axis.
 	 * @param restY the rest of the repeated pixels on the y-axis.
-	 * @param srcBuffer the source buffer (to reuse), or null.
-	 * @param dstBuffer the destination buffer (to reuse), or null.
+	 * @param srcBuffer the source buffer (to reuse), or {@code null}.
+	 * @param dstBuffer the destination buffer (to reuse), or {@code null}.
 	 * @return the destination image.
 	 */
 	public static WritableImage bresenhamUpscaling(Image src, WritableImage dst, int shiftX, int restX, int shiftY, int restY, int[] srcBuffer, int[] dstBuffer) {

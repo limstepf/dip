@@ -534,7 +534,7 @@ public class ProjectPage implements Modifiable, Localizable {
 	/**
 	 * Returns the pipeline patch of the page.
 	 *
-	 * @return the pipeline patch of the page, or null.
+	 * @return the pipeline patch of the page, or {@code null}.
 	 */
 	public PipelinePatch pipelinePatch() {
 		if (Files.exists(pipelinePatchXml())) {

@@ -228,11 +228,11 @@ public enum ImageFormat {
 	}
 
 	/**
-	 * Returns the ImageFormat of a file, or null if no supported ImageFormat is
-	 * available.
+	 * Returns the ImageFormat of a file, or {@code null} if no supported
+	 * ImageFormat is available.
 	 *
 	 * @param file an image file.
-	 * @return the ImageFormat that supports the file, or null.
+	 * @return the ImageFormat that supports the file, or {@code null}.
 	 */
 	public static ImageFormat getImageFormat(Path file) {
 		String ext = IOUtils.getFileExtension(file);

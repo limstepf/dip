@@ -38,7 +38,7 @@ public interface Tool {
 	/**
 	 * Returns the glyph of the tool.
 	 *
-	 * @return the glyph of the tool, or null (for no special glyph).
+	 * @return the glyph of the tool, or {@code null} (for no special glyph).
 	 */
 	default NamedGlyph getGlyph() {
 		return null;

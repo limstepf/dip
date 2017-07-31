@@ -193,7 +193,8 @@ public class PipelineManager implements Modifiable, Localizable {
 	 * Returns a pipeline by its id.
 	 *
 	 * @param id id of the pipeline.
-	 * @return the pipeline with given id, or null if no such pipeline is found.
+	 * @return the pipeline with given id, or {@code null} if no such pipeline
+	 * is found.
 	 */
 	public PrototypePipeline getPipeline(int id) {
 		for (PrototypePipeline p : pipelines) {

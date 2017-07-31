@@ -325,8 +325,8 @@ public class OSGiFramework {
 	 *
 	 * @param pid PID of the processor.
 	 * @param version version of the processor.
-	 * @return the OSGiService of the processor with desired version, or null if
-	 * not available.
+	 * @return the OSGiService of the processor with desired version, or
+	 * {@code null} if not available.
 	 */
 	public OSGiService<Processor> getProcessor(String pid, Version version) {
 		final ServiceCollection<Processor> collection = getProcessorCollection(pid);

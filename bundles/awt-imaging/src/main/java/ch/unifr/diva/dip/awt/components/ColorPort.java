@@ -9,7 +9,7 @@ import java.util.List;
 public class ColorPort {
 
 	/**
-	 * The associated color model. Can be null for a color untyped port.
+	 * The associated color model. Can be {@code null} for a color untyped port.
 	 */
 	public final SimpleColorModel cm;
 

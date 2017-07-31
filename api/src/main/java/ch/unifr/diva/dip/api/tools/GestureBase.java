@@ -28,9 +28,9 @@ public abstract class GestureBase implements Gesture {
 	/**
 	 * Adds (mouse) movement event handlers.
 	 *
-	 * @param onEntered the entered handler, or null.
-	 * @param onMoved the moved handler, or null.
-	 * @param onExited the exited handler, or null.
+	 * @param onEntered the entered handler, or {@code null}.
+	 * @param onMoved the moved handler, or {@code null}.
+	 * @param onExited the exited handler, or {@code null}.
 	 */
 	protected void addMouseEventHandlers(EventHandler<MouseEvent> onEntered, EventHandler<MouseEvent> onMoved, EventHandler<MouseEvent> onExited) {
 		Gesture.addMouseEventHandlers(this, onEntered, onMoved, onExited);

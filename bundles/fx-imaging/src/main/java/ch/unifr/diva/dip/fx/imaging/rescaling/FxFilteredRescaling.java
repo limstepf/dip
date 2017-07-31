@@ -68,7 +68,7 @@ public class FxFilteredRescaling extends AbstractFilteredRescaling {
 	 *
 	 * @param filterf the filter function.
 	 * @param src the source image.
-	 * @param dst the destination image. Must not be null.
+	 * @param dst the destination image. Must not be {@code null}.
 	 * @return the destination image.
 	 */
 	public static WritableImage zoom(FilterFunction filterf, Image src, WritableImage dst) {
@@ -103,7 +103,7 @@ public class FxFilteredRescaling extends AbstractFilteredRescaling {
 	 * Rescales the source image.
 	 *
 	 * @param src the source image.
-	 * @param dst the destination image. Must not be null.
+	 * @param dst the destination image. Must not be {@code null}.
 	 * @return the destination image.
 	 */
 	public WritableImage zoom(Image src, WritableImage dst) {

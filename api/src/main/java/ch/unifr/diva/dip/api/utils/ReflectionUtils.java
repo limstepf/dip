@@ -31,7 +31,7 @@ public class ReflectionUtils {
 	 * Returns the Java class by canonical name.
 	 *
 	 * @param name canonical name of a Java class.
-	 * @return Java class or null.
+	 * @return Java class or {@code null}.
 	 */
 	public static Class<?> getClass(String name) {
 		try {

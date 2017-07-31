@@ -70,7 +70,7 @@ public class PipelineData {
 	 * Returns the data of a single pipeline.
 	 *
 	 * @param id the id of the pipeline.
-	 * @return the pipeline data, or null.
+	 * @return the pipeline data, or {@code null}.
 	 */
 	public Pipeline getPipeline(int id) {
 		for (Pipeline p : list) {
@@ -487,7 +487,7 @@ public class PipelineData {
 		 * Returns the processor data by processor id.
 		 *
 		 * @param id the id of the processor.
-		 * @return the processor data, or null if not found.
+		 * @return the processor data, or {@code null} if not found.
 		 */
 		public Processor get(int id) {
 			for (Processor p : list) {
@@ -745,8 +745,8 @@ public class PipelineData {
 		/**
 		 * Creates a new pipeline item.
 		 *
-		 * @param pipeline the pipeline, or null.
-		 * @param data the pipeline data, or null.
+		 * @param pipeline the pipeline, or {@code null}.
+		 * @param data the pipeline data, or {@code null}.
 		 */
 		private PipelineItem(PrototypePipeline pipeline, PipelineData.Pipeline data) {
 			this.pipeline = pipeline;

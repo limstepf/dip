@@ -85,8 +85,8 @@ public class DipThreadPool {
 	 * @param workQueue the queue to use for holding tasks before they are
 	 * executed.
 	 * @param handler the handler to use when execution is blocked because the
-	 * thread bounds and queue capacities are reached. Can be null (uses the
-	 * default rejected execution handler/policy).
+	 * thread bounds and queue capacities are reached. Can be {@code null} (uses
+	 * the default rejected execution handler/policy).
 	 */
 	public DipThreadPool(String poolName, int poolSize, BlockingQueue<Runnable> workQueue, RejectedExecutionHandler handler) {
 		this.poolSize = poolSize;

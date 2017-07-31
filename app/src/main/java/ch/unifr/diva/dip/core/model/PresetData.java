@@ -58,7 +58,7 @@ public class PresetData {
 	 *
 	 * @param pid the pid of the processor.
 	 * @param requiredVersion a version to be included in the returned list, no
-	 * matter what, or null.
+	 * matter what, or {@code null}.
 	 * @return a list of available versions (with some presets).
 	 */
 	public ObservableList<String> getVersions(String pid, String requiredVersion) {
@@ -272,8 +272,8 @@ public class PresetData {
 		/**
 		 * Creates a new preset item.
 		 *
-		 * @param preset the preset, or null.
-		 * @param wrapper the processor, or null.
+		 * @param preset the preset, or {@code null}.
+		 * @param wrapper the processor, or {@code null}.
 		 */
 		private PresetItem(PresetData.Preset preset, PrototypeProcessor wrapper) {
 			this.preset = preset;

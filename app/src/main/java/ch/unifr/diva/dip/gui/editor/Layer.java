@@ -168,7 +168,7 @@ public interface Layer {
 	/**
 	 * Returns the glyph of the layer.
 	 *
-	 * @return the glyph of the layer, or null (for no glyph).
+	 * @return the glyph of the layer, or {@code null} (for no glyph).
 	 */
 	public NamedGlyph getGlyph();
 

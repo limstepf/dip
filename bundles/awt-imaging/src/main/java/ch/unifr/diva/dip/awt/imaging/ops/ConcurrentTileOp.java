@@ -67,8 +67,8 @@ public class ConcurrentTileOp<T extends BufferedImageOp & TileParallelizable<S>,
 	 * @param op the image processing filter to be parallelized.
 	 * @param tileWidth tile width.
 	 * @param tileHeight tile height.
-	 * @param threadPool a DIP thread pool, or null. If no thread pool is given,
-	 * thread will be created manually.
+	 * @param threadPool a DIP thread pool, or {@code null}. If no thread pool
+	 * is given, thread will be created manually.
 	 * @param threadCount number of threads to be used.
 	 */
 	public ConcurrentTileOp(T op, int tileWidth, int tileHeight, DipThreadPool threadPool, int threadCount) {

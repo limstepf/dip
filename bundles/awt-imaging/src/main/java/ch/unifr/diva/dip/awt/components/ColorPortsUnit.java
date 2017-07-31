@@ -666,8 +666,9 @@ public class ColorPortsUnit<T extends Processor> {
 	 * Sets/restores the output ports.
 	 *
 	 * @param context the processor context of the parent processor.
-	 * @param processedImage the processed image, or null. If no processed image
-	 * is given then the method tries to load it from the persistant storage.
+	 * @param processedImage the processed image, or {@code null}. If no
+	 * processed image is given then the method tries to load it from the
+	 * persistant storage.
 	 * @param provideLayer {@code true} to provide image layer (if possible/not
 	 * float sample precision), {@code false} to not do that.
 	 * @return {@code true} if the outputs could be set/restored (either if the

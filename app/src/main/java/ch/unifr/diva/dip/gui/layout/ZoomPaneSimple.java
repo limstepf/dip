@@ -328,10 +328,10 @@ public class ZoomPaneSimple implements Pannable {
 	}
 
 	/**
-	 * Defines the mouse cursor for this Node and subnodes. If null, then the
-	 * cursor of the first parent node with a non-null cursor will be used. If
-	 * no Node in the scene graph defines a cursor, then the cursor of the Scene
-	 * will be used.
+	 * Defines the mouse cursor for this Node and subnodes. If {@code null},
+	 * then the cursor of the first parent node with a non-null cursor will be
+	 * used. If no Node in the scene graph defines a cursor, then the cursor of
+	 * the Scene will be used.
 	 *
 	 * @return the cursor property of the zoom pane.
 	 */

@@ -424,7 +424,7 @@ public class UserSettings {
 		 * Savely returns the most recently accessed DIP save directory.
 		 *
 		 * @return a path to the most recently accessed DIP save directory
-		 * (guaranteed to exist), or null.
+		 * (guaranteed to exist), or {@code null}.
 		 */
 		public Path getSaveDirectory() {
 			if (dipSaveDirectory != null && !Files.exists(dipSaveDirectory)) {
@@ -437,7 +437,7 @@ public class UserSettings {
 		 * Updates the most recently accessed DIP save directory.
 		 *
 		 * @param file a path to the most recently accessed DIP save file,
-		 * directory, or null.
+		 * directory, or {@code null}.
 		 */
 		public void setSaveDirectory(Path file) {
 			if (file == null) {
@@ -453,10 +453,10 @@ public class UserSettings {
 
 		/**
 		 * The most recently accessed DIP data directory. Unlike
-		 * {@code dipDataFile} this path isn't set back to null after accessing
-		 * a DIP data file located in the user directory, s.t. the custom
-		 * directory is remembered upon trying to load a custom DIP data file
-		 * again.
+		 * {@code dipDataFile} this path isn't set back to {@code null} after
+		 * accessing a DIP data file located in the user directory, s.t. the
+		 * custom directory is remembered upon trying to load a custom DIP data
+		 * file again.
 		 */
 		@XmlElement
 		@XmlJavaTypeAdapter(PathAdapter.class)
@@ -466,7 +466,7 @@ public class UserSettings {
 		 * Savely returns the most recently accessed DIP data directory.
 		 *
 		 * @return a path to the most recently accessed DIP data directory
-		 * (guaranteed to exist), or null.
+		 * (guaranteed to exist), or {@code null}.
 		 */
 		public Path getDataDirectory() {
 			if (dipDataDirectory != null && !Files.exists(dipDataDirectory)) {
@@ -490,7 +490,7 @@ public class UserSettings {
 		 * Savely returns the most recently accessed DIP data file.
 		 *
 		 * @return a path to the most recently accessed DIP data file
-		 * (guaranteed to exist), or null.
+		 * (guaranteed to exist), or {@code null}.
 		 */
 		public Path getDataFile() {
 			if (dipDataFile != null && !Files.exists(dipDataFile)) {
@@ -503,7 +503,7 @@ public class UserSettings {
 		 * Updates the most recently accessed DIP data file and directory.
 		 *
 		 * @param file the most recently accessed DIP data file, directory, or
-		 * null.
+		 * {@code null}.
 		 */
 		public void setDataFile(Path file) {
 			if (file == null || !Files.exists(file)) {

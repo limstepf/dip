@@ -348,7 +348,7 @@ public class OpenIMAJUtils {
 	 *
 	 * @param context the processor context.
 	 * @param filename the filename of the image.
-	 * @return the image, or null.
+	 * @return the image, or {@code null}.
 	 */
 	public static FImage readFImage(ProcessorContext context, String filename) {
 		final Path file = context.getDirectory().resolve(filename);
@@ -409,7 +409,7 @@ public class OpenIMAJUtils {
 	 *
 	 * @param context the processor context.
 	 * @param filename the filename of the image.
-	 * @return the image, or null.
+	 * @return the image, or {@code null}.
 	 */
 	public static MBFImage readMBFImage(ProcessorContext context, String filename) {
 		final Path file = context.getDirectory().resolve(filename);
