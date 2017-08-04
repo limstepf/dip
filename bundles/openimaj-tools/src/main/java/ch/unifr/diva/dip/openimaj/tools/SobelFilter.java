@@ -3,17 +3,22 @@ package ch.unifr.diva.dip.openimaj.tools;
 import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.components.ProcessorContext;
+import ch.unifr.diva.dip.api.components.ProcessorDocumentation;
+import ch.unifr.diva.dip.api.components.SimpleProcessorDocumentation;
 import ch.unifr.diva.dip.api.components.XorInputPorts;
 import ch.unifr.diva.dip.api.datastructures.BufferedMatrix;
+import ch.unifr.diva.dip.api.parameters.CompositeGrid;
 import ch.unifr.diva.dip.api.parameters.ExpParameter;
 import ch.unifr.diva.dip.api.parameters.IntegerSliderParameter;
+import ch.unifr.diva.dip.api.parameters.TextParameter;
+import ch.unifr.diva.dip.api.parameters.XorParameter;
 import ch.unifr.diva.dip.api.services.ProcessableBase;
 import ch.unifr.diva.dip.api.services.Processor;
-import ch.unifr.diva.dip.api.services.ProcessorBase;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.glyphs.mdi.MaterialDesignIcons;
 import ch.unifr.diva.dip.openimaj.utils.OpenIMAJUtils;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 import org.openimaj.image.FImage;
 import org.openimaj.image.processing.convolution.FSobel;
 import org.osgi.service.component.annotations.Component;
@@ -33,6 +38,7 @@ public class SobelFilter extends ProcessableBase {
 	private final OutputPort<BufferedMatrix> dx_float;
 	private final OutputPort<BufferedMatrix> dy_float;
 	private final IntegerSliderParameter band;
+	private final XorParameter blur;
 	private final ExpParameter sigma;
 
 	/**
@@ -43,8 +49,22 @@ public class SobelFilter extends ProcessableBase {
 
 		this.band = new IntegerSliderParameter("Band", 1, 1, 4);
 		parameters.put("band", band);
+
+		final TextParameter noblur = new TextParameter("no Gaussian blurring");
 		this.sigma = new ExpParameter("Sigma", "1.0");
-		parameters.put("sigma", sigma);
+		sigma.addTextFieldViewHook((t) -> {
+			t.setMaxWidth(64);
+		});
+		final CompositeGrid grid = new CompositeGrid(
+				new TextParameter("sigma: "),
+				sigma
+		);
+		this.blur = new XorParameter(
+				"blur",
+				Arrays.asList(noblur, grid),
+				0
+		);
+		parameters.put("blur", blur);
 
 		this.input = new InputPort<>(
 				new ch.unifr.diva.dip.api.datatypes.BufferedImage(),
@@ -69,6 +89,17 @@ public class SobelFilter extends ProcessableBase {
 		);
 		outputs.put("dx-float", dx_float);
 		outputs.put("dy-float", dy_float);
+	}
+
+	@Override
+	public ProcessorDocumentation processorDocumentation() {
+		final SimpleProcessorDocumentation doc = new SimpleProcessorDocumentation();
+		doc.addTextFlow(
+				"OpenIMAJ's implementation of Sobel filters. Computes the X and Y "
+				+ "image gradients. Optionally, the input image can be blurred "
+				+ "first using a Gaussian."
+		);
+		return doc;
 	}
 
 	@Override
@@ -111,12 +142,17 @@ public class SobelFilter extends ProcessableBase {
 			fimage = OpenIMAJUtils.toFImage(image, getBand(image));
 		}
 
-		float fsobel_sigma = sigma.getFloat();
-		if (!Float.isFinite(fsobel_sigma) || fsobel_sigma < 0) {
-			log.warn("invalid sigma: {}. Sigma is reset to 1.0f.", fsobel_sigma);
-			fsobel_sigma = 1.0f;
+		final FSobel fsobel;
+		if (blur.getSelectedIndex() == 0) {
+			fsobel = new FSobel();
+		} else {
+			float fsobel_sigma = sigma.getFloat();
+			if (!Float.isFinite(fsobel_sigma) || fsobel_sigma < 0) {
+				log.warn("invalid sigma: {}. Sigma is reset to 1.0f.", fsobel_sigma);
+				fsobel_sigma = 1.0f;
+			}
+			fsobel = new FSobel(fsobel_sigma);
 		}
-		final FSobel fsobel = new FSobel(fsobel_sigma);
 		fsobel.analyseImage(fimage);
 
 		final BufferedMatrix mat_dx = OpenIMAJUtils.toBufferedMatrix(fsobel.dx);

@@ -4,6 +4,8 @@ import ch.unifr.diva.dip.api.components.EditorLayerPane;
 import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.components.ProcessorContext;
+import ch.unifr.diva.dip.api.components.ProcessorDocumentation;
+import ch.unifr.diva.dip.api.components.SimpleProcessorDocumentation;
 import ch.unifr.diva.dip.api.components.XorInputPorts;
 import ch.unifr.diva.dip.api.datastructures.BufferedMatrix;
 import ch.unifr.diva.dip.api.datastructures.Line2D;
@@ -18,7 +20,6 @@ import ch.unifr.diva.dip.api.parameters.TextParameter;
 import ch.unifr.diva.dip.api.parameters.XorParameter;
 import ch.unifr.diva.dip.api.services.ProcessableBase;
 import ch.unifr.diva.dip.api.services.Processor;
-import ch.unifr.diva.dip.api.services.ProcessorBase;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.glyphs.mdi.MaterialDesignIcons;
 import ch.unifr.diva.dip.openimaj.utils.OpenIMAJUtils;
@@ -132,6 +133,21 @@ public class HoughLines extends ProcessableBase {
 				new ch.unifr.diva.dip.api.datatypes.Lines2D()
 		);
 		this.outputs.put("hough-lines", output_lines);
+	}
+
+	@Override
+	public ProcessorDocumentation processorDocumentation() {
+		final SimpleProcessorDocumentation doc = new SimpleProcessorDocumentation();
+		doc.addTextFlow(
+				"OpenIMAJ's implementation of the Hough Transform for lines. The "
+				+ "input image should have the lines to detect zeroed in the image "
+				+ "(black). All other values will be ignored. That means you "
+				+ "usually need to invert images created with edge detectors.\n"
+				//
+				+ "\nThe best n lines will be returned in strength order. The end "
+				+ "points of the lines will have x coordinates at -2000 and 2000."
+		);
+		return doc;
 	}
 
 	@Override
@@ -273,9 +289,9 @@ public class HoughLines extends ProcessableBase {
 			return 0.5;
 		}
 		if (value > max) {
-			return max;
+			return Math.floor(max) + .5;
 		}
-		return value;
+		return Math.floor(value) + .5;
 	}
 
 	@Override

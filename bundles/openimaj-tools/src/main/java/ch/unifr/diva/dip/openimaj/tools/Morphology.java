@@ -3,13 +3,14 @@ package ch.unifr.diva.dip.openimaj.tools;
 import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.components.ProcessorContext;
+import ch.unifr.diva.dip.api.components.ProcessorDocumentation;
+import ch.unifr.diva.dip.api.components.SimpleProcessorDocumentation;
 import ch.unifr.diva.dip.api.components.XorInputPorts;
 import ch.unifr.diva.dip.api.parameters.EnumParameter;
 import ch.unifr.diva.dip.api.parameters.IntegerSliderParameter;
 import ch.unifr.diva.dip.api.services.Previewable;
 import ch.unifr.diva.dip.api.services.ProcessableBase;
 import ch.unifr.diva.dip.api.services.Processor;
-import ch.unifr.diva.dip.api.services.ProcessorBase;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.glyphs.mdi.MaterialDesignIcons;
 import ch.unifr.diva.dip.openimaj.utils.OpenIMAJUtils;
@@ -205,6 +206,15 @@ public class Morphology extends ProcessableBase implements Previewable {
 	@Override
 	public String name() {
 		return runtimeTitle;
+	}
+
+	@Override
+	public ProcessorDocumentation processorDocumentation() {
+		final SimpleProcessorDocumentation doc = new SimpleProcessorDocumentation();
+		doc.addTextFlow(
+				"OpenIMAJ's morphological operators for (assumed) binary images."
+		);
+		return doc;
 	}
 
 	@Override

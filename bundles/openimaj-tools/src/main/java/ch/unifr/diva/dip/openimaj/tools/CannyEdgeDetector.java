@@ -4,6 +4,8 @@ import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.components.Port;
 import ch.unifr.diva.dip.api.components.ProcessorContext;
+import ch.unifr.diva.dip.api.components.ProcessorDocumentation;
+import ch.unifr.diva.dip.api.components.SimpleProcessorDocumentation;
 import ch.unifr.diva.dip.api.components.XorInputPortGroup;
 import ch.unifr.diva.dip.api.datastructures.BufferedMatrix;
 import ch.unifr.diva.dip.api.parameters.CompositeGrid;
@@ -15,8 +17,8 @@ import ch.unifr.diva.dip.api.parameters.XorParameter;
 import ch.unifr.diva.dip.api.services.Previewable;
 import ch.unifr.diva.dip.api.services.ProcessableBase;
 import ch.unifr.diva.dip.api.services.Processor;
-import ch.unifr.diva.dip.api.services.ProcessorBase;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
+import ch.unifr.diva.dip.api.ui.StructuredText;
 import ch.unifr.diva.dip.glyphs.mdi.MaterialDesignIcons;
 import ch.unifr.diva.dip.openimaj.utils.OpenIMAJUtils;
 import java.awt.Rectangle;
@@ -138,6 +140,26 @@ public class CannyEdgeDetector extends ProcessableBase implements Previewable {
 	}
 
 	@Override
+	public ProcessorDocumentation processorDocumentation() {
+		final SimpleProcessorDocumentation doc = new SimpleProcessorDocumentation();
+		doc.addTextFlow(
+				"OpenIMAJ's Canny edge detector. Performs the following steps:"
+		);
+		doc.addStructuredText(StructuredText.orderedList(Arrays.asList(
+				"Gaussian blur with std.dev. sigma",
+				"Horizontal and vertical edge detection with Sobel operators",
+				"Non-maximum suppression",
+				"Hysteresis thresholding"
+		)));
+		doc.addTextFlow(
+				"The upper and lower thresholds for the hysteresis thresholding "
+				+ "can be specified manually or automatically chosen based on the "
+				+ "histogram of the edge magnitudes."
+		);
+		return doc;
+	}
+
+	@Override
 	public NamedGlyph glyph() {
 		return MaterialDesignIcons.FINGERPRINT;
 	}
@@ -235,7 +257,6 @@ public class CannyEdgeDetector extends ProcessableBase implements Previewable {
 		 * on the given bounds/subimage, so technically, we maybe should process
 		 * the whole thing anyways in this case?!
 		 */
-
 		if (group.equals(pg_sobel)) {
 			final BufferedImage mat_dx = getSubimage(input_dx.getValue(), bounds);
 			final BufferedImage mat_dy = getSubimage(input_dy.getValue(), bounds);

@@ -3,6 +3,8 @@ package ch.unifr.diva.dip.openimaj.tools;
 import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.components.ProcessorContext;
+import ch.unifr.diva.dip.api.components.ProcessorDocumentation;
+import ch.unifr.diva.dip.api.components.SimpleProcessorDocumentation;
 import ch.unifr.diva.dip.api.components.XorInputPorts;
 import ch.unifr.diva.dip.api.parameters.CompositeGrid;
 import ch.unifr.diva.dip.api.parameters.EnumParameter;
@@ -14,13 +16,16 @@ import ch.unifr.diva.dip.api.parameters.TextParameter;
 import ch.unifr.diva.dip.api.services.Previewable;
 import ch.unifr.diva.dip.api.services.ProcessableBase;
 import ch.unifr.diva.dip.api.services.Processor;
-import ch.unifr.diva.dip.api.services.ProcessorBase;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
+import ch.unifr.diva.dip.api.ui.StructuredText;
 import ch.unifr.diva.dip.glyphs.mdi.MaterialDesignIcons;
 import ch.unifr.diva.dip.openimaj.tools.patch.AdaptiveLocalThresholdBernsen;
 import ch.unifr.diva.dip.openimaj.utils.OpenIMAJUtils;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import javafx.beans.InvalidationListener;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.control.TextField;
@@ -85,6 +90,16 @@ public class AdaptiveLocalThreshold extends ProcessableBase implements Previewab
 						);
 						bernsen.processImage(fimage);
 					}
+
+					@Override
+					public String getDocText() {
+						return "Bernsen's adaptive local thresholding.";
+					}
+
+					@Override
+					public String getDocURL() {
+						return "http://fiji.sc/wiki/index.php/Auto_Local_Threshold";
+					}
 				},
 		CONTRAST("Local Contrast Thresholding") {
 					@Override
@@ -103,6 +118,18 @@ public class AdaptiveLocalThreshold extends ProcessableBase implements Previewab
 						);
 						contrast.processImage(fimage);
 					}
+
+					@Override
+					public String getDocText() {
+						return "Adaptive local thresholding using the local contrast. "
+						+ "Pixels are set to 1 if they are closer to the local maximum "
+						+ "rather than the local minimum.";
+					}
+
+					@Override
+					public String getDocURL() {
+						return "http://fiji.sc/wiki/index.php/Auto_Local_Threshold";
+					}
 				},
 		GAUSSIAN("Local Gaussian Thresholding") {
 					@Override
@@ -120,6 +147,17 @@ public class AdaptiveLocalThreshold extends ProcessableBase implements Previewab
 								processor.offset.getFloat()
 						);
 						gaussian.processImage(fimage);
+					}
+
+					@Override
+					public String getDocText() {
+						return "Adaptive local thresholding using the Gaussian weighted "
+						+ "sum of the patch and an offset.";
+					}
+
+					@Override
+					public String getDocURL() {
+						return "";
 					}
 				},
 		MEAN("Local Mean Thresholding") {
@@ -140,6 +178,17 @@ public class AdaptiveLocalThreshold extends ProcessableBase implements Previewab
 						);
 						mean.processImage(fimage);
 					}
+
+					@Override
+					public String getDocText() {
+						return "Adaptive local thresholding using the mean of the "
+						+ "patch and an offset.";
+					}
+
+					@Override
+					public String getDocURL() {
+						return "http://homepages.inf.ed.ac.uk/rbf/HIPR2/adpthrsh.htm";
+					}
 				},
 		MEDIAN("Local Median Thresholding") {
 					@Override
@@ -156,6 +205,17 @@ public class AdaptiveLocalThreshold extends ProcessableBase implements Previewab
 						);
 						mean.processImage(fimage);
 					}
+
+					@Override
+					public String getDocText() {
+						return "Adaptive local thresholding using the median of the "
+						+ "patch and an offset.";
+					}
+
+					@Override
+					public String getDocURL() {
+						return "http://homepages.inf.ed.ac.uk/rbf/HIPR2/adpthrsh.htm";
+					}
 				};
 
 		private final String methodName;
@@ -166,6 +226,14 @@ public class AdaptiveLocalThreshold extends ProcessableBase implements Previewab
 
 		public String getMethodName() {
 			return methodName;
+		}
+
+		public String getDocText() {
+			return "";
+		}
+
+		public String getDocURL() {
+			return "";
 		}
 
 		public abstract void putParameters(AdaptiveLocalThreshold processor);
@@ -250,6 +318,39 @@ public class AdaptiveLocalThreshold extends ProcessableBase implements Previewab
 		runtimeTitle = m.getMethodName();
 		m.putParameters(this);
 		repaint();
+	}
+
+	@Override
+	public ProcessorDocumentation processorDocumentation() {
+		final SimpleProcessorDocumentation doc = new SimpleProcessorDocumentation();
+		doc.addTextFlow(
+				"OpenIMAJ's adaptive local threshold algorithms:\n"
+		);
+
+		final Map<Object, Object> methods = new LinkedHashMap<>();
+		for (LocalThresholdMethod m : LocalThresholdMethod.values()) {
+			final String text = m.getDocText();
+			final String url = m.getDocURL();
+			if (!text.isEmpty() && !url.isEmpty()) {
+				methods.put(
+						m.getMethodName(),
+						StructuredText.textFlow(Arrays.asList(
+										text,
+										"\nSee also:",
+										doc.newHyperlink(url)
+								))
+				);
+			} else if (!text.isEmpty()) {
+				methods.put(
+						m.getMethodName(),
+						StructuredText.textFlow(Arrays.asList(
+										text
+								))
+				);
+			}
+		}
+		doc.addStructuredText(StructuredText.descriptionList(methods));
+		return doc;
 	}
 
 	@Override
