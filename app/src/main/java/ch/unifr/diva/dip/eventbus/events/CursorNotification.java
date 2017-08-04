@@ -52,4 +52,13 @@ public class CursorNotification {
 		this.cursor = cursor;
 	}
 
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName()
+				+ "{"
+				+ "type=" + type.name()
+				+ ", cursor=" + cursor.toString()
+				+ "}";
+	}
+
 }
