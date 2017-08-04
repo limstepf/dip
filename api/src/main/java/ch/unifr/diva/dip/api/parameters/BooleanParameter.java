@@ -122,7 +122,7 @@ public class BooleanParameter extends PersistentParameterBase<Boolean, BooleanPa
 
 			on.setToggleGroup(group);
 			off.setToggleGroup(group);
-			root.setAlignment(Pos.CENTER);
+			root.setAlignment(Pos.CENTER_LEFT);
 			root.getChildren().addAll(off, on);
 
 			set(parameter.get());
