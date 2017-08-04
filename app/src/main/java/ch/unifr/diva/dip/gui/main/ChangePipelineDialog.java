@@ -95,6 +95,7 @@ public class ChangePipelineDialog extends AbstractDialog {
 				vspane.getNode()
 		);
 		this.root.setCenter(vbox);
+		vbox.requestFocus();
 
 		this.ok = getDefaultButton(localize("page.change.pipelines"));
 		this.cancel = getCancelButton(stage);

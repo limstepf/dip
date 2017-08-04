@@ -36,8 +36,8 @@ public class DeletePipelineDialog extends AbstractDialog {
 
 	protected final static Insets titleInsets = new Insets(0, 0, UIStrategyGUI.Stage.insets, 0);
 	private final ApplicationHandler handler;
-	private final Button ok = getDefaultButton(localize("ok"));
-	private final Button cancel = getCancelButton(stage);
+	private final Button ok;
+	private final Button cancel;
 	private final List<ProjectPage> pages;
 	private final List<PrototypePipeline> deletedPipelines;
 	private final List<Integer> deletedPipelineIds;
@@ -83,6 +83,9 @@ public class DeletePipelineDialog extends AbstractDialog {
 		);
 		this.items = Listable.newListView();
 
+		this.ok = getDefaultButton(localize("ok"));
+		this.cancel = getCancelButton(stage);
+
 		this.validListener = (c) -> {
 			this.isValid = areAllValid();
 			this.ok.setDisable(!this.isValid);
@@ -105,6 +108,8 @@ public class DeletePipelineDialog extends AbstractDialog {
 
 		buttons.add(ok);
 		buttons.add(cancel);
+
+		root.requestFocus();
 	}
 
 	/**

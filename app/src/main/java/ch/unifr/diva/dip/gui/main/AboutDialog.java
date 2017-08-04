@@ -1,11 +1,13 @@
 package ch.unifr.diva.dip.gui.main;
 
 import ch.unifr.diva.dip.api.ui.Glyph;
+import ch.unifr.diva.dip.api.ui.StructuredText;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.ApplicationSettings;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import ch.unifr.diva.dip.gui.dialogs.AbstractDialog;
-import ch.unifr.diva.dip.gui.layout.FormGridPane;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -36,6 +38,7 @@ public class AboutDialog extends AbstractDialog {
 		ok = getDefaultButton(localize("close"));
 		buttons.add(ok);
 		ok.setOnAction(e -> stage.hide());
+		attachCancelOnEscapeHandler();
 
 		view.title.setText(ApplicationSettings.applicationTitle);
 
@@ -43,25 +46,29 @@ public class AboutDialog extends AbstractDialog {
 		final String version = getClass().getPackage().getImplementationVersion();
 		view.version.setText(version == null ? "IDE-SNAPSHOT" : version);
 
-		view.javaLabel.setText(localize("system.java.version") + ":");
-		view.java.setText(
+		final Map<Object, Object> info = new LinkedHashMap<>();
+		info.put(
+				localize("system.java.version"),
 				System.getProperty("java.runtime.version") + " "
 				+ System.getProperty("java.vm.name") + " "
 				+ System.getProperty("java.vm.version")
 		);
-
-		view.osLabel.setText(localize("system.os") + ":");
-		view.os.setText(
+		info.put(
+				localize("system.os"),
 				System.getProperty("os.name") + ", "
 				+ System.getProperty("os.version") + " ("
 				+ System.getProperty("os.arch") + ")"
 		);
-
-		view.appDirLabel.setText(localize("directory.application") + ":");
-		view.appDir.setText(handler.dataManager.appDir.toString());
-
-		view.userDirLabel.setText(localize("directory.user") + ":");
-		view.userDir.setText(handler.dataManager.appDataDir.toString());
+		info.put(
+				localize("directory.application"),
+				handler.dataManager.appDir.toString()
+		);
+		info.put(
+				localize("directory.user"),
+				handler.dataManager.appDataDir.toString()
+		);
+		final StructuredText infoPane = StructuredText.smallDescriptionList(info);
+		view.getChildren().add(infoPane);
 
 		root.setCenter(view);
 	}
@@ -73,15 +80,6 @@ public class AboutDialog extends AbstractDialog {
 
 		private final Label title = new Label();
 		private final Label version = new Label();
-		private final Label javaLabel = new Label();
-		private final Label java = new Label();
-		private final Label osLabel = new Label();
-		private final Label os = new Label();
-		private final Label appDirLabel = new Label();
-		private final Label appDir = new Label();
-		private final Label userDirLabel = new Label();
-		private final Label userDir = new Label();
-		private final FormGridPane form = new FormGridPane();
 
 		/**
 		 * Creates a new inner view.
@@ -96,12 +94,7 @@ public class AboutDialog extends AbstractDialog {
 			final double m = UIStrategyGUI.Stage.insets;
 			VBox.setMargin(g, new Insets(m, 0, m * 2, 0));
 
-			form.addRow(javaLabel, java);
-			form.addRow(osLabel, os);
-			form.addRow(appDirLabel, appDir);
-			form.addRow(userDirLabel, userDir);
-
-			this.getChildren().addAll(title, version, g, form);
+			this.getChildren().addAll(title, version, g);
 		}
 
 		private void setLeft(Label label) {
