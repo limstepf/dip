@@ -10,6 +10,7 @@ import ch.unifr.diva.dip.gui.pe.PipelineEditor;
 import ch.unifr.diva.dip.api.utils.FxUtils;
 import ch.unifr.diva.dip.eventbus.events.StatusMessageEvent;
 import ch.unifr.diva.dip.utils.BackgroundTask;
+import ch.unifr.diva.dip.utils.CursorLock;
 import ch.unifr.diva.dip.utils.ZipFileSystem;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -34,6 +35,7 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.Cursor;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -734,6 +736,7 @@ public class Project implements Modifiable, Localizable {
 	}
 
 	private Thread processPages(List<ProjectPage> pages) {
+		final CursorLock cursorLock = new CursorLock(handler, Cursor.WAIT);
 		final BackgroundTask<Void> task = new BackgroundTask<Void>(handler) {
 
 			@Override
@@ -771,6 +774,7 @@ public class Project implements Modifiable, Localizable {
 							+ localize("done")
 							+ "."
 					));
+					cursorLock.stop();
 				});
 			}
 		};
@@ -801,6 +805,7 @@ public class Project implements Modifiable, Localizable {
 	}
 
 	private Thread resetPages(List<ProjectPage> pages) {
+		final CursorLock cursorLock = new CursorLock(handler, Cursor.WAIT);
 		final BackgroundTask<Void> task = new BackgroundTask<Void>(handler) {
 
 			@Override
@@ -838,6 +843,7 @@ public class Project implements Modifiable, Localizable {
 							+ localize("done")
 							+ "."
 					));
+					cursorLock.stop();
 				});
 			}
 		};

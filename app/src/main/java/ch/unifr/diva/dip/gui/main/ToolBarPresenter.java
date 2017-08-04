@@ -13,6 +13,7 @@ import ch.unifr.diva.dip.core.model.ProjectPage;
 import ch.unifr.diva.dip.core.model.RunnablePipeline;
 import ch.unifr.diva.dip.core.model.RunnableProcessor;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
+import ch.unifr.diva.dip.eventbus.events.CursorNotification;
 import ch.unifr.diva.dip.eventbus.events.ProcessorNotification;
 import ch.unifr.diva.dip.eventbus.events.ProjectNotification;
 import ch.unifr.diva.dip.glyphs.mdi.MaterialDesignIcons;
@@ -232,6 +233,41 @@ public class ToolBarPresenter implements Presenter {
 		}
 	}
 
+	// listen to global Cursor.WAIT locks, and also display Cursor.WAIT instead
+	// of the tool's custom cursor, until released again.
+	@Subscribe
+	public void cursorNotification(CursorNotification event) {
+		switch (event.type) {
+			case LOCK:
+				lockCursor(event.cursor);
+				break;
+			case RELEASE_LOCK:
+				releaseCursorLock(event.cursor);
+				break;
+		}
+	}
+
+	private boolean isCursorLocked;
+
+	private void lockCursor(Cursor cursor) {
+		isCursorLocked = true;
+		if (editor.getZoomPane().cursorProperty().isBound()) {
+			editor.getZoomPane().cursorProperty().unbind();
+		}
+		editor.getZoomPane().setCursor(cursor);
+	}
+
+	private void releaseCursorLock(Cursor cursor) {
+		if (selectedTool != null) {
+			editor.getZoomPane().cursorProperty().bind(
+					selectedTool.tool().cursorProperty()
+			);
+		} else {
+			editor.getZoomPane().setCursor(Cursor.DEFAULT);
+		}
+		isCursorLocked = false;
+	}
+
 	private boolean loadToolBar(int processorId) {
 		final VisibilityMode mode = getVisibilityMode();
 		if (mode.equals(VisibilityMode.NEVER)) {
@@ -356,7 +392,9 @@ public class ToolBarPresenter implements Presenter {
 			}
 		}
 
-		editor.getZoomPane().cursorProperty().bind(newTool.cursorProperty());
+		if (!isCursorLocked) {
+			editor.getZoomPane().cursorProperty().bind(newTool.cursorProperty());
+		}
 		buildOptionsBar(newTool);
 	}
 
@@ -377,10 +415,14 @@ public class ToolBarPresenter implements Presenter {
 				}
 			}
 
-			editor.getZoomPane().cursorProperty().unbind();
+			if (!isCursorLocked) {
+				editor.getZoomPane().cursorProperty().unbind();
+			}
 			currentTool.onDeselected();
 		}
-		editor.getZoomPane().setCursor(Cursor.DEFAULT);
+		if (!isCursorLocked) {
+			editor.getZoomPane().setCursor(Cursor.DEFAULT);
+		}
 	}
 
 	private void rebuildOptionsBar() {

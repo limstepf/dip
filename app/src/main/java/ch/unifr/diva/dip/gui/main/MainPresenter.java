@@ -20,6 +20,7 @@ import ch.unifr.diva.dip.gui.dialogs.ErrorDialog;
 import ch.unifr.diva.dip.gui.editor.EditorPresenter;
 import ch.unifr.diva.dip.gui.layout.Zoomable;
 import ch.unifr.diva.dip.utils.BackgroundTask;
+import ch.unifr.diva.dip.utils.CursorLock;
 import com.google.common.eventbus.Subscribe;
 import java.io.File;
 import java.io.IOException;
@@ -352,6 +353,8 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 		final ProjectPage currentPage = project.getSelectedPage();
 		final boolean isDirty = (currentPage == null) ? false : currentPage.isModified();
 		final int selected = handler.getProject().getSelectedPageId();
+
+		final CursorLock cursorLock = new CursorLock(handler, Cursor.WAIT);
 		final BackgroundTask<Void> task = new BackgroundTask<Void>(handler) {
 			@Override
 			protected Void call() throws Exception {
@@ -380,10 +383,9 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 					));
 					eventBus.post(new StatusMessageEvent(localize("page.selected")));
 				}
-				scene.cursorProperty().set(Cursor.DEFAULT);
+				cursorLock.stop();
 			}
 		};
-		scene.cursorProperty().set(Cursor.WAIT);
 		task.start();
 	}
 
