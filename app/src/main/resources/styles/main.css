@@ -4,7 +4,7 @@
 */
 .root {
 	-dip-background: derive(-fx-base, -67%);
-	-dip-faint: derive(-fx-dark-text-color, 111%);
+	-dip-faint: derive(-fx-text-inner-color, 87%);
 	-dip-accent-faint: -fx-faint-focus-color;
 	-dip-accent-highlight: derive(-fx-accent, 67%);
 	-dip-accent-inverted: white;
@@ -41,6 +41,18 @@
 	30px		2.5em
 	45px		3.75em
 */
+
+Text, TextFlow {
+	-fx-text-fill: -fx-text-base-color;
+	-fx-fill: -fx-text-base-color;
+}
+
+.scroll-pane.edge-to-edge > .viewport,
+.scroll-pane.edge-to-edge,
+.tab-pane > * > .scroll-pane {
+    -fx-background-color: transparent;
+}
+
 
 .tooltip {
 	-fx-font-size: 10px;

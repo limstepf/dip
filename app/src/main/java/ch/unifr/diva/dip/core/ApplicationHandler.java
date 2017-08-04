@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.List;
+import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
@@ -96,6 +97,12 @@ public class ApplicationHandler implements Localizable {
 	 */
 	public final EventBus eventBus;
 
+	/**
+	 * FX application host services. Used to open browsers. Only available
+	 * running in GUI mode, will be {@code null} in headless mode.
+	 */
+	public final HostServices hostServices;
+
 	// open/current project
 	private Project project = null;
 	// pointers to invalid/corrupt project data; might be fixed and still opened
@@ -119,6 +126,23 @@ public class ApplicationHandler implements Localizable {
 			UIStrategy uiStrategy,
 			EventBus eventBus
 	) {
+		this(context, uiStrategy, eventBus, null);
+	}
+
+	/**
+	 * ApplicationHandler constructor.
+	 *
+	 * @param context the ApplicationContext.
+	 * @param uiStrategy an UIStrategy (for error handling, confirmations, ...).
+	 * @param eventBus the eventbus.
+	 * @param hostServices FX application host services.
+	 */
+	public ApplicationHandler(
+			ApplicationContext context,
+			UIStrategy uiStrategy,
+			EventBus eventBus,
+			HostServices hostServices
+	) {
 		this.context = context;
 		this.dataManager = context.dataManager;
 		this.threadPool = context.threadPool;
@@ -127,6 +151,7 @@ public class ApplicationHandler implements Localizable {
 		this.settings = context.settings;
 		this.uiStrategy = uiStrategy;
 		this.eventBus = eventBus;
+		this.hostServices = hostServices;
 	}
 
 	/**

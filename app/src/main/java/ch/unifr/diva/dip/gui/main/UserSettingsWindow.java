@@ -72,6 +72,8 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 
 		this.listView.getSelectionModel().selectFirst();
 		this.listView.getSelectionModel().selectedItemProperty().addListener(categoryListener);
+
+		root.requestFocus();
 		categoryCallback();
 	}
 
@@ -319,6 +321,7 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 		apply.setOnAction((c) -> apply());
 
 		final Button cancel = new Button(localize("cancel"));
+		cancel.setCancelButton(true);
 		cancel.setOnAction((c) -> cancel());
 
 		lane.getChildren().addAll(apply, cancel);

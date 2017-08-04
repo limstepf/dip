@@ -34,7 +34,8 @@ public class MainGUI extends Application {
 	private final ApplicationHandler handler = new ApplicationHandler(
 			context,
 			uiStrategy,
-			eventBus
+			eventBus,
+			getHostServices()
 	);
 	private Stage primaryStage;
 

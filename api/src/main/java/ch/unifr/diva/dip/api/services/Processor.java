@@ -4,6 +4,7 @@ import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.components.Port;
 import ch.unifr.diva.dip.api.components.ProcessorContext;
+import ch.unifr.diva.dip.api.components.ProcessorDocumentation;
 import ch.unifr.diva.dip.api.datatypes.DataType;
 import ch.unifr.diva.dip.api.parameters.Parameter;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
@@ -186,6 +187,17 @@ public interface Processor {
 	 * @return the name of the processor.
 	 */
 	public String name();
+
+	/**
+	 * Returns (optional) processor documentation. If overwritten/implemented
+	 * this method should always return a new instance of
+	 * {@code ProcessorDocumentation}.
+	 *
+	 * @return the processor documentation, or {@code null} if not available.
+	 */
+	default ProcessorDocumentation processorDocumentation() {
+		return null;
+	}
 
 	/**
 	 * Returns the glyph of the processor.

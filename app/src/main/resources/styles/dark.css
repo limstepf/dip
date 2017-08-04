@@ -1,4 +1,28 @@
+/*
+	Base: main.css (light skin), which in turn is based on modena.css
+	might need some further tweaking...
+*/
 .root {
-	/* might need some tweaking */
     -fx-base: rgba(60, 75, 80, 255);
+	-dip-faint: derive(-fx-text-inner-color, 137%);
+	-fx-mark-color: ladder(
+		-fx-accent,
+		white 30%,
+		derive(-fx-accent,111%) 31%
+	);
+	-fx-mark-highlight-color: ladder(
+		-fx-accent,
+        derive(-fx-accent,131%) 60%,
+		white 70%
+	);
 }
+
+.dip-dialog {
+	-fx-background-color: -fx-body-color;
+}
+
+.axis {
+    AXIS_COLOR: derive(-fx-accent,-20%);
+}
+
+

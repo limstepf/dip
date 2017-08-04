@@ -3,6 +3,7 @@ package ch.unifr.diva.dip.core.model;
 import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.components.ProcessorContext;
+import ch.unifr.diva.dip.api.components.ProcessorDocumentation;
 import ch.unifr.diva.dip.api.parameters.Parameter;
 import ch.unifr.diva.dip.api.parameters.PersistentParameter;
 import ch.unifr.diva.dip.core.services.api.HostProcessor;
@@ -252,6 +253,15 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 	 */
 	public Processor.State state() {
 		return (isAvailable() ? processor.state() : Processor.State.UNAVAILABLE);
+	}
+
+	/**
+	 * Returns the (optional) processor documentation.
+	 *
+	 * @return the processor documentation, or {@code null} if not available.
+	 */
+	public ProcessorDocumentation getProcessorDocumentation() {
+		return processor.processorDocumentation();
 	}
 
 	/**

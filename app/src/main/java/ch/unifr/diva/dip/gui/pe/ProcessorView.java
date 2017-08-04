@@ -24,6 +24,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -50,6 +51,7 @@ public abstract class ProcessorView extends BorderPane {
 	protected static final PseudoClass UNAVAILABLE = PseudoClass.getPseudoClass("unavailable");
 	protected static final NamedGlyph IMPORT_GLYPH = MaterialDesignIcons.IMPORT;
 	protected static final NamedGlyph EXPORT_GLYPH = MaterialDesignIcons.EXPORT;
+	protected static final NamedGlyph INFO_GLYPH = MaterialDesignIcons.INFORMATION_OUTLINE;
 
 	// we may want to make this a user setting in the future, but keep in mind that
 	// padding should be large enough to accommodate for port labels, and directly
@@ -765,11 +767,12 @@ public abstract class ProcessorView extends BorderPane {
 	 */
 	public static class ProcessorHead implements Localizable {
 
-		private final ApplicationHandler handler;
-		private final Window owner;
-		private final BorderPane pane;
-		private final HBox title;
-		private final HBox menu;
+		protected final ApplicationHandler handler;
+		protected final Window owner;
+		protected final PrototypeProcessor wrapper;
+		protected final BorderPane pane;
+		protected final HBox title;
+		protected final HBox menu;
 
 		/**
 		 * Creates a new processor head.
@@ -780,6 +783,7 @@ public abstract class ProcessorView extends BorderPane {
 		public ProcessorHead(ApplicationHandler handler, PrototypeProcessor wrapper) {
 			this.handler = handler;
 			this.owner = handler.uiStrategy.getStage();
+			this.wrapper = wrapper;
 			this.pane = new BorderPane();
 			pane.setMaxWidth(Double.MAX_VALUE);
 
@@ -815,13 +819,27 @@ public abstract class ProcessorView extends BorderPane {
 				final ProcessorPresetExportDialog dialog = new ProcessorPresetExportDialog(handler, wrapper);
 				dialog.show();
 			});
+			final Glyph infoGlyph = UIStrategyGUI.Glyphs.newGlyph(INFO_GLYPH, Glyph.Size.NORMAL);
+			infoGlyph.setPadding(new Insets(0, 0, 0, 5));
+			infoGlyph.enableHoverEffect(true);
+			infoGlyph.setTooltip(localize("processor.info"));
+			infoGlyph.setOnMouseClicked((e) -> showProcessorDocumentation());
+
 			this.menu = new HBox();
 			menu.setSpacing(UIStrategyGUI.Stage.insets);
 			menu.setAlignment(Pos.CENTER_RIGHT);
-			menu.getChildren().setAll(importGlyph, exportGlyph);
+			menu.getChildren().setAll(importGlyph, exportGlyph, infoGlyph);
 
 			pane.setCenter(title);
 			pane.setRight(menu);
+		}
+
+		public final void showProcessorDocumentation() {
+			final ProcessorInformationDialog dialog = new ProcessorInformationDialog(
+					handler,
+					wrapper
+			);
+			dialog.show();
 		}
 
 		public Node getNode() {
