@@ -203,7 +203,7 @@ public class ProcessorInformationDialog<T extends PrototypeProcessor> extends Ab
 							row.add(newLabel(
 									port.isRequired()
 											? localize("required").toLowerCase()
-											: localize("not required").toLowerCase(),
+											: localize("required.not").toLowerCase(),
 									visible
 							));
 
