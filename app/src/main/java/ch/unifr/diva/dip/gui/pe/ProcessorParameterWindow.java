@@ -119,8 +119,9 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 		sideBox.getChildren().addAll(ok, reset);
 		this.root.setRight(sideBox);
 
-		// kill off preview if the processor isn't in PROCESSING state
-		final boolean canPreview = runnable.getState().equals(Processor.State.PROCESSING);
+		// kill off preview if the processor isn't in PROCESSING or READY state
+		final boolean canPreview = runnable.getState().equals(Processor.State.PROCESSING)
+				|| runnable.getState().equals(Processor.State.READY);
 		// and make sure we have a valid previewContext
 		final PreviewContext previewContext = (runnable.isPreviewable() && canPreview)
 				? new PreviewContext(handler, runnable)
