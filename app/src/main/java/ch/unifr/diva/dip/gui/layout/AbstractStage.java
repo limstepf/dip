@@ -1,10 +1,11 @@
 package ch.unifr.diva.dip.gui.layout;
 
-import ch.unifr.diva.dip.core.ApplicationSettings;
 import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.core.ui.StylesheetManager;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -52,6 +53,30 @@ public abstract class AbstractStage implements Localizable {
 
 		stage.setTitle(title);
 		stage.setScene(scene);
+	}
+
+	/**
+	 * Attaches an event handler to close the dialog if {@code ESCAPE} has been
+	 * hit. Usually the default cancel button consumes {@code ESCAPE}, but in
+	 * cases where that's not really working/an option this key event handler
+	 * should do the job. Sometimes the key event get's swallowed by some node,
+	 * in which case {@code requestFocus()} on some neutral/background node
+	 * might help.
+	 */
+	protected void attachCancelOnEscapeHandler() {
+		stage.addEventHandler(KeyEvent.KEY_PRESSED, (e) -> {
+			if (e.getCode() == KeyCode.ESCAPE) {
+				cancelOnEscape();
+			}
+		});
+	}
+
+	/**
+	 * Closes the dialog (after hitting {@code ESCAPE}). May be overwritten if
+	 * needed.
+	 */
+	protected void cancelOnEscape() {
+		stage.close();
 	}
 
 	/**
