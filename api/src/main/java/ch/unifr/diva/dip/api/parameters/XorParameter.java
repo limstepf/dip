@@ -87,6 +87,24 @@ public class XorParameter extends CompositeBase<ValueListSelection, XorParameter
 		}
 	}
 
+	/**
+	 * Returns the selected index.
+	 *
+	 * @return the selected index.
+	 */
+	public int getSelectedIndex() {
+		return get().getSelectedIndex();
+	}
+
+	/**
+	 * Returns the selected value.
+	 *
+	 * @return the selected value.
+	 */
+	public Object getSelectedValue() {
+		return get().getSelectedValue();
+	}
+
 	@Override
 	protected Collection<? extends Parameter<?>> getChildren() {
 		return this.children;
