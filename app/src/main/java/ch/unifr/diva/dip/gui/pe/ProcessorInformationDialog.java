@@ -110,7 +110,7 @@ public class ProcessorInformationDialog<T extends PrototypeProcessor> extends Ab
 			root.getChildren().add(region);
 		}
 
-		root.getChildren().add(new ProcessorInformation(handler, wrapper, service));
+		root.getChildren().add(new ProcessorInformation<>(handler, wrapper, service));
 		return root;
 	}
 

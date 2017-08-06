@@ -835,7 +835,7 @@ public abstract class ProcessorView extends BorderPane {
 		}
 
 		public final void showProcessorDocumentation() {
-			final ProcessorInformationDialog dialog = new ProcessorInformationDialog(
+			final ProcessorInformationDialog<PrototypeProcessor> dialog = new ProcessorInformationDialog<>(
 					handler,
 					wrapper
 			);
