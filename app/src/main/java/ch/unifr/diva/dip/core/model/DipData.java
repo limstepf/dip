@@ -67,7 +67,7 @@ public class DipData {
 	 */
 	public PresetData getPresetData() {
 		if (!hasPresetData()) {
-			return new PresetData();
+			this.presets = new PresetData();
 		}
 		return this.presets;
 	}
