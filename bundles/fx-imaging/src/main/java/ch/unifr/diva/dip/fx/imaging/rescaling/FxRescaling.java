@@ -1,4 +1,4 @@
-package ch.unifr.diva.dip.imaging.rescaling;
+package ch.unifr.diva.dip.fx.imaging.rescaling;
 
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;

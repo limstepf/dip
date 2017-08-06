@@ -3,12 +3,16 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>ch.unifr.diva.dip</groupId>
-		<artifactId>dip-pom-osgi-bundle</artifactId>
+		<artifactId>dip-pom-osgi</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
-		<relativePath>../../pom-osgi-bundle/pom.xml</relativePath>
+		<relativePath>../../pom-osgi/pom.xml</relativePath>
 	</parent>
 
 	<artifactId>fx-imaging</artifactId>
+	<!-- This bundle is an "extra system package" loaded by the (classloader of
+	the) main APP, from where it's exposed to the embedded OSGi framework. Thus,
+	if you bump this version, the version should also be bumped in
+	{@code ch.unifr.diva.dip.osgi.ExtraSystemPackages}. -->
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 
@@ -16,6 +20,51 @@
 	<description>Imaging classes and utilities for JavaFX image processing (i.e. javafx.scene.image.Image).</description>
 
 	<dependencies>
+		<dependency>
+			<groupId>ch.unifr.diva.dip</groupId>
+			<artifactId>dip-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.compendium</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openjdk.jmh</groupId>
+			<artifactId>jmh-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openjdk.jmh</groupId>
+			<artifactId>jmh-generator-annprocess</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>ch.unifr.diva.dip</groupId>
 			<artifactId>imaging</artifactId>
@@ -27,11 +76,6 @@
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
 			</plugin>
 
 			<plugin>

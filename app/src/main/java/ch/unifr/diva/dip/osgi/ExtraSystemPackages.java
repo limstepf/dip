@@ -27,11 +27,15 @@ public class ExtraSystemPackages {
 					findPackages("ch.unifr.diva.dip.api")
 			),
 			/**
-			 * Export the imaging bundle.
+			 * Export the imaging and fx imaging bundles.
 			 */
 			new SystemPackageBundle(
 					"1.0.0",
 					findPackages("ch.unifr.diva.dip.imaging")
+			),
+			new SystemPackageBundle(
+					"1.0.0",
+					findPackages("ch.unifr.diva.dip.fx.imaging")
 			),
 			/**
 			 * Export glyph fonts.

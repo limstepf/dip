@@ -1,4 +1,4 @@
-package ch.unifr.diva.dip.imaging.rescaling;
+package ch.unifr.diva.dip.fx.imaging.rescaling;
 
 import ch.unifr.diva.dip.imaging.utils.AdaptiveIntBuffer;
 import javafx.scene.image.Image;

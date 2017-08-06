@@ -1,6 +1,6 @@
 package ch.unifr.diva.dip.fx.benchmarks;
 
-import ch.unifr.diva.dip.imaging.rescaling.FxRescaling;
+import ch.unifr.diva.dip.fx.imaging.rescaling.FxRescaling;
 import ch.unifr.diva.dip.imaging.utils.AdaptiveIntBuffer;
 import java.awt.RenderingHints;
 import java.util.Collection;

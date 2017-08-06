@@ -2,7 +2,6 @@ package ch.unifr.diva.dip.fx.imaging.rescaling;
 
 import ch.unifr.diva.dip.imaging.rescaling.AbstractFilteredRescaling;
 import ch.unifr.diva.dip.imaging.rescaling.FilterFunction;
-import ch.unifr.diva.dip.imaging.rescaling.FxRescaling;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.PixelWriter;
