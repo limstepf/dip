@@ -204,7 +204,12 @@ public class CannyEdgeDetector extends ProcessableBase implements Previewable {
 				fimage = OpenIMAJUtils.toFImage(mat, getBand(mat));
 			} else {
 				final BufferedImage image = input.getValue();
-				fimage = OpenIMAJUtils.toFImage(image, getBand(image));
+				if (image instanceof BufferedMatrix) {
+					final BufferedMatrix mat = (BufferedMatrix) image;
+					fimage = OpenIMAJUtils.toFImage(mat, getBand(mat));
+				} else {
+					fimage = OpenIMAJUtils.toFImage(image, getBand(image));
+				}
 			}
 			canny.processImage(fimage);
 			canny_out = fimage;
@@ -234,7 +239,7 @@ public class CannyEdgeDetector extends ProcessableBase implements Previewable {
 			return null;
 		}
 		final InputPort<?> port = group.getConnection();
-		if (port.equals(input_float)) {
+		if (port.equals(input_float) || (input.getValue() instanceof BufferedMatrix)) {
 			return null;
 		}
 		final BufferedImage image = input.getValue();
@@ -272,7 +277,12 @@ public class CannyEdgeDetector extends ProcessableBase implements Previewable {
 				fimage = OpenIMAJUtils.toFImage(mat, getBand(mat));
 			} else {
 				final BufferedImage image = getSubimage(input.getValue(), bounds);
-				fimage = OpenIMAJUtils.toFImage(image, getBand(image));
+				if (image instanceof BufferedMatrix) {
+					final BufferedImage mat = (BufferedMatrix) image;
+					fimage = OpenIMAJUtils.toFImage(mat, getBand(mat));
+				} else {
+					fimage = OpenIMAJUtils.toFImage(image, getBand(image));
+				}
 			}
 			canny.processImage(fimage);
 			canny_out = fimage;

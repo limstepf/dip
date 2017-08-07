@@ -139,7 +139,12 @@ public class SobelFilter extends ProcessableBase {
 			fimage = OpenIMAJUtils.toFImage(mat, getBand(mat));
 		} else {
 			final BufferedImage image = input.getValue();
-			fimage = OpenIMAJUtils.toFImage(image, getBand(image));
+			if (image instanceof BufferedMatrix) {
+				final BufferedMatrix mat = (BufferedMatrix) image;
+				fimage = OpenIMAJUtils.toFImage(mat, getBand(mat));
+			} else {
+				fimage = OpenIMAJUtils.toFImage(image, getBand(image));
+			}
 		}
 
 		final FSobel fsobel;
