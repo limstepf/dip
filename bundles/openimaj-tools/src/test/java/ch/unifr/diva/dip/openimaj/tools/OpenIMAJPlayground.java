@@ -3,6 +3,7 @@ package ch.unifr.diva.dip.openimaj.tools;
 import ch.unifr.diva.dip.openimaj.tools.patch.LocalContrastFilter;
 import org.junit.Test;
 import org.openimaj.image.FImage;
+import org.openimaj.image.processing.algorithm.DifferenceOfGaussian;
 import org.openimaj.image.processing.algorithm.FilterSupport;
 import org.openimaj.image.processing.convolution.FSobel;
 import org.openimaj.image.processing.convolution.Laplacian3x3;
@@ -45,6 +46,45 @@ public class OpenIMAJPlayground {
 
 		printScanline(sobel.dy.pixels, 10);
 		System.out.println();
+	}
+
+	@Test
+	public void differenceOfGaussiansTest() {
+		int width = 64;
+		int height = 64;
+		float[][] samples = getSamples(width, height);
+		for (int i = 16; i < 48; i++) {
+			vLine(samples, i, 255.0f, 1.0f);
+		}
+		vLine(samples, 48, 255.0f, 1.0f);
+		vLine(samples, 52, 96.0f, 1.0f);
+		hLine(samples, 15, 255.0f, 1.0f);
+		hLine(samples, 16, 255.0f, 1.0f);
+		hLine(samples, 17, 255.0f, 1.0f);
+		hLine(samples, 18, 255.0f, 1.0f);
+		hLine(samples, 19, 255.0f, 1.0f);
+		FImage fimage = new FImage(samples);
+		DifferenceOfGaussian dog = new DifferenceOfGaussian();
+		dog.processImage(fimage);
+
+//		fimage.addInplace(128.0f); // offset by 128 -> ~[51, 180]
+//		fimage.clip(0.0f, 255.0f); // clamp -> ~[0, 52]
+
+		final float min = Math.abs(fimage.min());
+		System.out.println("add min> " + min);
+		fimage.addInplace(min);
+		final float max = fimage.max();
+		final float mul = 255.0f / max;
+		System.out.println("add min> " + max + ", " + mul);
+		fimage.multiplyInplace(mul);
+
+		// samples in [-255, 255]?
+		printScanline(fimage.pixels, 10);
+		System.out.println();
+		printScanline(fimage.pixels, 17);
+		System.out.println();
+		System.out.println("min: " + fimage.min());
+		System.out.println("max: " + fimage.max());
 	}
 
 	@Test
