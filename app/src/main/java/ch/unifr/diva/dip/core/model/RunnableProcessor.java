@@ -17,6 +17,7 @@ import ch.unifr.diva.dip.utils.BackgroundTask;
 import ch.unifr.diva.dip.utils.FileFinder;
 import ch.unifr.diva.dip.api.utils.FxUtils;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
+import ch.unifr.diva.dip.utils.CursorLock;
 import ch.unifr.diva.dip.utils.IOUtils;
 import ch.unifr.diva.dip.utils.SynchronizedObjectProperty;
 import java.io.BufferedInputStream;
@@ -32,6 +33,7 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -523,6 +525,7 @@ public class RunnableProcessor extends PrototypeProcessor {
 	 */
 	public void processBackgroundTask() {
 		final RunnableProcessor runnable = this;
+		final CursorLock cursorLock = new CursorLock(handler, Cursor.WAIT);
 		final BackgroundTask<Void> task = new BackgroundTask<Void>(handler) {
 
 			@Override
@@ -544,6 +547,7 @@ public class RunnableProcessor extends PrototypeProcessor {
 							+ localize("done")
 							+ "."
 					));
+					cursorLock.stop();
 				});
 			}
 
@@ -577,6 +581,7 @@ public class RunnableProcessor extends PrototypeProcessor {
 	 */
 	public void resetBackgroundTask() {
 		final RunnableProcessor runnable = this;
+		final CursorLock cursorLock = new CursorLock(handler, Cursor.WAIT);
 		final BackgroundTask<Void> task = new BackgroundTask<Void>(handler) {
 
 			@Override
@@ -598,6 +603,7 @@ public class RunnableProcessor extends PrototypeProcessor {
 							+ localize("done")
 							+ "."
 					));
+					cursorLock.stop();
 				});
 			}
 
