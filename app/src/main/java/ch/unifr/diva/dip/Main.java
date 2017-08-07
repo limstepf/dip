@@ -63,6 +63,7 @@ public class Main {
 	public static void kthxbai() {
 		// close application resources
 		if (context != null) {
+			context.saveOSGiProcessorRecollection();
 			context.cleanup();
 			context.close();
 			// shutdown

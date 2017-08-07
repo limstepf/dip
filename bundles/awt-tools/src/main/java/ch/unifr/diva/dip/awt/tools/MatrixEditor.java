@@ -6,6 +6,7 @@ import ch.unifr.diva.dip.api.datastructures.BooleanMatrix;
 import ch.unifr.diva.dip.api.datastructures.DoubleMatrix;
 import ch.unifr.diva.dip.api.datastructures.FloatMatrix;
 import ch.unifr.diva.dip.api.datastructures.StringMatrix;
+import ch.unifr.diva.dip.api.datastructures.ValueList;
 import ch.unifr.diva.dip.api.parameters.ButtonParameter;
 import ch.unifr.diva.dip.api.parameters.CompositeGrid;
 import ch.unifr.diva.dip.api.parameters.EmptyParameter;
@@ -14,10 +15,16 @@ import ch.unifr.diva.dip.api.parameters.ExpParameter;
 import ch.unifr.diva.dip.api.parameters.IntegerParameter;
 import ch.unifr.diva.dip.api.parameters.TextParameter;
 import ch.unifr.diva.dip.api.parameters.TransientFacadeParameter;
+import ch.unifr.diva.dip.api.services.Preset;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.services.ProcessorBase;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.glyphs.mdi.MaterialDesignIcons;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javafx.beans.InvalidationListener;
 import org.osgi.service.component.annotations.Component;
 
@@ -199,6 +206,149 @@ public class MatrixEditor extends ProcessorBase {
 	@Override
 	public NamedGlyph glyph() {
 		return MaterialDesignIcons.MATRIX;
+	}
+
+	@Override
+	public List<Preset> presets() {
+		final List<Preset> presets = new ArrayList<>();
+
+		presets.add(new MatrixPreset(
+				"Box blur 3x3",
+				3,
+				3,
+				"1/9",
+				new String[][]{
+					new String[]{"1", "1", "1"},
+					new String[]{"1", "1", "1"},
+					new String[]{"1", "1", "1"}
+				}
+		));
+
+		presets.add(new MatrixPreset(
+				"Gaussian blur 3x3",
+				3,
+				3,
+				"1/16",
+				new String[][]{
+					new String[]{"1", "2", "1"},
+					new String[]{"2", "4", "2"},
+					new String[]{"1", "2", "1"}
+				}
+		));
+
+		presets.add(new MatrixPreset(
+				"Gaussian blur 5x5",
+				3,
+				3,
+				"1/256",
+				new String[][]{
+					new String[]{"1", "4", "6", "4", "1"},
+					new String[]{"4", "16", "24", "16", "4"},
+					new String[]{"6", "24", "36", "24", "6"},
+					new String[]{"4", "16", "24", "16", "4"},
+					new String[]{"1", "4", "6", "4", "1"},
+				}
+		));
+
+		presets.add(new MatrixPreset(
+				"Prewitt operator X (vertical)",
+				3,
+				3,
+				"1",
+				new String[][]{
+					new String[]{"-1", "0", "1"},
+					new String[]{"-1", "0", "1"},
+					new String[]{"-1", "0", "1"}
+				}
+		));
+
+		presets.add(new MatrixPreset(
+				"Prewitt operator Y (horizontal)",
+				3,
+				3,
+				"1",
+				new String[][]{
+					new String[]{"1", "1", "1"},
+					new String[]{"0", "0", "0"},
+					new String[]{"-1", "-1", "-1"}
+				}
+		));
+
+		presets.add(new MatrixPreset(
+				"Sharpen 3x3",
+				3,
+				3,
+				"1",
+				new String[][]{
+					new String[]{"0", "-1", "0"},
+					new String[]{"-1", "5", "-1"},
+					new String[]{"0", "-1", "0"}
+				}
+		));
+
+		presets.add(new MatrixPreset(
+				"Sobel operator X (vertical)",
+				3,
+				3,
+				"1",
+				new String[][]{
+					new String[]{"-1", "0", "1"},
+					new String[]{"-2", "0", "2"},
+					new String[]{"-1", "0", "1"}
+				}
+		));
+
+		presets.add(new MatrixPreset(
+				"Sobel operator Y (horizontal)",
+				3,
+				3,
+				"1",
+				new String[][]{
+					new String[]{"1", "2", "1"},
+					new String[]{"0", "0", "0"},
+					new String[]{"-1", "-2", "-1"}
+				}
+		));
+
+		return presets;
+	}
+
+	/**
+	 * A matrix preset. We use two {@code CompositeGrid} parameters backed by
+	 * {@code ValueList}s (only persistent parameters are stored). The
+	 * multiplier has to be given as a {@code String}, similarly we're using a
+	 * {@code StringMatrix}, for all these strings are intented for
+	 * {@code ExpParameter}s.
+	 */
+	public static class MatrixPreset extends Preset {
+
+		/**
+		 * Creates a new matrix preset.
+		 *
+		 * @param name name of the preset.
+		 * @param m number of rows.
+		 * @param n number of columns.
+		 * @param multiplier the multiplier (applied to all values
+		 * individually).
+		 * @param matrix the m-by-n matrix.
+		 */
+		public MatrixPreset(String name, int m, int n, String multiplier, String[][] matrix) {
+			super(name, getValues(m, n, multiplier, matrix));
+		}
+
+		protected static Map<String, Object> getValues(int m, int n, String multiplier, String[][] matrix) {
+			final Map<String, Object> values = new HashMap<>();
+			values.put("shape", new ValueList(Arrays.asList(
+					m,
+					n
+			)));
+			values.put("matrix", new ValueList(Arrays.asList(
+					multiplier,
+					new StringMatrix(matrix)
+			)));
+			return values;
+		}
+
 	}
 
 }

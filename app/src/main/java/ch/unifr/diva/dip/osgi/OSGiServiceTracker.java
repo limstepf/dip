@@ -25,18 +25,20 @@ public class OSGiServiceTracker<T> {
 	private final Class<T> service;
 	private final BundleContext context;
 	private final TrackerCustomizer<T> customizer;
-	private final ServiceTracker<T,T> tracker;
+	private final ServiceTracker<T, T> tracker;
 
 	/**
 	 * Creates a new OSGi service tracker.
 	 *
 	 * @param context the bundle context.
 	 * @param service the class of the interface of the declarative service.
+	 * @param osgiProcessorRecollection the OSGi {@code Processor} service
+	 * recollection.
 	 */
-	public OSGiServiceTracker(BundleContext context, Class<T> service) {
+	public OSGiServiceTracker(BundleContext context, Class<T> service, OSGiServiceRecollection<T> osgiProcessorRecollection) {
 		this.context = context;
 		this.service = service;
-		this.customizer = new TrackerCustomizer<>(context);
+		this.customizer = new TrackerCustomizer<>(context, osgiProcessorRecollection);
 		this.tracker = new ServiceTracker<>(context, service.getName(), this.customizer);
 
 		log.debug("starting service tracker: {}", service);
@@ -197,19 +199,23 @@ public class OSGiServiceTracker<T> {
 	 *
 	 * @param <T> class of the service interface of the tracked services.
 	 */
-	private static class TrackerCustomizer<T> implements ServiceTrackerCustomizer<T,T> {
+	private static class TrackerCustomizer<T> implements ServiceTrackerCustomizer<T, T> {
 
 		private final BundleContext context;
 		private final Map<String, OSGiServiceCollection<T>> services;
 		private final CopyOnWriteArrayList<TrackerListener<T>> listeners;
+		private final OSGiServiceRecollection<T> osgiProcessorRecollection;
 
 		/**
 		 * Creates a new service tracker customizer.
 		 *
 		 * @param context the bundle context.
+		 * @param osgiProcessorRecollection the OSGi {@code Processor} service
+		 * recollection.
 		 */
-		public TrackerCustomizer(BundleContext context) {
+		public TrackerCustomizer(BundleContext context, OSGiServiceRecollection<T> osgiProcessorRecollection) {
 			this.context = context;
+			this.osgiProcessorRecollection = osgiProcessorRecollection;
 			this.services = new HashMap<>();
 			this.listeners = new CopyOnWriteArrayList<>();
 		}
@@ -281,6 +287,8 @@ public class OSGiServiceTracker<T> {
 				}
 				collection.add(service);
 			}
+
+			osgiProcessorRecollection.addService(service);
 
 			for (TrackerListener<T> listener : listeners) {
 				listener.onAdded(collection, service);

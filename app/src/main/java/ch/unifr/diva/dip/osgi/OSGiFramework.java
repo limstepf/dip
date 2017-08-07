@@ -51,7 +51,9 @@ public class OSGiFramework {
 	 * bundles will be automatically installed, updated, uninstalled, ...).
 	 * @param bundleCacheDir The bundle cache directory.
 	 * @param systemPackages List of extra system packages which the system
-	 * bundle must export from the current execution environment
+	 * bundle must export from the current execution environment.
+	 * @param osgiProcessorRecollection the OSGi {@code Processor} service
+	 * recollection.
 	 * @throws BundleException
 	 * @throws IOException
 	 */
@@ -59,7 +61,8 @@ public class OSGiFramework {
 			Path bundleDir,
 			List<Path> bundleWatchDirs,
 			Path bundleCacheDir,
-			List<ExtraSystemPackages.SystemPackage> systemPackages
+			List<ExtraSystemPackages.SystemPackage> systemPackages,
+			OSGiServiceRecollection<Processor> osgiProcessorRecollection
 	) throws BundleException, IOException {
 		this.bundleDir = bundleDir;
 		this.defaultBundleStartLevel = 1;
@@ -69,10 +72,20 @@ public class OSGiFramework {
 		this.framework = createFramework(systemPackages);
 		this.context = framework.getBundleContext();
 		this.bundleTracker = new OSGiBundleTracker(this.context);
-		this.processorServiceTracker = new OSGiServiceTracker<>(this.context, Processor.class);
-		this.processorHostServiceTracker = new HostServiceTracker<>();
-		this.processors = new OSGiServiceMonitor<>(processorServiceTracker);
-		this.hostProcessors = new HostServiceMonitor<>(processorHostServiceTracker);
+		this.processorHostServiceTracker = new HostServiceTracker<>(
+				osgiProcessorRecollection
+		);
+		this.processorServiceTracker = new OSGiServiceTracker<>(
+				this.context,
+				Processor.class,
+				osgiProcessorRecollection
+		);
+		this.processors = new OSGiServiceMonitor<>(
+				processorServiceTracker
+		);
+		this.hostProcessors = new HostServiceMonitor<>(
+				processorHostServiceTracker
+		);
 		this.bundleTracker.open();
 		this.processorServiceTracker.open();
 

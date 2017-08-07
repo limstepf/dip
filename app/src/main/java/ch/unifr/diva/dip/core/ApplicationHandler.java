@@ -670,7 +670,7 @@ public class ApplicationHandler implements Localizable {
 			return true;
 		} catch (JAXBException ex) {
 			log.error(
-					"error writing: {}",
+					"error writing user settings back to disk: {}",
 					dataManager.appDataDir.settingsFile,
 					ex
 			);

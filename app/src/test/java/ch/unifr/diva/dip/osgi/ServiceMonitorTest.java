@@ -8,9 +8,6 @@ import static org.junit.Assert.*;
  */
 public class ServiceMonitorTest {
 
-	public ServiceMonitorTest() {
-	}
-
 	/**
 	 * Test HostServiceMonitor. If this fails, chances are the corresponding
 	 * package has been moved (hardcoded in HostServiceMonitor due to reflection
@@ -18,8 +15,12 @@ public class ServiceMonitorTest {
 	 */
 	@Test
 	public void testHostServiceMonitor() {
-		final HostServiceTracker<?> tracker = new HostServiceTracker<>();
-		final HostServiceMonitor<?> monitor = new HostServiceMonitor<>(tracker);
+		final HostServiceTracker<?> tracker = new HostServiceTracker<>(
+				new OSGiServiceRecollection<>()
+		);
+		final HostServiceMonitor<?> monitor = new HostServiceMonitor<>(
+				tracker
+		);
 		assertNotEquals(
 				"At least one host service must have been registered",
 				monitor.getServiceCollectionMap().size(),

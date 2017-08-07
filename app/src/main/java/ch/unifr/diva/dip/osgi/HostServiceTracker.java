@@ -20,12 +20,17 @@ import org.slf4j.LoggerFactory;
 public class HostServiceTracker<T> {
 
 	private static final Logger log = LoggerFactory.getLogger(HostServiceTracker.class);
+	private final OSGiServiceRecollection<T> osgiProcessorRecollection;
 	private final Map<String, OSGiServiceCollection<T>> services;
 
 	/**
 	 * Creates a new host service tracker.
+	 *
+	 * @param osgiProcessorRecollection the OSGi {@code Processor} service
+	 * recollection.
 	 */
-	public HostServiceTracker() {
+	public HostServiceTracker(OSGiServiceRecollection<T> osgiProcessorRecollection) {
+		this.osgiProcessorRecollection = osgiProcessorRecollection;
 		this.services = new HashMap<>();
 
 		String pid = "-1";
@@ -35,11 +40,17 @@ public class HostServiceTracker<T> {
 				pid = cn;
 				final Class<?> clazz = ReflectionUtils.getClass(cn);
 				@SuppressWarnings("unchecked")
-				final T service = (T) clazz.newInstance();
+				final T serviceObject = (T) clazz.newInstance();
+				final OSGiService<T> service = new OSGiService<>(
+						pid,
+						serviceObject,
+						HostService.VERSION
+				);
 				final OSGiServiceCollection<T> collection = new OSGiServiceCollection<>(
-						new OSGiService<>(pid, service, HostService.VERSION)
+						service
 				);
 				services.put(pid, collection);
+				osgiProcessorRecollection.addService(service);
 			}
 		} catch (IOException ex) {
 			log.error("can't find package: {}", HostService.PACKAGE);

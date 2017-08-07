@@ -11,7 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Services monitor safe to be accessed from the JavaFX application thread.
+ * Services monitor safe to be accessed from the JavaFX application thread. A
+ * service monitor manages {@code ObservableList}s/{@code ObservableMap}s on top
+ * of a {@code OSGiServiceTracker}, any JavaFX properties/nodes may bind to on
+ * the JavaFX application thread.
  *
  * @param <T> class/interface of the service.
  */

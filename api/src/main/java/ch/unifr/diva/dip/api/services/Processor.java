@@ -210,6 +210,24 @@ public interface Processor {
 	}
 
 	/**
+	 * Returns the default/pre-installed presets of the processor. These
+	 * processor presets are installed the first time this version
+	 * ({@code major.minor} part only) of the processor is seen on the user's
+	 * system. The user might still whish to delete/rearrange them at some
+	 * point, hence this is done only once.
+	 *
+	 * <p>
+	 * In order to reinstall these presets, the user would have to remove the
+	 * corresponding entry from the {@code processor-recollection.xml} file in
+	 * the DIP user directory.
+	 *
+	 * @return the default/pre-installed presets of the processor.
+	 */
+	default List<Preset> presets() {
+		return Collections.emptyList();
+	}
+
+	/**
 	 * Returns the parameters of the processor.
 	 *
 	 * @return a map of the parameters of the processor indexed by their keys.

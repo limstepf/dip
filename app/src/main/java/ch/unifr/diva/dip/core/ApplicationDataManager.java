@@ -197,6 +197,11 @@ public class ApplicationDataManager {
 		public final Path settingsFile;
 
 		/**
+		 * File of the OSGi {@code Processor} service recollection.
+		 */
+		public final Path osgiProcessorRecollectionFile;
+
+		/**
 		 * Default constructor.
 		 *
 		 * @param path path to the application data directory (subdir in
@@ -213,6 +218,7 @@ public class ApplicationDataManager {
 			this.logDir = getRealDirectory(path.resolve("log"));
 
 			this.settingsFile = path.resolve("settings.xml");
+			this.osgiProcessorRecollectionFile = path.resolve("processor-recollection.xml");
 		}
 
 		/**

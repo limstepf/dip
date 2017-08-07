@@ -1,8 +1,14 @@
 package ch.unifr.diva.dip.core;
 
+import ch.unifr.diva.dip.api.services.Preset;
+import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.utils.DipThreadPool;
+import ch.unifr.diva.dip.core.model.DipData;
+import ch.unifr.diva.dip.osgi.OSGiServiceRecollection;
+import ch.unifr.diva.dip.core.model.PresetData;
 import ch.unifr.diva.dip.osgi.OSGiFramework;
 import ch.unifr.diva.dip.osgi.ExtraSystemPackages;
+import ch.unifr.diva.dip.osgi.OSGiService;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -43,6 +49,11 @@ public class ApplicationContext {
 	 * The plugin/service framework.
 	 */
 	public final OSGiFramework osgi;
+
+	/**
+	 * The OSGi {@code Processor} service recollection.
+	 */
+	public final OSGiServiceRecollection<Processor> osgiProcessorRecollection;
 
 	/**
 	 * The user settings.
@@ -124,6 +135,9 @@ public class ApplicationContext {
 		threadPool = new DipThreadPool();
 		discardingThreadPool = DipThreadPool.newDiscardingThreadPool("dip-discarding-pool", 1, 1);
 
+		// init osgi service recollection
+		osgiProcessorRecollection = getOSGiProcessorRecollection();
+
 		// init OSGi framework
 		OSGiFramework tmpOsgi = null;
 		if (dataManager != null) {
@@ -136,7 +150,8 @@ public class ApplicationContext {
 						dataManager.appDir.coreBundleDir,
 						watchDirs,
 						dataManager.appDataDir.bundleCacheDir,
-						ExtraSystemPackages.getSystemPackages()
+						ExtraSystemPackages.getSystemPackages(),
+						osgiProcessorRecollection
 				);
 			} catch (IOException | BundleException ex) {
 				errors.add(new ContextError(
@@ -155,6 +170,133 @@ public class ApplicationContext {
 	}
 
 	/**
+	 * Loads the OSGi {@code Processor} service recollection from disk, or
+	 * initializes an empty recollection if no recollection exists yet.
+	 *
+	 * @return the OSGi {@code Processor} service recollection.
+	 */
+	private OSGiServiceRecollection<Processor> getOSGiProcessorRecollection() {
+		if (dataManager != null) {
+			if (Files.exists(dataManager.appDataDir.osgiProcessorRecollectionFile)) {
+				try {
+					final OSGiServiceRecollection<Processor> recollection = OSGiServiceRecollection.load(
+							dataManager.appDataDir.osgiProcessorRecollectionFile
+					);
+					recollection.setNewServiceHandler(newOSGiProcessorRecollectionHandler);
+					return recollection;
+				} catch (JAXBException ex) {
+					log.error(
+							"error reading the OSGi processor service recollection file: {}",
+							dataManager.appDataDir.osgiProcessorRecollectionFile,
+							ex
+					);
+				}
+			}
+		}
+		return new OSGiServiceRecollection<>(newOSGiProcessorRecollectionHandler);
+	}
+
+	private OSGiServiceRecollection.NewServiceHandler<Processor> newOSGiProcessorRecollectionHandler = (service) -> onNewProcessor(service);
+
+	/**
+	 * Handles the first time a version of a processor is seen on the user's
+	 * system.
+	 *
+	 * @param service the service.
+	 */
+	private void onNewProcessor(OSGiService<Processor> service) {
+		threadPool.getExecutorService().execute(() -> {
+			log.debug(
+					"OSGi Processor service recollection, new service: {}",
+					service
+			);
+
+			if (service == null || service.serviceObject == null) {
+				return;
+			}
+
+			final List<Preset> presets = service.serviceObject.presets();
+			if (presets == null || presets.isEmpty()) {
+				return;
+			}
+
+			// load preset data (or create a new file); currently presets of all
+			// versions of a certain processor are stored in the same file
+			final String pid = service.pid;
+			final String version = PresetData.toPresetVersion(service.version);
+			final Path file = dataManager.appDataDir.getProcessorPresetPath(pid);
+			final DipData data;
+
+			log.debug(
+					"Installing {} default/shipped presets of processor: {}, version: {}",
+					presets.size(),
+					pid,
+					version
+			);
+
+			try {
+				data = DipData.load(file);
+			} catch (IOException | JAXBException | ClassCastException ex) {
+				// don't mess with user files in this case, he may still delete an
+				// invalid file manually (or fix it)
+				log.warn(
+						"failed to load preset data from: {}. "
+						+ "Aborting installation of default presets of processor: {}",
+						file,
+						service
+				);
+				return;
+			}
+
+			// append default/shipped presets
+			final PresetData presetData = data.getPresetData();
+			for (Preset preset : presets) {
+				presetData.addPreset(
+						new PresetData.Preset(
+								pid,
+								version,
+								preset.getName(),
+								preset.getParameters()
+						)
+				);
+			}
+
+			// and write it back to disk
+			try {
+				data.save(file);
+			} catch (Exception ex) {
+				log.warn(
+						"failed to write preset file back to: {}. "
+						+ "Aborting installation of default presets of processor: {}",
+						file,
+						service
+				);
+			}
+		});
+	}
+
+	/**
+	 * Writes the OSGi {@code Processor} service recollection back to disk.
+	 *
+	 * @return {@code true} in case of success, {@code false} otherwise.
+	 */
+	public boolean saveOSGiProcessorRecollection() {
+		try {
+			osgiProcessorRecollection.save(
+					dataManager.appDataDir.osgiProcessorRecollectionFile
+			);
+			return true;
+		} catch (JAXBException ex) {
+			log.error(
+					"error writing OSGi processor service recollection back to disk: {}",
+					dataManager.appDataDir.osgiProcessorRecollectionFile,
+					ex
+			);
+			return false;
+		}
+	}
+
+	/**
 	 * Loads the user settings from disk, or initializes new default user
 	 * settings if no settings file is found.
 	 *
@@ -166,8 +308,11 @@ public class ApplicationContext {
 				try {
 					return UserSettings.load(dataManager.appDataDir.settingsFile);
 				} catch (JAXBException ex) {
-					log.error("error reading application settings file: {}",
-							dataManager.appDataDir.settingsFile, ex);
+					log.error(
+							"error reading application settings file: {}",
+							dataManager.appDataDir.settingsFile,
+							ex
+					);
 				}
 			}
 		}
