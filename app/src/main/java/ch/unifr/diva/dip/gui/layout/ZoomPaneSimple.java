@@ -11,6 +11,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
@@ -18,6 +19,7 @@ import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
@@ -690,6 +692,148 @@ public class ZoomPaneSimple implements Pannable {
 
 	protected double scrollY() {
 		return getVvalue() * scrollRangeY();
+	}
+
+	/**
+	 * Optional panning control for inplace panning.
+	 */
+	protected class PanningControl {
+
+		protected double dir = 1;
+		protected double x;
+		protected double y;
+		protected double h;
+		protected double v;
+		protected final EventHandler<MouseEvent> onMouseEnteredHandler = (e) -> onMouseUp(e);
+		protected final EventHandler<MouseEvent> onMouseDownHandler = (e) -> onMouseDown(e);
+		protected final EventHandler<MouseEvent> onMouseDragHandler = (e) -> onMouseDrag(e);
+		protected final EventHandler<MouseEvent> onMouseUpHandler = (e) -> onMouseUp(e);
+		protected final EventHandler<MouseEvent> onMouseExitHandler = (e) -> onMouseExit(e);
+
+		protected void onMouseDown(MouseEvent e) {
+			mousePanningProperty.set(true);
+			paddedRegion.setCursor(Cursor.CLOSED_HAND);
+			dir = inverseMousePanningProperty.get() ? -1 : 1;
+			x = e.getSceneX();
+			y = e.getSceneY();
+			h = getHvalue();
+			v = getVvalue();
+		}
+
+		protected void onMouseDrag(MouseEvent e) {
+			final double offsetX = e.getSceneX() - x;
+			final double offsetY = e.getSceneY() - y;
+			final Bounds viewportBounds = getViewportBounds();
+			final Bounds scaledBounds = getPaddedContentBounds();
+			final double scrollableWidth = scaledBounds.getWidth() - viewportBounds.getWidth();
+			final double scrollableHeight = scaledBounds.getHeight() - viewportBounds.getHeight();
+
+			final double hrange = getHrange() * dir;
+			final double dx = (scrollableWidth > 0) ? offsetX * hrange / scrollableWidth : 0;
+			final double dy = (scrollableHeight > 0) ? offsetY * hrange / scrollableHeight : 0;
+
+			final double hpos = clamp(
+					h + dx,
+					scrollPane.getHmin(),
+					scrollPane.getHmax()
+			);
+			final double vpos = clamp(
+					v + dy,
+					scrollPane.getVmin(),
+					scrollPane.getVmax()
+			);
+
+			setViewportPosition(hpos, vpos);
+		}
+
+		protected void onMouseUp(MouseEvent e) {
+			mousePanningProperty.set(false);
+			paddedRegion.setCursor(Cursor.OPEN_HAND);
+		}
+
+		protected void onMouseExit(MouseEvent e) {
+			paddedRegion.setCursor(Cursor.DEFAULT);
+		}
+
+		protected void start() {
+			paddedRegion.addEventHandler(MouseEvent.MOUSE_ENTERED, onMouseUpHandler);
+			paddedRegion.addEventHandler(MouseEvent.MOUSE_PRESSED, onMouseDownHandler);
+			paddedRegion.addEventHandler(MouseEvent.MOUSE_DRAGGED, onMouseDragHandler);
+			paddedRegion.addEventHandler(MouseEvent.MOUSE_RELEASED, onMouseUpHandler);
+			paddedRegion.addEventHandler(MouseEvent.MOUSE_EXITED, onMouseExitHandler);
+		}
+
+		protected void stop() {
+			paddedRegion.removeEventHandler(MouseEvent.MOUSE_ENTERED, onMouseUpHandler);
+			paddedRegion.removeEventHandler(MouseEvent.MOUSE_PRESSED, onMouseDownHandler);
+			paddedRegion.removeEventHandler(MouseEvent.MOUSE_DRAGGED, onMouseDragHandler);
+			paddedRegion.removeEventHandler(MouseEvent.MOUSE_RELEASED, onMouseUpHandler);
+			paddedRegion.removeEventHandler(MouseEvent.MOUSE_EXITED, onMouseExitHandler);
+		}
+
+	}
+
+	protected PanningControl panningControl;
+	protected BooleanProperty mousePanningProperty;
+	protected BooleanProperty inverseMousePanningProperty;
+
+	/**
+	 * Enables/disables optional inplace/-pane panning by dragging the mouse.
+	 *
+	 * @param enable {@code true} to enable inplace/-pane panning by dragging
+	 * the mouse, {@code false} to disable it.
+	 */
+	public void enableMousePanning(boolean enable) {
+		if (enable) {
+			// make sure mouse panning property exists!
+			if (mousePanningProperty == null) {
+				mousePanningProperty = new SimpleBooleanProperty(false);
+			} else {
+				mousePanningProperty.set(false);
+			}
+			// make sure mouse panning property exists!
+			if (inverseMousePanningProperty == null) {
+				inverseMousePanningProperty = new SimpleBooleanProperty(true);
+			} else {
+				inverseMousePanningProperty.set(false);
+			}
+			panningControl = new PanningControl();
+			panningControl.start();
+		} else {
+			if (panningControl != null) {
+				panningControl.stop();
+				panningControl = null;
+			}
+			// do not delete the mousePanningProperty in case someone bound to
+			// it and will enable panning again...
+		}
+	}
+
+	/**
+	 * The mouse panning property is {@code true} while the viewport is being
+	 * panned inplace/-pane by dragging the mouse (if enabled). Set to
+	 * {@code true} by default.
+	 *
+	 * @return the mouse panning property.
+	 */
+	public ReadOnlyBooleanProperty mousePanningProperty() {
+		if (mousePanningProperty == null) {
+			mousePanningProperty = new SimpleBooleanProperty(false);
+		}
+		return mousePanningProperty;
+	}
+
+	/**
+	 * The inverse mouse panning property inverts the panning direction of
+	 * inplace/-pane by dragging the mouse if set to {@code true}.
+	 *
+	 * @return the inverse mouse panning property.
+	 */
+	public BooleanProperty inverseMousePanningProperty() {
+		if (inverseMousePanningProperty == null) {
+			inverseMousePanningProperty = new SimpleBooleanProperty(true);
+		}
+		return inverseMousePanningProperty;
 	}
 
 }
