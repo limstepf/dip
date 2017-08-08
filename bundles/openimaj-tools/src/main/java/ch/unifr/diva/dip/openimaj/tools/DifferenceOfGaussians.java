@@ -82,7 +82,7 @@ public class DifferenceOfGaussians extends ProcessableBase implements Previewabl
 				new TextParameter(" sigma2: "),
 				sigma2
 		);
-		parameters.put("sigma1", grid);
+		parameters.put("gaussians", grid);
 
 		final TextParameter nonormalize = new TextParameter("no normalization");
 		final TextParameter clamp = new TextParameter("clamp to [0, 255]");
@@ -99,7 +99,7 @@ public class DifferenceOfGaussians extends ProcessableBase implements Previewabl
 				),
 				0
 		);
-		parameters.put("blur", normalization);
+		parameters.put("normalization", normalization);
 
 		this.input = new InputPort<>(
 				new ch.unifr.diva.dip.api.datatypes.BufferedImage(),
