@@ -208,6 +208,9 @@ public class EditorPresenter implements Presenter {
 		clear();
 		buildStages();
 		layersWidget().setRoot(this.rootLayer.getTreeItem());
+		
+		// TODO: save and restore zoom and position (centered pixel) for all pages
+		zoomPane.moveToPos(Pos.TOP_LEFT, 50);
 	}
 
 	private void onPageRemoved(int id) {
