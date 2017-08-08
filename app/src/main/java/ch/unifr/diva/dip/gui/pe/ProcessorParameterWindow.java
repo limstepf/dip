@@ -308,6 +308,7 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 			zoomPane.setInterpolation(
 					Zoomable.Interpolation.get(handler.settings.editor.interpolation)
 			);
+			zoomPane.enableMousePanning(true);
 			zoomPane.getNode().setMinWidth(128);
 			zoomPane.getNode().setMinHeight(128);
 			zoomPane.getNode().setPrefWidth(256);
