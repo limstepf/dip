@@ -11,7 +11,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -72,13 +71,9 @@ public class RgbPage extends HostService {
 			this.bi_out.setOutput(image);
 			this.rgb_out.setOutput(image);
 			// provide visual layer
-			context.threadPool.getExecutorService().execute(() -> {
-				final Image fx = SwingFXUtils.toFXImage(image, null);
-				Platform.runLater(() -> {
-					final EditorLayerPane layer = context.layer.newLayerPane();
-					layer.add(new ImageView(fx));
-				});
-			});
+			final Image fx = SwingFXUtils.toFXImage(image, null);
+			final EditorLayerPane layer = context.layer.newLayerPane();
+			layer.add(new ImageView(fx));
 		} catch (IOException ex) {
 			log.error("failed to load the page's image: {}", context.page.file, ex);
 		}
