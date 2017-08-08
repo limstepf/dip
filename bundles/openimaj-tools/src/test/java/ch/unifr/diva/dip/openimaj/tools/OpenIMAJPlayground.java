@@ -69,19 +69,38 @@ public class OpenIMAJPlayground {
 
 //		fimage.addInplace(128.0f); // offset by 128 -> ~[51, 180]
 //		fimage.clip(0.0f, 255.0f); // clamp -> ~[0, 52]
-
+		// -> [0, 255]
 		final float min = Math.abs(fimage.min());
-		System.out.println("add min> " + min);
 		fimage.addInplace(min);
 		final float max = fimage.max();
 		final float mul = 255.0f / max;
-		System.out.println("add min> " + max + ", " + mul);
 		fimage.multiplyInplace(mul);
 
-		// samples in [-255, 255]?
 		printScanline(fimage.pixels, 10);
 		System.out.println();
 		printScanline(fimage.pixels, 17);
+		System.out.println();
+		System.out.println("min: " + fimage.min());
+		System.out.println("max: " + fimage.max());
+	}
+
+	@Test
+	public void strokeWidthTransformTest() {
+		int width = 64;
+		int height = 64;
+		float[][] samples = getSamples(width, height);
+		vLine(samples, 16, 255.0f, 1.0f);
+		vLine(samples, 48, 255.0f, 1.0f);
+		vLine(samples, 52, 96.0f, 1.0f);
+		hLine(samples, 24, 255.0f, 1.0f);
+		FImage fimage = new FImage(samples);
+
+		boolean direction = true;
+		float sigma = 1.0f;
+		org.openimaj.image.processing.edges.StrokeWidthTransform swt = new org.openimaj.image.processing.edges.StrokeWidthTransform(direction, 0.05f, 0.3f, sigma);
+		swt.processImage(fimage);
+
+		printScanline(fimage.pixels, 16);
 		System.out.println();
 		System.out.println("min: " + fimage.min());
 		System.out.println("max: " + fimage.max());
