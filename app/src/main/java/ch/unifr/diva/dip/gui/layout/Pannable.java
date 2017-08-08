@@ -221,6 +221,7 @@ public interface Pannable extends Zoomable {
 	 */
 	default void moveToPos(Pos value, double offset) {
 		final double invZoom = 1 / getZoom();
+		offset = offset * invZoom;
 		final Bounds contentBounds = getContentBounds();
 		final Bounds viewportBounds = getViewportBounds();
 		final double viewportWidth = viewportBounds.getWidth() * invZoom;
