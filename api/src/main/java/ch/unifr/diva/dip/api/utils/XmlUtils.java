@@ -53,6 +53,10 @@ public class XmlUtils {
 			List<String> classes = ReflectionUtils.findClasses(DIP_API_DS_PACKAGE);
 			for (String cn : classes) {
 				Class<?> clazz = ReflectionUtils.getClass(cn);
+				// ignore interfaces or JAXB will complain about it
+				if (clazz.isInterface()) {
+					continue;
+				}
 				seeAlsoClasses.add(clazz);
 			}
 			seeAlsoClasses.add(ArrayList.class);
