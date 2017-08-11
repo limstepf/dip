@@ -66,6 +66,35 @@ public class ParameterTest {
 	}
 
 	@Test
+	public void testButtonToggleGroupParameter() {
+		String initial = "b";
+		ButtonToggleGroupParameter<String> parameter = ButtonToggleGroupParameter.newInstance(
+				"toggle",
+				initial
+		);
+		parameter.add("option a", "a");
+		parameter.add("option b", "b");
+		parameter.add("option c", "c");
+		parameter.add("option d", "d");
+		PersistentParameterTester<String, ButtonToggleGroupParameter<String>, ButtonToggleGroupParameter.ButtonToggleGroupView<String>> tester = new PersistentParameterTester<String, ButtonToggleGroupParameter<String>, ButtonToggleGroupParameter.ButtonToggleGroupView<String>>(
+				parameter,
+				parameter.view(),
+				initial
+		) {
+			@Override
+			public List<String> values() {
+				return Arrays.asList(
+						"c",
+						"a",
+						"d",
+						"b"
+				);
+			}
+		};
+		tester.test();
+	}
+
+	@Test
 	public void testCheckboxParameter() {
 		Boolean initial = true;
 		CheckboxParameter parameter = new CheckboxParameter(initial);
