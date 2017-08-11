@@ -1,5 +1,7 @@
 package ch.unifr.diva.dip.gui.layout;
 
+import ch.unifr.diva.dip.api.ui.AnimatedDashedShape;
+import ch.unifr.diva.dip.api.utils.ShapeUtils;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
@@ -13,7 +15,6 @@ import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 /**
@@ -39,6 +40,7 @@ public class RubberBandSelector<T extends Region> {
 	private final BooleanProperty enabledProperty;
 	private final BooleanProperty suppressIfNotDefaultCursorProperty;
 	private final Rectangle rect;
+	private final AnimatedDashedShape<Rectangle> animatedRect;
 	private final EventHandler<MouseEvent> onMousePressed;
 	private final EventHandler<MouseEvent> onMouseDragged;
 	private final EventHandler<MouseEvent> onMouseReleased;
@@ -67,15 +69,9 @@ public class RubberBandSelector<T extends Region> {
 	public RubberBandSelector(Pane master, Class<? super T> classFilter) {
 		this.master = master;
 		this.classFilter = (Class<T>) classFilter;
-
-		selection = FXCollections.observableSet();
-
-		rect = new Rectangle(0, 0, 0, 0);
-		rect.getStyleClass().add("dip-rubberband");
-		rect.setStroke(Color.BLACK);
-		rect.setFill(Color.TRANSPARENT);
-		rect.setStrokeWidth(1.0);
-		rect.getStrokeDashArray().addAll(5d, 5d);
+		this.selection = FXCollections.observableSet();
+		this.rect = ShapeUtils.newRectangleExclusionOutline();
+		this.animatedRect = new AnimatedDashedShape<>(rect);
 
 		onMousePressed = (MouseEvent e) -> {
 			if (isDragging || suppressIfNotDefaultCursor(e)) {
@@ -101,6 +97,7 @@ public class RubberBandSelector<T extends Region> {
 			rectAdded = false;
 
 			isDragging = true;
+			animatedRect.play();
 			e.consume();
 		};
 
@@ -149,6 +146,7 @@ public class RubberBandSelector<T extends Region> {
 				return;
 			}
 
+			animatedRect.stop();
 			rect.setX(0);
 			rect.setY(0);
 			rect.setWidth(0);

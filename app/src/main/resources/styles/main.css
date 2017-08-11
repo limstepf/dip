@@ -53,7 +53,6 @@ Text, TextFlow {
     -fx-background-color: transparent;
 }
 
-
 .tooltip {
 	-fx-font-size: 10px;
 }
@@ -138,7 +137,6 @@ Text, TextFlow {
 	-fx-fill: -dip-accent-inverted;
 	-fx-text-fill: -dip-accent-inverted;
 }
-
 
 .dip-form-grid-pane {
 	-fx-hgap: 1.25em;
@@ -360,13 +358,8 @@ Text, TextFlow {
 	-fx-border-color: -dip-proc-ready;
 }
 
-
 .dip-wire {
 
-}
-
-.dip-rubberband {
-	-fx-stroke: -fx-accent;
 }
 
 .dip-shadow {
