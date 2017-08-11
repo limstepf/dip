@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
-public class Polyline2D extends AbstractList<Point2D> {
+public class Polyline2D extends AbstractList<Point2D> implements Shape2D {
 
 	/**
 	 * Creates a new, empty polyline.
@@ -29,17 +29,22 @@ public class Polyline2D extends AbstractList<Point2D> {
 		super(points);
 	}
 
-	/**
-	 * Returns a copy of the polyline.
-	 *
-	 * @return a copy of the polyline.
-	 */
+	@Override
 	public Polyline2D copy() {
 		final Polyline2D copy = new Polyline2D();
 		for (Point2D point : elements) {
 			copy.add(point); // no need to copy; points are final
 		}
 		return copy;
+	}
+
+	@Override
+	public Polygon2D toPolygon2D() {
+		final Polygon2D polygon = new Polygon2D();
+		for (Point2D point : elements) {
+			polygon.add(point); // no need to copy; points are final
+		}
+		return polygon;
 	}
 
 }

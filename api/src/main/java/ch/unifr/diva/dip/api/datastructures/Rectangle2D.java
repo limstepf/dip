@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
-public class Rectangle2D {
+public class Rectangle2D implements Shape2D {
 
 	@XmlAttribute
 	public final double x;
@@ -39,7 +39,8 @@ public class Rectangle2D {
 	 * @param width the width.
 	 * @param height the height.
 	 */
-	public Rectangle2D(int x, int y, int width, int height) {
+	public Rectangle2D(double x, double y, double width, double height) {
+		super();
 		this.x = x;
 		this.y = y;
 		this.width = width;
@@ -65,6 +66,23 @@ public class Rectangle2D {
 	 */
 	public javafx.geometry.Rectangle2D toFXRectangle2D() {
 		return new javafx.geometry.Rectangle2D(x, y, width, height);
+	}
+
+	@Override
+	public Rectangle2D copy() {
+		return this; // no need to copy, since all fields are final
+	}
+
+	@Override
+	public Polygon2D toPolygon2D() {
+		final Polygon2D polygon = new Polygon2D();
+		final double x2 = x + width;
+		final double y2 = y + height;
+		polygon.add(new Point2D(x, y));
+		polygon.add(new Point2D(x2, y));
+		polygon.add(new Point2D(x2, y2));
+		polygon.add(new Point2D(x, y2));
+		return polygon;
 	}
 
 	@Override

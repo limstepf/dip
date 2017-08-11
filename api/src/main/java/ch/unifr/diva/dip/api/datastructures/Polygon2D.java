@@ -41,4 +41,9 @@ public class Polygon2D extends Polyline2D {
 		return copy;
 	}
 
+	@Override
+	public Polygon2D toPolygon2D() {
+		return copy();
+	}
+
 }

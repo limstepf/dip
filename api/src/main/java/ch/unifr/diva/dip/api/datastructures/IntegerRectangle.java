@@ -13,7 +13,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
-public class IntegerRectangle {
+public class IntegerRectangle implements Shape2D {
 
 	@XmlAttribute
 	public final int x;
@@ -75,6 +75,32 @@ public class IntegerRectangle {
 	 */
 	public javafx.geometry.Rectangle2D toFXRectangle2D() {
 		return new javafx.geometry.Rectangle2D(x, y, width, height);
+	}
+
+	/**
+	 * Returns the rectangle as {@code Rectangle2D}.
+	 *
+	 * @return the rectangle as {@code Rectangle2D}.
+	 */
+	public Rectangle2D toRectangle2D() {
+		return new Rectangle2D(x, y, width, height);
+	}
+
+	@Override
+	public IntegerRectangle copy() {
+		return this; // no need to copy, since all fields are final
+	}
+
+	@Override
+	public Polygon2D toPolygon2D() {
+		final Polygon2D polygon = new Polygon2D();
+		final int x2 = x + width;
+		final int y2 = y + height;
+		polygon.add(new Point2D(x, y));
+		polygon.add(new Point2D(x2, y));
+		polygon.add(new Point2D(x2, y2));
+		polygon.add(new Point2D(x, y2));
+		return polygon;
 	}
 
 	@Override

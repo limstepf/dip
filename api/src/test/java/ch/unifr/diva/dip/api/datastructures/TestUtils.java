@@ -2,6 +2,7 @@ package ch.unifr.diva.dip.api.datastructures;
 
 import ch.unifr.diva.dip.api.utils.MathUtils;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -124,7 +125,121 @@ public class TestUtils {
 	}
 
 	public static Point2D newPoint2D() {
-		return new Point2D(Math.random(), Math.random());
+		return new Point2D(Math.random() * 100, Math.random() * 100);
+	}
+
+	public static Circle2D newCircle2D() {
+		return new Circle2D(
+				Math.random() * 100,
+				Math.random() * 100,
+				Math.random() * 100
+		);
+	}
+
+	public static Rectangle2D newRectangle2D() {
+		return new Rectangle2D(
+				Math.random() * 100,
+				Math.random() * 100,
+				Math.random() * 100,
+				Math.random() * 100
+		);
+	}
+
+	public static Rectangles2D newRectangles2D(int n) {
+		final List<Rectangle2D> rectangles = new ArrayList<>();
+		for (int i = 0; i < n; i++) {
+			rectangles.add(newRectangle2D());
+		}
+		return new Rectangles2D(rectangles);
+	}
+
+	public static IntegerRectangle newIntegerRectangle() {
+		return new IntegerRectangle(
+				MathUtils.randomInt(0, 100),
+				MathUtils.randomInt(0, 100),
+				MathUtils.randomInt(0, 100),
+				MathUtils.randomInt(0, 100)
+		);
+	}
+
+	public static Polyline2D newPolyline2D() {
+		Polyline2D poly = new Polyline2D(newPoints2D(5));
+		return poly;
+	}
+
+	public static Polygon2D newPolygon2D() {
+		Polygon2D poly = new Polygon2D(newPoints2D(5));
+		return poly;
+	}
+
+	public static Shape2D newRandomShape() {
+		switch (MathUtils.randomInt(0, 5)) {
+			case 1:
+				return newCircle2D();
+			case 2:
+				return newPolyline2D();
+			case 3:
+				return newPolygon2D();
+			case 4:
+				return newIntegerRectangle();
+			default:
+				return newRectangle2D();
+		}
+	}
+
+	public static Shapes2D newShapes2D(int n) {
+		final List<Shape2D> shapes = new ArrayList<>();
+		for (int i = 0; i < n; i++) {
+			shapes.add(newRandomShape());
+		}
+		return new Shapes2D(shapes);
+	}
+
+	public static NestedRectangle2D newNestedRectangle2D(int depth) {
+		final List<NestedRectangle2D> children = new ArrayList<>();
+		if (depth > 0) {
+			final int n = MathUtils.randomInt(0, 3);
+			for (int i = 0; i < n; i++) {
+				children.add(newNestedRectangle2D(depth - 1));
+			}
+		}
+		return new NestedRectangle2D(
+				Math.random() * 100,
+				Math.random() * 100,
+				Math.random() * 100,
+				Math.random() * 100,
+				children
+		);
+	}
+
+	public static NestedRectangles2D newNestedRectangles2D(int n, int depth) {
+		final List<NestedRectangle2D> rectangles = new ArrayList<>();
+		for (int i = 0; i < n; i++) {
+			rectangles.add(newNestedRectangle2D(depth));
+		}
+		return new NestedRectangles2D(rectangles);
+	}
+
+	public static NestedShape2D newNestedShape2D(int depth) {
+		final List<NestedShape2D> children = new ArrayList<>();
+		if (depth > 0) {
+			final int n = MathUtils.randomInt(2, 5);
+			for (int i = 0; i < n; i++) {
+				children.add(newNestedShape2D(depth - 1));
+			}
+		}
+		return new NestedShape2D(
+				newRandomShape(),
+				children
+		);
+	}
+
+	public static NestedShapes2D newNestedShapes2D(int n, int depth) {
+		final List<NestedShape2D> shapes = new ArrayList<>();
+		for (int i = 0; i < n; i++) {
+			shapes.add(newNestedShape2D(depth));
+		}
+		return new NestedShapes2D(shapes);
 	}
 
 	public static ValueListSelection newValueListSelection(int size, int selection) {
