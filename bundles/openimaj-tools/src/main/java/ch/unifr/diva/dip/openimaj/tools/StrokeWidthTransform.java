@@ -8,10 +8,7 @@ import ch.unifr.diva.dip.api.components.SimpleProcessorDocumentation;
 import ch.unifr.diva.dip.api.components.XorInputPorts;
 import ch.unifr.diva.dip.api.datastructures.BufferedMatrix;
 import ch.unifr.diva.dip.api.parameters.BooleanParameter;
-import ch.unifr.diva.dip.api.parameters.CompositeGrid;
-import ch.unifr.diva.dip.api.parameters.ExpParameter;
 import ch.unifr.diva.dip.api.parameters.IntegerSliderParameter;
-import ch.unifr.diva.dip.api.parameters.PersistentParameter;
 import ch.unifr.diva.dip.api.parameters.TextParameter;
 import ch.unifr.diva.dip.api.parameters.XorParameter;
 import ch.unifr.diva.dip.api.services.Previewable;
@@ -27,7 +24,6 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import org.openimaj.image.FImage;
 import org.osgi.service.component.annotations.Component;
@@ -52,11 +48,8 @@ public class StrokeWidthTransform extends ProcessableBase implements Previewable
 	private final OutputPort<BufferedMatrix> output_float;
 
 	private final IntegerSliderParameter band;
+	private final CannyEdgeParameters cannyParameters;
 	private final BooleanParameter direction;
-	private final ExpParameter sigma;
-	private final XorParameter thresholds;
-	private final ExpParameter threshold_low;
-	private final ExpParameter threshold_high;
 	private final XorParameter normalization;
 
 	/**
@@ -71,38 +64,11 @@ public class StrokeWidthTransform extends ProcessableBase implements Previewable
 		});
 		parameters.put("band", band);
 
+		this.cannyParameters = new CannyEdgeParameters();
+		cannyParameters.putAsSub(parameters);
+
 		this.direction = new BooleanParameter("Direction", true, "dark on light", "light on dark");
 		parameters.put("direction", direction);
-
-		this.sigma = new ExpParameter("Sigma", "1.0");
-		parameters.put("sigma", sigma);
-
-		final ExpParameter.DoubleValidator expValidator = (v) -> {
-			if (v < 0 || v > 1.0) {
-				return Double.NaN;
-			}
-			return v;
-		};
-		final PersistentParameter.ViewHook<TextField> expHook = (t) -> {
-			t.setMaxWidth(64);
-		};
-		final TextParameter auto = new TextParameter("automatic");
-		final TextParameter lowLabel = new TextParameter("low: ");
-		this.threshold_low = new ExpParameter("low", "0.3");
-		threshold_low.addTextFieldViewHook(expHook);
-		threshold_low.setDoubleValidator(expValidator);
-		final TextParameter highLabel = new TextParameter(" high: ");
-		this.threshold_high = new ExpParameter("high", "0.7");
-		threshold_high.addTextFieldViewHook(expHook);
-		threshold_high.setDoubleValidator(expValidator);
-		final CompositeGrid grid = new CompositeGrid(
-				lowLabel,
-				threshold_low,
-				highLabel,
-				threshold_high
-		);
-		this.thresholds = new XorParameter("Thresholds", Arrays.asList(auto, grid));
-		parameters.put("thresholds", thresholds);
 
 		final TextParameter nonormalize = new TextParameter("no normalization");
 		final TextParameter normalize1 = new TextParameter("normalize to [0, 1]");
@@ -213,6 +179,7 @@ public class StrokeWidthTransform extends ProcessableBase implements Previewable
 	@Override
 	public void init(ProcessorContext context) {
 		input_xor.init(context);
+		input_gray.portStateProperty().addListener(grayPortListener);
 		onGrayPortChanged();
 		normalization.property().addListener(normalizationListener);
 		onNormalizationChanged();
@@ -220,6 +187,11 @@ public class StrokeWidthTransform extends ProcessableBase implements Previewable
 		if (context != null) {
 			restoreOutputs(context);
 		}
+	}
+
+	@Override
+	public boolean isConnected() {
+		return input_xor.isConnected();
 	}
 
 	@Override
@@ -249,17 +221,17 @@ public class StrokeWidthTransform extends ProcessableBase implements Previewable
 
 	protected FImage doSWT(FImage fimage) {
 		final boolean swt_dir = direction.get();
-		float canny_sigma = sigma.getFloat();
+		float canny_sigma = cannyParameters.getSigma();
 		if (!Float.isFinite(canny_sigma) || canny_sigma < 0) {
 			log.warn("invalid sigma: {}. Sigma is reset to 1.0f.", canny_sigma);
 			canny_sigma = 1.0f;
 		}
-		boolean canny_auto = thresholds.get().selection == 0;
+		boolean canny_auto = cannyParameters.isAutoThresholds();
 		float canny_low = 0;
 		float canny_high = 0;
 		if (!canny_auto) {
-			canny_low = threshold_low.getFloat();
-			canny_high = threshold_high.getFloat();
+			canny_low = cannyParameters.getThresholdLow();
+			canny_high = cannyParameters.getThresholdHigh();
 			if (canny_low < 0.0f || canny_low >= canny_high || canny_high > 1.0f) {
 				log.warn(
 						"invalid thresholds: low={}, hight={} must be in range [0, 1], and low < high."
@@ -326,12 +298,22 @@ public class StrokeWidthTransform extends ProcessableBase implements Previewable
 		}
 		if (image instanceof BufferedMatrix) {
 			final BufferedMatrix mat = (BufferedMatrix) image;
-			return OpenIMAJUtils.toFImage(mat, getBand(mat));
+			return OpenIMAJUtils.toFImage(
+					mat,
+					Math.min(mat.getSampleModel().getNumBands(), getBand(mat))
+			);
 		}
-		return OpenIMAJUtils.toFImage(image, getBand(image));
+		return OpenIMAJUtils.toFImage(
+				image,
+				Math.min(image.getSampleModel().getNumBands(), getBand(image))
+		);
 	}
 
 	private <T extends BufferedImage> int getBand(T image) {
+		final InputPort<?> port = input_xor.getEnabledPort();
+		if (input_gray.equals(port)) {
+			return 0;
+		}
 		final int n = image.getSampleModel().getNumBands();
 		int b = band.get();
 		if (b > n) {

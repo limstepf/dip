@@ -19,6 +19,9 @@ import ch.unifr.diva.dip.glyphs.mdi.MaterialDesignIcons;
 import ch.unifr.diva.dip.openimaj.utils.OpenIMAJUtils;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
+import javafx.beans.InvalidationListener;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import org.openimaj.image.FImage;
 import org.openimaj.image.processing.convolution.FSobel;
 import org.osgi.service.component.annotations.Component;
@@ -33,6 +36,7 @@ public class SobelFilter extends ProcessableBase {
 	private final static String STORAGE_MAT_DY = "dy.bmat";
 
 	private final InputPort<BufferedImage> input;
+	private final InputPort<BufferedImage> input_gray;
 	private final InputPort<BufferedMatrix> input_float;
 	private final XorInputPorts input_xor;
 	private final OutputPort<BufferedMatrix> dx_float;
@@ -48,6 +52,9 @@ public class SobelFilter extends ProcessableBase {
 		super("Sobel Filter");
 
 		this.band = new IntegerSliderParameter("Band", 1, 1, 4);
+		band.addSliderViewHook((s) -> {
+			s.disableProperty().bind(disableBandSelectionProperty);
+		});
 		parameters.put("band", band);
 
 		final TextParameter noblur = new TextParameter("no Gaussian blurring");
@@ -70,12 +77,17 @@ public class SobelFilter extends ProcessableBase {
 				new ch.unifr.diva.dip.api.datatypes.BufferedImage(),
 				false
 		);
+		this.input_gray = new InputPort<>(
+				new ch.unifr.diva.dip.api.datatypes.BufferedImageGray(),
+				false
+		);
 		this.input_float = new InputPort<>(
 				new ch.unifr.diva.dip.api.datatypes.BufferedImageFloat(),
 				false
 		);
 		this.input_xor = new XorInputPorts(this);
 		input_xor.addPort("buffered-image", input);
+		input_xor.addPort("buffered-image-gray", input_gray);
 		input_xor.addPort("buffered-matrix-float", input_float);
 		input_xor.enableAllPorts();
 
@@ -107,6 +119,13 @@ public class SobelFilter extends ProcessableBase {
 		return MaterialDesignIcons.BLUR_LINEAR;
 	}
 
+	private final BooleanProperty disableBandSelectionProperty = new SimpleBooleanProperty();
+	private final InvalidationListener grayPortListener = (e) -> onGrayPortChanged();
+
+	private void onGrayPortChanged() {
+		disableBandSelectionProperty.set(input_gray.isConnected());
+	}
+
 	@Override
 	public Processor newInstance(ProcessorContext context) {
 		return new SobelFilter();
@@ -115,6 +134,9 @@ public class SobelFilter extends ProcessableBase {
 	@Override
 	public void init(ProcessorContext context) {
 		input_xor.init(context);
+		input_gray.portStateProperty().addListener(grayPortListener);
+		onGrayPortChanged();
+
 		if (context != null) {
 			restoreOutputs(context);
 		}
@@ -137,6 +159,9 @@ public class SobelFilter extends ProcessableBase {
 		if (port.equals(input_float)) {
 			final BufferedMatrix mat = input_float.getValue();
 			fimage = OpenIMAJUtils.toFImage(mat, getBand(mat));
+		} else if (port.equals(input_gray)) {
+			final BufferedImage image = input_gray.getValue();
+			fimage = OpenIMAJUtils.toFImage(image, 0);
 		} else {
 			final BufferedImage image = input.getValue();
 			if (image instanceof BufferedMatrix) {
@@ -168,6 +193,10 @@ public class SobelFilter extends ProcessableBase {
 	}
 
 	private <T extends BufferedImage> int getBand(T image) {
+		final InputPort<?> port = input_xor.getEnabledPort();
+		if (input_gray.equals(port)) {
+			return 0;
+		}
 		final int n = image.getSampleModel().getNumBands();
 		int b = band.get();
 		if (b > n) {

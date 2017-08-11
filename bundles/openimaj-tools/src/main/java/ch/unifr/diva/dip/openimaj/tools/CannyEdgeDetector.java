@@ -8,12 +8,7 @@ import ch.unifr.diva.dip.api.components.ProcessorDocumentation;
 import ch.unifr.diva.dip.api.components.SimpleProcessorDocumentation;
 import ch.unifr.diva.dip.api.components.XorInputPortGroup;
 import ch.unifr.diva.dip.api.datastructures.BufferedMatrix;
-import ch.unifr.diva.dip.api.parameters.CompositeGrid;
-import ch.unifr.diva.dip.api.parameters.ExpParameter;
 import ch.unifr.diva.dip.api.parameters.IntegerSliderParameter;
-import ch.unifr.diva.dip.api.parameters.PersistentParameter.ViewHook;
-import ch.unifr.diva.dip.api.parameters.TextParameter;
-import ch.unifr.diva.dip.api.parameters.XorParameter;
 import ch.unifr.diva.dip.api.services.Previewable;
 import ch.unifr.diva.dip.api.services.ProcessableBase;
 import ch.unifr.diva.dip.api.services.Processor;
@@ -24,8 +19,10 @@ import ch.unifr.diva.dip.openimaj.utils.OpenIMAJUtils;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
+import javafx.beans.InvalidationListener;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import org.openimaj.image.FImage;
 import org.osgi.service.component.annotations.Component;
@@ -41,6 +38,7 @@ public class CannyEdgeDetector extends ProcessableBase implements Previewable {
 	private final static String STORAGE_IMAGE_FORMAT = "PNG";
 
 	private final InputPort<BufferedImage> input;
+	private final InputPort<BufferedImage> input_gray;
 	private final InputPort<BufferedMatrix> input_float;
 	private final InputPort<BufferedMatrix> input_dx;
 	private final InputPort<BufferedMatrix> input_dy;
@@ -51,10 +49,7 @@ public class CannyEdgeDetector extends ProcessableBase implements Previewable {
 	private final OutputPort<BufferedImage> output_binary;
 	private final OutputPort<BufferedMatrix> output_float;
 	private final IntegerSliderParameter band;
-	private final ExpParameter sigma;
-	private final XorParameter thresholds;
-	private final ExpParameter threshold_low;
-	private final ExpParameter threshold_high;
+	private final CannyEdgeParameters cannyParameters;
 
 	/**
 	 * Creates a new canny edge detector.
@@ -63,40 +58,20 @@ public class CannyEdgeDetector extends ProcessableBase implements Previewable {
 		super("Canny Edge Detector");
 
 		this.band = new IntegerSliderParameter("Band", 1, 1, 4);
+		band.addSliderViewHook((s) -> {
+			s.disableProperty().bind(disableBandSelectionProperty);
+		});
 		parameters.put("band", band);
 
-		this.sigma = new ExpParameter("Sigma", "1.0");
-		parameters.put("sigma", sigma);
-
-		final ExpParameter.DoubleValidator expValidator = (v) -> {
-			if (v < 0 || v > 1.0) {
-				return Double.NaN;
-			}
-			return v;
-		};
-		final ViewHook<TextField> expHook = (t) -> {
-			t.setMaxWidth(64);
-		};
-		final TextParameter auto = new TextParameter("automatic");
-		final TextParameter lowLabel = new TextParameter("low: ");
-		this.threshold_low = new ExpParameter("low", "0.3");
-		threshold_low.addTextFieldViewHook(expHook);
-		threshold_low.setDoubleValidator(expValidator);
-		final TextParameter highLabel = new TextParameter(" high: ");
-		this.threshold_high = new ExpParameter("high", "0.7");
-		threshold_high.addTextFieldViewHook(expHook);
-		threshold_high.setDoubleValidator(expValidator);
-		final CompositeGrid grid = new CompositeGrid(
-				lowLabel,
-				threshold_low,
-				highLabel,
-				threshold_high
-		);
-		this.thresholds = new XorParameter("Thresholds", Arrays.asList(auto, grid));
-		parameters.put("thresholds", thresholds);
+		this.cannyParameters = new CannyEdgeParameters();
+		cannyParameters.put(parameters);
 
 		this.input = new InputPort<>(
 				new ch.unifr.diva.dip.api.datatypes.BufferedImage(),
+				false
+		);
+		this.input_gray = new InputPort<>(
+				new ch.unifr.diva.dip.api.datatypes.BufferedImageGray(),
 				false
 		);
 		this.input_float = new InputPort<>(
@@ -117,6 +92,7 @@ public class CannyEdgeDetector extends ProcessableBase implements Previewable {
 
 		this.pg_image = new XorInputPortGroup.PortGroup<>(true);
 		pg_image.addPort("buffered-image", input);
+		pg_image.addPort("buffered-image-gray", input_gray);
 		pg_image.addPort("buffered-image-float", input_float);
 		this.pg_sobel = new XorInputPortGroup.PortGroup<>();
 		pg_sobel.addPort("dx-float", input_dx);
@@ -164,6 +140,13 @@ public class CannyEdgeDetector extends ProcessableBase implements Previewable {
 		return MaterialDesignIcons.FINGERPRINT;
 	}
 
+	private final BooleanProperty disableBandSelectionProperty = new SimpleBooleanProperty();
+	private final InvalidationListener grayPortListener = (e) -> onGrayPortChanged();
+
+	private void onGrayPortChanged() {
+		disableBandSelectionProperty.set(input_gray.isConnected());
+	}
+
 	@Override
 	public Processor newInstance(ProcessorContext context) {
 		return new CannyEdgeDetector();
@@ -172,6 +155,8 @@ public class CannyEdgeDetector extends ProcessableBase implements Previewable {
 	@Override
 	public void init(ProcessorContext context) {
 		input_xor.init(context);
+		input_gray.portStateProperty().addListener(grayPortListener);
+		onGrayPortChanged();
 
 		if (context != null) {
 			restoreOutputs(context);
@@ -186,7 +171,7 @@ public class CannyEdgeDetector extends ProcessableBase implements Previewable {
 			return;
 		}
 
-		final org.openimaj.image.processing.edges.CannyEdgeDetector canny = getCannyEdgeDetector();
+		final org.openimaj.image.processing.edges.CannyEdgeDetector canny = cannyParameters.getCannyEdgeDetector();
 		final FImage canny_out;
 
 		if (group.equals(pg_sobel)) {
@@ -202,6 +187,9 @@ public class CannyEdgeDetector extends ProcessableBase implements Previewable {
 			if (port.equals(input_float)) {
 				final BufferedMatrix mat = input_float.getValue();
 				fimage = OpenIMAJUtils.toFImage(mat, getBand(mat));
+			} else if (port.equals(input_gray)) {
+				final BufferedImage image = input_gray.getValue();
+				fimage = OpenIMAJUtils.toFImage(image, 0);
 			} else {
 				final BufferedImage image = input.getValue();
 				if (image instanceof BufferedMatrix) {
@@ -254,7 +242,7 @@ public class CannyEdgeDetector extends ProcessableBase implements Previewable {
 			return null;
 		}
 
-		final org.openimaj.image.processing.edges.CannyEdgeDetector canny = getCannyEdgeDetector();
+		final org.openimaj.image.processing.edges.CannyEdgeDetector canny = cannyParameters.getCannyEdgeDetector();
 		final FImage canny_out;
 
 		/*
@@ -300,42 +288,16 @@ public class CannyEdgeDetector extends ProcessableBase implements Previewable {
 		);
 	}
 
-	private org.openimaj.image.processing.edges.CannyEdgeDetector getCannyEdgeDetector() {
-		float canny_sigma = sigma.getFloat();
-		if (!Float.isFinite(canny_sigma) || canny_sigma < 0) {
-			log.warn("invalid sigma: {}. Sigma is reset to 1.0f.", canny_sigma);
-			canny_sigma = 1.0f;
-		}
-
-		boolean canny_auto = thresholds.get().selection == 0;
-		float canny_low = 0;
-		float canny_high = 0;
-		if (!canny_auto) {
-			canny_low = threshold_low.getFloat();
-			canny_high = threshold_high.getFloat();
-			if (canny_low < 0.0f || canny_low >= canny_high || canny_high > 1.0f) {
-				log.warn(
-						"invalid thresholds: low={}, hight={} must be in range [0, 1], and low < high."
-						+ " Chosing thresholds automaticlly.",
-						canny_low,
-						canny_high
-				);
-				canny_auto = true;
-			}
-		}
-		if (canny_auto) {
-			return new org.openimaj.image.processing.edges.CannyEdgeDetector(
-					canny_sigma
-			);
-		}
-		return new org.openimaj.image.processing.edges.CannyEdgeDetector(
-				canny_low,
-				canny_high,
-				canny_sigma
-		);
-	}
-
 	private <T extends BufferedImage> int getBand(T image) {
+		final XorInputPortGroup.PortGroup<InputPort<?>> group = input_xor.getEnabledGroup();
+		if (group == null) {
+			return 0;
+		}
+		final InputPort<?> port = group.getConnection();
+		if (input_gray.equals(port)) {
+			return 0;
+		}
+
 		final int n = image.getSampleModel().getNumBands();
 		int b = band.get();
 		if (b > n) {

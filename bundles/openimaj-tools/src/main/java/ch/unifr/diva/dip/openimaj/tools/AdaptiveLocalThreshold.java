@@ -27,6 +27,8 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javafx.beans.InvalidationListener;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -250,6 +252,9 @@ public class AdaptiveLocalThreshold extends ProcessableBase implements Previewab
 
 		this.runtimeTitle = this.name;
 		this.band = new IntegerSliderParameter("band", 1, 1, 4);
+		band.addSliderViewHook((s) -> {
+			s.disableProperty().bind(disableBandSelectionProperty);
+		});
 		parameters.put("band", band);
 
 		this.method = new EnumParameter("Method", LocalThresholdMethod.class, LocalThresholdMethod.BERNSEN.name());
@@ -302,25 +307,6 @@ public class AdaptiveLocalThreshold extends ProcessableBase implements Previewab
 	}
 
 	@Override
-	public Processor newInstance(ProcessorContext context) {
-		return new AdaptiveLocalThreshold();
-	}
-
-	@Override
-	public String name() {
-		return runtimeTitle;
-	}
-
-	private final InvalidationListener methodListener = (c) -> onMethodSelection();
-
-	protected void onMethodSelection() {
-		final LocalThresholdMethod m = method.getEnumValue(LocalThresholdMethod.class);
-		runtimeTitle = m.getMethodName();
-		m.putParameters(this);
-		repaint();
-	}
-
-	@Override
 	public ProcessorDocumentation processorDocumentation() {
 		final SimpleProcessorDocumentation doc = new SimpleProcessorDocumentation();
 		doc.addTextFlow(
@@ -359,14 +345,47 @@ public class AdaptiveLocalThreshold extends ProcessableBase implements Previewab
 	}
 
 	@Override
+	public String name() {
+		return runtimeTitle;
+	}
+
+	@Override
+	public Processor newInstance(ProcessorContext context) {
+		return new AdaptiveLocalThreshold();
+	}
+
+	private final InvalidationListener methodListener = (c) -> onMethodSelection();
+
+	protected void onMethodSelection() {
+		final LocalThresholdMethod m = method.getEnumValue(LocalThresholdMethod.class);
+		runtimeTitle = m.getMethodName();
+		m.putParameters(this);
+		repaint();
+	}
+
+	private final BooleanProperty disableBandSelectionProperty = new SimpleBooleanProperty();
+	private final InvalidationListener grayPortListener = (e) -> onGrayPortChanged();
+
+	private void onGrayPortChanged() {
+		disableBandSelectionProperty.set(input_gray.isConnected());
+	}
+
+	@Override
 	public void init(ProcessorContext context) {
 		input_xor.init(context);
+		input_gray.portStateProperty().addListener(grayPortListener);
+		onGrayPortChanged();
 		method.property().addListener(methodListener);
 		onMethodSelection();
 
 		if (context != null) {
 			restoreOutputs(context);
 		}
+	}
+
+	@Override
+	public boolean isConnected() {
+		return input_xor.isConnected();
 	}
 
 	@Override
@@ -422,10 +441,17 @@ public class AdaptiveLocalThreshold extends ProcessableBase implements Previewab
 		if (image == null) {
 			return null;
 		}
-		return OpenIMAJUtils.toFImage(image, getBand(image));
+		return OpenIMAJUtils.toFImage(
+				image,
+				Math.min(image.getSampleModel().getNumBands(), getBand(image))
+		);
 	}
 
 	private <T extends BufferedImage> int getBand(T image) {
+		final InputPort<?> port = input_xor.getEnabledPort();
+		if (input_gray.equals(port)) {
+			return 0;
+		}
 		final int n = image.getSampleModel().getNumBands();
 		int b = band.get();
 		if (b > n) {

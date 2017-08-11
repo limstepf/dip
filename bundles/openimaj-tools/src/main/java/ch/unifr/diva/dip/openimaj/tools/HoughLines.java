@@ -12,6 +12,7 @@ import ch.unifr.diva.dip.api.datastructures.Line2D;
 import ch.unifr.diva.dip.api.datastructures.Lines2D;
 import ch.unifr.diva.dip.api.parameters.BooleanParameter;
 import ch.unifr.diva.dip.api.parameters.CompositeGrid;
+import ch.unifr.diva.dip.api.parameters.EmptyParameter;
 import ch.unifr.diva.dip.api.parameters.ExpParameter;
 import ch.unifr.diva.dip.api.parameters.IntegerParameter;
 import ch.unifr.diva.dip.api.parameters.LabelParameter;
@@ -69,12 +70,15 @@ public class HoughLines extends ProcessableBase {
 		final TextParameter minThetaLabel = new TextParameter("min: ");
 		this.minTheta = new ExpParameter("Min. angle", "0");
 		minTheta.addTextFieldViewHook(expHook);
-		final TextParameter maxThetaLabel = new TextParameter(" max: ");
+		final TextParameter maxThetaLabel = new TextParameter("max: ");
 		this.maxTheta = new ExpParameter("Max. angle", "359");
 		maxTheta.addTextFieldViewHook(expHook);
+		final EmptyParameter spacer = new EmptyParameter();
+		spacer.setMinWidth(10);
 		final CompositeGrid angleGrid = new CompositeGrid(
 				minThetaLabel,
 				minTheta,
+				spacer,
 				maxThetaLabel,
 				maxTheta
 		);
@@ -167,6 +171,11 @@ public class HoughLines extends ProcessableBase {
 		if (context != null) {
 			restoreOutputs(context);
 		}
+	}
+
+	@Override
+	public boolean isConnected() {
+		return input_xor.isConnected();
 	}
 
 	@Override

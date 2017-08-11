@@ -2,6 +2,7 @@ package ch.unifr.diva.dip.openimaj.tools;
 
 import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
+import ch.unifr.diva.dip.api.components.Port;
 import ch.unifr.diva.dip.api.components.ProcessorContext;
 import ch.unifr.diva.dip.api.components.ProcessorDocumentation;
 import ch.unifr.diva.dip.api.components.SimpleProcessorDocumentation;
@@ -10,6 +11,7 @@ import ch.unifr.diva.dip.api.datastructures.BufferedMatrix;
 import ch.unifr.diva.dip.api.parameters.CompositeGrid;
 import ch.unifr.diva.dip.api.parameters.ExpParameter;
 import ch.unifr.diva.dip.api.parameters.IntegerSliderParameter;
+import ch.unifr.diva.dip.api.parameters.LabelParameter;
 import ch.unifr.diva.dip.api.parameters.PersistentParameter.ViewHook;
 import ch.unifr.diva.dip.api.parameters.TextParameter;
 import ch.unifr.diva.dip.api.parameters.XorParameter;
@@ -77,11 +79,13 @@ public class DifferenceOfGaussians extends ProcessableBase implements Previewabl
 		sigma2.addTextFieldViewHook(shook);
 		final CompositeGrid grid = new CompositeGrid(
 				"Gaussians",
-				new TextParameter("sigma1: "),
+				new LabelParameter("Sigma1"),
+				new LabelParameter("Sigma2"),
 				sigma1,
-				new TextParameter(" sigma2: "),
 				sigma2
 		);
+		grid.setColumnConstraints(2);
+		grid.setHorizontalSpacing(10);
 		parameters.put("gaussians", grid);
 
 		final TextParameter nonormalize = new TextParameter("no normalization");
@@ -181,6 +185,7 @@ public class DifferenceOfGaussians extends ProcessableBase implements Previewabl
 	@Override
 	public void init(ProcessorContext context) {
 		input_xor.init(context);
+		input_gray.portStateProperty().addListener(grayPortListener);
 		onGrayPortChanged();
 		normalization.property().addListener(normalizationListener);
 		onNormalizationChanged();
@@ -188,6 +193,11 @@ public class DifferenceOfGaussians extends ProcessableBase implements Previewabl
 		if (context != null) {
 			restoreOutputs(context);
 		}
+	}
+
+	@Override
+	public boolean isConnected() {
+		return input_xor.isConnected();
 	}
 
 	@Override
@@ -274,12 +284,22 @@ public class DifferenceOfGaussians extends ProcessableBase implements Previewabl
 		}
 		if (image instanceof BufferedMatrix) {
 			final BufferedMatrix mat = (BufferedMatrix) image;
-			return OpenIMAJUtils.toFImage(mat, getBand(mat));
+			return OpenIMAJUtils.toFImage(
+					mat,
+					Math.min(mat.getSampleModel().getNumBands(), getBand(mat))
+			);
 		}
-		return OpenIMAJUtils.toFImage(image, getBand(image));
+		return OpenIMAJUtils.toFImage(
+				image,
+				Math.min(image.getSampleModel().getNumBands(), getBand(image))
+		);
 	}
 
 	private <T extends BufferedImage> int getBand(T image) {
+		final InputPort<?> port = input_xor.getEnabledPort();
+		if (input_gray.equals(port)) {
+			return 0;
+		}
 		final int n = image.getSampleModel().getNumBands();
 		int b = band.get();
 		if (b > n) {
@@ -310,6 +330,23 @@ public class DifferenceOfGaussians extends ProcessableBase implements Previewabl
 			output_gray.setOutput(image);
 			output_float.setOutput(null);
 		}
+	}
+
+	@Override
+	public boolean isReady() {
+		if (!output.getPortState().equals(Port.State.READY)) {
+			return false;
+		}
+		if (isForceFloat()) {
+			if (!output_float.getPortState().equals(Port.State.READY)) {
+				return false;
+			}
+		} else {
+			if (!output_gray.getPortState().equals(Port.State.READY)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@Override
