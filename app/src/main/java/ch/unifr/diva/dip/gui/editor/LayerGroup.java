@@ -159,15 +159,10 @@ public class LayerGroup extends LayerBase implements EditorLayerGroup {
 		}
 		this.treeItem.getChildren().setAll(items);
 
-		// update parent if needed
-		final boolean wasHideGroup = this.isHideGroup();
 		this.updateHideGroup();
 
-		// can't we find a better invariant? It's a bit tricky to know if the
-		// parent group switches hideGroup if set to AUTO...
-		if ((getParent() != null
-				&& !getParent().getHideGroupMode().equals(LayerGroup.HideGroupMode.NEVER))
-				|| wasHideGroup != isHideGroup()) {
+		// update parent
+		if (getParent() != null) {
 			this.updateHideGroupParent();
 		}
 
