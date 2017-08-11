@@ -88,6 +88,7 @@ public class NavigatorWidget<T extends Pannable> extends AbstractWidget {
 		protected final ImageView snapshot;
 		protected final Scale snapshotScaleTransform;
 		protected final SnapshotParameters snapshotParams;
+		protected final EventHandler<MouseEvent> snapshotClickEvent;
 		protected final Rectangle viewport;
 		protected final ZoomSlider zoomSlider;
 
@@ -105,10 +106,18 @@ public class NavigatorWidget<T extends Pannable> extends AbstractWidget {
 		 */
 		public NavigatorWidgetView(T pannable) {
 			this.pannable = pannable;
-			this.snapshot = new ImageView();
 			this.snapshotScaleTransform = new Scale(1.0, 1.0);
 			this.snapshotParams = new SnapshotParameters();
 			snapshotParams.setTransform(snapshotScaleTransform);
+			this.snapshotClickEvent = (e) -> onSnapshotClicked(e);
+			this.snapshot = new ImageView();
+			snapshot.setOnMouseClicked(snapshotClickEvent);
+			snapshot.setOnMouseEntered(e -> {
+				snapshot.getScene().setCursor(Cursor.HAND);
+			});
+			snapshot.setOnMouseExited(e -> {
+				snapshot.getScene().setCursor(Cursor.DEFAULT);
+			});
 
 			this.viewport = new Rectangle();
 			viewport.setFill(Color.TRANSPARENT);
@@ -193,6 +202,14 @@ public class NavigatorWidget<T extends Pannable> extends AbstractWidget {
 					viewport.setY(visibleRegion.getScaledOffsetY() * scaleFactor);
 				}
 			}
+		}
+
+		protected final void onSnapshotClicked(MouseEvent e) {
+			final double invScale = 1 / scale;
+			pannable.moveToPixel(
+					e.getX() * invScale,
+					e.getY() * invScale
+			);
 		}
 
 		protected void onViewportDown(MouseEvent e) {
