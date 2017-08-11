@@ -11,6 +11,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 
 /**
  * An XOR parameter. Offers different parameters to choose one from to define
@@ -224,6 +225,27 @@ public class XorParameter extends CompositeBase<ValueListSelection, XorParameter
 		return new XorView(this);
 	}
 
+	protected final List<PersistentParameter.ViewHook<VBox>> viewHooks = new ArrayList<>();
+
+	/**
+	 * Adds a view hook to customize the {@code VBox}. This method is only called if
+	 * the view of the parameter is actually requested.
+	 *
+	 * @param hook hook method for a {@code VBox}.
+	 */
+	public void addVBoxViewHook(PersistentParameter.ViewHook<VBox> hook) {
+		this.viewHooks.add(hook);
+	}
+
+	/**
+	 * Removes a view hook.
+	 *
+	 * @param hook hook method to be removed.
+	 */
+	public void removeVBoxViewHook(PersistentParameter.ViewHook<VBox> hook) {
+		this.viewHooks.remove(hook);
+	}
+
 	/**
 	 * XOR item/option view.
 	 *
@@ -295,6 +317,8 @@ public class XorParameter extends CompositeBase<ValueListSelection, XorParameter
 			initItems();
 			set(parameter.get());
 			updateItems();
+
+			PersistentParameter.applyViewHooks(this.root, parameter.viewHooks);
 
 			// listen to xor selection
 			toggleGroup.selectedToggleProperty().addListener((obs) -> {
