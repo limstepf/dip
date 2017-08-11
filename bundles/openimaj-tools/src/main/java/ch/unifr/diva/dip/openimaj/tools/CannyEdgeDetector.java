@@ -230,6 +230,10 @@ public class CannyEdgeDetector extends ProcessableBase implements Previewable {
 		if (port.equals(input_float) || (input.getValue() instanceof BufferedMatrix)) {
 			return null;
 		}
+		if (port.equals(input_gray)) {
+			final BufferedImage image = input_gray.getValue();
+			return SwingFXUtils.toFXImage(image, null);
+		}
 		final BufferedImage image = input.getValue();
 		return SwingFXUtils.toFXImage(image, null);
 	}
@@ -263,6 +267,9 @@ public class CannyEdgeDetector extends ProcessableBase implements Previewable {
 			if (port.equals(input_float)) {
 				final BufferedImage mat = getSubimage(input_float.getValue(), bounds);
 				fimage = OpenIMAJUtils.toFImage(mat, getBand(mat));
+			} else if (port.equals(input_gray)) {
+				final BufferedImage image = getSubimage(input_gray.getValue(), bounds);
+				fimage = OpenIMAJUtils.toFImage(image, 0);
 			} else {
 				final BufferedImage image = getSubimage(input.getValue(), bounds);
 				if (image instanceof BufferedMatrix) {
