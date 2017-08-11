@@ -62,10 +62,10 @@ public class TextParameter extends TransientParameterBase<String, Parameter.View
 	protected final List<PersistentParameter.ViewHook<Text>> viewHooks = new ArrayList<>();
 
 	/**
-	 * Adds a view hook to customize the label. This method is only called if
+	 * Adds a view hook to customize the {@code Text}. This method is only called if
 	 * the view of the parameter is actually requested.
 	 *
-	 * @param hook hook method for a label.
+	 * @param hook hook method for a {@code Text}.
 	 */
 	public void addTextViewHook(PersistentParameter.ViewHook<Text> hook) {
 		this.viewHooks.add(hook);
