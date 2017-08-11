@@ -35,7 +35,7 @@ public abstract class AbstractList<T> implements List<T>, RandomAccess {
 	 * @param elements the list items.
 	 */
 	public AbstractList(List<T> elements) {
-		this.elements = elements;
+		this.elements = new ArrayList<>(elements);
 	}
 
 	@Override
