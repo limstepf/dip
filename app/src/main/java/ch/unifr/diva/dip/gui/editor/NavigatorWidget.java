@@ -160,15 +160,19 @@ public class NavigatorWidget<T extends Pannable> extends AbstractWidget {
 		}
 
 		protected void updateSnapshot() {
-			final Bounds contentBounds = pannable.getContentBounds();
-			scale = Math.min(
-					pane.getWidth() / contentBounds.getWidth(),
-					pane.getHeight() / contentBounds.getHeight()
-			);
-			snapshotScaleTransform.setX(scale);
-			snapshotScaleTransform.setY(scale);
-			final WritableImage image = pannable.getContentPane().snapshot(snapshotParams, null);
-			snapshot.setImage(image);
+			if (pannable.isEmpty()) {
+				snapshot.setImage(null);
+			} else {
+				final Bounds contentBounds = pannable.getContentBounds();
+				scale = Math.min(
+						pane.getWidth() / contentBounds.getWidth(),
+						pane.getHeight() / contentBounds.getHeight()
+				);
+				snapshotScaleTransform.setX(scale);
+				snapshotScaleTransform.setY(scale);
+				final WritableImage image = pannable.getContentPane().snapshot(snapshotParams, null);
+				snapshot.setImage(image);
+			}
 
 			updateViewport();
 		}

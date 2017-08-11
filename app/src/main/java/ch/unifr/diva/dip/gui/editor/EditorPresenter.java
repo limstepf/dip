@@ -68,7 +68,6 @@ public class EditorPresenter implements Presenter {
 
 		this.rootLayer = new LayerGroup();
 		this.zoomPane = new ZoomPaneBresenham(handler.discardingThreadPool);
-		zoomPane.setContent(this.rootLayer.getComponent());
 		zoomPane.getStyleClass().add("dip-editor");
 		zoomPane.setInterpolation(
 				Zoomable.Interpolation.get(handler.settings.editor.interpolation)
@@ -169,6 +168,7 @@ public class EditorPresenter implements Presenter {
 				this.rootLayer.getChildren().add(stageGroup);
 			}
 		}
+		zoomPane.setContent(this.rootLayer.getComponent());
 
 		// since we're currently not saving the expandProperty of layers, we're
 		// just going to expand all layers upon opening/building the stages.
@@ -193,6 +193,7 @@ public class EditorPresenter implements Presenter {
 	}
 
 	private void clear() {
+		zoomPane.clearContent();
 		this.rootLayer.clear();
 		clearMask();
 		resetOverlay();
@@ -208,7 +209,7 @@ public class EditorPresenter implements Presenter {
 		clear();
 		buildStages();
 		layersWidget().setRoot(this.rootLayer.getTreeItem());
-		
+
 		// TODO: save and restore zoom and position (centered pixel) for all pages
 		zoomPane.moveToPos(Pos.TOP_LEFT, 50);
 	}
