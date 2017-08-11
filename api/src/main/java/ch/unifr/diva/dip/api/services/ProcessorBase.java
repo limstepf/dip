@@ -24,6 +24,7 @@ import java.util.Map;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javax.imageio.ImageIO;
@@ -125,6 +126,33 @@ public abstract class ProcessorBase implements Processor {
 	 */
 	public static void resetLayer(ProcessorContext context) {
 		context.getLayer().clear();
+	}
+
+	/**
+	 * Provides and adds a simple {@code LayerPane} with the given {@code Node}
+	 * to the processor layer.
+	 *
+	 * @param context the processor context.
+	 * @param node the JavaFX node.
+	 * @return the added {@code LayerPane}.
+	 */
+	public static EditorLayerPane provideLayer(ProcessorContext context, Node node) {
+		return provideLayer(context, node, "");
+	}
+
+	/**
+	 * Provides and adds a simple {@code LayerPane} with the given {@code Node}
+	 * to the processor layer.
+	 *
+	 * @param context the processor context.
+	 * @param node the JavaFX node.
+	 * @param name the name of the layer.
+	 * @return the added {@code LayerPane}.
+	 */
+	public static EditorLayerPane provideLayer(ProcessorContext context, Node node, String name) {
+		final EditorLayerPane layer = context.getLayer().newLayerPane(name);
+		layer.add(node);
+		return layer;
 	}
 
 	/**
