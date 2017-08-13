@@ -3,7 +3,11 @@ package ch.unifr.diva.dip.gui.pe;
 import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.components.ProcessorDocumentation;
+import ch.unifr.diva.dip.api.services.Editable;
+import ch.unifr.diva.dip.api.services.Previewable;
 import ch.unifr.diva.dip.api.services.Processor;
+import ch.unifr.diva.dip.api.tools.MultiTool;
+import ch.unifr.diva.dip.api.tools.Tool;
 import ch.unifr.diva.dip.api.ui.Glyph;
 import ch.unifr.diva.dip.api.ui.StructuredText;
 import ch.unifr.diva.dip.core.ApplicationHandler;
@@ -18,6 +22,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -167,7 +172,11 @@ public class ProcessorInformationDialog<T extends PrototypeProcessor> extends Ab
 				final Map<Object, Object> basics = new LinkedHashMap<>();
 				basics.put("PID", service.pid);
 				basics.put("Bundle", service.symbolicBundleName);
-				basics.put("Version", service.version.toString());
+				basics.put(localize("version"), service.version.toString());
+				if (service.serviceObject != null) {
+					putCapabilities(basics, service);
+				}
+				basics.put(localize("state"), wrapper.state().toString());
 
 				final StructuredText basicsPane = StructuredText.smallDescriptionList(basics);
 				getChildren().add(basicsPane);
@@ -248,6 +257,44 @@ public class ProcessorInformationDialog<T extends PrototypeProcessor> extends Ab
 						localize("available.not.x", localize("processor.info"))
 				);
 				getChildren().add(unavailable);
+			}
+		}
+
+		private void putCapabilities(Map<Object, Object> map, OSGiService<Processor> service) {
+			final List<String> capabilities = new ArrayList<>();
+			final boolean canEdit = service.serviceObject.canEdit();
+			if (canEdit) {
+				capabilities.add(localize("edit"));
+			}
+			if (service.serviceObject.canProcess()) {
+				capabilities.add(localize("process"));
+			}
+			if (service.serviceObject.canReset()) {
+				capabilities.add(localize("reset"));
+			}
+			if (service.serviceObject instanceof Previewable) {
+				capabilities.add(localize("preview"));
+			}
+			map.put(localize("capabilities"), String.join(", ", capabilities));
+
+			if (canEdit) {
+				final List<String> tools = new ArrayList<>();
+				final Editable e = service.serviceObject.asEditableProcessor();
+				for (Tool tool : e.tools()) {
+					if (tool.isMultiTool()) {
+						final MultiTool multi = tool.asMultiTool();
+						tools.add(String.format(
+								"%s [%s]",
+								tool.getName(),
+								multi.getSimpleTools().stream().map(
+										t -> t.getName()
+								).collect(Collectors.joining(", "))
+						));
+					} else {
+						tools.add(tool.getName());
+					}
+				}
+				map.put(localize("tools"), String.join(", ", tools));
 			}
 		}
 
