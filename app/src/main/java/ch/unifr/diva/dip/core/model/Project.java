@@ -8,6 +8,7 @@ import ch.unifr.diva.dip.utils.Modifiable;
 import ch.unifr.diva.dip.utils.ModifiedProperty;
 import ch.unifr.diva.dip.gui.pe.PipelineEditor;
 import ch.unifr.diva.dip.api.utils.FxUtils;
+import ch.unifr.diva.dip.eventbus.events.ProjectRequest;
 import ch.unifr.diva.dip.eventbus.events.StatusMessageEvent;
 import ch.unifr.diva.dip.utils.BackgroundTask;
 import ch.unifr.diva.dip.utils.CursorLock;
@@ -198,6 +199,10 @@ public class Project implements Modifiable, Localizable {
 		if (currentPage != null) {
 			currentPage.close();
 		}
+		unbindSelectedPage();
+	}
+
+	private void unbindSelectedPage() {
 		// might run on a background thread, so make sure we only touch props
 		// and bindings on the FX Application thread
 		FxUtils.run(() -> {
@@ -244,8 +249,8 @@ public class Project implements Modifiable, Localizable {
 		final ProjectData data = new ProjectData(this);
 
 		// save current page and its pipeline (e.g. the object map)
-		if (this.getSelectedPageId() > 0) {
-			this.getSelectedPage().save();
+		if (getSelectedPageId() > 0 && getSelectedPage() != null) {
+			getSelectedPage().save();
 		}
 
 		// write project root xml
@@ -690,6 +695,12 @@ public class Project implements Modifiable, Localizable {
 			}
 
 			log.info("deleting page: {}", page);
+			if (page.id == getSelectedPageId()) {
+				unbindSelectedPage();
+				handler.eventBus.post(
+						new ProjectNotification(ProjectNotification.Type.SELECTED, -1)
+				);
+			}
 			page.pipelineIdProperty().removeListener(pipelineUsageListener);
 			addToPipelineUsage(page.getPipelineId(), -1);
 			this.modifiedProjectProperty.removeManagedProperty(page);
