@@ -596,6 +596,11 @@ public class EditorPane {
 			return;
 		}
 
+		// insert dot to keep pane-bounds intact and prevent viewport-jitter
+		pane.getChildren().add(dot);
+		final Bounds bounds = oldView.getBoundsInParent();
+		dot.relocate(bounds.getMaxX(), bounds.getMaxY());
+
 		// remove wires and unregister old ports
 		oldView.removePortLabels(); // in case they still stick around (e.g. parameter change -> repaint)
 		oldView.unregister();
@@ -625,6 +630,9 @@ public class EditorPane {
 				newConnection(input);
 			}
 		}
+
+		// remove dot
+		pane.getChildren().remove(dot);
 	}
 
 	/**
