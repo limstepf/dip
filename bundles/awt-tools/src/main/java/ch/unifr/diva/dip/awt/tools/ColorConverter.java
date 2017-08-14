@@ -99,10 +99,10 @@ public class ColorConverter extends ProcessableBase {
 			this.outputColors.add(new OutputColorPort(cm));
 		}
 
-		this.cmSrc = new EnumParameter("from", SimpleColorModel.class, SimpleColorModel.RGB.name());
+		this.cmSrc = new EnumParameter("From", SimpleColorModel.class, SimpleColorModel.RGB.name());
 		this.parameters.put("source", this.cmSrc);
 
-		this.cmDst = new EnumParameter("to", SimpleColorModel.class, SimpleColorModel.RGB.name());
+		this.cmDst = new EnumParameter("To", SimpleColorModel.class, SimpleColorModel.RGB.name());
 		this.parameters.put("destination", this.cmDst);
 
 		// announce all in/ouput ports

@@ -19,6 +19,8 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import javafx.beans.InvalidationListener;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import org.osgi.service.component.annotations.Component;
@@ -71,7 +73,10 @@ public class GlobalThreshold extends ProcessableBase implements Previewable {
 	public GlobalThreshold() {
 		super("Global Threshold");
 
-		this.bandParameter = new IntegerSliderParameter("band", 1, 1, 4);
+		this.bandParameter = new IntegerSliderParameter("Band", 1, 1, 4);
+		bandParameter.addSliderViewHook((s) -> {
+			s.disableProperty().bind(disableBandSelectionProperty);
+		});
 		this.parameters.put("band", this.bandParameter);
 
 		final EnumParameter adaptiveMethods = new EnumParameter(
@@ -89,7 +94,7 @@ public class GlobalThreshold extends ProcessableBase implements Previewable {
 			s.setMinorTickCount(15);
 		});
 
-		this.thresholdParameter = new XorParameter("threshold", Arrays.asList(
+		this.thresholdParameter = new XorParameter("Threshold", Arrays.asList(
 				adaptiveMethods,
 				manualInput
 		));
@@ -106,6 +111,8 @@ public class GlobalThreshold extends ProcessableBase implements Previewable {
 		this.output_binary = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImageBinary());
 		this.outputs.put("binary-image", this.output_binary);
 	}
+
+	private final BooleanProperty disableBandSelectionProperty = new SimpleBooleanProperty();
 
 	@Override
 	public Processor newInstance(ProcessorContext context) {
@@ -133,14 +140,17 @@ public class GlobalThreshold extends ProcessableBase implements Previewable {
 	private final InvalidationListener inputListener = (c) -> inputCallback();
 
 	private void inputCallback() {
+		boolean disableBandSelection = false;
 		if (this.input.isConnected()) {
 			enableInputs(this.input);
 		} else if (this.input_gray.isConnected()) {
+			disableBandSelection = true;
 			enableInputs(this.input_gray);
 		} else {
 			enableAllInputs();
 		}
 
+		disableBandSelectionProperty.set(disableBandSelection);
 		repaint();
 	}
 

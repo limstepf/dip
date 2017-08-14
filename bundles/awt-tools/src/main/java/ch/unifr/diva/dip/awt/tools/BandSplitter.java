@@ -160,7 +160,7 @@ public class BandSplitter extends ProcessableBase {
 	public BandSplitter() {
 		super("Band Splitter");
 
-		this.cmSrc = new EnumParameter("source", SimpleColorModel.class, ANY_OPTION);
+		this.cmSrc = new EnumParameter("Source", SimpleColorModel.class, ANY_OPTION);
 		this.cmSrc.addOption(ANY_OPTION, "Any/unknown");
 		this.cmSrc.addComboBoxViewHook((combo) -> {
 			final SelectionListCellFactory<String> cf = new SelectionListCellFactory<>();

@@ -251,7 +251,7 @@ public class AdaptiveLocalThreshold extends ProcessableBase implements Previewab
 		super("Adaptive Local Threshold");
 
 		this.runtimeTitle = this.name;
-		this.band = new IntegerSliderParameter("band", 1, 1, 4);
+		this.band = new IntegerSliderParameter("Band", 1, 1, 4);
 		band.addSliderViewHook((s) -> {
 			s.disableProperty().bind(disableBandSelectionProperty);
 		});

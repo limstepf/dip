@@ -67,7 +67,7 @@ public class SobelFilter extends ProcessableBase {
 				sigma
 		);
 		this.blur = new XorParameter(
-				"blur",
+				"Blur",
 				Arrays.asList(noblur, grid),
 				0
 		);
