@@ -280,7 +280,7 @@ public class UserSettings {
 		 * The interpolation method/algorithm to be used by the main editor.
 		 */
 		@XmlAttribute
-		public String interpolation = Zoomable.Interpolation.BILINEAR.name();
+		public String interpolation = Zoomable.Interpolation.NEAREST_NEIGHBOR.name();
 
 		/**
 		 * Returns a (human-readable) array of attributes.
