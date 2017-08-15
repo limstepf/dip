@@ -162,9 +162,12 @@ public class EditorPresenter implements Presenter {
 			for (Pipeline.Stage<RunnableProcessor> stage : page.getPipeline().stages()) {
 				final LayerGroup stageGroup = new LayerGroup(stage.title());
 
-				for (RunnableProcessor p : stage.processors) {
-					stageGroup.getChildren().add(p.layer());
+				// add processors in reverse order to be congruent with the view
+				// in the pipeline editor
+				for (int i = stage.processors.size() - 1; i >= 0; i--) {
+					stageGroup.getChildren().add(stage.processors.get(i).layer());
 				}
+
 				this.rootLayer.getChildren().add(stageGroup);
 			}
 		}
