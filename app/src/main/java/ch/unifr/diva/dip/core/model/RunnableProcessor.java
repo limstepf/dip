@@ -110,6 +110,7 @@ public class RunnableProcessor extends PrototypeProcessor {
 		this.layerGroup.setHideGroupMode(LayerGroup.HideGroupMode.AUTO);
 		this.layerGroup.layerExtensions().add(new ProcessorLayerExtension(this));
 		updateState();
+		updateStatusColor(getStateValue());
 	}
 
 	/**
@@ -235,7 +236,7 @@ public class RunnableProcessor extends PrototypeProcessor {
 			lane.setPadding(new Insets(4, 4, 4, 4));
 			vbox.getChildren().addAll(status, lane);
 
-			stateCallback();
+			stateCallback(runnable.getStateValue());
 			this.runnable.stateProperty().addListener((e) -> stateCallback());
 		}
 
@@ -246,7 +247,10 @@ public class RunnableProcessor extends PrototypeProcessor {
 		}
 
 		private void stateCallback() {
-			final Processor.State state = runnable.getState();
+			stateCallback(runnable.getState());
+		}
+
+		private void stateCallback(Processor.State state) {
 			status.setText(state.label);
 			if (processButton != null) {
 				processButton.setDisable(!state.equals(Processor.State.PROCESSING));

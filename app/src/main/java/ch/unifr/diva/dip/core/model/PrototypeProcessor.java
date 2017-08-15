@@ -202,11 +202,11 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 	/**
 	 * Returns the state of the processor. This method shouldn't be called if
 	 * listening to the {@code stateProperty} since this value might already be
-	 * newer.
+	 * newer. However, this method might be prefered to initialize things.
 	 *
 	 * @return the state of the processor.
 	 */
-	protected Processor.State getStateValue() {
+	public Processor.State getStateValue() {
 		return this.stateProperty.get();
 	}
 
