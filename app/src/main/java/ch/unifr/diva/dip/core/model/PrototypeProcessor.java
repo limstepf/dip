@@ -18,6 +18,7 @@ import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import ch.unifr.diva.dip.osgi.OSGiService;
 import ch.unifr.diva.dip.utils.IOUtils;
+import ch.unifr.diva.dip.utils.SynchronizedObjectProperty;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import org.osgi.framework.Version;
@@ -72,6 +74,7 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 	protected final Version version;
 	protected volatile Processor processor;
 	protected volatile boolean isHostProcessor;
+	protected final SynchronizedObjectProperty<Processor.State> stateProperty;
 	protected final DoubleProperty layoutXProperty;
 	protected final DoubleProperty layoutYProperty;
 	protected final BooleanProperty availableProperty;
@@ -130,6 +133,9 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 		this.pid = pid;
 		this.version = new Version(version);
 		this.handler = handler;
+		this.stateProperty = new SynchronizedObjectProperty<>(
+				Processor.State.WAITING
+		);
 		this.layoutXProperty = new SimpleDoubleProperty(x);
 		this.layoutYProperty = new SimpleDoubleProperty(y);
 		this.availableProperty = new SimpleBooleanProperty(false);
@@ -169,6 +175,52 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 		this.layoutYProperty.addListener(softEditListener);
 		this.editingProperty.addListener(softEditListener);
 
+	}
+
+	/**
+	 * Returns a read-only stateProperty of the processor.
+	 *
+	 * @return a read-only stateProperty.
+	 */
+	public ReadOnlyObjectProperty<Processor.State> stateProperty() {
+		return stateProperty.getReadOnlyProperty();
+	}
+
+	/**
+	 * Returns the state of the processor.
+	 *
+	 * @return the state of the processor.
+	 */
+	public Processor.State getState() {
+		// returning the value from stateProperty itself is bound to end in
+		// confusion if we're listening to the stateProperty for changes, since
+		// that value might be already newer than the ReadOnlyProperty on the
+		// FX application thread.
+		return this.stateProperty.getReadOnlyProperty().get();
+	}
+
+	/**
+	 * Returns the state of the processor. This method shouldn't be called if
+	 * listening to the {@code stateProperty} since this value might already be
+	 * newer.
+	 *
+	 * @return the state of the processor.
+	 */
+	protected Processor.State getStateValue() {
+		return this.stateProperty.get();
+	}
+
+	/**
+	 * Updates the state of the processor. Updates only the state of this
+	 * processor, not however the states of depended processors (whose states
+	 * might change once the state of this one does...).
+	 */
+	protected void updateState() {
+		if (isAvailable()) {
+			stateProperty.set(processor().state());
+		} else {
+			stateProperty.set(Processor.State.UNAVAILABLE);
+		}
 	}
 
 	/**
@@ -244,15 +296,6 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 	@Override
 	public ModifiedProperty modifiedProperty() {
 		return modifiedProcessorProperty;
-	}
-
-	/**
-	 * Returns the state of the wrapped processor.
-	 *
-	 * @return the state of the processor.
-	 */
-	public Processor.State state() {
-		return (isAvailable() ? processor.state() : Processor.State.UNAVAILABLE);
 	}
 
 	/**
@@ -354,7 +397,9 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 		// ports have disappeared or something...
 		if (processor != null) {
 
-			removeParameterListener(processor);
+			if (processor.hasRepaintProperty()) {
+				processor.repaintProperty().removeListener(repaintListener);
+			}
 			saveParameters(processor);
 
 			// disconnecting the old processor might change its ports (repaint)
@@ -403,7 +448,6 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 		// init new processor
 		this.parameters = PersistentParameter.validatePreset(newProcessor.parameters(), this.parameters);
 		initParameters(newProcessor);
-		addParameterListener(newProcessor);
 
 		// let the processor know it's ready again now. If processor was null,
 		// this proc just got created and init will be called in RunnablePipeline
@@ -414,6 +458,11 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 
 		processor = newProcessor;
 		availableProperty.set(true);
+
+		if (newProcessor.hasRepaintProperty()) {
+			newProcessor.repaintProperty().addListener(repaintListener);
+		}
+		onRepaint();
 	}
 
 	/**
@@ -473,22 +522,43 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 		this.parameters = PersistentParameter.getPreset(processor.parameters());
 	}
 
-	private void addParameterListener(Processor processor) {
-		for (Parameter<?> p : processor.parameters().values()) {
-			if (p.isPersistent()) {
-				final PersistentParameter<?> pp = (PersistentParameter) p;
-				this.modifiedProcessorProperty.addObservedProperty(pp.property());
-			}
-		}
+	private final InvalidationListener repaintListener = (e) -> onRepaint();
+	private final InvalidationListener inputPortListener = (e) -> onInputPortChanged();
+
+	private final List<PersistentParameter<?>> currentParameters = new ArrayList<>();
+	private final List<InputPort<?>> currentInputPorts = new ArrayList<>();
+
+	protected void onInputPortChanged() {
+		updateState();
 	}
 
-	private void removeParameterListener(Processor processor) {
+	// parameters and ports may change upon a repaint
+	protected void onRepaint() {
+		// remove parameter listeners
+		for (PersistentParameter<?> p : currentParameters) {
+			this.modifiedProcessorProperty.removeObservedProperty(p.property());
+		}
+		currentParameters.clear();
+		// remove input port listeners
+		for (InputPort<?> p : currentInputPorts) {
+			p.portStateProperty().removeListener(inputPortListener);
+		}
+		currentInputPorts.clear();
+
+		// add parameter listeners
 		for (Parameter<?> p : processor.parameters().values()) {
 			if (p.isPersistent()) {
-				final PersistentParameter<?> pp = (PersistentParameter) p;
-				this.modifiedProcessorProperty.removeObservedProperty(pp.property());
+				final PersistentParameter<?> pp = p.asPersitentParameter();
+				this.modifiedProcessorProperty.addObservedProperty(pp.property());
+				currentParameters.add(pp);
 			}
 		}
+		// add input port listeners
+		for (InputPort<?> p : processor.inputs().values()) {
+			p.portStateProperty().addListener(inputPortListener);
+		}
+
+		updateState();
 	}
 
 	/**

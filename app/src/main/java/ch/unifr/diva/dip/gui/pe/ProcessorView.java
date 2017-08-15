@@ -24,7 +24,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -33,7 +32,6 @@ import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Background;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Window;
@@ -66,7 +64,7 @@ public abstract class ProcessorView extends BorderPane {
 
 	protected final ProcessorHead head;
 	protected ParameterView parameterView;
-	protected ClosedParameterView closedParameterView;
+	protected ParameterView closedParameterView;
 	protected double anchorX;
 	protected double anchorY;
 	protected Node minimalNodeX;
@@ -93,21 +91,9 @@ public abstract class ProcessorView extends BorderPane {
 	public ProcessorView(PipelineEditor editor, PrototypeProcessor wrapper) {
 		this.editor = editor;
 		this.wrapper = wrapper;
-
-		this.setPadding(new Insets(
-				verticalPadding,
-				horizontalPadding,
-				verticalPadding,
-				horizontalPadding
-		));
-
-		if (!wrapper.isAvailable()) {
-			this.pseudoClassStateChanged(UNAVAILABLE, true);
-		}
-		wrapper.availableProperty().addListener(availableListener);
-
 		this.inputPorts = new ArrayList<>();
 		this.outputPorts = new ArrayList<>();
+
 		if (wrapper.isAvailable()) {
 			for (Map.Entry<String, InputPort<?>> e : wrapper.processor().inputs().entrySet()) {
 				final InputPort<?> input = e.getValue();
@@ -138,7 +124,25 @@ public abstract class ProcessorView extends BorderPane {
 		this.layoutYProperty().bindBidirectional(wrapper.layoutYProperty());
 
 		this.getStyleClass().add("dip-processor");
-		this.setBackground(Background.EMPTY);
+		this.setPadding(new Insets(
+				verticalPadding,
+				horizontalPadding,
+				verticalPadding,
+				horizontalPadding
+		));
+		/*
+		 * TODO: the problem with this is that the padding/insets also steal
+		 * mouse events, which is a problem since the padding may easily overlap
+		 * other processor views. Unfortunately setPickOnBounds doesn't help us
+		 * here, and neither can we just setMouseTransparent the root, since we
+		 * can't undo it for child nodes s.t. still recieve the mouse events...
+		 */
+//		this.setPickOnBounds(false);
+
+		if (!wrapper.isAvailable()) {
+			this.pseudoClassStateChanged(UNAVAILABLE, true);
+		}
+		wrapper.availableProperty().addListener(availableListener);
 
 		this.head = new ProcessorHead(editor.applicationHandler(), wrapper);
 	}
@@ -206,15 +210,11 @@ public abstract class ProcessorView extends BorderPane {
 
 	final InvalidationListener editingListener = (observable) -> {
 		if (editingProperty.get()) {
-			if (!parameterView().getChildren().isEmpty()) {
-				wrapper().editingProperty().set(true);
-				showParameters(true);
-			}
+			wrapper().editingProperty().set(true);
+			showParameters(true);
 		} else {
 			wrapper().editingProperty().set(false);
-			if (this.parameterView != null) {
-				showParameters(false);
-			}
+			showParameters(false);
 		}
 
 		updatePorts();
@@ -396,7 +396,7 @@ public abstract class ProcessorView extends BorderPane {
 	protected void onMouseEntered(MouseEvent e) {
 		editor.setCursor(Cursor.OPEN_HAND);
 		if (this.closedParameterView != null) {
-			this.closedParameterView.glyph.disabledHoverEffectProperty().set(false);
+			this.closedParameterView.onMouseEntered(e);
 		}
 		addPortLabels();
 	}
@@ -404,7 +404,7 @@ public abstract class ProcessorView extends BorderPane {
 	protected void onMouseExited(MouseEvent e) {
 		editor.setCursor(Cursor.DEFAULT);
 		if (this.closedParameterView != null) {
-			this.closedParameterView.glyph.disabledHoverEffectProperty().set(true);
+			this.closedParameterView.onMouseExited(e);
 		}
 		removePortLabels();
 	}
@@ -478,17 +478,21 @@ public abstract class ProcessorView extends BorderPane {
 	}
 
 	protected boolean hasParameters() {
-		if (!wrapper().isAvailable()) {
+		return hasParameters(wrapper());
+	}
+
+	protected static boolean hasParameters(PrototypeProcessor wrapper) {
+		if (!wrapper.isAvailable()) {
 			return false;
 		}
-		return wrapper().processor().parameters().size() > 0;
+		return wrapper.processor().parameters().size() > 0;
 	}
 
 	// parameter view factory
 	protected abstract ParameterView newParameterView();
 
 	// add/remove parameterView from main/info pane
-	// needs to be overritten and call repaint() at the end
+	// needs to be overwritten, and call repaint() at the end
 	protected void showParameters(boolean show) {
 		head.showMenu(show);
 	}
@@ -616,6 +620,25 @@ public abstract class ProcessorView extends BorderPane {
 		 * @return the children of the parameter view.
 		 */
 		public ObservableList<Node> getChildren();
+
+		/**
+		 * Passthrough of the processor view's mouse entered event.
+		 *
+		 * @param e the mouse event.
+		 */
+		default void onMouseEntered(MouseEvent e) {
+
+		}
+
+		/**
+		 * Passthrough of the processor view's mouse exited event.
+		 *
+		 * @param e the mouse event.
+		 */
+		default void onMouseExited(MouseEvent e) {
+
+		}
+
 	}
 
 	/**
@@ -642,6 +665,16 @@ public abstract class ProcessorView extends BorderPane {
 			hbox.setPadding(new Insets(UIStrategyGUI.Stage.insets));
 			hbox.setAlignment(Pos.CENTER);
 			hbox.getChildren().add(glyph);
+		}
+
+		@Override
+		public void onMouseEntered(MouseEvent e) {
+			glyph.disabledHoverEffectProperty().set(false);
+		}
+
+		@Override
+		public void onMouseExited(MouseEvent e) {
+			glyph.disabledHoverEffectProperty().set(true);
 		}
 
 		@Override
@@ -773,6 +806,7 @@ public abstract class ProcessorView extends BorderPane {
 		protected final BorderPane pane;
 		protected final HBox title;
 		protected final HBox menu;
+		protected final Glyph glyph;
 
 		/**
 		 * Creates a new processor head.
@@ -784,10 +818,14 @@ public abstract class ProcessorView extends BorderPane {
 			this.handler = handler;
 			this.owner = handler.uiStrategy.getStage();
 			this.wrapper = wrapper;
+			wrapper.stateProperty().addListener(stateListener);
+
+			final boolean hasParameters = hasParameters(wrapper);
+
 			this.pane = new BorderPane();
 			pane.setMaxWidth(Double.MAX_VALUE);
 
-			final Glyph glyph = UIStrategyGUI.Glyphs.newGlyph(wrapper.glyph(), Glyph.Size.NORMAL);
+			this.glyph = UIStrategyGUI.Glyphs.newGlyph(wrapper.glyph(), Glyph.Size.NORMAL);
 			final Label label = new Label(
 					wrapper.isAvailable()
 							? wrapper.processor().name()
@@ -805,33 +843,62 @@ public abstract class ProcessorView extends BorderPane {
 			title.setAlignment(Pos.CENTER_LEFT);
 			title.getChildren().setAll(glyph, label);
 
-			final Glyph importGlyph = UIStrategyGUI.Glyphs.newGlyph(IMPORT_GLYPH, Glyph.Size.NORMAL);
-			importGlyph.enableHoverEffect(true);
-			importGlyph.setTooltip(localize("preset.load"));
-			importGlyph.setOnMouseClicked((e) -> {
-				final ProcessorPresetImportDialog dialog = new ProcessorPresetImportDialog(handler, wrapper);
-				dialog.show();
-			});
-			final Glyph exportGlyph = UIStrategyGUI.Glyphs.newGlyph(EXPORT_GLYPH, Glyph.Size.NORMAL);
-			exportGlyph.enableHoverEffect(true);
-			exportGlyph.setTooltip(localize("preset.save"));
-			exportGlyph.setOnMouseClicked((e) -> {
-				final ProcessorPresetExportDialog dialog = new ProcessorPresetExportDialog(handler, wrapper);
-				dialog.show();
-			});
+			this.menu = new HBox();
+			menu.setSpacing(UIStrategyGUI.Stage.insets);
+			menu.setPadding(new Insets(0, 0, 0, UIStrategyGUI.Stage.insets));
+			menu.setAlignment(Pos.CENTER_RIGHT);
+
+			if (hasParameters) {
+				final Glyph importGlyph = UIStrategyGUI.Glyphs.newGlyph(IMPORT_GLYPH, Glyph.Size.NORMAL);
+				importGlyph.enableHoverEffect(true);
+				importGlyph.setTooltip(localize("preset.load"));
+				importGlyph.setOnMouseClicked((e) -> {
+					final ProcessorPresetImportDialog dialog = new ProcessorPresetImportDialog(handler, wrapper);
+					dialog.show();
+				});
+				menu.getChildren().add(importGlyph);
+
+				final Glyph exportGlyph = UIStrategyGUI.Glyphs.newGlyph(EXPORT_GLYPH, Glyph.Size.NORMAL);
+				exportGlyph.enableHoverEffect(true);
+				exportGlyph.setTooltip(localize("preset.save"));
+				exportGlyph.setOnMouseClicked((e) -> {
+					final ProcessorPresetExportDialog dialog = new ProcessorPresetExportDialog(handler, wrapper);
+					dialog.show();
+				});
+				menu.getChildren().add(exportGlyph);
+			}
+
 			final Glyph infoGlyph = UIStrategyGUI.Glyphs.newGlyph(INFO_GLYPH, Glyph.Size.NORMAL);
 			infoGlyph.setPadding(new Insets(0, 0, 0, 5));
 			infoGlyph.enableHoverEffect(true);
 			infoGlyph.setTooltip(localize("processor.info"));
 			infoGlyph.setOnMouseClicked((e) -> showProcessorDocumentation());
-
-			this.menu = new HBox();
-			menu.setSpacing(UIStrategyGUI.Stage.insets);
-			menu.setAlignment(Pos.CENTER_RIGHT);
-			menu.getChildren().setAll(importGlyph, exportGlyph, infoGlyph);
+			menu.getChildren().add(infoGlyph);
 
 			pane.setCenter(title);
 			pane.setRight(menu);
+
+			onStateChanged();
+		}
+
+		protected final InvalidationListener stateListener = (e) -> onStateChanged();
+
+		protected final void onStateChanged() {
+			// intendet to show if a processor is fully connected in the pipeline editor,
+			// so either the glyph is red (not good), or in default accent color (all fine).
+			switch (wrapper.getState()) {
+				case ERROR:
+				case UNAVAILABLE:
+				case UNCONNECTED:
+					glyph.setColor(UIStrategyGUI.Colors.error);
+					break;
+				case WAITING:
+				case PROCESSING:
+				case READY:
+				default:
+					glyph.setColor(UIStrategyGUI.Colors.accent);
+					break;
+			}
 		}
 
 		public final void showProcessorDocumentation() {

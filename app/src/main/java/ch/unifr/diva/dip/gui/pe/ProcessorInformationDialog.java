@@ -176,7 +176,7 @@ public class ProcessorInformationDialog<T extends PrototypeProcessor> extends Ab
 				if (service.serviceObject != null) {
 					putCapabilities(basics, service);
 				}
-				basics.put(localize("state"), wrapper.state().toString());
+				basics.put(localize("state"), wrapper.getState().toString());
 
 				final StructuredText basicsPane = StructuredText.smallDescriptionList(basics);
 				getChildren().add(basicsPane);
@@ -275,7 +275,10 @@ public class ProcessorInformationDialog<T extends PrototypeProcessor> extends Ab
 			if (service.serviceObject instanceof Previewable) {
 				capabilities.add(localize("preview"));
 			}
-			map.put(localize("capabilities"), String.join(", ", capabilities));
+			map.put(
+					localize("capabilities"),
+					capabilities.isEmpty() ? "-" : String.join(", ", capabilities)
+			);
 
 			if (canEdit) {
 				final List<String> tools = new ArrayList<>();

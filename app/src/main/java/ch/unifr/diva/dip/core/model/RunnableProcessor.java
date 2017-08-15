@@ -19,7 +19,6 @@ import ch.unifr.diva.dip.api.utils.FxUtils;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import ch.unifr.diva.dip.utils.CursorLock;
 import ch.unifr.diva.dip.utils.IOUtils;
-import ch.unifr.diva.dip.utils.SynchronizedObjectProperty;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -30,7 +29,6 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Set;
 import javafx.beans.InvalidationListener;
-import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -58,9 +56,6 @@ public class RunnableProcessor extends PrototypeProcessor {
 	private final ObjectMapData objectMap;
 	private final LayerGroup layerGroup;
 	private final LayerOverlay layerOverlay;
-
-	// needs to be updated manually after each interaction with the processor
-	private final SynchronizedObjectProperty<Processor.State> stateProperty;
 	private final InvalidationListener stateListener;
 
 	/**
@@ -78,9 +73,8 @@ public class RunnableProcessor extends PrototypeProcessor {
 		this.pipeline = pipeline;
 		this.page = pipeline.page;
 		this.project = page.project();
-		this.stateProperty = new SynchronizedObjectProperty<>(Processor.State.WAITING);
 		this.stateListener = (e) -> updateStatusColor();
-		stateProperty.getReadOnlyProperty().addListener(stateListener);
+		stateProperty().addListener(stateListener);
 
 		this.PROCESSOR_DATA_DIR = String.format(
 				ProjectPage.PROCESSOR_DATA_DIR_FORMAT,
@@ -252,13 +246,13 @@ public class RunnableProcessor extends PrototypeProcessor {
 		}
 
 		private void stateCallback() {
-			runnable.updateState();
-			status.setText(runnable.getState().label);
+			final Processor.State state = runnable.getState();
+			status.setText(state.label);
 			if (processButton != null) {
-				processButton.setDisable(!runnable.getState().equals(Processor.State.PROCESSING));
+				processButton.setDisable(!state.equals(Processor.State.PROCESSING));
 			}
 			if (resetButton != null) {
-				resetButton.setDisable(runnable.getState().equals(Processor.State.UNAVAILABLE));
+				resetButton.setDisable(state.equals(Processor.State.UNAVAILABLE));
 			}
 		}
 
@@ -387,30 +381,21 @@ public class RunnableProcessor extends PrototypeProcessor {
 	}
 
 	/**
-	 * Returns a read-only stateProperty of the processor.
+	 * Updates the state of the processor.
 	 *
-	 * @return a read-only stateProperty.
+	 * @param updateDependentProcessors Also updates the state of (directly)
+	 * dependend processors (i.e. processors connected to some output of this
+	 * processor) if set to {@code true}, does not otherwise.
 	 */
-	public ReadOnlyObjectProperty<Processor.State> stateProperty() {
-		return stateProperty.getReadOnlyProperty();
-	}
+	protected void updateState(boolean updateDependentProcessors) {
+		updateState();
 
-	/**
-	 * Returns the state of the processor.
-	 *
-	 * @return the state of the processor.
-	 */
-	public Processor.State getState() {
-		return this.stateProperty.get();
-	}
-
-	/**
-	 * Updates the state of the processor. Updates only the state of this
-	 * processor, not however the states of depended processors (whose states
-	 * might change once the state of this one does...).
-	 */
-	protected void updateState() {
-		updateState(false);
+		if (updateDependentProcessors) {
+			applyToDependentProcessors((p) -> {
+				p.updateState();
+				return null;
+			});
+		}
 	}
 
 	/**
@@ -434,30 +419,8 @@ public class RunnableProcessor extends PrototypeProcessor {
 		}
 	}
 
-	/**
-	 * Updates the state of the processor.
-	 *
-	 * @param updateDependentProcessors Also updates the state of (directly)
-	 * dependend processors (i.e. processors connected to some output of this
-	 * processor) if set to {@code true}, does not otherwise.
-	 */
-	protected void updateState(boolean updateDependentProcessors) {
-		if (this.processor() == null) {
-			stateProperty.set(Processor.State.UNAVAILABLE);
-		} else {
-			stateProperty.set(this.processor().state());
-
-			if (updateDependentProcessors) {
-				applyToDependentProcessors((p) -> {
-					p.updateState();
-					return null;
-				});
-			}
-		}
-	}
-
 	private void updateStatusColor() {
-		updateStatusColor(stateProperty.getReadOnlyProperty().get());
+		updateStatusColor(getState());
 	}
 
 	private void updateStatusColor(Processor.State state) {

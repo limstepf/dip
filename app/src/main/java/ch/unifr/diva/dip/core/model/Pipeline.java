@@ -727,8 +727,8 @@ public abstract class Pipeline<T extends PrototypeProcessor> implements Modifiab
 		public Processor.State state() {
 			int max = -1;
 			for (PrototypeProcessor w : this.processors) {
-				if (w.state().weight > max) {
-					max = w.state().weight;
+				if (w.getStateValue().weight > max) {
+					max = w.getStateValue().weight;
 				}
 			}
 			return Processor.State.getState(max);

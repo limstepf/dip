@@ -139,7 +139,7 @@ public class RunnablePipeline extends Pipeline<RunnableProcessor> {
 	}
 
 	private void registerProcessorState(RunnableProcessor p) {
-		switch (p.getState()) {
+		switch (p.getStateValue()) {
 			case WAITING:
 				registerProcessorState(p, null);
 				break;
@@ -310,7 +310,7 @@ public class RunnablePipeline extends Pipeline<RunnableProcessor> {
 
 	// can we process this now?
 	private boolean isProcessing(RunnableProcessor p) {
-		return Processor.State.PROCESSING.equals(p.getState()) && p.processor().canProcess();
+		return Processor.State.PROCESSING.equals(p.getStateValue()) && p.processor().canProcess();
 	}
 
 	// inital set of processor that can be processed
