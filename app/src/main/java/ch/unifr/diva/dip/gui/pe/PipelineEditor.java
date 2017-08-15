@@ -65,6 +65,7 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 	private final PipelineManager manager;
 	private final Map<Integer, PipelineData.Pipeline> backupData;
 	private final ObjectProperty<PrototypePipeline> selectedPipelineProperty = new SimpleObjectProperty<>();
+	private final List<ProcessorView> copiedViews = new ArrayList<>();
 	private final List<ProcessorsWidget> processorWidgets = new ArrayList<>();
 	private final ListChangeListener<PrototypeProcessor> processorListener;
 	private final RubberBandSelector<ProcessorView> rubberBandSelector;
@@ -173,26 +174,35 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 
 		// global key events for the pipeline editor
 		this.scene.addEventFilter(KeyEvent.KEY_PRESSED, (e) -> {
-			switch (e.getCode()) {
-				case A: // select (a)ll
-					if (e.isControlDown()) {
+			if (e.isControlDown()) {
+				switch (e.getCode()) {
+					case A: // select (a)ll
 						selection().addAll(editorPane.processorViews());
-					}
-					break;
+						break;
 
-				case L: // rearrange/do (l)ayout
-					if (e.isControlDown()) {
+					case C: // copy
+						copiedViews.clear();
+						copiedViews.addAll(selection());
+						break;
+
+					case L: // rearrange/do (l)ayout
 						editorPane.rearrangeProcessors();
-					}
-					break;
+						break;
 
-				case BACK_SPACE:
-				case DELETE:
-					for (Node node : selection()) {
-						ProcessorView v = (ProcessorView) node;
-						this.selectedPipeline().removeProcessor(v.wrapper(), false);
-					}
-					break;
+					case V: // paste
+						editorPane.pasteProcessors(copiedViews);
+						break;
+				}
+			} else {
+				switch (e.getCode()) {
+					case BACK_SPACE:
+					case DELETE:
+						for (Node node : selection()) {
+							ProcessorView v = (ProcessorView) node;
+							this.selectedPipeline().removeProcessor(v.wrapper(), false);
+						}
+						break;
+				}
 			}
 		});
 

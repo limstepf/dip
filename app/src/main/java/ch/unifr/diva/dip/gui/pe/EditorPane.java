@@ -3,6 +3,7 @@ package ch.unifr.diva.dip.gui.pe;
 import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.components.Port;
+import ch.unifr.diva.dip.api.parameters.PersistentParameter;
 import ch.unifr.diva.dip.core.model.PrototypeProcessor;
 import static ch.unifr.diva.dip.gui.pe.ProcessorsWidget.ProcessorListCell.OSGI_SERVICE_PROCESSOR;
 import ch.unifr.diva.dip.osgi.OSGiServiceReference;
@@ -11,9 +12,11 @@ import ch.unifr.diva.dip.core.model.PrototypePipeline;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javafx.beans.InvalidationListener;
+import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
@@ -44,6 +47,9 @@ public class EditorPane {
 	private final Map<InputPort<?>, ConnectionView> connections = new HashMap<>();
 	private final Map<Port<?>, PortView<? extends Port<?>>> ports = new HashMap<>();
 	private final InvalidationListener repaintListener;
+	private final EventHandler<MouseEvent> mousePositionHandler;
+	private double mouseX;
+	private double mouseY;
 
 	/**
 	 * Creates a new editor pane.
@@ -59,6 +65,12 @@ public class EditorPane {
 		FxUtils.expandInRegion(this.pane);
 
 		setupDraggable();
+
+		this.mousePositionHandler = (e) -> {
+			mouseX = e.getX();
+			mouseY = e.getY();
+		};
+		pane.addEventFilter(MouseEvent.MOUSE_MOVED, mousePositionHandler);
 
 		this.repaintListener = (e) -> editor.repaint();
 		pane.getChildren().addListener(this.repaintListener);
@@ -188,7 +200,7 @@ public class EditorPane {
 	 */
 	public void clear() {
 		for (ProcessorView view : processorViews.values()) {
-			view.removePortLabels();
+			view.stop();
 		}
 		pane().getChildren().clear();
 		processorViews.clear();
@@ -528,7 +540,7 @@ public class EditorPane {
 	public void removeProcessor(PrototypeProcessor wrapper) {
 		final ProcessorView view = processorViews.get(wrapper);
 		if (view != null) {
-			view.removePortLabels(); // in case they still stick around (e.g. del selection)
+			view.stop();
 			pane().getChildren().remove(view);
 			removeConnections(wrapper);
 			unregisterPorts(wrapper);
@@ -575,6 +587,50 @@ public class EditorPane {
 		// no-op; ProcessorView is bound to isAvailableProperty
 	}
 
+	/**
+	 * Pastes copies of the given processor views.
+	 *
+	 * @param views the processor views to be copied.
+	 */
+	protected void pasteProcessors(List<ProcessorView> views) {
+		if (views == null || views.isEmpty()) {
+			return;
+		}
+		/*
+		 * TODO: also copy/setup within-group connections, that would be nice.
+		 */
+		double offsetX = Double.MAX_VALUE;
+		double offsetY = Double.MAX_VALUE;
+		for (ProcessorView view : views) {
+			if (view.layoutXProperty().get() < offsetX) {
+				offsetX = view.layoutXProperty().get();
+			}
+			if (view.layoutYProperty().get() < offsetY) {
+				offsetY = view.layoutYProperty().get();
+			}
+		}
+		for (ProcessorView view : views) {
+			final PrototypeProcessor wrapper = editor.selectedPipeline().addProcessor(
+					view.wrapper().pid(),
+					view.wrapper().version().toString(),
+					clipPosition(
+							mouseX
+							- offsetX
+							+ view.layoutXProperty().get()
+							- ProcessorView.horizontalPadding
+					),
+					clipPosition(
+							mouseY
+							- offsetY
+							+ view.layoutYProperty().get()
+							- ProcessorView.verticalPadding
+					),
+					PersistentParameter.getPreset(view.wrapper().processor().parameters()),
+					view.editingProperty.get()
+			);
+		}
+	}
+
 	private boolean replaceNode(Node oldNode, Node newNode) {
 		final int id = pane().getChildren().indexOf(oldNode);
 		if (id < 0) {
@@ -602,7 +658,7 @@ public class EditorPane {
 		dot.relocate(bounds.getMaxX(), bounds.getMaxY());
 
 		// remove wires and unregister old ports
-		oldView.removePortLabels(); // in case they still stick around (e.g. parameter change -> repaint)
+		oldView.stop();
 		oldView.unregister();
 
 		// replace with new view (conn. already hooked up, just need wires)

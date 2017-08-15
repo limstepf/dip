@@ -416,14 +416,25 @@ public abstract class Pipeline<T extends PrototypeProcessor> implements Modifiab
 	 * @param version version of the processor.
 	 * @param x initial x position of the processor view.
 	 * @param y initial y position of the processor view.
+	 * @return the added processor wrapper.
 	 */
-	public final void addProcessor(String pid, String version, double x, double y) {
-		@SuppressWarnings("unchecked")
-		final T wrapper = (T) new PrototypeProcessor(newProcessorId(), pid, version, x, y, handler);
-		wrapper.init();
-		wrapper.initProcessor();
-		addProcessor(wrapper);
+	public T addProcessor(String pid, String version, double x, double y) {
+		return addProcessor(pid, version, x, y, null, false);
 	}
+
+	/**
+	 * Adds a processor to the pipeline.
+	 *
+	 * @param pid pid of the processor.
+	 * @param version version of the processor.
+	 * @param x initial x position of the processor view.
+	 * @param y initial y position of the processor view.
+	 * @param parameters parameters to initialize the processor with.
+	 * @param editing {@code true} to have to processor view open (editing
+	 * parameters), {@code false} for a closed processor view.
+	 * @return the added processor wrapper.
+	 */
+	public abstract T addProcessor(String pid, String version, double x, double y, Map<String, Object> parameters, boolean editing);
 
 	protected final void addProcessor(T wrapper) {
 		if (!wrapper.isAvailable()) {

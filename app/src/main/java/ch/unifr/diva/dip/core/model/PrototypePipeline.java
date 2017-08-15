@@ -1,6 +1,7 @@
 package ch.unifr.diva.dip.core.model;
 
 import ch.unifr.diva.dip.core.ApplicationHandler;
+import java.util.Map;
 
 /**
  * A prototype pipeline to be used in the pipeline editro (can not be run).
@@ -41,6 +42,19 @@ public class PrototypePipeline extends Pipeline<PrototypeProcessor> {
 	 */
 	public PrototypePipeline(ApplicationHandler handler, PipelineData.Pipeline pipeline, int id) {
 		super(handler, pipeline, id);
+	}
+
+	@Override
+	public PrototypeProcessor addProcessor(String pid, String version, double x, double y, Map<String, Object> parameters, boolean editing) {
+		final PrototypeProcessor wrapper = new PrototypeProcessor(newProcessorId(), pid, version, x, y, handler);
+		wrapper.editingProperty().set(editing);
+		wrapper.init();
+		if (parameters != null) {
+			wrapper.setParameters(parameters);
+		}
+		wrapper.initProcessor();
+		addProcessor(wrapper);
+		return wrapper;
 	}
 
 	@Override

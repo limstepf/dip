@@ -201,6 +201,26 @@ public class RunnablePipeline extends Pipeline<RunnableProcessor> {
 	}
 
 	@Override
+	public RunnableProcessor addProcessor(String pid, String version, double x, double y, Map<String, Object> parameters, boolean editing) {
+		final RunnableProcessor wrapper = new RunnableProcessor(
+				new PipelineData.Processor(
+						newProcessorId(),
+						pid,
+						version
+				),
+				this
+		);
+		wrapper.editingProperty().set(editing);
+		wrapper.init();
+		if (parameters != null) {
+			wrapper.setParameters(parameters);
+		}
+		wrapper.initProcessor();
+		addProcessor(wrapper);
+		return wrapper;
+	}
+
+	@Override
 	public RunnablePipeline clonePipeline() {
 		final PipelineData.Pipeline data = new PipelineData.Pipeline(this);
 		return new RunnablePipeline(handler, page, data);

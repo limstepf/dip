@@ -169,6 +169,18 @@ public abstract class ProcessorView extends BorderPane {
 	}
 
 	/**
+	 * Cleanly shuts down the view. Should be called before deletion to remove
+	 * some listeners that otherwise might complain. Also removes port labels
+	 * that might still hang around...
+	 */
+	public void stop() {
+		if (wrapper.processor().hasRepaintProperty()) {
+			wrapper.processor().repaintProperty().removeListener(repaintListener);
+		}
+		removePortLabels();
+	}
+
+	/**
 	 * Returns the horizontal padding. Applied to the right and left side of the
 	 * processor view.
 	 *
