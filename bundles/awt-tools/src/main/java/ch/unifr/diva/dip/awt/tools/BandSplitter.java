@@ -469,8 +469,10 @@ public class BandSplitter extends ProcessableBase {
 				if (source.cm == null) {
 					if (isBufferedMatrix) {
 						writeBufferedMatrix(context, (BufferedMatrix) images[i], band.FLOAT_FILE);
+						band.output_float.setOutput((BufferedMatrix) images[i]);
 					} else {
 						writeBufferedImage(context, images[i], band.GRAY_FILE, STORAGE_FORMAT);
+						band.output_gray.setOutput(images[i]);
 					}
 					band.output_bi.setOutput(images[i]);
 				} else if (!source.cm.requiresBufferedMatrix()) {
