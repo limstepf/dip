@@ -395,7 +395,11 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 	 * Opens a dialog to import project pages/images.
 	 */
 	public void importProjectPages() {
-		final File initialDirectory = ApplicationDataManager.userDirectory().toFile();
+		final Path initialPath = handler.settings.recentFiles.getSaveDirectory();
+		final File initialDirectory = (initialPath == null)
+				? ApplicationDataManager.userDirectory().toFile()
+				: initialPath.toFile();
+
 		final FileChooser chooser = new FileChooser();
 		chooser.setTitle(localize("files.import"));
 		chooser.setInitialDirectory(initialDirectory);
