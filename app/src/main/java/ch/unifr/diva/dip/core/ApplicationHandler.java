@@ -466,7 +466,7 @@ public class ApplicationHandler implements Localizable {
 	 * @return the thread doing the job, or {@code null} if there is no project
 	 * to be saved.
 	 */
-	public Thread saveProject() {
+	public BackgroundTask<Integer> saveProject() {
 		if (!hasProject()) {
 			return null;
 		}
@@ -490,7 +490,8 @@ public class ApplicationHandler implements Localizable {
 				eventBus.post(new StatusMessageEvent(localize("project.saved")));
 			}
 		};
-		return task.start();
+		task.start();
+		return task;
 	}
 
 	/**

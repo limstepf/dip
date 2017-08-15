@@ -728,9 +728,9 @@ public class Project implements Modifiable, Localizable {
 	 * Processes the page with the given id, or all pages with {@code -1}.
 	 *
 	 * @param pageId the page id, or {@code -1}.
-	 * @return the thread doing/kicking off the job.
+	 * @return the started background task.
 	 */
-	public Thread processPage(int pageId) {
+	public BackgroundTask<Void> processPage(int pageId) {
 		if (pageId < 0) {
 			return processAllPages();
 		}
@@ -740,13 +740,13 @@ public class Project implements Modifiable, Localizable {
 	/**
 	 * Processes all pages.
 	 *
-	 * @return the thread doing/kicking off the job.
+	 * @return the started background task.
 	 */
-	public Thread processAllPages() {
+	public BackgroundTask<Void> processAllPages() {
 		return processPages(pages());
 	}
 
-	private Thread processPages(List<ProjectPage> pages) {
+	private BackgroundTask<Void> processPages(List<ProjectPage> pages) {
 		final CursorLock cursorLock = new CursorLock(handler, Cursor.WAIT);
 		final BackgroundTask<Void> task = new BackgroundTask<Void>(handler) {
 
@@ -789,16 +789,17 @@ public class Project implements Modifiable, Localizable {
 				});
 			}
 		};
-		return task.start();
+		task.start();
+		return task;
 	}
 
 	/**
 	 * Resets the page with the given id, or all pages with {@code -1}.
 	 *
 	 * @param pageId the page id, or {@code -1}.
-	 * @return the thread doing/kicking off the job.
+	 * @return the started background task.
 	 */
-	public Thread resetPage(int pageId) {
+	public BackgroundTask<Void> resetPage(int pageId) {
 		if (pageId < 0) {
 			return resetAllPages();
 		} else {
@@ -809,13 +810,13 @@ public class Project implements Modifiable, Localizable {
 	/**
 	 * Resets all pages.
 	 *
-	 * @return the thread doing/kicking off the job.
+	 * @return the started background task.
 	 */
-	public Thread resetAllPages() {
+	public BackgroundTask<Void> resetAllPages() {
 		return resetPages(pages());
 	}
 
-	private Thread resetPages(List<ProjectPage> pages) {
+	private BackgroundTask<Void> resetPages(List<ProjectPage> pages) {
 		final CursorLock cursorLock = new CursorLock(handler, Cursor.WAIT);
 		final BackgroundTask<Void> task = new BackgroundTask<Void>(handler) {
 
@@ -858,7 +859,8 @@ public class Project implements Modifiable, Localizable {
 				});
 			}
 		};
-		return task.start();
+		task.start();
+		return task;
 	}
 
 	@Override

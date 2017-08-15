@@ -175,21 +175,21 @@ public class MainCLI {
 				if (CommandLineOption.RESET.hasOption()) {
 					System.out.println();
 					System.out.println("resetting project...");
-					joinThread(project.resetAllPages());
+					joinThread(project.resetAllPages().getThread());
 				}
 
 				// process all apges
 				if (CommandLineOption.PROCESS.hasOption()) {
 					System.out.println();
 					System.out.println("processing project...");
-					joinThread(project.processAllPages());
+					joinThread(project.processAllPages().getThread());
 				}
 
 				// save project, unless asked to not do so...
 				System.out.println();
 				if (!CommandLineOption.DONT_SAVE.hasOption()) {
 					System.out.println("saving project...");
-					joinThread(handler.saveProject());
+					joinThread(handler.saveProject().getThread());
 					System.out.println();
 					System.out.println("closing project...");
 				} else {

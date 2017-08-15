@@ -1,10 +1,14 @@
 package ch.unifr.diva.dip.utils;
 
+import ch.unifr.diva.dip.api.utils.FxUtils;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.ui.UIStrategy;
 import ch.unifr.diva.dip.eventbus.EventBus;
 import ch.unifr.diva.dip.eventbus.events.StatusWorkerEvent;
 import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,12 +24,18 @@ public abstract class BackgroundTask<T> extends Task<T> {
 	private static final Logger log = LoggerFactory.getLogger(BackgroundTask.class);
 	private final UIStrategy uiStrategy;
 	private final EventBus eventBus;
+	private final Thread thread;
+	private final ObjectProperty<Result> resultProperty;
 
 	/**
 	 * The result of a background task.
 	 */
 	public enum Result {
 
+		/**
+		 * The task is still running (or not even started yet).
+		 */
+		RUNNING,
 		/**
 		 * The task was successful.
 		 */
@@ -77,6 +87,28 @@ public abstract class BackgroundTask<T> extends Task<T> {
 	public BackgroundTask(UIStrategy uiStrategy, EventBus eventBus) {
 		this.uiStrategy = uiStrategy;
 		this.eventBus = eventBus;
+		this.thread = new Thread(this);
+		this.resultProperty = new SimpleObjectProperty<>(Result.RUNNING);
+	}
+
+	/**
+	 * Returns the result property. Starts out as {@code RUNNING}, and
+	 * eventually turns to {@code SUCCEEDED}, {@code CANCELLED}, or
+	 * {@code FAILED}.
+	 *
+	 * @return
+	 */
+	public ReadOnlyObjectProperty<Result> resultProperty() {
+		return resultProperty;
+	}
+
+	/**
+	 * Returns the thread executing this background task.
+	 *
+	 * @return the thread executing this background task.
+	 */
+	public Thread getThread() {
+		return thread;
 	}
 
 	/**
@@ -85,7 +117,6 @@ public abstract class BackgroundTask<T> extends Task<T> {
 	 * @return the thread of the background task.
 	 */
 	public Thread start() {
-		final Thread thread = new Thread(this);
 		if (eventBus != null) {
 			eventBus.post(new StatusWorkerEvent<>(this));
 		}
@@ -136,18 +167,30 @@ public abstract class BackgroundTask<T> extends Task<T> {
 	@Override
 	protected void succeeded() {
 		finished(Result.SUCCEEDED);
+
+		FxUtils.run(() -> {
+			resultProperty.set(Result.SUCCEEDED);
+		});
 	}
 
 	@Override
 	protected void cancelled() {
 		finished(Result.CANCELLED);
 		cleanUp();
+
+		FxUtils.run(() -> {
+			resultProperty.set(Result.CANCELLED);
+		});
 	}
 
 	@Override
 	protected void failed() {
 		finished(Result.FAILED);
 		cleanUp();
+
+		FxUtils.run(() -> {
+			resultProperty.set(Result.FAILED);
+		});
 
 		final Throwable throwable = this.exceptionProperty().get();
 		if (throwable instanceof Exception) {

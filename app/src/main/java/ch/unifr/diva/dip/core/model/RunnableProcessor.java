@@ -485,8 +485,10 @@ public class RunnableProcessor extends PrototypeProcessor {
 
 	/**
 	 * Starts processing on a background task.
+	 *
+	 * @return the started background task.
 	 */
-	public void processBackgroundTask() {
+	public BackgroundTask<Void> processBackgroundTask() {
 		final RunnableProcessor runnable = this;
 		final CursorLock cursorLock = new CursorLock(handler, Cursor.WAIT);
 		final BackgroundTask<Void> task = new BackgroundTask<Void>(handler) {
@@ -516,6 +518,7 @@ public class RunnableProcessor extends PrototypeProcessor {
 
 		};
 		task.start();
+		return task;
 	}
 
 	/**
@@ -541,8 +544,10 @@ public class RunnableProcessor extends PrototypeProcessor {
 
 	/**
 	 * Resets the processor on a background task.
+	 *
+	 * @return the started background task.
 	 */
-	public void resetBackgroundTask() {
+	public BackgroundTask<Void> resetBackgroundTask() {
 		final RunnableProcessor runnable = this;
 		final CursorLock cursorLock = new CursorLock(handler, Cursor.WAIT);
 		final BackgroundTask<Void> task = new BackgroundTask<Void>(handler) {
@@ -572,6 +577,7 @@ public class RunnableProcessor extends PrototypeProcessor {
 
 		};
 		task.start();
+		return task;
 	}
 
 	/**
