@@ -347,8 +347,9 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 	 * Selects a project page/image.
 	 *
 	 * @param page id of the project page.
+	 * @return the started background task.
 	 */
-	public void selectProjectPage(int page) {
+	public BackgroundTask<Void> selectProjectPage(int page) {
 		final Project project = handler.getProject();
 		final ProjectPage currentPage = project.getSelectedPage();
 		final boolean isDirty = (currentPage == null) ? false : currentPage.isModified();
@@ -387,6 +388,7 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 			}
 		};
 		task.start();
+		return task;
 	}
 
 	/**
