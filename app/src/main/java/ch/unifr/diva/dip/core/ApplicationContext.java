@@ -1,5 +1,6 @@
 package ch.unifr.diva.dip.core;
 
+import ch.unifr.diva.dip.api.parameters.PersistentParameter;
 import ch.unifr.diva.dip.api.services.Preset;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.utils.DipThreadPool;
@@ -215,9 +216,13 @@ public class ApplicationContext {
 				return;
 			}
 
-			final List<Preset> presets = service.serviceObject.presets();
-			if (presets == null || presets.isEmpty()) {
+			if (!service.serviceObject.hasParameters()) {
 				return;
+			}
+
+			List<Preset> presets = service.serviceObject.presets();
+			if (presets == null) {
+				presets = new ArrayList<>();
 			}
 
 			// load preset data (or create a new file); currently presets of all
@@ -229,7 +234,7 @@ public class ApplicationContext {
 
 			log.debug(
 					"Installing {} default/shipped presets of processor: {}, version: {}",
-					presets.size(),
+					presets.size() + 1,
 					pid,
 					version
 			);
@@ -248,8 +253,15 @@ public class ApplicationContext {
 				return;
 			}
 
-			// append default/shipped presets
 			final PresetData presetData = data.getPresetData();
+			// append default preset
+			presetData.addPreset(new PresetData.Preset(
+					pid,
+					version,
+					"Default",
+					PersistentParameter.getDefaultPreset(service.serviceObject.parameters())
+			));
+			// append shipped presets
 			for (Preset preset : presets) {
 				presetData.addPreset(
 						new PresetData.Preset(
