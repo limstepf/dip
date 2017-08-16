@@ -533,6 +533,17 @@ public class EditorPane {
 	}
 
 	/**
+	 * Removes the processors of the given processor views.
+	 *
+	 * @param views a set of processor views.
+	 */
+	public void removeProcessors(Set<ProcessorView> views) {
+		for (ProcessorView view : views) {
+			editor.selectedPipeline().removeProcessor(view.wrapper(), false);
+		}
+	}
+
+	/**
 	 * Removes a processor from the editor pane.
 	 *
 	 * @param wrapper the processor.

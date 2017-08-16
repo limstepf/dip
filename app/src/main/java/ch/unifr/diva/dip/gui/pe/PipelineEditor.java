@@ -192,15 +192,19 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 					case V: // paste
 						editorPane.pasteProcessors(copiedViews);
 						break;
+
+					case X: // cut
+						copiedViews.clear();
+						copiedViews.addAll(selection());
+						editorPane.removeProcessors(selection());
+						selection().clear();
 				}
 			} else {
 				switch (e.getCode()) {
 					case BACK_SPACE:
 					case DELETE:
-						for (Node node : selection()) {
-							ProcessorView v = (ProcessorView) node;
-							this.selectedPipeline().removeProcessor(v.wrapper(), false);
-						}
+						editorPane.removeProcessors(selection());
+						selection().clear();
 						break;
 				}
 			}
