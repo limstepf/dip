@@ -524,11 +524,17 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 
 	private final InvalidationListener repaintListener = (e) -> onRepaint();
 	private final InvalidationListener inputPortListener = (e) -> onInputPortChanged();
+	private final InvalidationListener outputPortListener = (e) -> onOutputPortChanged();
 
 	private final List<PersistentParameter<?>> currentParameters = new ArrayList<>();
 	private final List<InputPort<?>> currentInputPorts = new ArrayList<>();
+	private final List<OutputPort<?>> currentOutputPorts = new ArrayList<>();
 
 	protected void onInputPortChanged() {
+		updateState();
+	}
+
+	protected void onOutputPortChanged() {
 		updateState();
 	}
 
@@ -539,11 +545,15 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 			this.modifiedProcessorProperty.removeObservedProperty(p.property());
 		}
 		currentParameters.clear();
-		// remove input port listeners
+		// remove port listeners
 		for (InputPort<?> p : currentInputPorts) {
 			p.portStateProperty().removeListener(inputPortListener);
 		}
 		currentInputPorts.clear();
+		for (OutputPort<?> p : currentOutputPorts) {
+			p.portStateProperty().removeListener(outputPortListener);
+		}
+		currentOutputPorts.clear();
 
 		// add parameter listeners
 		for (Parameter<?> p : processor.parameters().values()) {
@@ -553,9 +563,12 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 				currentParameters.add(pp);
 			}
 		}
-		// add input port listeners
+		// add port listeners
 		for (InputPort<?> p : processor.inputs().values()) {
 			p.portStateProperty().addListener(inputPortListener);
+		}
+		for (OutputPort<?> p : processor.outputs().values()) {
+			p.portStateProperty().addListener(outputPortListener);
 		}
 
 		updateState();

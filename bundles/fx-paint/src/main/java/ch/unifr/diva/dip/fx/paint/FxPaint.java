@@ -7,7 +7,6 @@ import ch.unifr.diva.dip.api.datastructures.FxColor;
 import ch.unifr.diva.dip.api.parameters.ColorPickerParameter;
 import ch.unifr.diva.dip.api.services.HybridProcessorBase;
 import ch.unifr.diva.dip.api.services.Processor;
-import ch.unifr.diva.dip.api.services.ProcessorBase;
 import ch.unifr.diva.dip.api.tools.BrushTool;
 import ch.unifr.diva.dip.api.tools.ClickGesture;
 import ch.unifr.diva.dip.api.tools.SimpleTool;
@@ -23,7 +22,9 @@ import ch.unifr.diva.dip.glyphs.fontawesome.FontAwesome;
 import ch.unifr.diva.dip.glyphs.mdi.MaterialDesignIcons;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.EventHandler;
@@ -98,7 +99,26 @@ public class FxPaint extends HybridProcessorBase {
 	 * Any tool that modifies the canvas must set {@code isDirty} to
 	 * {@code true}.
 	 */
-	private boolean isDirty;
+	private BooleanProperty isDirtyProperty = new SimpleBooleanProperty() {
+		@Override
+		public void invalidated() {
+			if (isDirtyProperty.get()) {
+				colorPortsUnit.resetOutputs();
+			}
+		}
+	};
+
+	private boolean isDirty() {
+		return isDirtyProperty.get();
+	}
+
+	private void setDirty() {
+		setDirty(true);
+	}
+
+	private void setDirty(boolean dirty) {
+		isDirtyProperty.set(dirty);
+	}
 
 	private GraphicsContext getGC() {
 		return gcProperty.get();
@@ -150,7 +170,7 @@ public class FxPaint extends HybridProcessorBase {
 		setGC(canvas.getGraphicsContext2D());
 		final Image fximage = SwingFXUtils.toFXImage(image, null);
 		getGC().drawImage(fximage, 0, 0);
-		isDirty = false;
+		setDirty(false);
 
 		getContext().getLayer().clear();
 		final EditorLayerPane layer = getContext().getLayer().newLayerPane();
@@ -175,7 +195,7 @@ public class FxPaint extends HybridProcessorBase {
 			});
 			final BufferedImage out = SwingFXUtils.fromFXImage(rendered, null);
 			writeBufferedImage(context, out, STORAGE_IMAGE, STORAGE_FORMAT);
-			isDirty = false;
+			setDirty(false);
 			return out;
 		} catch (Exception ex) {
 			log.error("Failed to save the canvas in: {}", context, ex);
@@ -209,7 +229,7 @@ public class FxPaint extends HybridProcessorBase {
 	@Override
 	public void process(ProcessorContext context) {
 		BufferedImage image;
-		if (isDirty) {
+		if (isDirty()) {
 			image = saveCanvas(context);
 		} else {
 			image = readBufferedImage(context, STORAGE_IMAGE);
@@ -226,7 +246,7 @@ public class FxPaint extends HybridProcessorBase {
 		super.onContextSwitch(context, saveRequired);
 
 		// only safe canvas if we made it dirty
-		if (saveRequired && isDirty) {
+		if (saveRequired && isDirty()) {
 			saveCanvas(context);
 		}
 	}
@@ -285,7 +305,7 @@ public class FxPaint extends HybridProcessorBase {
 		@Override
 		protected void onReleased(MouseEvent e) {
 			getGC().restore();
-			isDirty = true;
+			setDirty();
 		}
 
 	}
