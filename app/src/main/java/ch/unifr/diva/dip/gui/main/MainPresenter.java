@@ -24,6 +24,7 @@ import ch.unifr.diva.dip.utils.CursorLock;
 import com.google.common.eventbus.Subscribe;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.application.Platform;
@@ -97,6 +98,10 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 		this.scene = new Scene(this.view.getComponent());
 		initView();
 
+		// global key event listener; not used yet. Might be something to
+		// publish over the event bus.
+//		this.scene.addEventFilter(KeyEvent.KEY_PRESSED, keyHandler);
+		//
 		// register shutdown hook
 		this.scene.getWindow().setOnCloseRequest(e -> {
 			if (!confirmClosingProject()) {
@@ -108,6 +113,12 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 		});
 	}
 
+//	private final EventHandler<KeyEvent> keyHandler = (e) -> {
+//		final KeyCode code = e.getCode();
+//		if (KeyCode.ESCAPE.equals(code)) {
+//
+//		}
+//	};
 	private void initView() {
 		view.menuBarProperty().set(menuBar.getComponent());
 		view.statusBarProperty().set(statusBar.getComponent());
