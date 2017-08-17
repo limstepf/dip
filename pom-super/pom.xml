@@ -117,7 +117,7 @@
 		Some of them might not get activated any longer, in which case some
 		older version of the dependency should be made available as a new bundle.
 
-			see: "third_party" multi-module (then copy or repackage)
+			see: "third-party" multi-module (then copy or repackage)
 		-->
 		<slf4j.version>1.7.25</slf4j.version>
 

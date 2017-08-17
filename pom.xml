@@ -26,7 +26,7 @@
 		<module>app-fragments</module>
 
 		<!-- OSGi packages (copied/repackaged dependencies) -->
-		<module>third_party</module>
+		<module>third-party</module>
 
 		<!-- OSGi packages (in-house bundles) -->
 		<module>bundles</module>
