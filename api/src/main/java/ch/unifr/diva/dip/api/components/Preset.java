@@ -1,4 +1,4 @@
-package ch.unifr.diva.dip.api.services;
+package ch.unifr.diva.dip.api.components;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,7 +1,7 @@
 package ch.unifr.diva.dip.core;
 
 import ch.unifr.diva.dip.api.parameters.PersistentParameter;
-import ch.unifr.diva.dip.api.services.Preset;
+import ch.unifr.diva.dip.api.components.Preset;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.utils.DipThreadPool;
 import ch.unifr.diva.dip.core.model.DipData;

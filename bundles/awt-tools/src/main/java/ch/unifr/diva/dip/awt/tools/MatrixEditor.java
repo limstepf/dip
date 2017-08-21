@@ -15,7 +15,7 @@ import ch.unifr.diva.dip.api.parameters.ExpParameter;
 import ch.unifr.diva.dip.api.parameters.IntegerParameter;
 import ch.unifr.diva.dip.api.parameters.TextParameter;
 import ch.unifr.diva.dip.api.parameters.TransientFacadeParameter;
-import ch.unifr.diva.dip.api.services.Preset;
+import ch.unifr.diva.dip.api.components.Preset;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.services.ProcessorBase;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;

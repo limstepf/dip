@@ -1,5 +1,6 @@
 package ch.unifr.diva.dip.api.services;
 
+import ch.unifr.diva.dip.api.components.Preset;
 import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.components.Port;
