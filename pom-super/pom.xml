@@ -34,7 +34,12 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<maven.compiler.compilerargs.xlint>-Xlint:all,-processing</maven.compiler.compilerargs.xlint>
-		<maven.javadoc.additionalparam.xdoclint>-Xdoclint:none</maven.javadoc.additionalparam.xdoclint>
+		<maven.javadoc.additionalparam.graphuml>
+			-views -enumerations -enumconstants
+		</maven.javadoc.additionalparam.graphuml>
+		<maven.javadoc.additionalparam.xdoclint>
+			-Xdoclint:none ${maven.javadoc.additionalparam.graphuml}
+		</maven.javadoc.additionalparam.xdoclint>
 		<maven.javadoc.failonerror>false</maven.javadoc.failonerror>
 
 		<!-- OSGi bundle directories -->
