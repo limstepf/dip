@@ -12,6 +12,8 @@ import ch.unifr.diva.dip.gui.VisibilityMode;
 import ch.unifr.diva.dip.gui.layout.Zoomable;
 import ch.unifr.diva.dip.gui.pe.ConnectionView;
 import ch.unifr.diva.dip.osgi.OSGiVersionPolicy;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import javafx.beans.property.BooleanProperty;
@@ -247,6 +249,10 @@ public class UserSettings {
 		// https://bugs.openjdk.java.net/browse/JDK-8115114
 		final Region root = (Region) stage.getScene().getRoot();
 
+		if (settings.x == -1 && settings.y == -1) {
+			initStageDimensions(settings);
+		}
+
 		if (settings.width >= UIStrategyGUI.Stage.minWidth) {
 			//stage.setWidth(settings.width);
 			root.setPrefWidth(settings.width);
@@ -262,6 +268,16 @@ public class UserSettings {
 			stage.setY(settings.y);
 		}
 		stage.setMaximized(settings.maximized);
+	}
+
+	protected static void initStageDimensions(PrimaryStage settings) {
+		final GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+		final int width = gd.getDisplayMode().getWidth();
+		final int height = gd.getDisplayMode().getHeight();
+		settings.width = (int) (width * .79);
+		settings.height = (int) (height * .79);
+		settings.x = (int) ((width - settings.width) * .5);
+		settings.y = (int) ((height - settings.height) * .3);
 	}
 
 	/**
