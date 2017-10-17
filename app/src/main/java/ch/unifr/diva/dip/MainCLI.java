@@ -14,6 +14,7 @@ import ch.unifr.diva.dip.core.model.PipelineData;
 import ch.unifr.diva.dip.core.model.Project;
 import ch.unifr.diva.dip.core.model.ProjectData;
 import ch.unifr.diva.dip.eventbus.events.ProjectNotification;
+import ch.unifr.diva.dip.gui.main.RepairProjectUnit;
 import ch.unifr.diva.dip.osgi.OSGiBundleTracker;
 import ch.unifr.diva.dip.osgi.OSGiService;
 import ch.unifr.diva.dip.osgi.OSGiVersionPolicy;
@@ -28,6 +29,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import javafx.beans.InvalidationListener;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -69,11 +71,11 @@ public class MainCLI {
 		this.eventBus = new EventBusGuava();
 		this.handler = new ApplicationHandler(context, uiStrategy, eventBus);
 
-		StatusListener status = new StatusListener();
-		eventBus.register(status);
-
 		// manually initialize the JavaFX toolkit
 		FxUtils.initToolkit();
+
+		StatusListener status = new StatusListener();
+		eventBus.register(status);
 		System.out.println();
 
 		// list system information
@@ -85,54 +87,14 @@ public class MainCLI {
 			listSystemInformation(handler);
 		}
 
-		// wait for OSGi services...
-		System.out.println();
-		System.out.println("waiting for OSGi bundles...");
-		boolean osgiTimeout = true;
-		try {
-			Thread.sleep(500);
-			osgiTimeout = !handler.osgi.getProcessors().waitForBundles(3, 500, 10000);
-		} catch (InterruptedException ex) {
-			log.debug("interrupted while waiting for OSGi bundles to be installed", ex);
-		}
-		if (osgiTimeout) {
-			System.out.println(INDENT + "...timed out.");
-		} else {
-			System.out.println(INDENT + "ready.");
-		}
+		waitForOSGiBundles();
 
-		// list installed OSGi bundles
-		if (CommandLineOption.hasAnyOption(
-				CommandLineOption.LIST_ALL,
-				CommandLineOption.LIST_BUNDLES
-		)) {
-			System.out.println();
-			listOSGiBundles();
-		}
+		final ProjectData data = readProjectData();
+		final Project project = loadProject(data);
+		pauseThread();
 
-		// read DIP project file
-		if (CommandLineOption.FILE.hasOption()) {
-			final String projectFileVal = CommandLineOption.FILE.getOptionValue();
-			final Path projectFile = getProjectFile(projectFileVal);
-			if (projectFile == null) {
-				log.warn("no file found at: {}", projectFileVal);
-				return;
-			}
-
-			// load DIP project data from file
-			System.out.println("reading project data from: " + projectFile + "...");
-			ProjectData data;
-			try {
-				data = handler.loadProjectData(projectFile);
-			} catch (IOException | JAXBException ex) {
-				log.error("failed to read project data from: {}", projectFile);
-				return;
-			}
-
-			// load project assets (the pipelines in particular)
-			data.loadAssets();
-
-			// print DIP project information
+		// print DIP project information
+		if (data != null) {
 			if (CommandLineOption.hasAnyOption(
 					CommandLineOption.LIST_ALL,
 					CommandLineOption.LIST_PROJECT,
@@ -141,6 +103,7 @@ public class MainCLI {
 				System.out.println();
 				listProjectPipelines(data);
 			}
+
 			if (CommandLineOption.hasAnyOption(
 					CommandLineOption.LIST_ALL,
 					CommandLineOption.LIST_PROJECT,
@@ -149,57 +112,37 @@ public class MainCLI {
 				System.out.println();
 				listProjectPages(data);
 			}
+		}
 
-			// validate and open project data...
-			if (CommandLineOption.hasAnyOption(
-					CommandLineOption.PROCESS,
-					CommandLineOption.RESET
-			)) {
-				System.out.println("validating project data...");
-				final ProjectData.ValidationResult validation = data.validate(handler);
-				if (!validation.isValid()) {
-					log.error("invalid/corrupt project data: {}", validation);
-					return;
-				} else {
-					System.out.println(INDENT + "...looking good.");
-				}
-
+		if (project != null) {
+			// reset all pages
+			if (CommandLineOption.RESET.hasOption()) {
 				System.out.println();
-
-				// open project
-				System.out.println("opening project...");
-				final Project project = handler.openProject(data);
-				pauseThread();
-
-				// reset all pages
-				if (CommandLineOption.RESET.hasOption()) {
-					System.out.println();
-					System.out.println("resetting project...");
-					joinThread(project.resetAllPages().getThread());
-				}
-
-				// process all apges
-				if (CommandLineOption.PROCESS.hasOption()) {
-					System.out.println();
-					System.out.println("processing project...");
-					joinThread(project.processAllPages().getThread());
-				}
-
-				// save project, unless asked to not do so...
-				System.out.println();
-				if (!CommandLineOption.DONT_SAVE.hasOption()) {
-					System.out.println("saving project...");
-					joinThread(handler.saveProject().getThread());
-					System.out.println();
-					System.out.println("closing project...");
-				} else {
-					System.out.println("closing project... (without saving)");
-				}
-
-				// and close the project
-				handler.closeProject();
-				pauseThread();
+				System.out.println("resetting project...");
+				joinThread(project.resetAllPages().getThread());
 			}
+
+			// process all pages
+			if (CommandLineOption.PROCESS.hasOption()) {
+				System.out.println();
+				System.out.println("processing project...");
+				joinThread(project.processAllPages().getThread());
+			}
+
+			// save project, unless asked to not do so...
+			System.out.println();
+			if (!CommandLineOption.DONT_SAVE.hasOption()) {
+				System.out.println("saving project...");
+				joinThread(handler.saveProject().getThread());
+				System.out.println();
+				System.out.println("closing project...");
+			} else {
+				System.out.println("closing project... (without saving)");
+			}
+
+			// and close the project
+			handler.closeProject();
+			pauseThread();
 		}
 
 		System.out.println();
@@ -218,9 +161,88 @@ public class MainCLI {
 		}
 	}
 
+	private void waitForOSGiBundles() {
+		System.out.println("waiting for OSGi bundles...");
+		boolean osgiTimeout = true;
+		try {
+			Thread.sleep(500);
+			osgiTimeout = !handler.osgi.getProcessors().waitForBundles(3, 500, 10000);
+		} catch (InterruptedException ex) {
+			log.debug("interrupted while waiting for OSGi bundles to be installed", ex);
+		}
+		if (osgiTimeout) {
+			System.out.println(INDENT + "...timed out.");
+		} else {
+			System.out.println(INDENT + "ready.");
+		}
+	}
+
+	private ProjectData readProjectData() {
+		ProjectData data;
+
+		if (CommandLineOption.FILE.hasOption()) {
+			final String projectFileVal = CommandLineOption.FILE.getOptionValue();
+			final Path projectFile = getProjectFile(projectFileVal);
+			if (projectFile == null) {
+				log.warn("no file found at: {}", projectFileVal);
+				return null;
+			}
+
+			System.out.println("reading project data from: " + projectFile + "...");
+			try {
+				data = handler.loadProjectData(projectFile);
+			} catch (IOException | JAXBException ex) {
+				log.error("failed to read project data from: {}", projectFile, ex);
+				return null;
+			}
+		} else {
+			return null;
+		}
+
+		// load project assets (the pipelines in particular)
+		data.loadAssets();
+		System.out.println(INDENT + "ok.");
+
+		return data;
+	}
+
+	private Project loadProject(ProjectData data) {
+		if (data == null) {
+			return null;
+		}
+		System.out.println("validating project data...");
+		final ProjectData.ValidationResult validation = handler.validateProjectData(data);
+		if (!validation.isValid()) {
+			final CountDownLatch latch = new CountDownLatch(1);
+			final RepairProjectUnit repair = new RepairProjectUnit(handler);
+			repair.setStopCallback(
+					() -> {
+						latch.countDown();
+					},
+					RepairProjectUnit.DEFAULT_TIMEOUT_IN_MS
+			);
+			repair.start();
+			try {
+				latch.await();
+			} catch (InterruptedException ex) {
+
+			}
+			repair.stop();
+			if (!repair.canFullyAutoRepair()) {
+				log.error("invalid/corrupt project data: {}", validation);
+				return null;
+			}
+			repair.applyRepairs();
+		}
+
+		System.out.println(INDENT + "ok.");
+		System.out.println("opening project...");
+		return handler.openProject(data);
+	}
+
 	// short sleep (in ms) after a thread has been joined to enforce correct
 	// status message flow/order (i.e. we're waiting for the last status message
-	// to be processed before continuing)
+	// to be processed before continuing, which happens on the Java FX app. Thread)
 	private static final int THREAD_DELAY = 100;
 
 	private static boolean pauseThread() {

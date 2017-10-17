@@ -331,10 +331,9 @@ public class ApplicationHandler implements Localizable {
 						ApplicationHandler.this
 				);
 
-				// TODO: auto-repair for moved/modified-only files (-> user settings)
 				if (!validation.isValid()) {
-					log.warn("failed to open project: {}", getValue());
-					log.warn("invalid/corrupt project data: {}", validation);
+					log.debug("failed to open project: {}", getValue());
+					log.debug("invalid/corrupt project data: {}", validation);
 
 					projectData = getValue();
 					projectValidation = validation;
@@ -438,6 +437,18 @@ public class ApplicationHandler implements Localizable {
 	 */
 	public ProjectData.ValidationResult getRepairValidation() {
 		return this.projectValidation;
+	}
+
+	/**
+	 * Manually validates project data.
+	 *
+	 * @param data the project data.
+	 * @return the validation result.
+	 */
+	public ProjectData.ValidationResult validateProjectData(ProjectData data) {
+		this.projectData = data;
+		this.projectValidation = data.validate(this);
+		return projectValidation;
 	}
 
 	/**

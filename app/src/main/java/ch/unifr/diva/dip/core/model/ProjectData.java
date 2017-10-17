@@ -534,12 +534,18 @@ public class ProjectData {
 		 * The path to the image file of the page.
 		 */
 		@XmlJavaTypeAdapter(PathAdapter.class)
-		public Path file;
+		// lives on the main thread if running headless (CLI), but might get
+		// changed by the FX Appplication Thread, hence marked as volatile.
+		// There is no race/no need to sync.
+		public volatile Path file;
 
 		/**
 		 * The checksum of the image file of the page.
 		 */
-		public String checksum;
+		// lives on the main thread if running headless (CLI), but might get
+		// changed by the FX Appplication Thread, hence marked as volatile.
+		// There is no race/no need to sync.
+		public volatile String checksum;
 
 		@Override
 		public String toString() {

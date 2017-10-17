@@ -344,14 +344,33 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 			return;
 		}
 
-		final RepairProjectDialog dialog = new RepairProjectDialog(stage, handler);
-		dialog.showAndWait();
+		// first try to automatically repair the project
+		// (typically to relocate image files)
+		final RepairProjectUnit repair = new RepairProjectUnit(handler);
+		repair.setStopCallback(
+				() -> {
+					if (!repair.canFullyAutoRepair()) {
+						// open dialog to manually handle the case
+						final RepairProjectDialog dialog = new RepairProjectDialog(
+								stage,
+								repair
+						);
+						dialog.showAndWait();
+						if (dialog.isOk()) {
+							handler.openRepairedProject();
+						}
+					} else {
+						// project has been fully repaired automatically
+						repair.stop();
+						repair.applyRepairs();
+						handler.openRepairedProject();
+					}
 
-		if (dialog.isOk()) {
-			handler.openRepairedProject();
-		}
-
-		handler.clearRepairData();
+					handler.clearRepairData();
+				},
+				RepairProjectUnit.DEFAULT_TIMEOUT_IN_MS
+		);
+		repair.start();
 	}
 
 	/**
