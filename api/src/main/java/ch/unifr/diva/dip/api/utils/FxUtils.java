@@ -43,14 +43,16 @@ public class FxUtils {
 	 * @param delay the (minimum) duration to wait before the event handler is
 	 * executed.
 	 * @param afterDelay the event handler to exectue after the delay.
+	 * @return the started timeline.
 	 */
-	public static void delay(Duration delay, EventHandler<ActionEvent> afterDelay) {
+	public static Timeline delay(Duration delay, EventHandler<ActionEvent> afterDelay) {
 		final Timeline t = new Timeline(new KeyFrame(
 				delay,
 				afterDelay
 		));
 
 		t.play();
+		return t;
 	}
 
 	/**
