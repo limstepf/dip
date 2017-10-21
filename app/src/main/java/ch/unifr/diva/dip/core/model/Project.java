@@ -8,7 +8,6 @@ import ch.unifr.diva.dip.utils.Modifiable;
 import ch.unifr.diva.dip.utils.ModifiedProperty;
 import ch.unifr.diva.dip.gui.pe.PipelineEditor;
 import ch.unifr.diva.dip.api.utils.FxUtils;
-import ch.unifr.diva.dip.eventbus.events.ProjectRequest;
 import ch.unifr.diva.dip.eventbus.events.StatusMessageEvent;
 import ch.unifr.diva.dip.utils.BackgroundTask;
 import ch.unifr.diva.dip.utils.CursorLock;
