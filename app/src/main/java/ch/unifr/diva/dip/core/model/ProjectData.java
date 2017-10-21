@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -485,6 +486,27 @@ public class ProjectData {
 	 */
 	public void save(OutputStream stream) throws JAXBException {
 		XmlUtils.marshal(this, stream);
+	}
+
+	/**
+	 * Returns the path to a project file, given its {@code String}
+	 * representation.
+	 *
+	 * @param val the path to a project file represented as a {@code String}.
+	 * @return the path to a project file, or {@code null} if there is no such
+	 * file.
+	 */
+	public static Path toProjectFile(String val) {
+		final Path file = Paths.get(val);
+		if (Files.exists(file)) {
+			return file.normalize();
+		}
+		final Path wd = Paths.get(System.getProperty("user.dir"));
+		final Path relFile = wd.resolve(val);
+		if (Files.exists(relFile)) {
+			return relFile.normalize();
+		}
+		return null;
 	}
 
 	/**
