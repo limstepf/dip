@@ -1,10 +1,12 @@
 package ch.unifr.diva.dip;
 
+import ch.unifr.diva.dip.api.utils.L10n;
 import ch.unifr.diva.dip.core.ApplicationContext;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.ui.UIStrategy;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import ch.unifr.diva.dip.core.UserSettings;
+import ch.unifr.diva.dip.core.model.ProjectData;
 import ch.unifr.diva.dip.core.ui.StylesheetManager;
 import ch.unifr.diva.dip.eventbus.EventBus;
 import ch.unifr.diva.dip.eventbus.EventBusGuava;
@@ -18,6 +20,8 @@ import ch.unifr.diva.dip.gui.main.StatusBarPresenter;
 import ch.unifr.diva.dip.gui.main.PagesWidget;
 import ch.unifr.diva.dip.gui.main.SideBarPresenter;
 import ch.unifr.diva.dip.gui.main.ToolBarPresenter;
+import ch.unifr.diva.dip.utils.BackgroundTask;
+import java.nio.file.Path;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
@@ -27,6 +31,7 @@ import org.slf4j.LoggerFactory;
  * Graphical user interface (GUI) of the application.
  */
 public class MainGUI extends Application {
+
 	private static final Logger log = LoggerFactory.getLogger(MainGUI.class);
 	private final EventBus eventBus = new EventBusGuava();
 	private final ApplicationContext context = Main.getApplicationContext();
@@ -96,19 +101,7 @@ public class MainGUI extends Application {
 
 		// ready, set, go...
 		presenter.show();
-
-		// TODO: open project file
-		if (CommandLineOption.FILE.hasOption()) {
-			boolean osgiTimeout = true;
-			try {
-				Thread.sleep(500);
-				osgiTimeout = !handler.osgi.getProcessors().waitForBundles(3, 500, 10000);
-			} catch (InterruptedException ex) {
-
-			}
-		}
-
-
+		loadProjectFromCommandLine();
 	}
 
 	@Override
@@ -128,12 +121,50 @@ public class MainGUI extends Application {
 
 	/**
 	 * Shows an error dialog.
+	 *
 	 * @param error An error (wrapped exception and an error message).
 	 */
 	public void showError(ApplicationContext.ContextError error) {
 		log.error(error.message, error.exception);
 		final ErrorDialog dialog = new ErrorDialog(error.message, error.exception);
 		dialog.showAndWait();
+	}
+
+	private void loadProjectFromCommandLine() {
+		if (CommandLineOption.FILE.hasOption()) {
+			final String projectFileVal = CommandLineOption.FILE.getOptionValue();
+			final Path projectFile = ProjectData.toProjectFile(projectFileVal);
+			if (projectFile != null) {
+				// wait for OSGi bundles on background thread; maybe we should
+				// hava a splash-screen doing this? no?
+				BackgroundTask<Void> task = new BackgroundTask<Void>(
+						handler.uiStrategy,
+						eventBus
+				) {
+					@Override
+					protected Void call() throws Exception {
+						updateTitle(L10n.getInstance().getString("project.open"));
+						updateMessage(L10n.getInstance().getString("project.open"));
+						updateProgress(-1, Double.NaN);
+						try {
+							handler.osgi.getProcessors().waitForBundles(3, 500, 10000);
+						} catch (InterruptedException ex) {
+
+						}
+						return null;
+					}
+
+					@Override
+					protected void succeeded() {
+						handler.openProject(projectFile);
+						super.succeeded();
+					}
+				};
+				task.start();
+			} else {
+				log.warn("no file found at: {}", projectFileVal);
+			}
+		}
 	}
 
 }

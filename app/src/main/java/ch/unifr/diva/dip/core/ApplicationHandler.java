@@ -270,6 +270,7 @@ public class ApplicationHandler implements Localizable {
 							localize("project.created")
 					));
 				});
+				super.succeeded();
 			}
 		};
 		return task.start();
@@ -321,6 +322,7 @@ public class ApplicationHandler implements Localizable {
 				cleanUp();
 				// ...or show error if unfixable
 				uiStrategy.showError(this.getException());
+				super.failed();
 			}
 
 			@Override
@@ -345,6 +347,7 @@ public class ApplicationHandler implements Localizable {
 					project = Project.openProject(getValue(), ApplicationHandler.this);
 					broadcastOpenProject();
 				}
+				super.succeeded();
 			}
 		};
 		return task.start();
@@ -499,6 +502,7 @@ public class ApplicationHandler implements Localizable {
 			@Override
 			protected void succeeded() {
 				eventBus.post(new StatusMessageEvent(localize("project.saved")));
+				super.succeeded();
 			}
 		};
 		task.start();
@@ -534,6 +538,7 @@ public class ApplicationHandler implements Localizable {
 			@Override
 			protected void succeeded() {
 				eventBus.post(new StatusMessageEvent(localize("project.saved")));
+				super.succeeded();
 			}
 		};
 		return task.start();

@@ -182,7 +182,7 @@ public class MainCLI {
 
 		if (CommandLineOption.FILE.hasOption()) {
 			final String projectFileVal = CommandLineOption.FILE.getOptionValue();
-			final Path projectFile = getProjectFile(projectFileVal);
+			final Path projectFile = ProjectData.toProjectFile(projectFileVal);
 			if (projectFile == null) {
 				log.warn("no file found at: {}", projectFileVal);
 				return null;
@@ -301,19 +301,6 @@ public class MainCLI {
 			// different version (auto up-/downgraded)
 			return versionByPolicy + " (AUTO UP/DOWNGRADE by pipeline version policy)";
 		}
-	}
-
-	private static Path getProjectFile(String val) {
-		final Path file = Paths.get(val);
-		if (Files.exists(file)) {
-			return file.normalize();
-		}
-		final Path wd = Paths.get(System.getProperty("user.dir"));
-		final Path relFile = wd.resolve(val);
-		if (Files.exists(relFile)) {
-			return relFile.normalize();
-		}
-		return null;
 	}
 
 	private static void printErrors(List<ApplicationContext.ContextError> errors) {
