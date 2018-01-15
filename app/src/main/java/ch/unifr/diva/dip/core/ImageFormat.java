@@ -17,6 +17,9 @@ import java.util.List;
 import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.ImageTypeSpecifier;
+import javax.imageio.stream.ImageInputStream;
 
 /**
  * Supported image formats. ImageFormat defines a set of supported image formats
@@ -209,8 +212,6 @@ public enum ImageFormat {
 
 		try (InputStream stream = new BufferedInputStream(Files.newInputStream(file))) {
 			return format.loadImage(stream);
-		} catch (IOException ex) {
-			throw (ex);
 		}
 	}
 
@@ -222,8 +223,6 @@ public enum ImageFormat {
 
 		try (InputStream stream = new BufferedInputStream(Files.newInputStream(file))) {
 			return format.loadBufferedImage(stream);
-		} catch (IOException ex) {
-			throw (ex);
 		}
 	}
 
@@ -242,6 +241,37 @@ public enum ImageFormat {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Reads image information. This method should be way more light than
+	 * reading the (whole) image as a {@code BufferedImage}.
+	 *
+	 * @param file the path to the image file.
+	 * @return an array of: {@code [0:width, 1:height, 2:numBands]}.
+	 */
+	public static int[] readImageInformation(Path file) {
+		final int[] dim = new int[]{-1, -1, -1};
+		try (InputStream stream = new BufferedInputStream(Files.newInputStream(file))) {
+			try (ImageInputStream istream = ImageIO.createImageInputStream(stream)) {
+				ImageReader reader = ImageIO.getImageReaders(istream).next();
+				try {
+					reader.setInput(istream);
+					dim[0] = reader.getWidth(0);
+					dim[1] = reader.getHeight(0);
+					ImageTypeSpecifier spec = reader.getImageTypes(0).next();
+					if (spec != null) {
+						dim[2] = spec.getNumBands();
+					}
+				} catch (Exception ex) {
+					// so be it...
+				}
+				reader.dispose();
+			}
+		} catch (Exception ex) {
+			// so be it...
+		}
+		return dim;
 	}
 
 	/**
