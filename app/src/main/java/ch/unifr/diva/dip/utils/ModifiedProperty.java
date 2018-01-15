@@ -81,6 +81,9 @@ public class ModifiedProperty {
 	 * @param modifiable the modifiable (object) to be managed no longer.
 	 */
 	public void removeManagedProperty(Modifiable modifiable) {
+		if (modifiable == null) {
+			return;
+		}
 		modifiable.modifiedProperty().removeListener(modifiedListener);
 		managedModifiables.remove(modifiable);
 	}
