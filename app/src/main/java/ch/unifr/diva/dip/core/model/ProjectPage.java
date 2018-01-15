@@ -152,7 +152,7 @@ public class ProjectPage implements Modifiable, Localizable {
 		this.pipelineIdProperty = new SimpleIntegerProperty(page.pipelineId);
 		this.pipelineNameProperty = new SimpleStringProperty(getPipelineNameFromPrototype());
 		this.nameProperty = new SimpleStringProperty(page.name);
-		this.stateProperty = new SynchronizedObjectProperty(page.getState());
+		this.stateProperty = new SynchronizedObjectProperty<>(page.getState());
 		this.file = page.file;
 		this.checksum = page.checksum;
 		this.modifiedPageProperty = new ModifiedProperty();
