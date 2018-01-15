@@ -1,7 +1,6 @@
 package ch.unifr.diva.dip.gui.layout;
 
 import javafx.beans.binding.Bindings;
-import javafx.geometry.Orientation;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
