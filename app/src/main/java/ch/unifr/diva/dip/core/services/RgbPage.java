@@ -16,7 +16,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 /**
- * The RGB generator provides a {@code BufferedImage} of the type
+ * The RGB page generator provides a {@code BufferedImage} of the type
  * {@code TYPE_INT_RGB}.
  */
 public class RgbPage extends HostService {
@@ -66,7 +66,9 @@ public class RgbPage extends HostService {
 		}
 
 		try {
-			final BufferedImage image = assertBufferedImageType(context.page.bufferedImage());
+			final BufferedImage cimage = context.page.bufferedImage();
+			final BufferedImage image = assertBufferedImageType(cimage);
+
 			// provide outputs
 			this.bi_out.setOutput(image);
 			this.rgb_out.setOutput(image);
