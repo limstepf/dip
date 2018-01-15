@@ -17,7 +17,7 @@ import java.awt.image.WritableRaster;
  * "currying" (i.e. the transformation of a function with multiple arguments
  * into a function with only a single argument).
  */
-public abstract class BinaryImageOp extends NullOp implements SimpleTileParallelizable {
+public abstract class BinaryImageOp extends NullOp implements InverseMappedTileParallelizable {
 
 	protected final BufferedImage left;
 	protected final boolean combinePixels;
@@ -87,25 +87,60 @@ public abstract class BinaryImageOp extends NullOp implements SimpleTileParallel
 			}
 		}
 
+		final WritableRaster dstRaster = dst.getRaster();
+
+		// possible tile parallelizable offset (true if dstRaster.getParent() != null)
+		final int offsetX = dstRaster.getSampleModelTranslateX();
+		final int offsetY = dstRaster.getSampleModelTranslateY();
+		final int[] samples = new int[2];
+
 		if (this.combinePixels) {
-			for (Location pt : new RasterScanner(dst, false)) {
-				final int s1 = this.left.getRGB(pt.col, pt.row);
-				final int s2 = right.getRGB(pt.col, pt.row);
-				dst.setRGB(pt.col, pt.row, combineRGB(s1, s2));
+			for (Location pt : new RasterScanner(dstRaster, false)) {
+				readRGB(
+						pt.col - offsetX,
+						pt.row - offsetY,
+						left,
+						right,
+						samples
+				);
+				dst.setRGB(
+						pt.col,
+						pt.row,
+						combineRGB(samples[0], samples[1])
+				);
 			}
 		} else {
 			final WritableRaster leftRaster = this.left.getRaster();
 			final WritableRaster rightRaster = right.getRaster();
-			final WritableRaster dstRaster = dst.getRaster();
-
-			for (Location pt : new RasterScanner(dst, true)) {
-				final int s1 = leftRaster.getSample(pt.col, pt.row, pt.band);
-				final int s2 = rightRaster.getSample(pt.col, pt.row, pt.band);
-				dstRaster.setSample(pt.col, pt.row, pt.band, combine(s1, s2));
+			for (Location pt : new RasterScanner(dstRaster, true)) {
+				readSamples(
+						pt.col - offsetX,
+						pt.row - offsetY,
+						pt.band,
+						leftRaster,
+						rightRaster,
+						samples
+				);
+				dstRaster.setSample(
+						pt.col,
+						pt.row,
+						pt.band,
+						combineRGB(samples[0], samples[1])
+				);
 			}
 		}
 
 		return dst;
+	}
+
+	private void readRGB(int col, int row, BufferedImage left, BufferedImage right, int[] samples) {
+		samples[0] = left.getRGB(col, row);
+		samples[1] = right.getRGB(col, row);
+	}
+
+	private void readSamples(int col, int row, int band, WritableRaster left, WritableRaster right, int[] samples) {
+		samples[0] = left.getSample(col, row, band);
+		samples[1] = right.getSample(col, row, band);
 	}
 
 	private BufferedImage getImageWithLeastBands(BufferedImage... images) {
