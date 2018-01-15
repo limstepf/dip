@@ -13,18 +13,39 @@ public class ParentObjectProperty<T> extends SimpleObjectProperty<T> {
 	private static final Object DEFAULT_BEAN = null;
 	private static final String DEFAULT_NAME = "";
 
+	/**
+	 * The constructor of ParentObjectProperty.
+	 */
 	public ParentObjectProperty() {
 		this(DEFAULT_BEAN, DEFAULT_NAME);
 	}
 
+	/**
+	 * The constructor of ParentObjectProperty.
+	 *
+	 * @param initialValue the initial value of the wrapped value.
+	 */
 	public ParentObjectProperty(T initialValue) {
 		this(DEFAULT_BEAN, DEFAULT_NAME, initialValue);
 	}
 
+	/**
+	 * The constructor of ParentObjectProperty.
+	 *
+	 * @param bean the bean of this ParentObjectProperty.
+	 * @param name the name of this ParentObjectProperty.
+	 */
 	public ParentObjectProperty(Object bean, String name) {
 		super(bean, name);
 	}
 
+	/**
+	 * The constructor of ParentObjectProperty.
+	 *
+	 * @param bean the bean of this ParentObjectProperty.
+	 * @param name the name of this ParentObjectProperty.
+	 * @param initialValue the initial value of the wrapped value.
+	 */
 	public ParentObjectProperty(Object bean, String name, T initialValue) {
 		super(bean, name, initialValue);
 	}
@@ -36,4 +57,5 @@ public class ParentObjectProperty<T> extends SimpleObjectProperty<T> {
 	public void invalidate() {
 		this.fireValueChangedEvent();
 	}
+
 }
