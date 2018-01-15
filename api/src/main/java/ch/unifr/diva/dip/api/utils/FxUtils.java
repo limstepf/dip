@@ -57,7 +57,7 @@ public class FxUtils {
 	}
 
 	/**
-	 * Executes a Runnable on the JavaFX application thread. This method is save
+	 * Executes a Runnable on the JavaFX application thread. This method is safe
 	 * to be called from any thread.
 	 *
 	 * @param runnable the Runnable.
@@ -72,7 +72,7 @@ public class FxUtils {
 
 	/**
 	 * Executes a Callable as a FutureTask on the JavaFX application thread to
-	 * return some result once done. This method is save to be called from any
+	 * return some result once done. This method is safe to be called from any
 	 * thread.
 	 *
 	 * @param <T> class of the result.
