@@ -13,6 +13,7 @@ import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 /**
@@ -187,6 +188,21 @@ public class FxUtils {
 	 */
 	public static boolean isEmpty(Rectangle2D r) {
 		return (r.getWidth() <= 0 || r.getHeight() <= 0);
+	}
+
+	/**
+	 * Return the RGB hex string of a color.
+	 *
+	 * @param color the color.
+	 * @return the RGB hex string.
+	 */
+	public static String toHexString(Color color) {
+		return String.format(
+				"#%02X%02X%02X",
+				(int) (color.getRed() * 255),
+				(int) (color.getGreen() * 255),
+				(int) (color.getBlue() * 255)
+		);
 	}
 
 }
