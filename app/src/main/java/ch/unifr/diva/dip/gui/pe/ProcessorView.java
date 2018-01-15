@@ -95,7 +95,7 @@ public abstract class ProcessorView extends BorderPane {
 		this.outputPorts = new ArrayList<>();
 
 		if (wrapper.isAvailable()) {
-			for (Map.Entry<String, InputPort<?>> e : wrapper.processor().inputs().entrySet()) {
+			for (Map.Entry<String, InputPort<?>> e : wrapper.serviceObject().inputs().entrySet()) {
 				final InputPort<?> input = e.getValue();
 				if (input != null) {
 					final PortView<InputPort<?>> view = new PortView<>(this, e.getKey(), input);
@@ -106,7 +106,7 @@ public abstract class ProcessorView extends BorderPane {
 				}
 			}
 
-			for (Map.Entry<String, OutputPort<?>> e : wrapper.processor().outputs().entrySet()) {
+			for (Map.Entry<String, OutputPort<?>> e : wrapper.serviceObject().outputs().entrySet()) {
 				final OutputPort<?> output = e.getValue();
 				if (output != null) {
 					final PortView<OutputPort<?>> view = new PortView<>(this, e.getKey(), output);
@@ -163,8 +163,8 @@ public abstract class ProcessorView extends BorderPane {
 	 * processorViews in the EditorPane.
 	 */
 	public void init() {
-		if (wrapper.processor().hasRepaintProperty()) {
-			wrapper.processor().repaintProperty().addListener(repaintListener);
+		if (wrapper.serviceObject().hasRepaintProperty()) {
+			wrapper.serviceObject().repaintProperty().addListener(repaintListener);
 		}
 	}
 
@@ -174,8 +174,8 @@ public abstract class ProcessorView extends BorderPane {
 	 * that might still hang around...
 	 */
 	public void stop() {
-		if (wrapper.processor().hasRepaintProperty()) {
-			wrapper.processor().repaintProperty().removeListener(repaintListener);
+		if (wrapper.serviceObject().hasRepaintProperty()) {
+			wrapper.serviceObject().repaintProperty().removeListener(repaintListener);
 		}
 		removePortLabels();
 	}
@@ -315,8 +315,8 @@ public abstract class ProcessorView extends BorderPane {
 
 	// safely remove wires and unregister ports
 	public void unregister() {
-		if (wrapper.processor().hasRepaintProperty()) {
-			wrapper.processor().repaintProperty().removeListener(repaintListener);
+		if (wrapper.serviceObject().hasRepaintProperty()) {
+			wrapper.serviceObject().repaintProperty().removeListener(repaintListener);
 		}
 
 		for (PortView<InputPort<?>> v : this.inputPorts) {
@@ -497,7 +497,7 @@ public abstract class ProcessorView extends BorderPane {
 		if (!wrapper.isAvailable()) {
 			return false;
 		}
-		return wrapper.processor().parameters().size() > 0;
+		return wrapper.serviceObject().parameters().size() > 0;
 	}
 
 	// parameter view factory
@@ -840,7 +840,7 @@ public abstract class ProcessorView extends BorderPane {
 			this.glyph = UIStrategyGUI.Glyphs.newGlyph(wrapper.glyph(), Glyph.Size.NORMAL);
 			final Label label = new Label(
 					wrapper.isAvailable()
-							? wrapper.processor().name()
+							? wrapper.serviceObject().name()
 							: wrapper.pid()
 			);
 			final Tooltip tooltip = new Tooltip(String.format(

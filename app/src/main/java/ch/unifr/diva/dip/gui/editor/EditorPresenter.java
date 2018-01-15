@@ -458,8 +458,8 @@ public class EditorPresenter implements Presenter {
 		if (selectionTool == null || currentProcessor == null) {
 			return;
 		}
-		if (currentProcessor.processor().canEdit()) {
-			currentProcessor.processor().asEditableProcessor().onSelectionMaskChanged(
+		if (currentProcessor.serviceObject().canEdit()) {
+			currentProcessor.serviceObject().asEditableProcessor().onSelectionMaskChanged(
 					selectionTool.getMask()
 			);
 		}

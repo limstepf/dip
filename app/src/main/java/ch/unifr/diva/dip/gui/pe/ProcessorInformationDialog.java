@@ -130,9 +130,9 @@ public class ProcessorInformationDialog<T extends PrototypeProcessor> extends Ab
 	public final static <T extends PrototypeProcessor> HBox getProcessorTitle(T wrapper, OSGiService<Processor> service) {
 		final Processor p;
 		if (service != null) {
-			p = (service.serviceObject == null) ? wrapper.processor() : service.serviceObject;
+			p = (service.serviceObject == null) ? wrapper.serviceObject() : service.serviceObject;
 		} else {
-			p = wrapper.processor();
+			p = wrapper.serviceObject();
 		}
 		final Glyph glyph = UIStrategyGUI.Glyphs.newGlyph(wrapper.glyph(), Glyph.Size.NORMAL);
 		final Label label = new Label(
@@ -194,7 +194,7 @@ public class ProcessorInformationDialog<T extends PrototypeProcessor> extends Ab
 						for (Map.Entry<String, InputPort<?>> input : serviceObject.inputs().entrySet()) {
 							final List<Object> row = new ArrayList<>();
 							final InputPort<?> port = input.getValue();
-							InputPort<?> portW = wrapper.processor().input(input.getKey());
+							InputPort<?> portW = wrapper.serviceObject().input(input.getKey());
 							boolean visible = true;
 							if (portW == null) {
 								portW = port;
@@ -229,7 +229,7 @@ public class ProcessorInformationDialog<T extends PrototypeProcessor> extends Ab
 						for (Map.Entry<String, OutputPort<?>> output : serviceObject.outputs().entrySet()) {
 							final List<Object> row = new ArrayList<>();
 							final OutputPort<?> port = output.getValue();
-							OutputPort<?> portW = wrapper.processor().output(output.getKey());
+							OutputPort<?> portW = wrapper.serviceObject().output(output.getKey());
 							boolean visible = true;
 							if (portW == null) {
 								portW = port;

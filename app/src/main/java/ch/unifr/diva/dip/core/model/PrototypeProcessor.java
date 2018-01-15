@@ -109,8 +109,8 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 	 *
 	 * @param id new, unique id of the PrototypeProcessor, usually assigned by
 	 * the parent pipeline.
-	 * @param pid pid of the wrapped processor.
-	 * @param version version of the wrapped processor.
+	 * @param pid pid of the service object (or wrapped processor).
+	 * @param version version of the service object (or wrapped processor).
 	 * @param x x position of the processor view.
 	 * @param y y position of the processor view.
 	 * @param handler the application handler.
@@ -151,9 +151,10 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 	}
 
 	/**
-	 * Initializes the wrapped processor. Must be called before doing anything
-	 * else (and can't be moved to/called from the constructor, since we need to
-	 * override some methods in RunnableProcessor...).
+	 * Initializes the service object (or wrapped processor). Must be called
+	 * before doing anything else (and can't be moved to/called from the
+	 * constructor, since we need to override some methods in
+	 * RunnableProcessor...).
 	 */
 	public void init() {
 		setProcessor(pid);
@@ -201,7 +202,7 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 	 */
 	protected void updateState() {
 		if (isAvailable()) {
-			stateProperty.set(processor().state());
+			stateProperty.set(serviceObject().state());
 		} else {
 			stateProperty.set(Processor.State.UNAVAILABLE);
 		}
@@ -235,9 +236,10 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 	}
 
 	/**
-	 * Checks whether the wrapped processor is available or not.
+	 * Checks whether the service object (or wrapped processor) is available or
+	 * not.
 	 *
-	 * @return {@code true} if the processor is available, {@code false}
+	 * @return {@code true} if the service object is available, {@code false}
 	 * otherwise.
 	 */
 	public final boolean isAvailable() {
@@ -254,11 +256,10 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 	}
 
 	/**
-	 * Checks whether the wrapped processor is in editing mode or not. This only
-	 * conserns the graphical representation of the wrapped processor in the
-	 * pipeline. If in editing mode, the node is expanded to show parameters (to
-	 * be edited), otherwise the node is more compact and only shows the
-	 * minimum.
+	 * Checks whether the processor is in editing mode or not. This only
+	 * conserns the graphical representation of the processor in the pipeline.
+	 * If in editing mode, the node is expanded to show parameters (to be
+	 * edited), otherwise the node is more compact and only shows the minimum.
 	 *
 	 * @return {@code true} if the processor is in editing mode, {@code false}
 	 * otherwise.
@@ -297,7 +298,7 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 	 * @return the glyph (factory) of the processor.
 	 */
 	public NamedGlyph glyph() {
-		return glyph(this.processor());
+		return glyph(this.serviceObject());
 	}
 
 	/**
@@ -315,7 +316,7 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 	}
 
 	/**
-	 * Returns the pid of the wrapped processor.
+	 * Returns the pid of the processor (or service object).
 	 *
 	 * @return the pid of the processor.
 	 */
@@ -324,25 +325,25 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 	}
 
 	/**
-	 * Returns the version of the wrapped processor.
+	 * Returns the version of the processor (or service object).
 	 *
-	 * @return the version of the wrapped processor.
+	 * @return the version of the service object.
 	 */
 	public Version version() {
 		return version;
 	}
 
 	/**
-	 * Returns the wrapped processor.
+	 * Returns the service object (or wrapped processor).
 	 *
-	 * @return the wrapped processor instance.
+	 * @return the service object.
 	 */
-	public final Processor processor() {
+	public final Processor serviceObject() {
 		return processor;
 	}
 
 	/**
-	 * Sets the wrapped processor.
+	 * Sets the processor.
 	 *
 	 * @param pid pid of the desired processor service.
 	 */
@@ -352,20 +353,20 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 	}
 
 	/**
-	 * Updates/hot-swaps the wrapped processor by creating a new instance of it.
-	 * This method is also called the first time (by setProcessor) the wrapped
-	 * processor is initialized.
+	 * Updates/hot-swaps the service object (or wrapped processor) by creating a
+	 * new instance of it. This method is also called the first time (by
+	 * setProcessor) the service object is initialized.
 	 */
 	public void updateProcessor() {
 		updateProcessor(false);
 	}
 
 	/**
-	 * Updates/hot-swaps the wrapped processor by creating a new instance of it.
-	 * This method is also called the first time (by setProcessor) the wrapped
-	 * processor is initialized.
+	 * Updates/hot-swaps the service object (or wrapped processor) by creating a
+	 * new instance of it. This method is also called the first time (by
+	 * setProcessor) the service object is initialized.
 	 *
-	 * @param forceInit forces initialization of the wrapped processor if set to
+	 * @param forceInit forces initialization of the service object if set to
 	 * {@code true}. This is usually set to {@code false}, and only needed for
 	 * hot-swapping of processor services.
 	 */
@@ -448,22 +449,22 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 	}
 
 	/**
-	 * Inits the wrapped processor. This signals the wrapped processor service
-	 * that it's ready to be fully initialized, meaning that all parameters have
-	 * been set/restored, and that ports are connected.
+	 * Inits the service object (or wrapped processor). This signals the service
+	 * object that it's ready to be fully initialized, meaning that all
+	 * parameters have been set/restored, and that ports are connected.
 	 */
 	protected void initProcessor() {
-		if (processor() == null) {
+		if (serviceObject() == null) {
 			availableProperty.set(false);
 			return;
 		}
-		initProcessor(processor());
+		initProcessor(serviceObject());
 	}
 
 	/**
-	 * Inits the wrapped processor. This signals the wrapped processor service
-	 * that it's ready to be fully initialized, meaning that all parameters have
-	 * been set/restored, and that ports are connected.
+	 * Inits the service object (or wrapped processor). This signals the service
+	 * object that it's ready to be fully initialized, meaning that all
+	 * parameters have been set/restored, and that ports are connected.
 	 *
 	 * @param processor the processor to be initialized.
 	 */
@@ -715,7 +716,7 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 	 * @param p the processor to copy the parameters from.
 	 */
 	public <T extends PrototypeProcessor> void copyParameters(T p) {
-		copyParameters(p.processor().parameters());
+		copyParameters(p.serviceObject().parameters());
 	}
 
 	/**
@@ -725,7 +726,7 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 	 * @param p the parameter map to be copied.
 	 */
 	public void copyParameters(Map<String, Parameter<?>> p) {
-		final Map<String, Parameter<?>> q = this.processor().parameters();
+		final Map<String, Parameter<?>> q = this.serviceObject().parameters();
 		final List<String> secondPass = new ArrayList<>();
 
 		for (Map.Entry<String, Parameter<?>> e : p.entrySet()) {
@@ -761,7 +762,7 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 	 * @param parameters the new parameters.
 	 */
 	public void setParameters(Map<String, Object> parameters) {
-		final Map<String, Parameter<?>> q = this.processor().parameters();
+		final Map<String, Parameter<?>> q = this.serviceObject().parameters();
 		for (Map.Entry<String, Object> e : parameters.entrySet()) {
 			final String key = e.getKey();
 			if (q.containsKey(key)) {
@@ -802,7 +803,7 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 	 * otherwise.
 	 */
 	public static <T extends PrototypeProcessor> boolean equalParameters(T p, T q) {
-		return equalParameters(p.processor().parameters(), q.processor().parameters());
+		return equalParameters(p.serviceObject().parameters(), q.serviceObject().parameters());
 	}
 
 	/**
@@ -861,8 +862,8 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 	 * processors, this mapping is needed to retrieve processor id and key of an
 	 * output port.
 	 *
-	 * @param <T> class of the processor wrapper.
-	 * @param wrappers list of wrapped processors.
+	 * @param <T> class of the processors.
+	 * @param wrappers list of processors.
 	 * @return map of PortMapEntry indexed by OutputPort.
 	 */
 	public static <T extends PrototypeProcessor> Map<OutputPort<?>, PortMapEntry> getOutputPortMap(List<T> wrappers) {
@@ -872,7 +873,7 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 			if (!wrapper.isAvailable()) {
 				continue;
 			}
-			for (Map.Entry<String, OutputPort<?>> e : wrapper.processor().outputs().entrySet()) {
+			for (Map.Entry<String, OutputPort<?>> e : wrapper.serviceObject().outputs().entrySet()) {
 				map.put(e.getValue(), new PortMapEntry(wrapper.id, e.getKey()));
 			}
 		}
@@ -886,15 +887,15 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 	 * processors, this mapping is needed to retrieve processor id and key of an
 	 * input port.
 	 *
-	 * @param <T>
-	 * @param wrappers list of wrapped processors.
+	 * @param <T> class of the processors
+	 * @param wrappers list of processors.
 	 * @return map of PortMapEntry indexed by InputPort.
 	 */
 	public static <T extends PrototypeProcessor> Map<InputPort<?>, PortMapEntry> getInputPortMap(List<T> wrappers) {
 		final Map<InputPort<?>, PortMapEntry> map = new HashMap<>();
 
 		for (PrototypeProcessor wrapper : wrappers) {
-			for (Map.Entry<String, InputPort<?>> e : wrapper.processor().inputs().entrySet()) {
+			for (Map.Entry<String, InputPort<?>> e : wrapper.serviceObject().inputs().entrySet()) {
 				map.put(e.getValue(), new PortMapEntry(wrapper.id, e.getKey()));
 			}
 		}

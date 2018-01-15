@@ -80,7 +80,7 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 	 * @param runnable the runnable processor.
 	 */
 	public ProcessorParameterWindow(Window owner, ApplicationHandler handler, RunnableProcessor runnable) {
-		super(owner, runnable.processor().name());
+		super(owner, runnable.serviceObject().name());
 
 		// set modality to none s.t. multiple such windows can be operated at
 		// the same time
@@ -92,7 +92,7 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 		final PrototypePipeline pipelinePrototype = handler.getProject().getSelectedPage().getPipelinePrototype();
 		this.prototype = pipelinePrototype.getProcessor(runnable.id);
 		this.patchedProperty = new SimpleBooleanProperty();
-		this.runnable.processor().repaintProperty().addListener(repaintListener);
+		this.runnable.serviceObject().repaintProperty().addListener(repaintListener);
 
 		onRepaint();
 		updatePatchedProperty();
@@ -133,7 +133,7 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 			this.root.setLeft(this.previewWidget.getNode());
 
 			// listen to input changes
-			final Collection<InputPort<?>> inputs = runnable.processor().inputs().values();
+			final Collection<InputPort<?>> inputs = runnable.serviceObject().inputs().values();
 			for (InputPort<?> input : inputs) {
 				input.valueChangedProperty().addListener(valueListener);
 			}
@@ -155,7 +155,7 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 
 	final protected void onRepaint() {
 		// new parameter view
-		this.parameterView = new ProcessorView.GridParameterView(runnable.processor());
+		this.parameterView = new ProcessorView.GridParameterView(runnable.serviceObject());
 		this.root.setCenter(this.parameterView.node());
 
 		// remove old parameter listeners
@@ -165,7 +165,7 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 		paramProperties.clear();
 
 		// listen to new set of parameters
-		for (Parameter<?> p : runnable.processor().parameters().values()) {
+		for (Parameter<?> p : runnable.serviceObject().parameters().values()) {
 			if (p.isPersistent()) {
 				final ReadOnlyObjectProperty<?> property = p.asPersitentParameter().property();
 				property.addListener(paramListener);
@@ -201,7 +201,7 @@ public class ProcessorParameterWindow extends AbstractWindow implements Presente
 
 	private void onClose(WindowEvent e) {
 		if (this.valueListener != null) {
-			final Collection<InputPort<?>> inputs = runnable.processor().inputs().values();
+			final Collection<InputPort<?>> inputs = runnable.serviceObject().inputs().values();
 			for (InputPort<?> input : inputs) {
 				input.valueChangedProperty().removeListener(valueListener);
 			}

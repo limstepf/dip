@@ -293,8 +293,8 @@ public class ToolBarPresenter implements Presenter {
 			return false;
 		}
 
-		if (this.currentRunnable.processor().hasTools()) {
-			this.currentProcessor = this.currentRunnable.processor().asEditableProcessor();
+		if (this.currentRunnable.serviceObject().hasTools()) {
+			this.currentProcessor = this.currentRunnable.serviceObject().asEditableProcessor();
 		} else {
 			this.currentProcessor = null;
 			return false;

@@ -225,7 +225,7 @@ public abstract class PipelineExecutor {
 	 */
 	protected boolean isProcessing(RunnableProcessor p) {
 		return Processor.State.PROCESSING.equals(p.getState())
-				&& p.processor().canProcess();
+				&& p.serviceObject().canProcess();
 	}
 
 }

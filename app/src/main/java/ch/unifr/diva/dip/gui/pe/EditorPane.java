@@ -326,7 +326,7 @@ public class EditorPane {
 		if (!wrapper.isAvailable()) {
 			return;
 		}
-		for (Map.Entry<String, InputPort<?>> port : wrapper.processor().inputs().entrySet()) {
+		for (Map.Entry<String, InputPort<?>> port : wrapper.serviceObject().inputs().entrySet()) {
 			final InputPort<?> input = port.getValue();
 			if (input.isConnected()) {
 				newConnection(input);
@@ -356,11 +356,11 @@ public class EditorPane {
 
 		final Set<InputPort<?>> trash = new HashSet<>();
 
-		for (InputPort<?> input : wrapper.processor().inputs().values()) {
+		for (InputPort<?> input : wrapper.serviceObject().inputs().values()) {
 			trash.add(input);
 		}
 
-		for (Set<InputPort<?>> inputs : wrapper.processor().dependentInputs().values()) {
+		for (Set<InputPort<?>> inputs : wrapper.serviceObject().dependentInputs().values()) {
 			for (InputPort<?> input : inputs) {
 				trash.add(input);
 			}
@@ -571,10 +571,10 @@ public class EditorPane {
 			return;
 		}
 
-		for (InputPort<?> port : wrapper.processor().inputs().values()) {
+		for (InputPort<?> port : wrapper.serviceObject().inputs().values()) {
 			ports.remove(port);
 		}
-		for (OutputPort<?> port : wrapper.processor().outputs().values()) {
+		for (OutputPort<?> port : wrapper.serviceObject().outputs().values()) {
 			ports.remove(port);
 		}
 	}
@@ -636,7 +636,7 @@ public class EditorPane {
 							+ view.layoutYProperty().get()
 							- ProcessorView.verticalPadding
 					),
-					PersistentParameter.getPreset(view.wrapper().processor().parameters()),
+					PersistentParameter.getPreset(view.wrapper().serviceObject().parameters()),
 					view.editingProperty.get()
 			);
 		}
@@ -686,13 +686,13 @@ public class EditorPane {
 
 		newView.init();
 
-		for (InputPort<?> input : wrapper.processor().inputs().values()) {
+		for (InputPort<?> input : wrapper.serviceObject().inputs().values()) {
 			if (input.isConnected()) {
 				newConnection(input);
 			}
 		}
 
-		for (Set<InputPort<?>> inputs : wrapper.processor().dependentInputs().values()) {
+		for (Set<InputPort<?>> inputs : wrapper.serviceObject().dependentInputs().values()) {
 			for (InputPort<?> input : inputs) {
 				newConnection(input);
 			}

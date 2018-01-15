@@ -47,10 +47,10 @@ public class ProcessorTiming extends Timing {
 	public <T extends PrototypeProcessor> ProcessorTiming(T processor) {
 		this(
 				processor.id,
-				processor.processor().name(),
+				processor.serviceObject().name(),
 				processor.pid(),
 				processor.version().toString(),
-				processor.processor().canProcess()
+				processor.serviceObject().canProcess()
 		);
 	}
 

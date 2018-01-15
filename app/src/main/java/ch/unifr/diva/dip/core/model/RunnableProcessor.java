@@ -111,8 +111,8 @@ public class RunnableProcessor extends PrototypeProcessor {
 		// we overide initProcessor() rather than doing this in init() since a
 		// processor might have changed its name (repaint) once being fully
 		// initialized
-		this.layerGroup.setName(this.processor().name());
-		this.layerGroup.setGlyph(RunnableProcessor.glyph(this.processor()));
+		this.layerGroup.setName(this.serviceObject().name());
+		this.layerGroup.setGlyph(RunnableProcessor.glyph(this.serviceObject()));
 		this.layerGroup.setHideGroupMode(LayerGroup.HideGroupMode.AUTO);
 		this.layerExtension = new ProcessorLayerExtension(this);
 		this.layerGroup.layerExtensions().add(layerExtension);
@@ -152,7 +152,7 @@ public class RunnableProcessor extends PrototypeProcessor {
 	 * @return {@code true} if a preview is offered, {@code false} otherwise.
 	 */
 	public boolean isPreviewable() {
-		return this.processor() instanceof Previewable;
+		return this.serviceObject() instanceof Previewable;
 	}
 
 	/**
@@ -161,7 +161,7 @@ public class RunnableProcessor extends PrototypeProcessor {
 	 * @return a previewable instance of the processor service.
 	 */
 	public Previewable getPreviewable() {
-		return (Previewable) this.processor();
+		return (Previewable) this.serviceObject();
 	}
 
 	/**
@@ -226,7 +226,7 @@ public class RunnableProcessor extends PrototypeProcessor {
 
 			status.getStyleClass().add("dip-small");
 
-			if (runnable.processor().hasParameters()) {
+			if (runnable.serviceObject().hasParameters()) {
 				paramButton = newButton(localize("parameters") + "...");
 				paramButton.setOnAction((e) -> {
 					final RunnableProcessor p = ProcessorLayerExtension.this.runnable.get();
@@ -249,7 +249,7 @@ public class RunnableProcessor extends PrototypeProcessor {
 				paramButton = null;
 			}
 
-			if (runnable.processor().canProcess()) {
+			if (runnable.serviceObject().canProcess()) {
 				processButton = newButton(localize("process"));
 				processButton.setOnAction((e) -> {
 					final RunnableProcessor p = ProcessorLayerExtension.this.runnable.get();
@@ -262,7 +262,7 @@ public class RunnableProcessor extends PrototypeProcessor {
 				processButton = null;
 			}
 
-			if (runnable.processor().canReset()) {
+			if (runnable.serviceObject().canReset()) {
 				resetButton = newButton(localize("reset"));
 				resetButton.setOnAction((e) -> {
 					final RunnableProcessor p = ProcessorLayerExtension.this.runnable.get();
@@ -484,7 +484,7 @@ public class RunnableProcessor extends PrototypeProcessor {
 			return deps;
 		}
 		final Map<InputPort<?>, PrototypeProcessor.PortMapEntry> inputPortMap = rp.inputPortMap();
-		for (Map.Entry<String, Set<InputPort<?>>> e : processor().dependentInputs().entrySet()) {
+		for (Map.Entry<String, Set<InputPort<?>>> e : serviceObject().dependentInputs().entrySet()) {
 			final Set<InputPort<?>> inputs = e.getValue();
 			for (InputPort<?> input : inputs) {
 				final PortMapEntry m = inputPortMap.get(input);
@@ -514,14 +514,14 @@ public class RunnableProcessor extends PrototypeProcessor {
 				layerGroup.setGlyphColor(UIStrategyGUI.Colors.waiting);
 				break;
 			case PROCESSING:
-				if (!processor().canProcess()) {
+				if (!serviceObject().canProcess()) {
 					layerGroup.setGlyphColor(UIStrategyGUI.Colors.processingEdit);
 				} else {
 					layerGroup.setGlyphColor(UIStrategyGUI.Colors.processing);
 				}
 				break;
 			case READY:
-				if (processor().canEdit()) {
+				if (serviceObject().canEdit()) {
 					layerGroup.setGlyphColor(UIStrategyGUI.Colors.readyEdit);
 				} else {
 					layerGroup.setGlyphColor(UIStrategyGUI.Colors.ready);
@@ -576,7 +576,7 @@ public class RunnableProcessor extends PrototypeProcessor {
 			@Override
 			protected Void call() throws Exception {
 				updateTitle(localize("processing") + "...");
-				updateMessage(localize("processing.object", runnable.processor().name()) + "...");
+				updateMessage(localize("processing.object", runnable.serviceObject().name()) + "...");
 				updateProgress(-1, Double.NaN);
 
 				final ProcessorTiming timing = new ProcessorTiming(runnable);
@@ -596,7 +596,7 @@ public class RunnableProcessor extends PrototypeProcessor {
 			protected void finished(BackgroundTask.Result result) {
 				runLater(() -> {
 					handler.eventBus.post(new StatusMessageEvent(
-							localize("processing.object", runnable.processor().name()) + "..."
+							localize("processing.object", runnable.serviceObject().name()) + "..."
 							+ " "
 							+ localize("done")
 							+ "."
@@ -616,16 +616,16 @@ public class RunnableProcessor extends PrototypeProcessor {
 	 * thread, or something...
 	 */
 	public void process() {
-		if (!processor().canProcess()) {
+		if (!serviceObject().canProcess()) {
 			log.warn(
 					"Can't process. Processor doesn't implement Processable: {}",
-					processor()
+					serviceObject()
 			);
 			return;
 		}
 
 		final ProcessorContext context = newProcessorContext();
-		processor().asProcessableProcessor().process(context);
+		serviceObject().asProcessableProcessor().process(context);
 
 		FxUtils.runAndWait(() -> {
 			this.updateState(true);
@@ -646,7 +646,7 @@ public class RunnableProcessor extends PrototypeProcessor {
 			@Override
 			protected Void call() throws Exception {
 				updateTitle(localize("resetting") + "...");
-				updateMessage(localize("resetting.object", runnable.processor().name()) + "...");
+				updateMessage(localize("resetting.object", runnable.serviceObject().name()) + "...");
 				updateProgress(-1, Double.NaN);
 
 				runnable.reset();
@@ -657,7 +657,7 @@ public class RunnableProcessor extends PrototypeProcessor {
 			protected void finished(BackgroundTask.Result result) {
 				runLater(() -> {
 					handler.eventBus.post(new StatusMessageEvent(
-							localize("resetting.object", runnable.processor().name()) + "..."
+							localize("resetting.object", runnable.serviceObject().name()) + "..."
 							+ " "
 							+ localize("done")
 							+ "."
@@ -695,8 +695,8 @@ public class RunnableProcessor extends PrototypeProcessor {
 			}
 		}
 
-		if (this.processor().canReset()) {
-			processor().asResetableProcessor().reset(newProcessorContext());
+		if (this.serviceObject().canReset()) {
+			serviceObject().asResetableProcessor().reset(newProcessorContext());
 		}
 
 		FxUtils.runAndWait(() -> {

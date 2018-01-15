@@ -180,7 +180,7 @@ public abstract class Pipeline<T extends PrototypeProcessor> implements Modifiab
 				log.warn("invalid connection. Input processor {} not found", c.input.id);
 				continue;
 			}
-			if (input.processor() == null) {
+			if (input.serviceObject() == null) {
 				log.warn("invalid connection. Input processor OSGi service {} is not available", input);
 				continue;
 			}
@@ -189,13 +189,13 @@ public abstract class Pipeline<T extends PrototypeProcessor> implements Modifiab
 				log.warn("invalid connection. Output processor {} not found", c.output.id);
 				continue;
 			}
-			if (output.processor() == null) {
+			if (output.serviceObject() == null) {
 				log.warn("invalid connection. Output processor OSGi service {} is not available", output);
 				continue;
 			}
 
-			final InputPort<?> ip = input.processor().input(c.input.port);
-			final OutputPort<?> op = output.processor().output(c.output.port);
+			final InputPort<?> ip = input.serviceObject().input(c.input.port);
+			final OutputPort<?> op = output.serviceObject().output(c.output.port);
 			if (ip != null && op != null) {
 				ip.connectTo(op);
 			} else {
@@ -360,7 +360,7 @@ public abstract class Pipeline<T extends PrototypeProcessor> implements Modifiab
 	protected final Map<Integer, InvalidationListener> repaintListeners = new HashMap<>();
 
 	protected void addRepaintListener(T p) {
-		if (p.processor().hasRepaintProperty()) {
+		if (p.serviceObject().hasRepaintProperty()) {
 			final int weakId = p.id;
 			final WeakReference<T> weakProcessor = new WeakReference<>(p);
 			final InvalidationListener listener = (c) -> {
@@ -372,34 +372,34 @@ public abstract class Pipeline<T extends PrototypeProcessor> implements Modifiab
 				registerPorts(wp);
 			};
 			this.repaintListeners.put(p.id, listener);
-			p.processor().repaintProperty().addListener(listener);
+			p.serviceObject().repaintProperty().addListener(listener);
 		}
 	}
 
 	protected void removeRepaintListener(T p) {
-		if (p.processor().hasRepaintProperty()) {
+		if (p.serviceObject().hasRepaintProperty()) {
 			final InvalidationListener listener = this.repaintListeners.get(p.id);
 			if (listener != null) {
-				p.processor().repaintProperty().removeListener(listener);
+				p.serviceObject().repaintProperty().removeListener(listener);
 				this.repaintListeners.remove(p.id);
 			}
 		}
 	}
 
 	protected void registerPorts(T p) {
-		for (Map.Entry<String, InputPort<?>> e : p.processor().inputs().entrySet()) {
+		for (Map.Entry<String, InputPort<?>> e : p.serviceObject().inputs().entrySet()) {
 			this.inputPortMap.put(e.getValue(), new PortMapEntry(p.id, e.getKey()));
 		}
-		for (Map.Entry<String, OutputPort<?>> e : p.processor().outputs().entrySet()) {
+		for (Map.Entry<String, OutputPort<?>> e : p.serviceObject().outputs().entrySet()) {
 			this.outputPortMap.put(e.getValue(), new PortMapEntry(p.id, e.getKey()));
 		}
 	}
 
 	protected void unregisterPorts(T p) {
-		for (InputPort<?> port : p.processor().inputs().values()) {
+		for (InputPort<?> port : p.serviceObject().inputs().values()) {
 			this.inputPortMap.remove(port);
 		}
-		for (OutputPort<?> port : p.processor().outputs().values()) {
+		for (OutputPort<?> port : p.serviceObject().outputs().values()) {
 			this.outputPortMap.remove(port);
 		}
 	}
@@ -530,7 +530,7 @@ public abstract class Pipeline<T extends PrototypeProcessor> implements Modifiab
 	 */
 	public final void removeProcessor(T wrapper, boolean disconnect) {
 		if (disconnect && wrapper.isAvailable()) {
-			wrapper.processor().disconnect();
+			wrapper.serviceObject().disconnect();
 		}
 
 		this.modifiedPipelineProperty.removeManagedProperty(wrapper);
@@ -656,7 +656,7 @@ public abstract class Pipeline<T extends PrototypeProcessor> implements Modifiab
 					boolean isReady = true;
 
 					if (wrapper.isAvailable()) {
-						for (InputPort<?> input : wrapper.processor().inputs().values()) {
+						for (InputPort<?> input : wrapper.serviceObject().inputs().values()) {
 							if (input.isConnected()) {
 								final OutputPort<?> output = input.connection();
 								final PrototypeProcessor.PortMapEntry source = portMap.get(output);

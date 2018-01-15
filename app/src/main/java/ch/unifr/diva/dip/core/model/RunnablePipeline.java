@@ -160,7 +160,7 @@ public class RunnablePipeline extends Pipeline<RunnableProcessor> {
 				registerProcessorState(p, null);
 				break;
 			case PROCESSING:
-				if (p.processor().canProcess()) {
+				if (p.serviceObject().canProcess()) {
 					registerProcessorState(p, processingProcessors);
 				} else {
 					registerProcessorState(p, waitingProcessors);
@@ -382,7 +382,7 @@ public class RunnablePipeline extends Pipeline<RunnableProcessor> {
 	public void reset(boolean unpatch) {
 		synchronized (pipelineLock) {
 			for (RunnableProcessor p : processors()) {
-				if (p.processor().canReset()) {
+				if (p.serviceObject().canReset()) {
 					p.reset();
 					FxUtils.runAndWait(() -> p.updateState(true));
 				}

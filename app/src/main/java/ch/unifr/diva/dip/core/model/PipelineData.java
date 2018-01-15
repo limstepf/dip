@@ -403,7 +403,7 @@ public class PipelineData {
 				this.processors.list.add(new Processor(wrapper));
 
 				if (wrapper.isAvailable()) {
-					for (Map.Entry<String, InputPort<?>> e : wrapper.processor().inputs().entrySet()) {
+					for (Map.Entry<String, InputPort<?>> e : wrapper.serviceObject().inputs().entrySet()) {
 						final InputPort<?> input = e.getValue();
 						final PrototypeProcessor.PortMapEntry output = outputPortMap.get(input.connection());
 						if (output != null) {

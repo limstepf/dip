@@ -55,7 +55,7 @@ public class ProcessorViewTopDown extends ProcessorView {
 
 	@Override
 	protected ParameterView newParameterView() {
-		return new GridParameterView(wrapper().processor());
+		return new GridParameterView(wrapper().serviceObject());
 	}
 
 	@Override
