@@ -6,7 +6,6 @@ import ch.unifr.diva.dip.api.parameters.EnumParameter;
 import ch.unifr.diva.dip.api.parameters.StringParameter;
 import ch.unifr.diva.dip.api.services.ProcessableBase;
 import ch.unifr.diva.dip.api.services.Processor;
-import ch.unifr.diva.dip.api.services.ProcessorBase;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.awt.components.ColorPortsUnit;
 import ch.unifr.diva.dip.awt.imaging.SimpleColorModel;
@@ -173,20 +172,28 @@ public class BufferedImageExporter extends ProcessableBase {
 	@Override
 	public void process(ProcessorContext context) {
 		setExportPath(context);
-		final BufferedImage image = this.colorPortsUnit.getValue();
-		final ImageFormat format = getFormat();
-		final Path out = getExportFile(context, format);
-		if (out != null) {
-			try {
-				deleteFile(out);
-			} catch (IOException ex) {
-				log.error("failed to remvoe file: {}", out, ex);
+
+		try {
+			final BufferedImage image = this.colorPortsUnit.getValue();
+			cancelIfInterrupted(image);
+			final ImageFormat format = getFormat();
+			final Path out = getExportFile(context, format);
+			if (out != null) {
+				try {
+					deleteFile(out);
+				} catch (IOException ex) {
+					log.error("failed to remvoe file: {}", out, ex);
+				}
+				cancelIfInterrupted();
+				try (OutputStream os = Files.newOutputStream(out)) {
+					ImageIO.write(image, format.name(), os);
+				} catch (IOException ex) {
+					log.error("failed to write the file: {}", out, ex);
+				}
+				cancelIfInterrupted();
 			}
-			try (OutputStream os = Files.newOutputStream(out)) {
-				ImageIO.write(image, format.name(), os);
-			} catch (IOException ex) {
-				log.error("failed to write the file: {}", out, ex);
-			}
+		} catch (InterruptedException ex) {
+			reset(context);
 		}
 	}
 

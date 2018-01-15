@@ -180,48 +180,57 @@ public class HoughLines extends ProcessableBase {
 
 	@Override
 	public void process(ProcessorContext context) {
-		final InputPort<?> port = input_xor.getEnabledPort();
-		if (port == null) {
-			log.warn("no input port enabled");
-			return;
+		try {
+			final InputPort<?> port = input_xor.getEnabledPort();
+			if (port == null) {
+				log.warn("no input port enabled");
+				return;
+			}
+
+			final FImage fimage;
+			if (port.equals(input_float)) {
+				final BufferedMatrix mat = input_float.getValue();
+				fimage = OpenIMAJUtils.toFImage(mat, 0);
+			} else if (port.equals(input_binary)) {
+				final BufferedImage image = input_binary.getValue();
+				fimage = OpenIMAJUtils.toFImage(image, 0);
+			} else {
+				final BufferedImage image = input.getValue();
+				fimage = OpenIMAJUtils.toFImage(image, 0);
+			}
+			cancelIfInterrupted(fimage);
+
+			final int max = maxLines.get();
+			final boolean invert = invertSamples.get();
+
+			if (invert) {
+				fimage.inverse();
+				cancelIfInterrupted();
+			}
+
+			final org.openimaj.image.analysis.algorithm.HoughLines hough = getHoughLines();
+			fimage.analyseWith(hough);
+			cancelIfInterrupted();
+
+			final Lines2D lines = new Lines2D();
+			for (org.openimaj.math.geometry.line.Line2d line : getBestLines(hough, max)) {
+				lines.add(new Line2D(
+						line.begin.getX(),
+						line.begin.getY(),
+						line.end.getX(),
+						line.end.getY()
+				));
+			}
+			cancelIfInterrupted(lines);
+
+			writeObject(context, lines, STORAGE_LINES_XML);
+			context.getObjects().put("width", fimage.width);
+			context.getObjects().put("height", fimage.height);
+			setOutputs(context, lines);
+			cancelIfInterrupted();
+		} catch (InterruptedException ex) {
+			reset(context);
 		}
-
-		final FImage fimage;
-		if (port.equals(input_float)) {
-			final BufferedMatrix mat = input_float.getValue();
-			fimage = OpenIMAJUtils.toFImage(mat, 0);
-		} else if (port.equals(input_binary)) {
-			final BufferedImage image = input_binary.getValue();
-			fimage = OpenIMAJUtils.toFImage(image, 0);
-		} else {
-			final BufferedImage image = input.getValue();
-			fimage = OpenIMAJUtils.toFImage(image, 0);
-		}
-
-		final int max = maxLines.get();
-		final boolean invert = invertSamples.get();
-
-		if (invert) {
-			fimage.inverse();
-		}
-
-		final org.openimaj.image.analysis.algorithm.HoughLines hough = getHoughLines();
-		fimage.analyseWith(hough);
-
-		final Lines2D lines = new Lines2D();
-		for (org.openimaj.math.geometry.line.Line2d line : getBestLines(hough, max)) {
-			lines.add(new Line2D(
-					line.begin.getX(),
-					line.begin.getY(),
-					line.end.getX(),
-					line.end.getY()
-			));
-		}
-
-		writeObject(context, lines, STORAGE_LINES_XML);
-		context.getObjects().put("width", fimage.width);
-		context.getObjects().put("height", fimage.height);
-		setOutputs(context, lines);
 	}
 
 	protected List<org.openimaj.math.geometry.line.Line2d> getBestLines(org.openimaj.image.analysis.algorithm.HoughLines hough, int max) {

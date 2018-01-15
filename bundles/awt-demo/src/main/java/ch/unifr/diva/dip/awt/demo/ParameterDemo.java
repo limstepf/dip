@@ -92,7 +92,7 @@ public class ParameterDemo extends ProcessableBase {
 		// be still nice to have a reference directly to child parameters...
 		this.parameters.put("composite-list", compositeGrid);
 
-		final Map<String, Parameter> compositeMap = new LinkedHashMap<>();
+		final Map<String, Parameter<?>> compositeMap = new LinkedHashMap<>();
 		compositeMap.put("empty-param", new EmptyParameter()); // skip first cell
 		compositeMap.put("float-param", new FloatParameter("float", 0.67f, 0.0f, 1.0f));
 		compositeMap.put("integer-param", new IntegerParameter("integer", 5));

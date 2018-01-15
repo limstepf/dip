@@ -245,19 +245,26 @@ public class Morphology extends ProcessableBase implements Previewable {
 
 	@Override
 	public void process(ProcessorContext context) {
-		final FImage fimage = getSourceFImage();
-		if (fimage == null) {
-			return;
+		try {
+			final FImage fimage = getSourceFImage();
+			if (fimage == null) {
+				return;
+			}
+
+			final OP op = operator.getEnumValue(OP.class);
+			final SE se = structuringElement.getEnumValue(SE.class);
+
+			op.process(fimage, se.get(), repeat.get());
+			cancelIfInterrupted(fimage);
+
+			final BufferedImage image = OpenIMAJUtils.toBinaryBufferedImage(fimage);
+			cancelIfInterrupted(image);
+			writeBufferedImage(context, image, STORAGE_IMAGE, STORAGE_IMAGE_FORMAT);
+			setOutputs(context, image);
+			cancelIfInterrupted();
+		} catch (InterruptedException ex) {
+			reset(context);
 		}
-
-		final OP op = operator.getEnumValue(OP.class);
-		final SE se = structuringElement.getEnumValue(SE.class);
-
-		op.process(fimage, se.get(), repeat.get());
-
-		final BufferedImage image = OpenIMAJUtils.toBinaryBufferedImage(fimage);
-		writeBufferedImage(context, image, STORAGE_IMAGE, STORAGE_IMAGE_FORMAT);
-		setOutputs(context, image);
 	}
 
 	@Override

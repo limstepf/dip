@@ -88,37 +88,43 @@ public class LayerDemo extends ProcessableBase {
 
 	@Override
 	public void process(ProcessorContext context) {
+		try {
+			final List<Point2D> pointSet = new ArrayList<>();
+			final List<Line2D> lineSet = new ArrayList<>();
 
-		final List<Point2D> pointSet = new ArrayList<>();
-		final List<Line2D> lineSet = new ArrayList<>();
+			final EditorLayerGroup root = context.getLayer();
 
-		final EditorLayerGroup root = context.getLayer();
+			final int height = input.getValue().getHeight();
+			final int width = input.getValue().getWidth();
+			context.getObjects().put("width", width);
+			context.getObjects().put("height", height);
+			final int dx = 100;
+			final double r = 2;
 
-		final int height = input.getValue().getHeight();
-		final int width = input.getValue().getWidth();
-		context.getObjects().put("width", width);
-		context.getObjects().put("height", height);
-		final int dx = 100;
-		final double r = 2;
-
-		for (int y = dx; y < height; y = y + dx) {
-			for (int x = dx; x < width; x = x + dx) {
-				pointSet.add(new Point2D(x, y));
+			for (int y = dx; y < height; y = y + dx) {
+				for (int x = dx; x < width; x = x + dx) {
+					pointSet.add(new Point2D(x, y));
+				}
 			}
-		}
-		drawPoints(getPointsLayer(context), pointSet, width, height);
-		// custom classes (with their own @XmlRootElement annotation) need
-		// to be wrapped in a JaxbList to be marshalled to xml!
-		context.getObjects().put("points", new JaxbList(pointSet));
+			cancelIfInterrupted();
+			drawPoints(getPointsLayer(context), pointSet, width, height);
+			// custom classes (with their own @XmlRootElement annotation) need
+			// to be wrapped in a JaxbList to be marshalled to xml!
+			context.getObjects().put("points", new JaxbList(pointSet));
 
-		for (int y = dx; y < height; y = y + dx) {
-			lineSet.add(new Line2D(0, y, width, y));
-		}
-		drawLines(getLinesLayer(context), lineSet, width, height);
-		context.getObjects().put("lines", new JaxbList(lineSet));
+			for (int y = dx; y < height; y = y + dx) {
+				lineSet.add(new Line2D(0, y, width, y));
+			}
+			cancelIfInterrupted();
+			drawLines(getLinesLayer(context), lineSet, width, height);
+			context.getObjects().put("lines", new JaxbList(lineSet));
 
-		this.points_out.setOutput(pointSet);
-		this.lines_out.setOutput(lineSet);
+			this.points_out.setOutput(pointSet);
+			this.lines_out.setOutput(lineSet);
+			cancelIfInterrupted();
+		} catch (InterruptedException ex) {
+			reset(context);
+		}
 	}
 
 	private void drawPoints(final EditorLayerGroup layer, final List<Point2D> pointSet, int width, int height) {

@@ -180,16 +180,25 @@ public class SampleRescaler extends ProcessableBase implements Previewable {
 	@Override
 	public void process(ProcessorContext context) {
 		if (!restoreOutputs(context)) {
-			final InputPort<? extends BufferedImage> source = getConnectedInput();
-			final BufferedImage src = source.getValue();
-			final BufferedImage rescaledImage = doProcess(context, src);
+			try {
+				final InputPort<? extends BufferedImage> source = getConnectedInput();
+				final BufferedImage src = source.getValue();
+				cancelIfInterrupted(src);
+				final BufferedImage rescaledImage = doProcess(context, src);
+				cancelIfInterrupted(rescaledImage);
+				
+				if (this.rescaleUnit.isBufferedMatrix()) {
+					writeBufferedMatrix(context, (BufferedMatrix) rescaledImage, STORAGE_MAT);
+				} else {
+					writeBufferedImage(context, rescaledImage, STORAGE_IMAGE, STORAGE_IMAGE_FORMAT);
+				}
+				cancelIfInterrupted();
 
-			if (this.rescaleUnit.isBufferedMatrix()) {
-				writeBufferedMatrix(context, (BufferedMatrix) rescaledImage, STORAGE_MAT);
-			} else {
-				writeBufferedImage(context, rescaledImage, STORAGE_IMAGE, STORAGE_IMAGE_FORMAT);
+				restoreOutputs(context, rescaledImage);
+				cancelIfInterrupted();
+			} catch (InterruptedException ex) {
+				reset(context);
 			}
-			restoreOutputs(context, rescaledImage);
 		}
 	}
 

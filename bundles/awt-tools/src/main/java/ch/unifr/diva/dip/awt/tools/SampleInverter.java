@@ -433,14 +433,22 @@ public class SampleInverter extends ProcessableBase {
 				op = new InvertOp();
 			}
 
-			final BufferedImage invertedImage = Filter.filter(context, op, source);
-			if (this.config.isBufferedMatrix()) {
-				writeBufferedMatrix(context, (BufferedMatrix) invertedImage, STORAGE_MAT);
-			} else {
-				writeBufferedImage(context, invertedImage, STORAGE_IMAGE, STORAGE_IMAGE_FORMAT);
-			}
+			try {
+				final BufferedImage invertedImage = Filter.filter(context, op, source);
+				cancelIfInterrupted(invertedImage);
 
-			restoreOutputs(context, invertedImage);
+				if (this.config.isBufferedMatrix()) {
+					writeBufferedMatrix(context, (BufferedMatrix) invertedImage, STORAGE_MAT);
+				} else {
+					writeBufferedImage(context, invertedImage, STORAGE_IMAGE, STORAGE_IMAGE_FORMAT);
+				}
+				cancelIfInterrupted();
+
+				restoreOutputs(context, invertedImage);
+				cancelIfInterrupted();
+			} catch (InterruptedException ex) {
+				reset(context);
+			}
 		}
 	}
 

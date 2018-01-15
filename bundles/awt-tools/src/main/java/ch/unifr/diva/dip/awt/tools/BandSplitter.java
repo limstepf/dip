@@ -428,41 +428,51 @@ public class BandSplitter extends ProcessableBase {
 
 	@Override
 	public void process(ProcessorContext context) {
-		final InputColorPort source = getSource(); // untyped or color typed input port
-		final BufferedImage src = source.port.getValue();
-		final int cmBands = (source.cm == null) ? 4 : source.cm.numBands();
-		final int srcBands = src.getColorModel().getNumComponents();
-		final int numBands = Math.min(cmBands, srcBands);
-		final WritableRaster srcRaster = src.getRaster();
-		// source.cm is null if untyped port is used!
-		final LayerOption opt = EnumParameter.valueOf(
-				this.provideLayers.get(),
-				LayerOption.class,
-				LayerOption.NONE
-		);
-		final boolean provideAll = this.processAllBands.get();
-		final boolean isBufferedMatrix = src instanceof BufferedMatrix;
-		// remember type s.t. we can restore the saved file more easily
-		context.getObjects().put("isBufferedMatrix", isBufferedMatrix);
+		try {
+			final InputColorPort source = getSource(); // untyped or color typed input port
+			final BufferedImage src = source.port.getValue();
+			cancelIfInterrupted(src);
 
-		final boolean[] processBand = new boolean[numBands];
-		final BufferedImage[] images = new BufferedImage[numBands];
+			final int cmBands = (source.cm == null) ? 4 : source.cm.numBands();
+			final int srcBands = src.getColorModel().getNumComponents();
+			final int numBands = Math.min(cmBands, srcBands);
+			final WritableRaster srcRaster = src.getRaster();
+			final boolean provideAll = this.processAllBands.get();
+			final boolean isBufferedMatrix = src instanceof BufferedMatrix;
+			// remember type s.t. we can restore the saved file more easily
+			context.getObjects().put("isBufferedMatrix", isBufferedMatrix);
 
-		// check which bands to extract...
-		for (int i = 0; i < numBands; i++) {
-			final OutputBand band = this.outputBands.get(i);
-			if (provideAll || band.isConnected()) {
-				processBand[i] = true;
+			final boolean[] processBand = new boolean[numBands];
+			final BufferedImage[] images = new BufferedImage[numBands];
+
+			// check which bands to extract...
+			for (int i = 0; i < numBands; i++) {
+				final OutputBand band = this.outputBands.get(i);
+				if (provideAll || band.isConnected()) {
+					processBand[i] = true;
+				}
 			}
-		}
 
-		// extract, save and set outputs
+			// extract, save and set outputs
+			doProcess(context, source, src, isBufferedMatrix, numBands, images, processBand);
+			cancelIfInterrupted();
+
+			// optionally provide layers (and extra band visualizations)
+			provideEditorLayers(context, source, src, isBufferedMatrix, numBands, images, processBand);
+			cancelIfInterrupted();
+		} catch (InterruptedException ex) {
+			reset(context);
+		}
+	}
+
+	private void doProcess(ProcessorContext context, InputColorPort source, BufferedImage src, boolean isBufferedMatrix, int numBands, BufferedImage[] images, boolean[] processBand) throws InterruptedException {
 		final BandExtractOp op = new BandExtractOp();
 
 		for (int i = 0; i < numBands; i++) {
 			if (processBand[i]) {
 				op.setBand(i);
 				images[i] = Filter.filter(context, op, src);
+				cancelIfInterrupted(images[i]);
 
 				final OutputBand band = this.outputBands.get(i);
 
@@ -486,8 +496,15 @@ public class BandSplitter extends ProcessableBase {
 				}
 			}
 		}
+	}
 
-		// optionally provide layers (and extra band visualizations)
+	private void provideEditorLayers(ProcessorContext context, InputColorPort source, BufferedImage src, boolean isBufferedMatrix, int numBands, BufferedImage[] images, boolean[] processBand) {
+		// source.cm is null if untyped port is used!
+		final LayerOption opt = EnumParameter.valueOf(
+				this.provideLayers.get(),
+				LayerOption.class,
+				LayerOption.NONE
+		);
 		final BufferedImage[] layerImages;
 		switch (opt) {
 			case GRAYSCALE:

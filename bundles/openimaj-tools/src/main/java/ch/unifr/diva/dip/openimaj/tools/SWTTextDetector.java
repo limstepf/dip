@@ -351,63 +351,73 @@ public class SWTTextDetector extends ProcessableBase {
 
 	@Override
 	public void process(ProcessorContext context) {
-		final FImage fimage = getSourceFImage(getSourceImage());
-		if (fimage == null) {
-			return;
-		}
-
-		final org.openimaj.image.text.extraction.swt.SWTTextDetector detector = doTextDetection(fimage);
-		final NestedRectangles2D lines = new NestedRectangles2D();
-
-		log.info(
-				"SWTTextDetector detected {} line(s) and {} letter(s).",
-				detector.getLines().size(),
-				detector.getLetters().size()
-		);
-
-		for (LineCandidate line : detector.getLines()) {
-			final NestedRectangle2D lineRect = new NestedRectangle2D(
-					line.getRegularBoundingBox().x,
-					line.getRegularBoundingBox().y,
-					line.getRegularBoundingBox().width,
-					line.getRegularBoundingBox().height
-			);
-			for (WordCandidate word : line.getWords()) {
-				final NestedRectangle2D wordRect = new NestedRectangle2D(
-						word.getRegularBoundingBox().x,
-						word.getRegularBoundingBox().y,
-						word.getRegularBoundingBox().width,
-						word.getRegularBoundingBox().height
-				);
-				for (LetterCandidate letter : word.getLetters()) {
-					final NestedRectangle2D letterRect = new NestedRectangle2D(
-							letter.getRegularBoundingBox().x,
-							letter.getRegularBoundingBox().y,
-							letter.getRegularBoundingBox().width,
-							letter.getRegularBoundingBox().height
-					);
-					wordRect.getChildren().add(letterRect);
-				}
-				lineRect.getChildren().add(wordRect);
+		try {
+			final FImage fimage = getSourceFImage(getSourceImage());
+			if (fimage == null) {
+				return;
 			}
-			lines.add(lineRect);
-		}
 
-		final NestedRectangles2D letters = new NestedRectangles2D();
-		for (LetterCandidate letter : detector.getLetters()) {
-			final NestedRectangle2D letterRect = new NestedRectangle2D(
-					letter.getRegularBoundingBox().x,
-					letter.getRegularBoundingBox().y,
-					letter.getRegularBoundingBox().width,
-					letter.getRegularBoundingBox().height
+			final org.openimaj.image.text.extraction.swt.SWTTextDetector detector = doTextDetection(fimage);
+			cancelIfInterrupted();
+			final NestedRectangles2D lines = new NestedRectangles2D();
+
+			log.info(
+					"SWTTextDetector detected {} line(s) and {} letter(s).",
+					detector.getLines().size(),
+					detector.getLetters().size()
 			);
-			letters.add(letterRect);
+
+			for (LineCandidate line : detector.getLines()) {
+				cancelIfInterrupted();
+				final NestedRectangle2D lineRect = new NestedRectangle2D(
+						line.getRegularBoundingBox().x,
+						line.getRegularBoundingBox().y,
+						line.getRegularBoundingBox().width,
+						line.getRegularBoundingBox().height
+				);
+				for (WordCandidate word : line.getWords()) {
+					cancelIfInterrupted();
+					final NestedRectangle2D wordRect = new NestedRectangle2D(
+							word.getRegularBoundingBox().x,
+							word.getRegularBoundingBox().y,
+							word.getRegularBoundingBox().width,
+							word.getRegularBoundingBox().height
+					);
+					for (LetterCandidate letter : word.getLetters()) {
+						final NestedRectangle2D letterRect = new NestedRectangle2D(
+								letter.getRegularBoundingBox().x,
+								letter.getRegularBoundingBox().y,
+								letter.getRegularBoundingBox().width,
+								letter.getRegularBoundingBox().height
+						);
+						wordRect.getChildren().add(letterRect);
+					}
+					lineRect.getChildren().add(wordRect);
+				}
+				lines.add(lineRect);
+			}
+			cancelIfInterrupted();
+
+			final NestedRectangles2D letters = new NestedRectangles2D();
+			for (LetterCandidate letter : detector.getLetters()) {
+				final NestedRectangle2D letterRect = new NestedRectangle2D(
+						letter.getRegularBoundingBox().x,
+						letter.getRegularBoundingBox().y,
+						letter.getRegularBoundingBox().width,
+						letter.getRegularBoundingBox().height
+				);
+				letters.add(letterRect);
+			}
+			cancelIfInterrupted();
+
+			writeObject(context, lines, STORAGE_LINES_XML);
+			writeObject(context, letters, STORAGE_LETTERS_XML);
+
+			setOutputs(context, lines, letters);
+			cancelIfInterrupted();
+		} catch (InterruptedException ex) {
+			reset(context);
 		}
-
-		writeObject(context, lines, STORAGE_LINES_XML);
-		writeObject(context, letters, STORAGE_LETTERS_XML);
-
-		setOutputs(context, lines, letters);
 	}
 
 	protected org.openimaj.image.text.extraction.swt.SWTTextDetector doTextDetection(FImage fimage) {

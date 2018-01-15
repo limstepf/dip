@@ -165,55 +165,65 @@ public class CannyEdgeDetector extends ProcessableBase implements Previewable {
 
 	@Override
 	public void process(ProcessorContext context) {
-		final XorInputPortGroup.PortGroup<InputPort<?>> group = input_xor.getEnabledGroup();
-		if (group == null) {
-			log.warn("no input port group enabled");
-			return;
-		}
-
-		final org.openimaj.image.processing.edges.CannyEdgeDetector canny = cannyParameters.getCannyEdgeDetector();
-		final FImage canny_out;
-
-		if (group.equals(pg_sobel)) {
-			final BufferedMatrix mat_dx = input_dx.getValue();
-			final BufferedMatrix mat_dy = input_dy.getValue();
-			final FImage fdx = OpenIMAJUtils.toFImage(mat_dx, 0);
-			final FImage fdy = OpenIMAJUtils.toFImage(mat_dy, 0);
-			canny_out = new FImage(fdx.width, fdx.height);
-			canny.processImage(canny_out, fdx, fdy);
-		} else {
-			final InputPort<?> port = group.getConnection();
-			final FImage fimage;
-			if (port.equals(input_float)) {
-				final BufferedMatrix mat = input_float.getValue();
-				fimage = OpenIMAJUtils.toFImage(mat, getBand(mat));
-			} else if (port.equals(input_gray)) {
-				final BufferedImage image = input_gray.getValue();
-				fimage = OpenIMAJUtils.toFImage(image, 0);
-			} else {
-				final BufferedImage image = input.getValue();
-				if (image instanceof BufferedMatrix) {
-					final BufferedMatrix mat = (BufferedMatrix) image;
-					fimage = OpenIMAJUtils.toFImage(mat, getBand(mat));
-				} else {
-					fimage = OpenIMAJUtils.toFImage(image, getBand(image));
-				}
+		try {
+			final XorInputPortGroup.PortGroup<InputPort<?>> group = input_xor.getEnabledGroup();
+			if (group == null) {
+				log.warn("no input port group enabled");
+				return;
 			}
-			canny.processImage(fimage);
-			canny_out = fimage;
-		}
 
-		final BufferedImage canny_image = OpenIMAJUtils.toBinaryBufferedImage(canny_out);
-		writeBufferedImage(context, canny_image, STORAGE_IMAGE, STORAGE_IMAGE_FORMAT);
-		final BufferedMatrix canny_mat;
-		if (output_float.isConnected()) {
-			canny_mat = OpenIMAJUtils.toBufferedMatrix(canny_out);
-			writeBufferedMatrix(context, canny_mat, STORAGE_MAT);
-		} else {
-			canny_mat = null;
-		}
+			final org.openimaj.image.processing.edges.CannyEdgeDetector canny = cannyParameters.getCannyEdgeDetector();
+			final FImage canny_out;
 
-		setOutputs(context, canny_image, canny_mat);
+			if (group.equals(pg_sobel)) {
+				final BufferedMatrix mat_dx = input_dx.getValue();
+				final BufferedMatrix mat_dy = input_dy.getValue();
+				final FImage fdx = OpenIMAJUtils.toFImage(mat_dx, 0);
+				final FImage fdy = OpenIMAJUtils.toFImage(mat_dy, 0);
+				canny_out = new FImage(fdx.width, fdx.height);
+				canny.processImage(canny_out, fdx, fdy);
+			} else {
+				final InputPort<?> port = group.getConnection();
+				final FImage fimage;
+				if (port.equals(input_float)) {
+					final BufferedMatrix mat = input_float.getValue();
+					fimage = OpenIMAJUtils.toFImage(mat, getBand(mat));
+				} else if (port.equals(input_gray)) {
+					final BufferedImage image = input_gray.getValue();
+					fimage = OpenIMAJUtils.toFImage(image, 0);
+				} else {
+					final BufferedImage image = input.getValue();
+					if (image instanceof BufferedMatrix) {
+						final BufferedMatrix mat = (BufferedMatrix) image;
+						fimage = OpenIMAJUtils.toFImage(mat, getBand(mat));
+					} else {
+						fimage = OpenIMAJUtils.toFImage(image, getBand(image));
+					}
+				}
+				canny.processImage(fimage);
+				canny_out = fimage;
+			}
+			cancelIfInterrupted(canny_out);
+
+			final BufferedImage canny_image = OpenIMAJUtils.toBinaryBufferedImage(canny_out);
+			cancelIfInterrupted(canny_image);
+			writeBufferedImage(context, canny_image, STORAGE_IMAGE, STORAGE_IMAGE_FORMAT);
+			cancelIfInterrupted();
+
+			final BufferedMatrix canny_mat;
+			if (output_float.isConnected()) {
+				canny_mat = OpenIMAJUtils.toBufferedMatrix(canny_out);
+				cancelIfInterrupted(canny_mat);
+				writeBufferedMatrix(context, canny_mat, STORAGE_MAT);
+			} else {
+				canny_mat = null;
+			}
+
+			setOutputs(context, canny_image, canny_mat);
+			cancelIfInterrupted();
+		} catch (InterruptedException ex) {
+			reset(context);
+		}
 	}
 
 	@Override

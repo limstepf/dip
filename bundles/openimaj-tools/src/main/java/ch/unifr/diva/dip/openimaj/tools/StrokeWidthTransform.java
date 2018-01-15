@@ -196,27 +196,36 @@ public class StrokeWidthTransform extends ProcessableBase implements Previewable
 
 	@Override
 	public void process(ProcessorContext context) {
-		FImage fimage = getSourceFImage(getSourceImage());
-		if (fimage == null) {
-			return;
+		try {
+			FImage fimage = getSourceFImage(getSourceImage());
+			if (fimage == null) {
+				return;
+			}
+
+			fimage = doSWT(fimage);
+			cancelIfInterrupted(fimage);
+
+			BufferedImage swt_image = null;
+			BufferedMatrix swt_mat = null;
+
+			final boolean isForceFloat = isForceFloat();
+			if (isForceFloat || output_float.isConnected()) {
+				swt_mat = OpenIMAJUtils.toBufferedMatrix(fimage);
+				cancelIfInterrupted(swt_mat);
+				writeBufferedMatrix(context, swt_mat, STORAGE_MAT);
+			}
+			if (!isForceFloat) {
+				swt_image = OpenIMAJUtils.toBufferedImage(fimage);
+				cancelIfInterrupted(swt_image);
+				writeBufferedImage(context, swt_image, STORAGE_IMAGE, STORAGE_IMAGE_FORMAT);
+			}
+			cancelIfInterrupted();
+
+			setOutputs(context, swt_image, swt_mat);
+			cancelIfInterrupted();
+		} catch (InterruptedException ex) {
+			reset(context);
 		}
-
-		fimage = doSWT(fimage);
-
-		BufferedImage swt_image = null;
-		BufferedMatrix swt_mat = null;
-
-		final boolean isForceFloat = isForceFloat();
-		if (isForceFloat || output_float.isConnected()) {
-			swt_mat = OpenIMAJUtils.toBufferedMatrix(fimage);
-			writeBufferedMatrix(context, swt_mat, STORAGE_MAT);
-		}
-		if (!isForceFloat) {
-			swt_image = OpenIMAJUtils.toBufferedImage(fimage);
-			writeBufferedImage(context, swt_image, STORAGE_IMAGE, STORAGE_IMAGE_FORMAT);
-		}
-
-		setOutputs(context, swt_image, swt_mat);
 	}
 
 	protected FImage doSWT(FImage fimage) {

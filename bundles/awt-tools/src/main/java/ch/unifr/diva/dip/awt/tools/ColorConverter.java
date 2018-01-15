@@ -277,21 +277,29 @@ public class ColorConverter extends ProcessableBase {
 
 	@Override
 	public void process(ProcessorContext context) {
-		if (!restoreOutputs(context)) {
-			final InputColorPort in = ColorPort.getColorPort(this.cmSrc.get(), this.inputColors);
-			final OutputColorPort out = ColorPort.getColorPort(this.cmDst.get(), this.outputColors);
-			final InputColorPort source = getSource();
-			final BufferedImage src = source.port.getValue();
-			final ColorConvertOp op = new ColorConvertOp(in.cm, out.cm);
-			final BufferedImage image = Filter.filter(context, op, src, op.createCompatibleDestImage(src, out.cm));
+		try {
+			if (!restoreOutputs(context)) {
+				final InputColorPort in = ColorPort.getColorPort(this.cmSrc.get(), this.inputColors);
+				final OutputColorPort out = ColorPort.getColorPort(this.cmDst.get(), this.outputColors);
+				final InputColorPort source = getSource();
+				final BufferedImage src = source.port.getValue();
+				cancelIfInterrupted(src);
+				final ColorConvertOp op = new ColorConvertOp(in.cm, out.cm);
+				final BufferedImage image = Filter.filter(context, op, src, op.createCompatibleDestImage(src, out.cm));
+				cancelIfInterrupted(image);
 
-			if (out.cm.requiresBufferedMatrix()) {
-				writeBufferedMatrix(context, (BufferedMatrix) image, out.STORAGE_FILE);
-			} else {
-				writeBufferedImage(context, image, out.STORAGE_FILE, out.STORAGE_FORMAT);
+				if (out.cm.requiresBufferedMatrix()) {
+					writeBufferedMatrix(context, (BufferedMatrix) image, out.STORAGE_FILE);
+				} else {
+					writeBufferedImage(context, image, out.STORAGE_FILE, out.STORAGE_FORMAT);
+				}
+				cancelIfInterrupted();
+
+				restoreOutputs(context, image);
+				cancelIfInterrupted();
 			}
-
-			restoreOutputs(context, image);
+		} catch (InterruptedException ex) {
+			reset(context);
 		}
 	}
 

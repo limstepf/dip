@@ -232,17 +232,25 @@ public class RankFilter extends ProcessableBase implements Previewable {
 	@Override
 	public void process(ProcessorContext context) {
 		if (!restoreOutputs(context)) {
-			final BufferedImage src = input.getValue();
-			final ProcessConfig cfg = new ProcessConfig(this);
-			final BufferedImage image = doProcess(context, src, cfg);
+			try {
+				final BufferedImage src = input.getValue();
+				cancelIfInterrupted(src);
+				final ProcessConfig cfg = new ProcessConfig(this);
+				final BufferedImage image = doProcess(context, src, cfg);
+				cancelIfInterrupted(image);
 
-			if (isBufferedMatrix()) {
-				writeBufferedMatrix(context, (BufferedMatrix) image, MATRIX_FILE);
-			} else {
-				writeBufferedImage(context, image, IMAGE_FILE, IMAGE_FORMAT);
+				if (isBufferedMatrix()) {
+					writeBufferedMatrix(context, (BufferedMatrix) image, MATRIX_FILE);
+				} else {
+					writeBufferedImage(context, image, IMAGE_FILE, IMAGE_FORMAT);
+				}
+				cancelIfInterrupted();
+
+				restoreOutputs(context, image);
+				cancelIfInterrupted();
+			} catch (InterruptedException ex) {
+				reset(context);
 			}
-
-			restoreOutputs(context, image);
 		}
 	}
 

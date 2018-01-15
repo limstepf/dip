@@ -48,16 +48,23 @@ public class ImageConverter extends ProcessableBase {
 
 	@Override
 	public void process(ProcessorContext context) {
-		BufferedImage image = readBufferedImage(context, STORAGE_FILE);
+		try {
+			BufferedImage image = readBufferedImage(context, STORAGE_FILE);
+			cancelIfInterrupted();
 
-		if (image == null) {
-			final Image source = input.getValue();
-			image = SwingFXUtils.fromFXImage(source, null);
+			if (image == null) {
+				final Image source = input.getValue();
+				image = SwingFXUtils.fromFXImage(source, null);
+				cancelIfInterrupted(image);
 
-			writeBufferedImage(context, image, STORAGE_FILE, STORAGE_FORMAT);
+				writeBufferedImage(context, image, STORAGE_FILE, STORAGE_FORMAT);
+			}
+
+			this.output.setOutput(image);
+			cancelIfInterrupted();
+		} catch (InterruptedException ex) {
+			reset(context);
 		}
-
-		this.output.setOutput(image);
 	}
 
 	@Override

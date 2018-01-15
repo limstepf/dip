@@ -390,17 +390,23 @@ public class AdaptiveLocalThreshold extends ProcessableBase implements Previewab
 
 	@Override
 	public void process(ProcessorContext context) {
-		final FImage fimage = getSourceFImage();
-		if (fimage == null) {
-			return;
+		try {
+			final FImage fimage = getSourceFImage();
+			cancelIfInterrupted(fimage);
+
+			final LocalThresholdMethod m = method.getEnumValue(LocalThresholdMethod.class);
+			m.process(this, fimage);
+			cancelIfInterrupted(fimage);
+
+			final BufferedImage image = OpenIMAJUtils.toBinaryBufferedImage(fimage);
+			cancelIfInterrupted(image);
+			writeBufferedImage(context, image, STORAGE_IMAGE, STORAGE_IMAGE_FORMAT);
+
+			setOutputs(context, image);
+			cancelIfInterrupted();
+		} catch (InterruptedException ex) {
+			reset(context);
 		}
-
-		final LocalThresholdMethod m = method.getEnumValue(LocalThresholdMethod.class);
-		m.process(this, fimage);
-
-		final BufferedImage image = OpenIMAJUtils.toBinaryBufferedImage(fimage);
-		writeBufferedImage(context, image, STORAGE_IMAGE, STORAGE_IMAGE_FORMAT);
-		setOutputs(context, image);
 	}
 
 	@Override

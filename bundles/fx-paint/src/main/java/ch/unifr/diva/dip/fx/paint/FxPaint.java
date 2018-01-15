@@ -179,30 +179,6 @@ public class FxPaint extends HybridProcessorBase {
 		return null;
 	}
 
-	private BufferedImage saveCanvas(ProcessorContext context) {
-		if (context == null || this.canvas == null) {
-			return null;
-		}
-
-		try {
-			final WritableImage rendered = FxUtils.runFutureTask(() -> {
-				final WritableImage img = new WritableImage(
-						(int) this.canvas.getWidth(),
-						(int) this.canvas.getHeight()
-				);
-				canvas.snapshot(null, img);
-				return img;
-			});
-			final BufferedImage out = SwingFXUtils.fromFXImage(rendered, null);
-			writeBufferedImage(context, out, STORAGE_IMAGE, STORAGE_FORMAT);
-			setDirty(false);
-			return out;
-		} catch (Exception ex) {
-			log.error("Failed to save the canvas in: {}", context, ex);
-			return null;
-		}
-	}
-
 	@Override
 	public Processor newInstance(ProcessorContext context) {
 		final FxPaint p = new FxPaint();
@@ -228,27 +204,66 @@ public class FxPaint extends HybridProcessorBase {
 
 	@Override
 	public void process(ProcessorContext context) {
-		BufferedImage image;
-		if (isDirty()) {
-			image = saveCanvas(context);
-		} else {
-			image = readBufferedImage(context, STORAGE_IMAGE);
-			if (image == null) {
-				image = this.colorPortsUnit.getValue();
+		try {
+			BufferedImage image;
+			if (isDirty()) {
+				image = saveCanvas(context);
+			} else {
+				image = readBufferedImage(context, STORAGE_IMAGE);
+				if (image == null) {
+					image = this.colorPortsUnit.getValue();
+				}
 			}
-		}
+			cancelIfInterrupted(image);
 
-		this.colorPortsUnit.setOutputs(image);
+			this.colorPortsUnit.setOutputs(image);
+			cancelIfInterrupted();
+		} catch (InterruptedException ex) {
+			reset(context);
+		}
 	}
 
 	@Override
 	public void onContextSwitch(ProcessorContext context, boolean saveRequired) {
 		super.onContextSwitch(context, saveRequired);
 
-		// only safe canvas if we made it dirty
+		// only save canvas if we made it dirty
 		if (saveRequired && isDirty()) {
-			saveCanvas(context);
+			try {
+				saveCanvas(context);
+			} catch (InterruptedException ex) {
+				// too bad...
+			}
 		}
+	}
+
+	private BufferedImage saveCanvas(ProcessorContext context) throws InterruptedException {
+		if (context == null || this.canvas == null) {
+			return null;
+		}
+
+		WritableImage rendered;
+		try {
+			rendered = FxUtils.runFutureTask(() -> {
+				final WritableImage img = new WritableImage(
+						(int) this.canvas.getWidth(),
+						(int) this.canvas.getHeight()
+				);
+				canvas.snapshot(null, img);
+				return img;
+			});
+		} catch (Exception ex) {
+			log.error("Failed to save the canvas in: {}", context, ex);
+			return null;
+		}
+		cancelIfInterrupted(rendered);
+
+		final BufferedImage out = SwingFXUtils.fromFXImage(rendered, null);
+		cancelIfInterrupted(out);
+
+		writeBufferedImage(context, out, STORAGE_IMAGE, STORAGE_FORMAT);
+		setDirty(false);
+		return out;
 	}
 
 	@Override

@@ -149,47 +149,57 @@ public class SobelFilter extends ProcessableBase {
 
 	@Override
 	public void process(ProcessorContext context) {
-		final InputPort<?> port = input_xor.getEnabledPort();
-		if (port == null) {
-			log.warn("no input port enabled");
-			return;
-		}
+		try {
+			final InputPort<?> port = input_xor.getEnabledPort();
+			if (port == null) {
+				log.warn("no input port enabled");
+				return;
+			}
 
-		final FImage fimage;
-		if (port.equals(input_float)) {
-			final BufferedMatrix mat = input_float.getValue();
-			fimage = OpenIMAJUtils.toFImage(mat, getBand(mat));
-		} else if (port.equals(input_gray)) {
-			final BufferedImage image = input_gray.getValue();
-			fimage = OpenIMAJUtils.toFImage(image, 0);
-		} else {
-			final BufferedImage image = input.getValue();
-			if (image instanceof BufferedMatrix) {
-				final BufferedMatrix mat = (BufferedMatrix) image;
+			final FImage fimage;
+			if (port.equals(input_float)) {
+				final BufferedMatrix mat = input_float.getValue();
 				fimage = OpenIMAJUtils.toFImage(mat, getBand(mat));
+			} else if (port.equals(input_gray)) {
+				final BufferedImage image = input_gray.getValue();
+				fimage = OpenIMAJUtils.toFImage(image, 0);
 			} else {
-				fimage = OpenIMAJUtils.toFImage(image, getBand(image));
+				final BufferedImage image = input.getValue();
+				if (image instanceof BufferedMatrix) {
+					final BufferedMatrix mat = (BufferedMatrix) image;
+					fimage = OpenIMAJUtils.toFImage(mat, getBand(mat));
+				} else {
+					fimage = OpenIMAJUtils.toFImage(image, getBand(image));
+				}
 			}
-		}
+			cancelIfInterrupted(fimage);
 
-		final FSobel fsobel;
-		if (blur.getSelectedIndex() == 0) {
-			fsobel = new FSobel();
-		} else {
-			float fsobel_sigma = sigma.getFloat();
-			if (!Float.isFinite(fsobel_sigma) || fsobel_sigma < 0) {
-				log.warn("invalid sigma: {}. Sigma is reset to 1.0f.", fsobel_sigma);
-				fsobel_sigma = 1.0f;
+			final FSobel fsobel;
+			if (blur.getSelectedIndex() == 0) {
+				fsobel = new FSobel();
+			} else {
+				float fsobel_sigma = sigma.getFloat();
+				if (!Float.isFinite(fsobel_sigma) || fsobel_sigma < 0) {
+					log.warn("invalid sigma: {}. Sigma is reset to 1.0f.", fsobel_sigma);
+					fsobel_sigma = 1.0f;
+				}
+				fsobel = new FSobel(fsobel_sigma);
 			}
-			fsobel = new FSobel(fsobel_sigma);
-		}
-		fsobel.analyseImage(fimage);
+			fsobel.analyseImage(fimage);
+			cancelIfInterrupted(fsobel);
 
-		final BufferedMatrix mat_dx = OpenIMAJUtils.toBufferedMatrix(fsobel.dx);
-		final BufferedMatrix mat_dy = OpenIMAJUtils.toBufferedMatrix(fsobel.dy);
-		writeBufferedMatrix(context, mat_dx, STORAGE_MAT_DX);
-		writeBufferedMatrix(context, mat_dy, STORAGE_MAT_DY);
-		setOutputs(context, mat_dx, mat_dy);
+			final BufferedMatrix mat_dx = OpenIMAJUtils.toBufferedMatrix(fsobel.dx);
+			cancelIfInterrupted(mat_dx);
+			final BufferedMatrix mat_dy = OpenIMAJUtils.toBufferedMatrix(fsobel.dy);
+			cancelIfInterrupted(mat_dy);
+
+			writeBufferedMatrix(context, mat_dx, STORAGE_MAT_DX);
+			writeBufferedMatrix(context, mat_dy, STORAGE_MAT_DY);
+			setOutputs(context, mat_dx, mat_dy);
+			cancelIfInterrupted();
+		} catch (InterruptedException ex) {
+			reset(context);
+		}
 	}
 
 	private <T extends BufferedImage> int getBand(T image) {

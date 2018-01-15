@@ -238,52 +238,61 @@ public class KernelSeparator extends ProcessableBase {
 
 	@Override
 	public void process(ProcessorContext context) {
-		if (!restoreOutputs(context)) {
+		try {
+			if (!restoreOutputs(context)) {
+				final Kernel.Precision precision = getKernelPrecision();
+				final boolean isDouble = precision.equals(Kernel.Precision.DOUBLE);
+				final SimpleMatrix matrix;
 
-			final Kernel.Precision precision = getKernelPrecision();
-			final boolean isDouble = precision.equals(Kernel.Precision.DOUBLE);
-			final SimpleMatrix matrix;
+				if (isDouble) {
+					final DoubleMatrix kernel = this.input_double.getValue();
+					cancelIfInterrupted(kernel);
+					matrix = new SimpleMatrix(kernel.getArray2D());
+				} else {
+					final FloatMatrix kernel = this.input_float.getValue();
+					cancelIfInterrupted(kernel);
+					matrix = new SimpleMatrix(
+							kernel.rows,
+							kernel.columns,
+							kernel.layout.equals(Matrix.Layout.ROW_MAJOR_ORDER),
+							floatToDouble(kernel.data)
+					);
+				}
 
-			if (isDouble) {
-				final DoubleMatrix kernel = this.input_double.getValue();
-				matrix = new SimpleMatrix(kernel.getArray2D());
-			} else {
-				final FloatMatrix kernel = this.input_float.getValue();
-				matrix = new SimpleMatrix(
-						kernel.rows,
-						kernel.columns,
-						kernel.layout.equals(Matrix.Layout.ROW_MAJOR_ORDER),
-						floatToDouble(kernel.data)
+				final SimpleSVD<?> svd = matrix.svd();
+				cancelIfInterrupted(svd);
+				// svd.rank() uses a ridiculously small/conservative singularity
+				// threshold, so we rather use our own here
+				final double singThresh = this.singularityThreshold.getDouble();
+				final int rank = SingularOps.rank(svd.getSVD(), singThresh);
+
+				log.trace("input matrix: {}", matrix);
+				log.trace("singularity threshold: {}", singThresh);
+				log.trace("svd(matrix) = UWV: {}", svd.getSVD());
+				log.trace("U: {}" + svd.getU());
+				log.trace("W: {}" + svd.getW());
+				log.trace("V: {}" + svd.getV());
+				log.debug("singular values({}): {}",
+						svd.getSVD().numberOfSingularValues(),
+						Arrays.toString(svd.getSVD().getSingularValues())
 				);
-			}
+				log.debug("rank: {} (w. EJML's default threshold: {})", rank, svd.rank());
 
-			final SimpleSVD<?> svd = matrix.svd();
-			// svd.rank() uses a ridiculously small/conservative singularity
-			// threshold, so we rather use our own here
-			final double singThresh = this.singularityThreshold.getDouble();
-			final int rank = SingularOps.rank(svd.getSVD(), singThresh);
+				// our kernel is only separable if rank == 1, meaning that all
+				// rows are linearly dependent
+				if (rank != 1) {
+					log.debug("kernel not separable. rank: {} should be 1.", rank);
+					return;
+				}
 
-			log.trace("input matrix: {}", matrix);
-			log.trace("singularity threshold: {}", singThresh);
-			log.trace("svd(matrix) = UWV: {}", svd.getSVD());
-			log.trace("U: {}" + svd.getU());
-			log.trace("W: {}" + svd.getW());
-			log.trace("V: {}" + svd.getV());
-			log.debug("singular values({}): {}",
-					svd.getSVD().numberOfSingularValues(),
-					Arrays.toString(svd.getSVD().getSingularValues())
-			);
-			log.debug("rank: {} (w. EJML's default threshold: {})", rank, svd.rank());
-
-			// our kernel is only separable if rank == 1, meaning that all
-			// rows are linearly dependent
-			if (rank == 1) {
 				final double s = Math.sqrt(svd.getW().get(0, 0));
 
 				// get horizontal and vertical vectors from first columns of U and V,
 				// scaled by the singular value
 				final SimpleMatrix column = svd.getU().extractVector(false, 0).scale(s);
+				cancelIfInterrupted(column);
 				final SimpleMatrix row = svd.getV().extractVector(false, 0).transpose().scale(s);
+				cancelIfInterrupted(row);
 
 				log.debug("row vector: {}", row);
 				log.debug("column vector: {}", column);
@@ -306,27 +315,36 @@ public class KernelSeparator extends ProcessableBase {
 				} else {
 					log.debug("diff. error check skipped. Threshold: {}", errThresh);
 				}
+				cancelIfInterrupted();
 
 				if (isDouble) {
 					final DoubleMatrix rowVector = new DoubleMatrix(1, row.getNumElements());
+					cancelIfInterrupted(rowVector);
 					copyMatrixData(row, rowVector);
 					final DoubleMatrix columnVector = new DoubleMatrix(column.getNumElements(), 1);
+					cancelIfInterrupted(columnVector);
 					copyMatrixData(column, columnVector);
 
 					context.getObjects().put("row-vector-double", rowVector);
 					context.getObjects().put("column-vector-double", columnVector);
 				} else {
 					final FloatMatrix rowVector = new FloatMatrix(1, row.getNumElements());
+					cancelIfInterrupted(rowVector);
 					copyMatrixData(row, rowVector);
 					final FloatMatrix columnVector = new FloatMatrix(column.getNumElements(), 1);
+					cancelIfInterrupted(columnVector);
 					copyMatrixData(column, columnVector);
 
 					context.getObjects().put("row-vector-float", rowVector);
 					context.getObjects().put("column-vector-float", columnVector);
 				}
+				cancelIfInterrupted();
 
 				restoreOutputs(context);
+				cancelIfInterrupted();
 			}
+		} catch (InterruptedException ex) {
+			reset(context);
 		}
 	}
 

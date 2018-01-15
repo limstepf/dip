@@ -189,22 +189,31 @@ public class GlobalThreshold extends ProcessableBase implements Previewable {
 	public void process(ProcessorContext context) {
 		BufferedImage binaryImage = readBufferedImage(context, STORAGE_FILE);
 
-		if (binaryImage == null) {
-			final BufferedImage src = getConnectedInput().getValue();
+		try {
+			if (binaryImage == null) {
+				final BufferedImage src = getConnectedInput().getValue();
+				cancelIfInterrupted(src);
 
-			if (src instanceof BufferedMatrix) {
-				// GloablThresholdOp can't handle BufferedMatrix; BITS and BYTES only
-				// TODO: standard error handling!
-				return;
+				if (src instanceof BufferedMatrix) {
+					// GloablThresholdOp can't handle BufferedMatrix; BITS and BYTES only
+					// TODO: standard error handling!
+					return;
+				}
+
+				final int band = this.bandParameter.get() - 1; // to index
+				final int threshold = computeThreshold(src, band);
+				binaryImage = doProcess(context, src, band, threshold);
+				cancelIfInterrupted(binaryImage);
+
+				writeBufferedImage(context, binaryImage, STORAGE_FILE, STORAGE_FORMAT);
+				cancelIfInterrupted();
 			}
 
-			final int band = this.bandParameter.get() - 1; // to index
-			final int threshold = computeThreshold(src, band);
-			binaryImage = doProcess(context, src, band, threshold);
-			writeBufferedImage(context, binaryImage, STORAGE_FILE, STORAGE_FORMAT);
+			setOutputs(context, binaryImage);
+			cancelIfInterrupted();
+		} catch (InterruptedException ex) {
+			reset(context);
 		}
-
-		setOutputs(context, binaryImage);
 	}
 
 	private BufferedImage doProcess(ProcessorContext context, BufferedImage src, int band, int threshold) {

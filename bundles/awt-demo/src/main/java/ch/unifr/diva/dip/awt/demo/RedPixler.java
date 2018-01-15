@@ -56,43 +56,50 @@ public class RedPixler extends ProcessableBase {
 
 	@Override
 	public void process(ProcessorContext context) {
-		BufferedImage redImage = readBufferedImage(context, STORAGE_FILE);
+		try {
+			BufferedImage redImage = readBufferedImage(context, STORAGE_FILE);
 
-		if (redImage == null) {
-			final BufferedImage src = input.getValue();
-			final int nth = this.nthParameter.get();
+			if (redImage == null) {
+				final BufferedImage src = input.getValue();
+				cancelIfInterrupted(src);
+				final int nth = this.nthParameter.get();
 
-			// consider implementing a BufferedImageOp instead of twiddling
-			// with samples/pixels in here...
-			// @see package ch.unifr.diva.dip.api.utils.imaging.ops
-			final BufferedImage dst = createBinaryDestImage(src);
+				// consider implementing a BufferedImageOp instead of twiddling
+				// with samples/pixels in here...
+				// @see package ch.unifr.diva.dip.api.utils.imaging.ops
+				final BufferedImage dst = createBinaryDestImage(src);
 
-			final WritableRaster srcRaster = src.getRaster();
-			final WritableRaster dstRaster = dst.getRaster();
+				final WritableRaster srcRaster = src.getRaster();
+				final WritableRaster dstRaster = dst.getRaster();
 
-			// while we assume RGB, there might be a (useless) alpha channel there
-			// (e.g. introduced by JavaFX Image to AWT BufferedImage converter)
-			final int numBands = ImagingUtils.maxBands(src, dst);
+				// while we assume RGB, there might be a (useless) alpha channel there
+				// (e.g. introduced by JavaFX Image to AWT BufferedImage converter)
+				final int numBands = ImagingUtils.maxBands(src, dst);
 
-			int i = 0;
-			int[] pixel = new int[numBands];
-			for (Location pt : new RasterScanner(src, false)) {
-				pixel = srcRaster.getPixel(pt.col, pt.row, pixel);
-				if ((i % nth) == 0) {
-					pixel[0] = 255;
-					pixel[1] = 0;
-					pixel[2] = 0;
+				int i = 0;
+				int[] pixel = new int[numBands];
+				for (Location pt : new RasterScanner(src, false)) {
+					pixel = srcRaster.getPixel(pt.col, pt.row, pixel);
+					if ((i % nth) == 0) {
+						pixel[0] = 255;
+						pixel[1] = 0;
+						pixel[2] = 0;
+					}
+					i++;
+					dstRaster.setPixel(pt.col, pt.row, pixel);
 				}
-				i++;
-				dstRaster.setPixel(pt.col, pt.row, pixel);
+
+				redImage = dst;
+				writeBufferedImage(context, redImage, STORAGE_FILE, STORAGE_FORMAT);
 			}
+			cancelIfInterrupted(redImage);
 
-			redImage = dst;
-			writeBufferedImage(context, STORAGE_FILE, STORAGE_FORMAT, redImage);
+			output.setOutput(redImage);
+			provideImageLayer(context, redImage);
+			cancelIfInterrupted();
+		} catch (InterruptedException ex) {
+			reset(context);
 		}
-
-		output.setOutput(redImage);
-		provideImageLayer(context, redImage);
 	}
 
 	private BufferedImage createBinaryDestImage(BufferedImage src) {

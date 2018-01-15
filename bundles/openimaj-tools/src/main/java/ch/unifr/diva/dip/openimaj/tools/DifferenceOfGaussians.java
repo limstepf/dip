@@ -202,27 +202,36 @@ public class DifferenceOfGaussians extends ProcessableBase implements Previewabl
 
 	@Override
 	public void process(ProcessorContext context) {
-		final FImage fimage = getSourceFImage(getSourceImage());
-		if (fimage == null) {
-			return;
+		try {
+			final FImage fimage = getSourceFImage(getSourceImage());
+			if (fimage == null) {
+				return;
+			}
+
+			dogInplace(fimage);
+			cancelIfInterrupted(fimage);
+
+			BufferedImage dog_image = null;
+			BufferedMatrix dog_mat = null;
+
+			final boolean isForceFloat = isForceFloat();
+			if (isForceFloat || output_float.isConnected()) {
+				dog_mat = OpenIMAJUtils.toBufferedMatrix(fimage);
+				cancelIfInterrupted(dog_mat);
+				writeBufferedMatrix(context, dog_mat, STORAGE_MAT);
+			}
+			if (!isForceFloat) {
+				dog_image = OpenIMAJUtils.toBufferedImage(fimage);
+				cancelIfInterrupted(dog_image);
+				writeBufferedImage(context, dog_image, STORAGE_IMAGE, STORAGE_IMAGE_FORMAT);
+			}
+			cancelIfInterrupted();
+
+			setOutputs(context, dog_image, dog_mat);
+			cancelIfInterrupted();
+		} catch (InterruptedException ex) {
+			reset(context);
 		}
-
-		dogInplace(fimage);
-
-		BufferedImage dog_image = null;
-		BufferedMatrix dog_mat = null;
-
-		final boolean isForceFloat = isForceFloat();
-		if (isForceFloat || output_float.isConnected()) {
-			dog_mat = OpenIMAJUtils.toBufferedMatrix(fimage);
-			writeBufferedMatrix(context, dog_mat, STORAGE_MAT);
-		}
-		if (!isForceFloat) {
-			dog_image = OpenIMAJUtils.toBufferedImage(fimage);
-			writeBufferedImage(context, dog_image, STORAGE_IMAGE, STORAGE_IMAGE_FORMAT);
-		}
-
-		setOutputs(context, dog_image, dog_mat);
 	}
 
 	private void dogInplace(FImage fimage) {

@@ -429,20 +429,28 @@ public class ConvolutionFilter extends ProcessableBase implements Previewable {
 
 	@Override
 	public void process(ProcessorContext context) {
-		if (!restoreOutputs(context)) {
-			final InputPort<? extends BufferedImage> source = getConnectedInput();
-			final BufferedImage src = source.getValue();
+		try {
+			if (!restoreOutputs(context)) {
+				final InputPort<? extends BufferedImage> source = getConnectedInput();
+				final BufferedImage src = source.getValue();
+				cancelIfInterrupted(src);
 
-			final ProcessConfig cfg = new ProcessConfig(this);
-			final BufferedImage image = doProcess(context, src, cfg);
+				final ProcessConfig cfg = new ProcessConfig(this);
+				final BufferedImage image = doProcess(context, src, cfg);
+				cancelIfInterrupted(image);
 
-			if (this.rescaleUnit.isBufferedMatrix()) {
-				writeBufferedMatrix(context, (BufferedMatrix) image, MATRIX_FILE);
-			} else {
-				writeBufferedImage(context, image, IMAGE_FILE, IMAGE_FORMAT);
+				if (this.rescaleUnit.isBufferedMatrix()) {
+					writeBufferedMatrix(context, (BufferedMatrix) image, MATRIX_FILE);
+				} else {
+					writeBufferedImage(context, image, IMAGE_FILE, IMAGE_FORMAT);
+				}
+				cancelIfInterrupted();
+
+				restoreOutputs(context, image);
+				cancelIfInterrupted();
 			}
-
-			restoreOutputs(context, image);
+		} catch (InterruptedException ex) {
+			reset(context);
 		}
 	}
 
