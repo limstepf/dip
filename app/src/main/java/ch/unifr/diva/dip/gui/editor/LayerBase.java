@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  * Layer base class.
  *
  * <p>
- * This class implements {@code EditorLayer} to offer save access to OSGi
+ * This class implements {@code EditorLayer} to offer safe access to OSGi
  * services (or usage from any other thread for that matter). All methods of
  * this interface must be executed on the JavaFx application thread!
  */

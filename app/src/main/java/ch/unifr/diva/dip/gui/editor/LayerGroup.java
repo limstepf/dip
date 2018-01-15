@@ -24,7 +24,7 @@ import javafx.scene.control.TreeItem;
  * A layer group. A layer group has other layers as children.
  *
  * <p>
- * This class implements {@code EditorLayerGroup} to offer save access to OSGi
+ * This class implements {@code EditorLayerGroup} to offer safe access to OSGi
  * services (or usage from any other thread for that matter). All methods of
  * this interface must be executed on the JavaFx application thread!
  */

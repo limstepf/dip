@@ -72,7 +72,7 @@ public interface EditorLayerOverlay {
 
 	/**
 	 * The zoom property. The read-only zoom factor of the overlay (or parent
-	 * editor pane). This property is save to bind to even across processor
+	 * editor pane). This property is safe to bind to even across processor
 	 * context switches.
 	 *
 	 * @return the zoom property.

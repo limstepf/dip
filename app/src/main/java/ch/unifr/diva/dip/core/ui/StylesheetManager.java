@@ -66,7 +66,7 @@ public class StylesheetManager {
 		}
 
 		/**
-		 * Savely returns a skin by its name.
+		 * Safely returns a skin by its name.
 		 *
 		 * @param name the name of the skin.
 		 * @return the skin with the given name, or the default skin.

@@ -15,7 +15,7 @@ import javafx.scene.layout.Pane;
  * considered a leaf in terms of layers.
  *
  * <p>
- * This class implements {@code EditorLayerPane} to offer save access to OSGi
+ * This class implements {@code EditorLayerPane} to offer safe access to OSGi
  * services (or usage from any other thread for that matter). All methods of
  * this interface must be executed on the JavaFx application thread!
  */

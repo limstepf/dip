@@ -33,7 +33,7 @@ public class ApplicationDataManager {
 	public final Path workingDir;
 
 	/**
-	 * User directory. Save to write to independent of platform. There might be
+	 * User directory. Safe to write to independent of platform. There might be
 	 * more appropriate locations to put app data though (e.g. %APPDATA% on a
 	 * windows box). This is usually the user's home directory (or maybe some
 	 * tmp. directory while running some tests...).
@@ -46,7 +46,7 @@ public class ApplicationDataManager {
 
 	/**
 	 * Application directory. The directory where the application executable is
-	 * located. This is probably not save to write to (e.g. on multi-user
+	 * located. This is probably not safe to write to (e.g. on multi-user
 	 * systems, or sandboxed, ...), so use {@code appDataDir} instead.
 	 */
 	public final ApplicationDirectory appDir;
@@ -292,7 +292,7 @@ public class ApplicationDataManager {
 	}
 
 	/**
-	 * The application directory. Most likely not save to write to (missing
+	 * The application directory. Most likely not safe to write to (missing
 	 * permissions/privileges).
 	 */
 	public static class ApplicationDirectory extends DecoratedPath {

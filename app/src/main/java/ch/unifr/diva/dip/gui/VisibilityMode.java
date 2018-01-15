@@ -41,7 +41,7 @@ public enum VisibilityMode {
 	}
 
 	/**
-	 * Savely returns a visibility mode by its name.
+	 * Safely returns a visibility mode by its name.
 	 *
 	 * @param name name of the visibility mode.
 	 * @return the visibility mode with the given name, or the default

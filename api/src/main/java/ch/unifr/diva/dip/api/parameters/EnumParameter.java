@@ -247,7 +247,7 @@ public class EnumParameter extends PersistentParameterBase<String, EnumParameter
 	}
 
 	/**
-	 * Savely returns the Enum item associated to the given name, or a default
+	 * Safely returns the Enum item associated to the given name, or a default
 	 * one if not defined.
 	 *
 	 * @param <E> class of the enumeration.

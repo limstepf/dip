@@ -28,7 +28,7 @@ public interface Zoomable {
 		BILINEAR;
 
 		/**
-		 * Savely returns the interpolation method by its name.
+		 * Safely returns the interpolation method by its name.
 		 *
 		 * @param name the name of the interpolation method.
 		 * @return the requested interpolation method, or the default one if
