@@ -50,6 +50,21 @@ public class RasterScanner extends ImageScanner {
 	}
 
 	/**
+	 * Creates a new, banded raster scanner for the given raster. Iterates over
+	 * all pixels and all bands in the raster.
+	 *
+	 * @param raster the raster to scan.
+	 * @param isBanded iterates over all pixels and bands if {@code true}, over
+	 * all pixels only if {@code false}.
+	 */
+	public RasterScanner(WritableRaster raster, boolean isBanded) {
+		this(
+				raster,
+				isBanded ? raster.getNumBands() : 1
+		);
+	}
+
+	/**
 	 * Creates a new raster scanner for the given raster. Iterates over all
 	 * pixels, and given number of bands in the raster.
 	 *
