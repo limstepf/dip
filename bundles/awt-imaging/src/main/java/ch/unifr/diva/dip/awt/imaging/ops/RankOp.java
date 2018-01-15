@@ -2,7 +2,6 @@ package ch.unifr.diva.dip.awt.imaging.ops;
 
 import ch.unifr.diva.dip.api.datastructures.Mask;
 import ch.unifr.diva.dip.awt.imaging.padders.ImagePadder;
-import ch.unifr.diva.dip.awt.imaging.scanners.ImageTiler;
 import ch.unifr.diva.dip.awt.imaging.scanners.Location;
 import ch.unifr.diva.dip.awt.imaging.scanners.PaddedImageTiler;
 import ch.unifr.diva.dip.awt.imaging.scanners.RasterScanner;
