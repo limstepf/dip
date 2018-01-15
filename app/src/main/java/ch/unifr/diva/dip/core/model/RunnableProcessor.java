@@ -227,7 +227,7 @@ public class RunnableProcessor extends PrototypeProcessor {
 			status.getStyleClass().add("dip-small");
 
 			if (runnable.processor().hasParameters()) {
-				paramButton = newButton(localize("parameters"));
+				paramButton = newButton(localize("parameters") + "...");
 				paramButton.setOnAction((e) -> {
 					final RunnableProcessor p = ProcessorLayerExtension.this.runnable.get();
 					if (p != null) {
@@ -575,8 +575,8 @@ public class RunnableProcessor extends PrototypeProcessor {
 
 			@Override
 			protected Void call() throws Exception {
-				updateTitle(localize("processing"));
-				updateMessage(localize("processing.object", runnable.processor().name()));
+				updateTitle(localize("processing") + "...");
+				updateMessage(localize("processing.object", runnable.processor().name()) + "...");
 				updateProgress(-1, Double.NaN);
 
 				final ProcessorTiming timing = new ProcessorTiming(runnable);
@@ -596,7 +596,7 @@ public class RunnableProcessor extends PrototypeProcessor {
 			protected void finished(BackgroundTask.Result result) {
 				runLater(() -> {
 					handler.eventBus.post(new StatusMessageEvent(
-							localize("processing.object", runnable.processor().name())
+							localize("processing.object", runnable.processor().name()) + "..."
 							+ " "
 							+ localize("done")
 							+ "."
@@ -645,8 +645,8 @@ public class RunnableProcessor extends PrototypeProcessor {
 
 			@Override
 			protected Void call() throws Exception {
-				updateTitle(localize("resetting"));
-				updateMessage(localize("resetting.object", runnable.processor().name()));
+				updateTitle(localize("resetting") + "...");
+				updateMessage(localize("resetting.object", runnable.processor().name()) + "...");
 				updateProgress(-1, Double.NaN);
 
 				runnable.reset();
@@ -657,7 +657,7 @@ public class RunnableProcessor extends PrototypeProcessor {
 			protected void finished(BackgroundTask.Result result) {
 				runLater(() -> {
 					handler.eventBus.post(new StatusMessageEvent(
-							localize("resetting.object", runnable.processor().name())
+							localize("resetting.object", runnable.processor().name()) + "..."
 							+ " "
 							+ localize("done")
 							+ "."

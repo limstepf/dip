@@ -92,7 +92,7 @@ public class ModifiedPipelinesDialog extends AbstractDialog {
 		this.ok = getDefaultButton(localize("apply"));
 		this.cancel = getCancelButton(stage);
 
-		setTitle(localize("pipelines.modified"));
+		setTitle(localize("pipelines.modified") + "...");
 
 		this.box = new VBox();
 		box.setPrefWidth(720);

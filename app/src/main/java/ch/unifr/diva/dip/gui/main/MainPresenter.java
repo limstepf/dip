@@ -326,7 +326,7 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 		if (confirmClosingProject()) {
 			final FileChooser chooser = new FileChooser();
 			chooser.setInitialDirectory(handler.getRecentSaveDirectory().toFile());
-			chooser.setTitle(localize("project.open"));
+			chooser.setTitle(localize("project.open") + "...");
 			ApplicationSettings.setProjectExtensionFilter(chooser);
 			final File file = chooser.showOpenDialog(stage);
 
@@ -389,17 +389,17 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 		final BackgroundTask<Void> task = new BackgroundTask<Void>(handler) {
 			@Override
 			protected Void call() throws Exception {
-				updateTitle(localize("page.selecting"));
+				updateTitle(localize("page.selecting") + "...");
 				updateProgress(-1, Double.NaN);
 				if (isDirty) {
 					// this might take a bit longer, so...
-					updateMessage(localize("page.saving"));
+					updateMessage(localize("page.saving") + "...");
 					// explicit call to closePage (which otherwise would be called
 					// by selectPage below) to separate saving the current, dirty
 					// page, and loading of the (assets of) the new page
 					project.closePage();
 				}
-				updateMessage(localize("page.loading"));
+				updateMessage(localize("page.loading") + "...");
 				project.selectPage(page);
 				return null;
 			}
@@ -431,7 +431,7 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 				: initialPath.toFile();
 
 		final FileChooser chooser = new FileChooser();
-		chooser.setTitle(localize("files.import"));
+		chooser.setTitle(localize("files.import") + "...");
 		chooser.setInitialDirectory(initialDirectory);
 		ImageFormat.setExtensionFilter(chooser);
 		final List<File> files = chooser.showOpenMultipleDialog(this.stage);
@@ -485,7 +485,7 @@ public class MainPresenter extends AbstractPresenter<MainView> {
 	public void saveAsProject() {
 		final FileChooser chooser = new FileChooser();
 		chooser.setInitialDirectory(ApplicationDataManager.userDirectory().toFile());
-		chooser.setTitle(localize("project.save.as"));
+		chooser.setTitle(localize("project.save.as") + "...");
 		chooser.getExtensionFilters().add(ApplicationSettings.projectFileExtensionFilter);
 		final File file = chooser.showSaveDialog(stage);
 

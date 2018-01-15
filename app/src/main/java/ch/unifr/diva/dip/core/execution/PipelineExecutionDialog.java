@@ -64,7 +64,7 @@ public class PipelineExecutionDialog extends AbstractDialog {
 	 */
 	public PipelineExecutionDialog(Window owner, PipelineExecutionController controller) {
 		super(owner);
-		setTitle(localize("processing.object", localize("pages")));
+		setTitle(localize("processing.object", localize("pages")) + "...");
 		this.controller = controller;
 		this.logger = controller.getLogger();
 		this.pageLabel = new Label(localize("progress.total") + ":");

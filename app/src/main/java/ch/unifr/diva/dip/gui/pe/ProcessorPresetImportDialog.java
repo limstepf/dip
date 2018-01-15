@@ -28,7 +28,7 @@ public class ProcessorPresetImportDialog extends DataItemDialogBase<PresetData.P
 				handler.dataManager.appDataDir.getProcessorPresetPath(wrapper.pid()),
 				false
 		);
-		setTitle(localize("preset.load"));
+		setTitle(localize("preset.load") + "...");
 		setListLabel(localize("presets"));
 		this.wrapper = wrapper;
 

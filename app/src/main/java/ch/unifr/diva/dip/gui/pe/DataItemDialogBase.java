@@ -80,7 +80,7 @@ public abstract class DataItemDialogBase<T extends DataItemListView.DataItem> ex
 		);
 		this.dstFile = new FileParameter(
 				"",
-				localize("locate"),
+				localize("locate") + "...",
 				editable
 						? FileParameter.Mode.SAVE
 						: FileParameter.Mode.OPEN

@@ -147,7 +147,7 @@ public class PagesWidget extends AbstractWidget {
 			listView.setMaxHeight(Double.MAX_VALUE);
 			listView.setCellFactory((ListView<ProjectPage> param) -> new ProjectPageCell(handler, group));
 
-			final MenuItem importItem = new MenuItem(localize("page.import"));
+			final MenuItem importItem = new MenuItem(localize("page.import") + "...");
 			importItem.setOnAction((e) -> {
 				handler.eventBus.post(
 						new ProjectRequest(ProjectRequest.Type.IMPORT_PAGES)

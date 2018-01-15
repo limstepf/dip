@@ -296,7 +296,7 @@ public abstract class BackgroundTask<T> extends Task<T> {
 			);
 			this.root.setCenter(lane);
 
-			setTitle(localize("processing"));
+			setTitle(localize("processing") + "...");
 		}
 
 		private void onResult() {
@@ -316,7 +316,7 @@ public abstract class BackgroundTask<T> extends Task<T> {
 		 */
 		public final void cancel() {
 			cancel.setDisable(true);
-			setTitle(localize("cancelling"));
+			setTitle(localize("cancelling") + "...");
 			progressBar.getStyleClass().add("dip-cancelled-progress");
 			task.cancel();
 

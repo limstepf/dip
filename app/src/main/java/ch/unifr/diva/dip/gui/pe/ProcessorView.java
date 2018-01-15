@@ -863,7 +863,7 @@ public abstract class ProcessorView extends BorderPane {
 			if (hasParameters) {
 				final Glyph importGlyph = UIStrategyGUI.Glyphs.newGlyph(IMPORT_GLYPH, Glyph.Size.NORMAL);
 				importGlyph.enableHoverEffect(true);
-				importGlyph.setTooltip(localize("preset.load"));
+				importGlyph.setTooltip(localize("preset.load") + "...");
 				importGlyph.setOnMouseClicked((e) -> {
 					final ProcessorPresetImportDialog dialog = new ProcessorPresetImportDialog(handler, wrapper);
 					dialog.show();
@@ -872,7 +872,7 @@ public abstract class ProcessorView extends BorderPane {
 
 				final Glyph exportGlyph = UIStrategyGUI.Glyphs.newGlyph(EXPORT_GLYPH, Glyph.Size.NORMAL);
 				exportGlyph.enableHoverEffect(true);
-				exportGlyph.setTooltip(localize("preset.save"));
+				exportGlyph.setTooltip(localize("preset.save") + "...");
 				exportGlyph.setOnMouseClicked((e) -> {
 					final ProcessorPresetExportDialog dialog = new ProcessorPresetExportDialog(handler, wrapper);
 					dialog.show();

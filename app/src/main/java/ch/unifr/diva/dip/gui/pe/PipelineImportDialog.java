@@ -26,7 +26,7 @@ public class PipelineImportDialog extends DataItemDialogBase<PipelineData.Pipeli
 				handler.dataManager.appDataDir.getPipelinePresetPath(),
 				false
 		);
-		setTitle(localize("pipeline.import"));
+		setTitle(localize("pipeline.import") + "...");
 		setListLabel(localize("pipelines"));
 		setSelectionMode(SelectionMode.MULTIPLE);
 		initFile();

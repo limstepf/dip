@@ -30,7 +30,7 @@ public class PipelineExportDialog extends DataItemDialogBase<PipelineData.Pipeli
 				handler.dataManager.appDataDir.getPipelinePresetPath(),
 				true
 		);
-		setTitle(localize("pipeline.export"));
+		setTitle(localize("pipeline.export") + "...");
 		setListLabel(localize("pipelines"));
 		this.pipelines = pipelines;
 		this.newPipelineItems = toPipelineItems(this.pipelines);

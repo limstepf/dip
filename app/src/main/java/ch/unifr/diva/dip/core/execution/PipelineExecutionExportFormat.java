@@ -203,7 +203,7 @@ public enum PipelineExecutionExportFormat {
 				c.getStyleClass().add("dip-small");
 			});
 
-			this.export = new Button(L10n.getInstance().getString("export"));
+			this.export = new Button(L10n.getInstance().getString("export") + "...");
 			export.getStyleClass().add("dip-small");
 			export.setOnAction((e) -> onExport());
 
@@ -221,7 +221,7 @@ public enum PipelineExecutionExportFormat {
 			final ExtensionFilter extensionFilter = exportFormat.getExtensionFilter();
 
 			final FileChooser chooser = new FileChooser();
-			chooser.setTitle(L10n.getInstance().getString("export"));
+			chooser.setTitle(L10n.getInstance().getString("export") + "...");
 			chooser.getExtensionFilters().add(extensionFilter);
 			chooser.setSelectedExtensionFilter(extensionFilter);
 			chooser.setInitialDirectory(handler.getRecentSaveDirectory().toFile());

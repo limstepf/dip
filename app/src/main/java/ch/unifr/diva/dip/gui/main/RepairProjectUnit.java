@@ -569,7 +569,7 @@ public class RepairProjectUnit {
 		private final Label primaryValue = new Label();
 		private final Label secondaryLabel = new Label();
 		private final Label secondaryValue = new Label();
-		private final Button locate = new Button(localize("locate"));
+		private final Button locate = new Button(localize("locate") + "...");
 		private ResourceState state = ResourceState.NOT_FOUND;
 		private Path newPath;
 		private String newChecksum;
@@ -1036,14 +1036,14 @@ public class RepairProjectUnit {
 				this.finderDirectory = new Label();
 				this.finderProgressBar = new ProgressBar(0);
 				finderProgressBar.setPadding(new Insets(1, 0, 0, 1)); // not sure why this guy is a pixel off...
-				this.searchLabel = new Label(localize("searching"));
+				this.searchLabel = new Label(localize("searching") + "...");
 				searchLabel.setPadding(new Insets(5, 0, 0, 0));
 				this.searchChooser = new DirectoryChooser();
-				searchChooser.setTitle(localize("search.from"));
+				searchChooser.setTitle(localize("search.from") + "...");
 				this.searchCancel = new Button(localize("cancel"));
 				searchCancel.getStyleClass().add("dip-small");
 				searchCancel.setOnAction((e) -> finder.cancel());
-				this.searchFrom = new Button(localize("search.from"));
+				this.searchFrom = new Button(localize("search.from") + "...");
 				searchFrom.getStyleClass().add("dip-small");
 				searchFrom.setOnAction((e) -> {
 					finder.cancel();
@@ -1288,7 +1288,7 @@ public class RepairProjectUnit {
 			);
 			this.replaceOption = new HBox();
 			this.replaceOption.getChildren().setAll(
-					new Label(localize("replace.with")),
+					new Label(localize("replace.with") + "..."),
 					this.replaceProcessorOption,
 					this.replaceVersionOption
 			);

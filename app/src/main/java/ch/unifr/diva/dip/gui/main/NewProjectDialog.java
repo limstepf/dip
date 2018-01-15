@@ -73,7 +73,7 @@ public class NewProjectDialog extends AbstractDialog {
 	 */
 	public NewProjectDialog(Window owner, ApplicationHandler handler) {
 		super(owner);
-		setTitle(localize("project.new"));
+		setTitle(localize("project.new") + "...");
 		this.owner = owner;
 		this.handler = handler;
 
@@ -83,10 +83,10 @@ public class NewProjectDialog extends AbstractDialog {
 		projectName.textProperty().addListener(updateListener);
 		this.projectFile = new TextField();
 		projectFile.setDisable(true);
-		this.projectFileBrowse = new Button(localize("save.as"));
+		this.projectFileBrowse = new Button(localize("save.as") + "...");
 		projectFileBrowse.setMaxWidth(Double.MAX_VALUE);
 		this.projectFileChooser = new FileChooser();
-		projectFileChooser.setTitle(localize("save.as"));
+		projectFileChooser.setTitle(localize("save.as") + "...");
 		ApplicationSettings.setProjectExtensionFilter(projectFileChooser);
 		projectFileBrowse.setOnAction((e) -> {
 			projectFileChooser.setInitialFileName(getProjectFilename());
@@ -109,13 +109,13 @@ public class NewProjectDialog extends AbstractDialog {
 		this.images.setEditable(false);
 		images.setSelectionMode(SelectionMode.MULTIPLE);
 		this.imageFileChooser = new FileChooser();
-		imageFileChooser.setTitle(localize("files.import"));
+		imageFileChooser.setTitle(localize("files.import") + "...");
 		this.imageDirectoryChooser = new DirectoryChooser();
-		imageDirectoryChooser.setTitle(localize("directory.import"));
-		final MenuItem importFiles = new MenuItem(localize("files.import"));
+		imageDirectoryChooser.setTitle(localize("directory.import") + "...");
+		final MenuItem importFiles = new MenuItem(localize("files.import") + "...");
 		importFiles.setOnAction((e) -> onImportImageFiles());
 		images.addMenuItem(importFiles);
-		final MenuItem importDirectory = new MenuItem(localize("directory.import"));
+		final MenuItem importDirectory = new MenuItem(localize("directory.import") + "...");
 		importDirectory.setOnAction((e) -> onImportImageDirectory());
 		images.addMenuItem(importDirectory);
 		images.addMenuItem(images.getDeleteItemMenuItem(localize("image.any")));
@@ -126,7 +126,7 @@ public class NewProjectDialog extends AbstractDialog {
 		final MenuItem setDefaultPipeline = new MenuItem(localize("pipeline.default.set"));
 		setDefaultPipeline.disableProperty().bind(Bindings.not(pipelines.hasOneSelectedProperty()));
 		setDefaultPipeline.setOnAction((e) -> onSetDefaultPipeline());
-		final MenuItem importPipelines = new MenuItem(localize("pipeline.import"));
+		final MenuItem importPipelines = new MenuItem(localize("pipeline.import") + "...");
 		importPipelines.setOnAction((e) -> onImportPipelines());
 		final MenuItem deletePipelines = pipelines.getDeleteItemMenuItem(
 				localize("pipeline.any"),

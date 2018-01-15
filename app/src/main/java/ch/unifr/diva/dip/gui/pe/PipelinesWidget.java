@@ -218,10 +218,10 @@ public class PipelinesWidget extends AbstractWidget {
 			cloneItem.disableProperty().bind(Bindings.not(hasOneSelectedProperty));
 			cloneItem.setOnAction((e) -> widget.clonePipeline(getSelectedItem()));
 
-			final MenuItem importItem = new MenuItem(localize("pipeline.import"));
+			final MenuItem importItem = new MenuItem(localize("pipeline.import") + "...");
 			importItem.setOnAction((e) -> widget.importPipelines());
 
-			final MenuItem exportItem = new MenuItem(localize("pipeline.export.selected"));
+			final MenuItem exportItem = new MenuItem(localize("pipeline.export.selected") + "...");
 			exportItem.disableProperty().bind(Bindings.not(hasSelectionProperty));
 			exportItem.setOnAction((e) -> widget.exportPipelines(getSelectedItems()));
 

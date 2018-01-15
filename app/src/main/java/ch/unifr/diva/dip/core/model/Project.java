@@ -799,8 +799,8 @@ public class Project implements Modifiable, Localizable {
 		final BackgroundTask<Void> task = new BackgroundTask<Void>(handler) {
 			@Override
 			protected Void call() throws Exception {
-				updateTitle(localize("processing.object", localize("pipelines")));
-				updateMessage(localize("processing.object", localize("pipelines")));
+				updateTitle(localize("processing.object", localize("pipelines")) + "...");
+				updateMessage(localize("processing.object", localize("pipelines")) + "...");
 				updateProgress(-1, Double.NaN);
 				controller.process();
 				return null;
@@ -810,7 +810,7 @@ public class Project implements Modifiable, Localizable {
 			protected void finished(BackgroundTask.Result result) {
 				runLater(() -> {
 					handler.eventBus.post(new StatusMessageEvent(
-							localize("processing.object", localize("pipelines"))
+							localize("processing.object", localize("pipelines")) + "..."
 							+ " "
 							+ localize("done")
 							+ "."
@@ -856,11 +856,11 @@ public class Project implements Modifiable, Localizable {
 
 			@Override
 			protected Void call() throws Exception {
-				updateTitle(localize("resetting.object", localize("pipelines")));
+				updateTitle(localize("resetting.object", localize("pipelines")) + "...");
 				final int n = pages.size();
 				int i = 1;
 				for (ProjectPage page : pages) {
-					updateMessage(localize("resetting.object", page.getName()));
+					updateMessage(localize("resetting.object", page.getName()) + "...");
 					if (i == n) {
 						updateProgress(-1, Double.NaN);
 					} else {
@@ -884,7 +884,7 @@ public class Project implements Modifiable, Localizable {
 			protected void finished(BackgroundTask.Result result) {
 				runLater(() -> {
 					handler.eventBus.post(new StatusMessageEvent(
-							localize("resetting.object", localize("pipelines"))
+							localize("resetting.object", localize("pipelines")) + "..."
 							+ " "
 							+ localize("done")
 							+ "."

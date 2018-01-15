@@ -35,7 +35,7 @@ public class ProcessorPresetExportDialog extends DataItemDialogBase<PresetData.P
 				handler.dataManager.appDataDir.getProcessorPresetPath(wrapper.pid()),
 				true
 		);
-		setTitle(localize("preset.save"));
+		setTitle(localize("preset.save") + "...");
 		setListLabel(localize("presets"));
 		this.wrapper = wrapper;
 		this.newPresetItem = new PresetData.PresetItem(wrapper);

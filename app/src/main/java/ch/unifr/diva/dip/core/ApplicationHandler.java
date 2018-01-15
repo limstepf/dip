@@ -240,8 +240,8 @@ public class ApplicationHandler implements Localizable {
 		) {
 			@Override
 			protected Void call() throws Exception {
-				updateTitle(localize("project.new"));
-				updateMessage(localize("project.creating"));
+				updateTitle(localize("project.new") + "...");
+				updateMessage(localize("project.creating") + "...");
 				updateProgress(-1, Double.NaN);
 
 				final ProjectData projectData = new ProjectData(
@@ -302,8 +302,8 @@ public class ApplicationHandler implements Localizable {
 		) {
 			@Override
 			protected ProjectData call() throws Exception {
-				updateTitle(localize("project.open"));
-				updateMessage(localize("project.open"));
+				updateTitle(localize("project.open") + "...");
+				updateMessage(localize("project.open") + "...");
 				updateProgress(-1, Double.NaN);
 
 				return loadProjectData(saveFile);

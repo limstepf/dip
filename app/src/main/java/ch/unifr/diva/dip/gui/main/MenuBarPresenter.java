@@ -67,14 +67,14 @@ public class MenuBarPresenter implements Presenter, Localizable {
 	private Menu getFileMenu() {
 		final Menu menu = new Menu(localize("file"));
 
-		final MenuItem newProject = new MenuItem(localize("project.new"));
+		final MenuItem newProject = new MenuItem(localize("project.new") + "...");
 		newProject.setMnemonicParsing(true);
 		newProject.setOnAction(e -> {
 			eventBus.post(new ProjectRequest(ProjectRequest.Type.NEW));
 		});
 		newProject.setAccelerator(KeyCombination.keyCombination("Ctrl+N"));
 
-		final MenuItem openProject = new MenuItem(localize("project.open"));
+		final MenuItem openProject = new MenuItem(localize("project.open") + "...");
 		openProject.setOnAction(e -> {
 			eventBus.post(new ProjectRequest(ProjectRequest.Type.OPEN));
 		});
@@ -97,7 +97,7 @@ public class MenuBarPresenter implements Presenter, Localizable {
 		saveProject.disableProperty().bind(Bindings.not(canSave));
 		saveProject.setAccelerator(KeyCombination.keyCombination("Ctrl+S"));
 
-		final MenuItem saveAsProject = new MenuItem(localize("project.save.as"));
+		final MenuItem saveAsProject = new MenuItem(localize("project.save.as") + "...");
 		saveAsProject.setOnAction(e -> {
 			eventBus.post(new ProjectRequest(ProjectRequest.Type.SAVE_AS));
 		});

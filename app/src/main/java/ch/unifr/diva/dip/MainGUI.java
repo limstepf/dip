@@ -143,8 +143,8 @@ public class MainGUI extends Application {
 				) {
 					@Override
 					protected Void call() throws Exception {
-						updateTitle(L10n.getInstance().getString("project.open"));
-						updateMessage(L10n.getInstance().getString("project.open"));
+						updateTitle(L10n.getInstance().getString("project.open") + "...");
+						updateMessage(L10n.getInstance().getString("project.open") + "...");
 						updateProgress(-1, Double.NaN);
 						try {
 							handler.osgi.getProcessors().waitForBundles(3, 500, 10000);
