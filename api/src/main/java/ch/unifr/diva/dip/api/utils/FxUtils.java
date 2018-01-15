@@ -71,6 +71,25 @@ public class FxUtils {
 	}
 
 	/**
+	 * Executes a Runnable on the JavaFX application thread, and waits until
+	 * done before returning. This method is safe to be called from any thread.
+	 *
+	 * @param runnable the Runnable.
+	 */
+	public static void runAndWait(final Runnable runnable) {
+		if (Platform.isFxApplicationThread()) {
+			runnable.run();
+		} else {
+			final FxLock lock = new FxLock();
+			FxUtils.run(() -> {
+				runnable.run();
+				lock.notifyThread();
+			});
+			lock.waitForFxApplicationThread();
+		}
+	}
+
+	/**
 	 * Executes a Callable as a FutureTask on the JavaFX application thread to
 	 * return some result once done. This method is safe to be called from any
 	 * thread.
