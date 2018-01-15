@@ -375,11 +375,18 @@ public interface Processor {
 	 * Disconnects all inputs and outputs of the processor.
 	 */
 	default void disconnect() {
-		for (InputPort<?> input : inputs().values()) {
-			input.disconnect();
+		final List<InputPort<?>> removeIns = new ArrayList<>(inputs().values());
+		for (InputPort<?> input : removeIns) {
+			if (input.isConnected()) {
+				input.disconnect();
+			}
 		}
-		for (OutputPort<?> output : outputs().values()) {
-			output.disconnect();
+
+		final List<OutputPort<?>> removeOuts = new ArrayList<>(outputs().values());
+		for (OutputPort<?> output : removeOuts) {
+			if (output.isConnected()) {
+				output.disconnect();
+			}
 		}
 	}
 
