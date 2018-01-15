@@ -5,11 +5,22 @@ import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.ui.UIStrategy;
 import ch.unifr.diva.dip.eventbus.EventBus;
 import ch.unifr.diva.dip.eventbus.events.StatusWorkerEvent;
+import ch.unifr.diva.dip.gui.dialogs.AbstractDialog;
+import ch.unifr.diva.dip.gui.layout.Lane;
+import java.util.concurrent.atomic.AtomicInteger;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
+import javafx.scene.control.Button;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.stage.Window;
+import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,11 +28,12 @@ import org.slf4j.LoggerFactory;
  * Wrapper for JavaFX {@code Task}s with optional status communication over an
  * event-bus.
  *
- * @param <T> The result type returned by this FutureTask's get methods.
+ * @param <T> The result type returned by the background task's get method.
  */
 public abstract class BackgroundTask<T> extends Task<T> {
 
 	private static final Logger log = LoggerFactory.getLogger(BackgroundTask.class);
+	private final static AtomicInteger threadNumber = new AtomicInteger(1);
 	private final UIStrategy uiStrategy;
 	private final EventBus eventBus;
 	private final Thread thread;
@@ -88,6 +100,12 @@ public abstract class BackgroundTask<T> extends Task<T> {
 		this.uiStrategy = uiStrategy;
 		this.eventBus = eventBus;
 		this.thread = new Thread(this);
+		thread.setName(
+				"dip-background-task-"
+				+ threadNumber.getAndIncrement()
+		);
+		thread.setPriority(Thread.MAX_PRIORITY);
+		thread.setDaemon(false);
 		this.resultProperty = new SimpleObjectProperty<>(Result.RUNNING);
 	}
 
@@ -206,6 +224,119 @@ public abstract class BackgroundTask<T> extends Task<T> {
 		if (uiStrategy != null) {
 			uiStrategy.showError(throwable);
 		}
+	}
+
+	/**
+	 * Offers a cancel dialog after a given delay/timeout. Only works with an
+	 * {@code uiStrategy} that has a stage.
+	 *
+	 * @param delay the delay/timeout after which to open a cancel dialog.
+	 * @return the timeline of the delayed dialog creation.
+	 */
+	public Timeline offerCancelDialog(Duration delay) {
+		if (!uiStrategy.hasStage()) {
+			return new Timeline();
+		}
+
+		final Timeline timeout = new Timeline(new KeyFrame(
+				delay,
+				(e) -> {
+					if (!isRunning()) {
+						return;
+					}
+					final CancelDialog<T> dialog = new CancelDialog<>(
+							uiStrategy.getStage(),
+							this
+					);
+					dialog.show();
+				}
+		));
+		timeout.play();
+		return timeout;
+	}
+
+	/**
+	 * An optional cancel dialog to show up after some delay/timeout.
+	 *
+	 * @param <T> The result type returned by the background task's get method.
+	 */
+	public static class CancelDialog<T> extends AbstractDialog {
+
+		protected final BackgroundTask<T> task;
+		protected final Lane lane;
+		protected final ProgressBar progressBar;
+		protected final Button cancel;
+
+		/**
+		 * Creates a new cancel dialog.
+		 *
+		 * @param owner the owner of the dialog.
+		 * @param task the running background task.
+		 */
+		public CancelDialog(Window owner, BackgroundTask<T> task) {
+			super(owner);
+			this.task = task;
+			task.resultProperty().addListener((e) -> onResult());
+			this.progressBar = new ProgressBar();
+			progressBar.setMaxWidth(Double.MAX_VALUE);
+			Platform.runLater(() -> {
+				progressBar.progressProperty().bind(task.progressProperty());
+			});
+
+			this.cancel = getDefaultButton(localize("cancel"));
+			cancel.setOnAction((e) -> cancel());
+
+			this.lane = new Lane();
+			lane.setMaxWidth(Double.MAX_VALUE);
+			HBox.setHgrow(progressBar, Priority.ALWAYS);
+			HBox.setHgrow(cancel, Priority.SOMETIMES);
+			lane.add(
+					progressBar,
+					cancel
+			);
+			this.root.setCenter(lane);
+
+			setTitle(localize("processing"));
+		}
+
+		private void onResult() {
+			switch (task.resultProperty().get()) {
+				case RUNNING:
+					return; // keep going...
+				case CANCELLED:
+					return; // already handled
+				default:
+					cancel.setDisable(true);
+					close();
+			}
+		}
+
+		/**
+		 * Cancels the background task.
+		 */
+		public final void cancel() {
+			cancel.setDisable(true);
+			setTitle(localize("cancelling"));
+			progressBar.getStyleClass().add("dip-cancelled-progress");
+			task.cancel();
+
+			// wait for background task to actually stop, then close this dialog
+			// or things get irritating if background threads don't shut down
+			// immediately...
+			final Thread b = task.getThread();
+			final Thread t = new Thread(() -> {
+				try {
+					b.join();
+				} catch (InterruptedException ex) {
+					//
+				}
+				FxUtils.run(() -> {
+					close();
+				});
+			});
+			t.start();
+		}
+
 	}
 
 }
