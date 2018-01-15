@@ -122,6 +122,13 @@ public class UIStrategyGUI implements UIStrategy {
 		public static final Color accent_inverted = Color.WHITE;
 
 		/**
+		 * Accent/highlight color in "light". May be used together with
+		 * {@code accent} color to indicate a less important, or more passive
+		 * thing.
+		 */
+		public static final Color accent_light = Color.web("0x99D5E9");
+
+		/**
 		 * Ok status color.
 		 */
 		public static final Color ok = Color.FORESTGREEN;
