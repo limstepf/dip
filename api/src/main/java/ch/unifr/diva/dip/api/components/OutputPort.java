@@ -114,7 +114,8 @@ public class OutputPort<T> extends AbstractPort<T> {
 
 	@Override
 	public void disconnect() {
-		for (InputPort<?> input : inputs) {
+		final Set<InputPort<?>> copy = new HashSet<>(inputs);
+		for (InputPort<?> input : copy) {
 			disconnect(input);
 		}
 	}
