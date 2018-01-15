@@ -37,7 +37,7 @@ import javafx.scene.layout.BorderPane;
 public class RescaleUnit {
 
 	// GUI/config
-	private final List<Band> bands;
+	private final List<? extends Band> bands;
 	private final XorParameter outputConfig;
 	private final CompositeGrid bandConfig;
 
@@ -59,68 +59,64 @@ public class RescaleUnit {
 	 * Creates a new rescale unit with up to 4 bands.
 	 */
 	public RescaleUnit() {
-		this.bands = Arrays.asList(
-				new Band(1),
-				new Band(2),
-				new Band(3),
-				new Band(4)
-		);
+		this(getDefaultBands(4), true, true, true, true);
+	}
 
-		// output configuration parameters
-		final TextParameter bitOption = new TextParameter("BIT");
-		final IntegerSliderParameter byteSlider = new IntegerSliderParameter(1, 1, 4);
-		byteSlider.setPrefix(new TextParameter("BYTE"));
-		byteSlider.addSliderViewHook((s) -> initBandSlider(s));
-		final IntegerSliderParameter floatSlider = new IntegerSliderParameter(1, 1, 4);
-		floatSlider.setPrefix(new TextParameter("FLOAT"));
-		floatSlider.addSliderViewHook((s) -> initBandSlider(s));
-		final EnumParameter cmOption = new EnumParameter(
-				"", SimpleColorModel.class, SimpleColorModel.RGB.name()
-		);
+	public static List<Band> getDefaultBands(int num) {
+		final List<Band> bands = new ArrayList<>();
+		for (int i = 1; i <= num; i++) {
+			bands.add(new Band(i));
+		}
+		return bands;
+	}
+
+	protected final TextParameter bitOption;
+	protected final IntegerSliderParameter byteSlider;
+	protected final IntegerSliderParameter floatSlider;
+	protected final EnumParameter cmOption;
+	protected final List<Parameter<?>> enabledOutputOptions;
+
+	public RescaleUnit(List<? extends Band> bands, boolean enableBitOutput, boolean enableByteOutput, boolean enableFloatOutput, boolean enableColorOutput) {
+		this.bands = bands;
+
+		this.enabledOutputOptions = new ArrayList<>();
+		if (enableBitOutput) {
+			this.bitOption = new TextParameter("BIT");
+			enabledOutputOptions.add(bitOption);
+		} else {
+			this.bitOption = null;
+		}
+		if (enableByteOutput) {
+			this.byteSlider = new IntegerSliderParameter(1, 1, 4);
+			byteSlider.setPrefix(new TextParameter("BYTE"));
+			byteSlider.addSliderViewHook((s) -> initBandSlider(s));
+			enabledOutputOptions.add(byteSlider);
+		} else {
+			this.byteSlider = null;
+		}
+		if (enableFloatOutput) {
+			this.floatSlider = new IntegerSliderParameter(1, 1, 4);
+			floatSlider.setPrefix(new TextParameter("FLOAT"));
+			floatSlider.addSliderViewHook((s) -> initBandSlider(s));
+			enabledOutputOptions.add(floatSlider);
+		} else {
+			this.floatSlider = null;
+		}
+		if (enableColorOutput) {
+			this.cmOption = new EnumParameter(
+					"", SimpleColorModel.class, SimpleColorModel.RGB.name()
+			);
+			enabledOutputOptions.add(cmOption);
+		} else {
+			this.cmOption = null;
+		}
 		this.outputConfig = new XorParameter(
 				"output",
-				Arrays.asList(
-						bitOption,
-						byteSlider,
-						floatSlider,
-						cmOption
-				)
+				enabledOutputOptions
 		);
-
-		// band rescale spec. labels
-		final Insets insets = new Insets(10, 0, 0, 0);
-		final LabelParameter scalingLP = new LabelParameter("Scaling");
-		final LabelParameter clampLP = new LabelParameter("Clamp");
-		scalingLP.addLabelViewHook((label) -> {
-			label.setPadding(insets);
-		});
-		clampLP.addLabelViewHook((label) -> {
-			label.setPadding(insets);
-		});
-
-		final CompositeGrid labelsTop = new CompositeGrid(
-				new EmptyParameter(),
-				new EmptyParameter(),
-				scalingLP,
-				new EmptyParameter(),
-				clampLP,
-				new EmptyParameter()
-		);
-		labelsTop.setColumnWidthConstraints(Band.GRID_PERCENT_WIDTHS);
-
-		final CompositeGrid labelsBottom = new CompositeGrid(
-				new EmptyParameter(),
-				new LabelParameter("abs."),
-				new LabelParameter("Gain"),
-				new LabelParameter("Bias"),
-				new LabelParameter("Minimum"),
-				new LabelParameter("Maximum")
-		);
-		labelsBottom.setColumnWidthConstraints(Band.GRID_PERCENT_WIDTHS);
 
 		final List<Parameter<?>> bandComponents = new ArrayList<>();
-		bandComponents.add(labelsTop);
-		bandComponents.add(labelsBottom);
+		bandComponents.addAll(this.bands.get(0).getHeaderRows());
 		for (Band band : this.bands) {
 			bandComponents.add(band.composite);
 		}
@@ -163,6 +159,10 @@ public class RescaleUnit {
 		return ColorPort.getColorPort(name, this.outputColors);
 	}
 
+	private Parameter<?> getSelectedOutputOption(int index) {
+		return enabledOutputOptions.get(index);
+	}
+
 	/**
 	 * Updates the state/config.
 	 */
@@ -171,15 +171,15 @@ public class RescaleUnit {
 		this.enabledOutputPorts.clear();
 		this.enabledOutputPorts.put("buffered-image", this.output);
 
-		switch (this.vs.selection) {
-			case 0: // BIT
+		final Object selectedValue = getSelectedOutputOption(vs.getSelectedIndex());
+		if (selectedValue != null) {
+			if (selectedValue.equals(this.bitOption)) {
 				this.numBands = 1;
 				this.isBufferedMatrix = false;
 				this.precision = SamplePrecision.BIT;
 				this.enabledOutputPorts.put("buffered-image-binary", this.output_binary);
-				break;
 
-			case 1: { // BYTE
+			} else if (selectedValue.equals(this.byteSlider)) {
 				this.numBands = (int) this.vs.getSelectedValue();
 				this.isBufferedMatrix = false;
 				this.precision = SamplePrecision.BYTE;
@@ -196,17 +196,14 @@ public class RescaleUnit {
 						break;
 				}
 				this.enabledOutputPorts.put(out.key, out.port);
-				break;
-			}
 
-			case 2: // FLOAT
+			} else if (selectedValue.equals(this.floatSlider)) {
 				this.numBands = (int) this.vs.getSelectedValue();
 				this.isBufferedMatrix = true;
 				this.precision = SamplePrecision.FLOAT;
 				this.enabledOutputPorts.put("buffered-matrix-float", this.output_float);
-				break;
 
-			case 3: // SimpleColorModel
+			} else if (selectedValue.equals(this.cmOption)) {
 				final OutputColorPort out = getPort(this.vs.getSelectedValue());
 				this.numBands = out.cm.numBands();
 				this.isBufferedMatrix = out.cm.requiresBufferedMatrix();
@@ -214,7 +211,7 @@ public class RescaleUnit {
 						? SamplePrecision.FLOAT
 						: SamplePrecision.BYTE;
 				this.enabledOutputPorts.put(out.key, out.port);
-				break;
+			}
 		}
 
 		setClamp();
@@ -366,23 +363,18 @@ public class RescaleUnit {
 	}
 
 	private void setClamp() {
-		switch (this.vs.selection) {
-			case 0: // BIT
+		final Object selectedValue = getSelectedOutputOption(vs.getSelectedIndex());
+		if (selectedValue != null) {
+			if (selectedValue.equals(this.bitOption)) {
 				this.setClamp(1, "0", "1");
-				break;
-
-			case 1: // BYTE
+			} else if (selectedValue.equals(this.byteSlider)) {
 				this.setClamp(this.numBands, "0", "255");
-				break;
-
-			case 2: // FLOAT
+			} else if (selectedValue.equals(this.floatSlider)) {
 				this.setClamp(1, "0.0", "1.0"); // wild guess :)
-				break;
-
-			case 3: // SimpleColorModel
+			} else if (selectedValue.equals(this.cmOption)) {
 				final OutputColorPort out = getPort(this.vs.getSelectedValue());
 				this.setClamp(out);
-				break;
+			}
 		}
 	}
 
@@ -413,24 +405,46 @@ public class RescaleUnit {
 	/**
 	 * Configuration of a single band.
 	 */
-	private static class Band {
+	public static class Band {
 
-		public final static List<Double> GRID_PERCENT_WIDTHS = Arrays.asList(
-				0.03, 0.05, 0.3, 0.3, 0.16, 0.16
-		);
+		protected final int num;
+		protected final List<Double> gridPercentWidths;
+		protected final String key;
+		protected final LabelParameter label;
+		protected final CheckboxParameter abs;
+		protected final ExpParameter gain;
+		protected final ExpParameter bias;
+		protected final ExpParameter min;
+		protected final ExpParameter max;
+		protected final CompositeGrid composite;
 
-		public final int num;
-		public final String key;
-		public final LabelParameter label;
-		public final CheckboxParameter abs;
-		public final ExpParameter gain;
-		public final ExpParameter bias;
-		public final ExpParameter min;
-		public final ExpParameter max;
-		public final CompositeGrid composite;
-
+		/**
+		 * Creates a new band.
+		 *
+		 * @param num the band number, starting with {@code 1} for the first
+		 * band.
+		 */
 		public Band(int num) {
+			this(
+					num,
+					null,
+					Arrays.asList(
+							0.03, 0.05, 0.3, 0.3, 0.16, 0.16
+					)
+			);
+		}
+
+		/**
+		 * Creates a new band.
+		 *
+		 * @param num the band number, starting with {@code 1} for the first
+		 * band.
+		 * @param extraParameter an extra parameter, or null.
+		 * @param gridPercentWidths the grid percent widths.
+		 */
+		public Band(int num, Parameter<?> extraParameter, List<Double> gridPercentWidths) {
 			this.num = num;
+			this.gridPercentWidths = gridPercentWidths;
 			this.key = String.format("band%d", this.num);
 			this.label = new LabelParameter(String.format("%d:", this.num));
 			this.abs = new CheckboxParameter(false);
@@ -438,11 +452,18 @@ public class RescaleUnit {
 			this.bias = new ExpParameter("bias", "0.0");
 			this.min = new ExpParameter("min", "0");
 			this.max = new ExpParameter("max", "255");
-			this.composite = new CompositeGrid(
-					String.format("band %d", this.num),
-					label, abs, gain, bias, min, max
-			);
-			this.composite.setColumnWidthConstraints(GRID_PERCENT_WIDTHS);
+			if (extraParameter == null) {
+				this.composite = new CompositeGrid(
+						String.format("band %d", this.num),
+						label, abs, gain, bias, min, max
+				);
+			} else {
+				this.composite = new CompositeGrid(
+						String.format("band %d", this.num),
+						label, extraParameter, abs, gain, bias, min, max
+				);
+			}
+			this.composite.setColumnWidthConstraints(gridPercentWidths);
 
 			// 4 textfields on a row... better shorten their widths a bit
 			final ExpParameter[] params = {gain, bias, min, max};
@@ -451,9 +472,72 @@ public class RescaleUnit {
 			}
 		}
 
-		private void initTextField(TextField tf) {
+		protected final void initTextField(TextField tf) {
 			tf.setPrefColumnCount(tf.getPrefColumnCount() / 2);
 		}
+
+		public List<Parameter<?>> getHeaderRows() {
+			return getHeaderRows(null, gridPercentWidths);
+		}
+
+		public static List<Parameter<?>> getHeaderRows(Parameter<?> extraLabel, List<Double> gridPercentWidths) {
+			final List<Parameter<?>> header = new ArrayList<>();
+			final Insets insets = new Insets(10, 0, 0, 0);
+			final LabelParameter scalingLP = new LabelParameter("Scaling");
+			final LabelParameter clampLP = new LabelParameter("Clamp");
+			scalingLP.addLabelViewHook((t) -> {
+				t.setPadding(insets);
+			});
+			clampLP.addLabelViewHook((t) -> {
+				t.setPadding(insets);
+			});
+
+			final CompositeGrid top;
+			final CompositeGrid bottom;
+			if (extraLabel == null) {
+				top = new CompositeGrid(
+						new EmptyParameter(),
+						new EmptyParameter(),
+						scalingLP,
+						new EmptyParameter(),
+						clampLP,
+						new EmptyParameter()
+				);
+				bottom = new CompositeGrid(
+						new EmptyParameter(),
+						new LabelParameter("abs."),
+						new LabelParameter("Gain"),
+						new LabelParameter("Bias"),
+						new LabelParameter("Minimum"),
+						new LabelParameter("Maximum")
+				);
+			} else {
+				top = new CompositeGrid(
+						new EmptyParameter(),
+						new EmptyParameter(),
+						new EmptyParameter(),
+						scalingLP,
+						new EmptyParameter(),
+						clampLP,
+						new EmptyParameter()
+				);
+				bottom = new CompositeGrid(
+						new EmptyParameter(),
+						extraLabel,
+						new LabelParameter("abs."),
+						new LabelParameter("Gain"),
+						new LabelParameter("Bias"),
+						new LabelParameter("Minimum"),
+						new LabelParameter("Maximum")
+				);
+			}
+			top.setColumnWidthConstraints(gridPercentWidths);
+			bottom.setColumnWidthConstraints(gridPercentWidths);
+			header.add(top);
+			header.add(bottom);
+			return header;
+		}
+
 	}
 
 }
