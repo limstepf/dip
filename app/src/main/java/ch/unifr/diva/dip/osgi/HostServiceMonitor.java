@@ -41,4 +41,25 @@ public class HostServiceMonitor<T> implements ServiceMonitor<T> {
 		return processors;
 	}
 
+	/**
+	 * Returns the default host (or generator) service collection.
+	 *
+	 * @return the default host (or generator) service collection, or
+	 * {@code null} if no suitable host service collection is available.
+	 */
+	public OSGiServiceCollection<T> getDefaultHostServiceCollection() {
+		if (collections.size() == 1) {
+			return collections.get(0);
+		}
+		if (collections.size() > 0) {
+			for (OSGiServiceCollection<T> collection : collections) {
+				if (collection.pid().toLowerCase().contains("rgb")) {
+					return collection;
+				}
+			}
+			return collections.get(0);
+		}
+		return null;
+	}
+
 }

@@ -2,6 +2,7 @@ package ch.unifr.diva.dip.gui.pe;
 
 import ch.unifr.diva.dip.api.components.Port;
 import ch.unifr.diva.dip.api.datatypes.DataType;
+import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.utils.ArrayUtils;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.UserSettings;
@@ -16,6 +17,8 @@ import ch.unifr.diva.dip.gui.layout.Pannable;
 import ch.unifr.diva.dip.gui.layout.RubberBandSelector;
 import ch.unifr.diva.dip.gui.layout.ZoomPaneSimple;
 import ch.unifr.diva.dip.gui.main.SideBarPresenter;
+import ch.unifr.diva.dip.osgi.OSGiService;
+import ch.unifr.diva.dip.osgi.OSGiServiceCollection;
 import ch.unifr.diva.dip.utils.IOUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,7 +32,6 @@ import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.SplitPane;
 import javafx.scene.input.KeyEvent;
@@ -355,6 +357,21 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 	 */
 	public void createPipeline(String name) {
 		final PrototypePipeline pipeline = manager.createPipeline(name);
+
+		// add default page generator
+		final OSGiServiceCollection<Processor> generator = handler.osgi.getHostProcessors().getDefaultHostServiceCollection();
+		if (generator != null) {
+			final OSGiService<Processor> service = generator.getService();
+			if (service != null) {
+				pipeline.addProcessor(
+						service.pid,
+						service.version.toString(),
+						0,
+						0
+				);
+			}
+		}
+
 		selectPipeline(pipeline);
 	}
 
