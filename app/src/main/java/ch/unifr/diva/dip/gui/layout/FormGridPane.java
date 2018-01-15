@@ -2,6 +2,7 @@ package ch.unifr.diva.dip.gui.layout;
 
 import ch.unifr.diva.dip.api.parameters.Parameter;
 import ch.unifr.diva.dip.api.parameters.PersistentParameter;
+import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.geometry.VPos;
@@ -19,25 +20,45 @@ public class FormGridPane extends GridPane {
 	private int row = 0;
 
 	/**
-	 * Creates a new FormGridPane.
+	 * Creates a new FormGridPane with default column constraints.
 	 */
 	public FormGridPane() {
-		this.getStyleClass().add("dip-form-grid-pane");
+		this(getDefaultColumnConstraints());
+	}
 
-		final ColumnConstraints labelConstraint = new ColumnConstraints();
-		final ColumnConstraints valueConstraint = new ColumnConstraints();
-		labelConstraint.setHgrow(Priority.SOMETIMES);
-		valueConstraint.setHgrow(Priority.ALWAYS);
-		getColumnConstraints().addAll(labelConstraint, valueConstraint);
+	private static ColumnConstraints[] getDefaultColumnConstraints() {
+		final ColumnConstraints[] cc = new ColumnConstraints[]{
+			new ColumnConstraints(),
+			new ColumnConstraints()
+		};
+		cc[0].setHgrow(Priority.SOMETIMES);
+		cc[1].setHgrow(Priority.ALWAYS);
+		return cc;
 	}
 
 	/**
-	 * Creates a new FormGridPane with column constraints.
+	 * Creates a new FormGridPane with given column constraints.
 	 *
-	 * @param constraints column constraints.
+	 * @param constraints the column constraints.
 	 */
 	public FormGridPane(ColumnConstraints... constraints) {
-		this.getStyleClass().add("dip-form-grid-pane");
+		this(
+				UIStrategyGUI.Stage.insets * 3,
+				UIStrategyGUI.Stage.insets,
+				constraints
+		);
+	}
+
+	/**
+	 * Creates a new FormGridPane.
+	 *
+	 * @param hgap the width of the horizontal gaps between columns.
+	 * @param vgap the height of the vertical gaps between rows.
+	 * @param constraints the column constraints.
+	 */
+	public FormGridPane(double hgap, double vgap, ColumnConstraints... constraints) {
+		this.setHgap(hgap);
+		this.setVgap(vgap);
 		getColumnConstraints().addAll(constraints);
 	}
 
