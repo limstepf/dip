@@ -5,6 +5,7 @@ import ch.unifr.diva.dip.api.utils.XmlUtils;
 import ch.unifr.diva.dip.api.utils.jaxb.BooleanPropertyAdapter;
 import ch.unifr.diva.dip.api.utils.jaxb.PathAdapter;
 import ch.unifr.diva.dip.api.utils.jaxb.StringPropertyAdapter;
+import ch.unifr.diva.dip.core.execution.PipelineExecutor;
 import ch.unifr.diva.dip.core.ui.StylesheetManager;
 import ch.unifr.diva.dip.gui.pe.PipelineLayoutStrategy;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
@@ -324,6 +325,12 @@ public class UserSettings {
 	public static class PipelineEditor {
 
 		/**
+		 * The default pipeline executor.
+		 */
+		@XmlAttribute
+		public String pipelineExecutor = PipelineExecutor.Type.getDefault().name();
+
+		/**
 		 * The default connection/wire type.
 		 */
 		@XmlAttribute
@@ -348,6 +355,15 @@ public class UserSettings {
 		 */
 		@XmlAttribute
 		public boolean autoRearrangeOnProcessorFold = false;
+
+		/**
+		 * Returns the default pipeline executor.
+		 *
+		 * @return the default pipeline executor.
+		 */
+		public PipelineExecutor.Type getDefaultPipelineExecutor() {
+			return PipelineExecutor.Type.get(pipelineExecutor);
+		}
 
 		/**
 		 * Returns the connection (or wire) type preferred by the user.

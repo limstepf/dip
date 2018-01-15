@@ -2,6 +2,8 @@ package ch.unifr.diva.dip.core;
 
 import ch.unifr.diva.dip.api.utils.DipThreadPool;
 import ch.unifr.diva.dip.core.model.PipelineData;
+import ch.unifr.diva.dip.core.execution.PipelineExecutionLogger;
+import ch.unifr.diva.dip.core.execution.TimingPipelineExecutionLogger;
 import ch.unifr.diva.dip.core.ui.UIStrategy;
 import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.core.model.ProjectData;
@@ -209,6 +211,13 @@ public class ApplicationHandler implements Localizable {
 		return fallback;
 	}
 
+	public PipelineExecutionLogger getPipelineExecutorLogger() {
+		// TODO: user setting? Not sure if really necessary...
+		// either way this should always be something extending a timing logger
+//		return new PrintingPipelineExecutionLogger();
+		return new TimingPipelineExecutionLogger();
+	}
+
 	/**
 	 * Creates a new project.
 	 *
@@ -327,8 +336,6 @@ public class ApplicationHandler implements Localizable {
 
 			@Override
 			protected void succeeded() {
-
-				// validation comes here!
 				final ProjectData.ValidationResult validation = getValue().validate(
 						ApplicationHandler.this
 				);

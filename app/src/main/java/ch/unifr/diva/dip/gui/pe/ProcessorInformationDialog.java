@@ -176,7 +176,7 @@ public class ProcessorInformationDialog<T extends PrototypeProcessor> extends Ab
 				if (service.serviceObject != null) {
 					putCapabilities(basics, service);
 				}
-				basics.put(localize("state"), wrapper.getStateValue().toString());
+				basics.put(localize("state"), wrapper.getState().toString());
 
 				final StructuredText basicsPane = StructuredText.smallDescriptionList(basics);
 				getChildren().add(basicsPane);

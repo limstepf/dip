@@ -16,16 +16,19 @@ import ch.unifr.diva.dip.gui.pe.ProcessorParameterWindow;
 import ch.unifr.diva.dip.utils.BackgroundTask;
 import ch.unifr.diva.dip.utils.FileFinder;
 import ch.unifr.diva.dip.api.utils.FxUtils;
+import ch.unifr.diva.dip.core.execution.PipelineTiming;
+import ch.unifr.diva.dip.core.execution.ProcessorTiming;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import ch.unifr.diva.dip.utils.CursorLock;
-import ch.unifr.diva.dip.utils.IOUtils;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.ref.WeakReference;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javafx.beans.InvalidationListener;
@@ -40,6 +43,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
+import javafx.util.Duration;
 import javax.xml.bind.JAXBException;
 
 /**
@@ -50,13 +54,14 @@ public class RunnableProcessor extends PrototypeProcessor {
 
 	private final Project project;
 	private final ProjectPage page;
-	private final RunnablePipeline pipeline;
+	private final WeakReference<RunnablePipeline> pipeline;
 	private final String PROCESSOR_DATA_DIR;
 	private final String PROCESSOR_DATA_XML;
 	private final ObjectMapData objectMap;
 	private final LayerGroup layerGroup;
 	private final LayerOverlay layerOverlay;
 	private final InvalidationListener stateListener;
+	private ProcessorLayerExtension layerExtension;
 
 	/**
 	 * Creates a runnable processor. As opposed to {@code PrototypeProcessor}s,
@@ -70,11 +75,10 @@ public class RunnableProcessor extends PrototypeProcessor {
 				processor,
 				pipeline.handler
 		);
-		this.pipeline = pipeline;
+		this.pipeline = new WeakReference<>(pipeline);
 		this.page = pipeline.page;
 		this.project = page.project();
 		this.stateListener = (e) -> updateStatusColor();
-		stateProperty().addListener(stateListener);
 
 		this.PROCESSOR_DATA_DIR = String.format(
 				ProjectPage.PROCESSOR_DATA_DIR_FORMAT,
@@ -102,15 +106,44 @@ public class RunnableProcessor extends PrototypeProcessor {
 	protected void initProcessor(Processor processor) {
 		super.initProcessor(processor);
 
+		stateProperty().addListener(stateListener);
+
 		// we overide initProcessor() rather than doing this in init() since a
 		// processor might have changed its name (repaint) once being fully
 		// initialized
 		this.layerGroup.setName(this.processor().name());
 		this.layerGroup.setGlyph(RunnableProcessor.glyph(this.processor()));
 		this.layerGroup.setHideGroupMode(LayerGroup.HideGroupMode.AUTO);
-		this.layerGroup.layerExtensions().add(new ProcessorLayerExtension(this));
-		updateState();
-		updateStatusColor(getStateValue());
+		this.layerExtension = new ProcessorLayerExtension(this);
+		this.layerGroup.layerExtensions().add(layerExtension);
+	}
+
+	@Override
+	protected void updateState() {
+		// ignore/don't update state due to releasing the pipeline, or error/warning
+		// status might show up for a tick (due to not being connected anymore, etc...)
+		final RunnablePipeline p = this.getPipeline();
+		if (p == null || p.releaseLock) {
+			return;
+		}
+		super.updateState();
+		updateStatusColor();
+	}
+
+	/**
+	 * Releases this object, making sure it can be garbage collected
+	 * immediately.
+	 */
+	@Override
+	protected void release() {
+		stateProperty().removeListener(stateListener);
+
+		if (this.layerExtension != null) {
+			this.layerExtension.release();
+		}
+
+		this.pipeline.clear();
+		super.release();
 	}
 
 	/**
@@ -147,7 +180,7 @@ public class RunnableProcessor extends PrototypeProcessor {
 	 * @return the runnable pipeline.
 	 */
 	public RunnablePipeline getPipeline() {
-		return this.pipeline;
+		return this.pipeline.get();
 	}
 
 	/**
@@ -174,13 +207,14 @@ public class RunnableProcessor extends PrototypeProcessor {
 	 */
 	public static class ProcessorLayerExtension implements LayerExtension, Localizable {
 
-		private final RunnableProcessor runnable;
+		private final WeakReference<RunnableProcessor> runnable;
 		private final VBox vbox = new VBox();
 		private final Label status = new Label();
 		private final Lane lane = new Lane();
 		private final Button paramButton;
 		private final Button processButton;
 		private final Button resetButton;
+		private final InvalidationListener stateListener;
 
 		/**
 		 * Creates a new processor layer extension.
@@ -188,19 +222,22 @@ public class RunnableProcessor extends PrototypeProcessor {
 		 * @param runnable the runnable processor.
 		 */
 		public ProcessorLayerExtension(RunnableProcessor runnable) {
-			this.runnable = runnable;
+			this.runnable = new WeakReference<>(runnable);
 
 			status.getStyleClass().add("dip-small");
 
 			if (runnable.processor().hasParameters()) {
 				paramButton = newButton(localize("parameters"));
 				paramButton.setOnAction((e) -> {
-					final ProcessorParameterWindow paramWindow = new ProcessorParameterWindow(
-							runnable.handler.uiStrategy.getStage(),
-							runnable.handler,
-							runnable
-					);
-					paramWindow.show();
+					final RunnableProcessor p = ProcessorLayerExtension.this.runnable.get();
+					if (p != null) {
+						final ProcessorParameterWindow paramWindow = new ProcessorParameterWindow(
+								p.handler.uiStrategy.getStage(),
+								p.handler,
+								p
+						);
+						paramWindow.show();
+					}
 				});
 				lane.add(paramButton);
 
@@ -215,7 +252,10 @@ public class RunnableProcessor extends PrototypeProcessor {
 			if (runnable.processor().canProcess()) {
 				processButton = newButton(localize("process"));
 				processButton.setOnAction((e) -> {
-					this.runnable.processBackgroundTask();
+					final RunnableProcessor p = ProcessorLayerExtension.this.runnable.get();
+					if (p != null) {
+						p.processBackgroundTask();
+					}
 				});
 				lane.add(processButton);
 			} else {
@@ -225,7 +265,10 @@ public class RunnableProcessor extends PrototypeProcessor {
 			if (runnable.processor().canReset()) {
 				resetButton = newButton(localize("reset"));
 				resetButton.setOnAction((e) -> {
-					this.runnable.resetBackgroundTask();
+					final RunnableProcessor p = ProcessorLayerExtension.this.runnable.get();
+					if (p != null) {
+						p.resetBackgroundTask();
+					}
 				});
 				lane.add(resetButton);
 			} else {
@@ -236,8 +279,17 @@ public class RunnableProcessor extends PrototypeProcessor {
 			lane.setPadding(new Insets(4, 4, 4, 4));
 			vbox.getChildren().addAll(status, lane);
 
-			stateCallback(runnable.getStateValue());
-			this.runnable.stateProperty().addListener((e) -> stateCallback());
+			this.stateListener = (e) -> stateCallback();
+			runnable.stateProperty().addListener(stateListener);
+			stateCallback(runnable.getState());
+		}
+
+		protected void release() {
+			final RunnableProcessor p = runnable.get();
+			if (p != null) {
+				p.stateProperty().removeListener(stateListener);
+			}
+			runnable.clear();
 		}
 
 		private Button newButton(String label) {
@@ -247,7 +299,10 @@ public class RunnableProcessor extends PrototypeProcessor {
 		}
 
 		private void stateCallback() {
-			stateCallback(runnable.getState());
+			final RunnableProcessor p = runnable.get();
+			if (p != null) {
+				stateCallback(p.getState());
+			}
 		}
 
 		private void stateCallback(Processor.State state) {
@@ -271,7 +326,7 @@ public class RunnableProcessor extends PrototypeProcessor {
 		 * @return the parent processor.
 		 */
 		public RunnableProcessor getProcessor() {
-			return runnable;
+			return runnable.get();
 		}
 
 		@Override
@@ -357,16 +412,20 @@ public class RunnableProcessor extends PrototypeProcessor {
 	 * @return a path to the processor's data directory.
 	 */
 	private Path processorDataDirectory() {
-		final Path path = processorDataPath();
-
+		final RunnablePipeline rp = pipeline.get();
+		if (rp == null) {
+			return null;
+		}
 		try {
-			final Path directory = IOUtils.getRealDirectories(path);
+			final Path directory = rp.getProcessorDirectory(PROCESSOR_DATA_DIR);
 			return directory;
 		} catch (IOException ex) {
-			log.error("failed to retrieve the data directory of the processor: {} in {}", this, path, ex);
+			log.error(
+					"failed to retrieve the data directory of the processor: {}",
+					this, ex
+			);
 			handler.uiStrategy.showError(ex);
 		}
-
 		return null;
 	}
 
@@ -407,20 +466,37 @@ public class RunnableProcessor extends PrototypeProcessor {
 	 *
 	 * @param callback the callback function.
 	 */
-	protected void applyToDependentProcessors(Callback<RunnableProcessor, Void> callback) {
-		final Map<InputPort<?>, PrototypeProcessor.PortMapEntry> inputPortMap = this.pipeline.inputPortMap();
+	public void applyToDependentProcessors(Callback<RunnableProcessor, Void> callback) {
+		for (RunnableProcessor p : getDependentProcessors()) {
+			callback.call(p);
+		}
+	}
+
+	/**
+	 * Returns all dependent (or subsequent) processors.
+	 *
+	 * @return a set of all dependent (or subsequent) processors.
+	 */
+	public Set<RunnableProcessor> getDependentProcessors() {
+		final Set<RunnableProcessor> deps = new HashSet<>();
+		final RunnablePipeline rp = pipeline.get();
+		if (rp == null) {
+			return deps;
+		}
+		final Map<InputPort<?>, PrototypeProcessor.PortMapEntry> inputPortMap = rp.inputPortMap();
 		for (Map.Entry<String, Set<InputPort<?>>> e : processor().dependentInputs().entrySet()) {
 			final Set<InputPort<?>> inputs = e.getValue();
 			for (InputPort<?> input : inputs) {
 				final PortMapEntry m = inputPortMap.get(input);
 				if (m != null) {
-					final RunnableProcessor runnable = this.pipeline.getProcessor(m.id);
+					final RunnableProcessor runnable = rp.getProcessor(m.id);
 					if (runnable != null) {
-						callback.call(runnable);
+						deps.add(runnable);
 					}
 				}
 			}
 		}
+		return deps;
 	}
 
 	private void updateStatusColor() {
@@ -503,7 +579,16 @@ public class RunnableProcessor extends PrototypeProcessor {
 				updateMessage(localize("processing.object", runnable.processor().name()));
 				updateProgress(-1, Double.NaN);
 
+				final ProcessorTiming timing = new ProcessorTiming(runnable);
+				timing.start();
 				runnable.process();
+				timing.stop();
+
+				final PipelineTiming pipelineTiming = runnable.getPage().getPipelineTiming();
+				if (pipelineTiming != null) {
+					pipelineTiming.setProcessorTiming(timing);
+				}
+
 				return null;
 			}
 
@@ -522,6 +607,7 @@ public class RunnableProcessor extends PrototypeProcessor {
 
 		};
 		task.start();
+		task.offerCancelDialog(new Duration(760));
 		return task;
 	}
 
@@ -529,19 +615,20 @@ public class RunnableProcessor extends PrototypeProcessor {
 	 * Executes the processor. Probably should be run on some background/worker
 	 * thread, or something...
 	 */
-	protected void process() {
-		if (!this.processor().canProcess()) {
+	public void process() {
+		if (!processor().canProcess()) {
 			log.warn(
 					"Can't process. Processor doesn't implement Processable: {}",
-					this.processor()
+					processor()
 			);
 			return;
 		}
 
-		processor().asProcessableProcessor().process(newProcessorContext());
+		final ProcessorContext context = newProcessorContext();
+		processor().asProcessableProcessor().process(context);
 
-		this.updateState(true);
-		FxUtils.run(() -> {
+		FxUtils.runAndWait(() -> {
+			this.updateState(true);
 			this.setModified(true);
 		});
 	}
@@ -612,8 +699,8 @@ public class RunnableProcessor extends PrototypeProcessor {
 			processor().asResetableProcessor().reset(newProcessorContext());
 		}
 
-		this.updateState(true);
-		FxUtils.run(() -> {
+		FxUtils.runAndWait(() -> {
+			this.updateState(true);
 			this.setModified(true);
 		});
 	}

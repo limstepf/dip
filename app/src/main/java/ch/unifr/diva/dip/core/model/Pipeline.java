@@ -5,11 +5,13 @@ import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.core.ApplicationHandler;
+import ch.unifr.diva.dip.core.execution.PipelineExecutor;
 import ch.unifr.diva.dip.core.model.PrototypeProcessor.PortMapEntry;
 import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.osgi.OSGiVersionPolicy;
 import ch.unifr.diva.dip.utils.Modifiable;
 import ch.unifr.diva.dip.utils.ModifiedProperty;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -47,34 +49,6 @@ public abstract class Pipeline<T extends PrototypeProcessor> implements Modifiab
 	protected final ApplicationHandler handler;
 
 	/**
-	 * The state of a (runnable) pipeline.
-	 */
-	public enum State {
-
-		/**
-		 * Error state. There exists a processor in the pipeline with processor
-		 * state {@code ERROR}, {@code UNAVAILABLE}, or {@code UNCONNECTED}.
-		 */
-		ERROR,
-		/**
-		 * Waiting state. All remaining processor in the pipeline with processor
-		 * state {@code PROCESSING} can not be automatically processed (i.e.
-		 * {p.canProcess() == false}).
-		 */
-		WAITING,
-		/**
-		 * Processing state. There exists a processor in the pipeline that can
-		 * be processed (automatically).
-		 */
-		PROCESSING,
-		/**
-		 * Ready state. All processors in the pipeline are in the processor
-		 * state {@code READY}.
-		 */
-		READY
-	}
-
-	/**
 	 * Pipeline id. Unique key for all pipelines in a project.
 	 */
 	public final int id;
@@ -82,6 +56,7 @@ public abstract class Pipeline<T extends PrototypeProcessor> implements Modifiab
 	protected int maxProcessorId = -1;
 	protected final StringProperty name;
 	protected final ObservableList<T> processors;
+	protected final ObjectProperty<PipelineExecutor.Type> pipelineExecutorProperty;
 	protected final ObjectProperty<PipelineLayoutStrategy> layoutStrategyProperty;
 	protected final ObjectProperty<OSGiVersionPolicy> versionPolicyProperty;
 	protected final ModifiedProperty modifiedPipelineProperty;
@@ -95,19 +70,41 @@ public abstract class Pipeline<T extends PrototypeProcessor> implements Modifiab
 	 * @param name name of the pipeline.
 	 */
 	public Pipeline(ApplicationHandler handler, int id, String name) {
+		this(
+				handler,
+				id,
+				name,
+				handler.settings.pipelineEditor.getDefaultPipelineExecutor(),
+				handler.settings.pipelineEditor.getDefaultPipelineLayout(),
+				handler.settings.osgi.versionPolicy
+		);
+	}
+
+	/**
+	 * Creates an empty pipeline.
+	 *
+	 * @param handler the application handler.
+	 * @param id id of the pipeline. Needs to be unique among all pipelines in
+	 * the project, and is usually assigned by the PipelineManager.
+	 * @param name name of the pipeline.
+	 * @param pipelineExecutor the pipeline executor.
+	 * @param layoutStrategy the layout strategy.
+	 * @param versionPolicy the version policy.
+	 */
+	public Pipeline(ApplicationHandler handler, int id, String name, PipelineExecutor.Type pipelineExecutor, PipelineLayoutStrategy layoutStrategy, OSGiVersionPolicy versionPolicy) {
 		this.handler = handler;
 		this.id = id;
 		this.name = new SimpleStringProperty(name);
 		this.processors = FXCollections.observableArrayList();
-		this.layoutStrategyProperty = new SimpleObjectProperty<>(
-				handler.settings.pipelineEditor.getDefaultPipelineLayout()
-		);
-		this.versionPolicyProperty = new SimpleObjectProperty<>(
-				handler.settings.osgi.versionPolicy
-		);
+		this.pipelineExecutorProperty = new SimpleObjectProperty<>(pipelineExecutor);
+		this.layoutStrategyProperty = new SimpleObjectProperty<>(layoutStrategy);
+		this.versionPolicyProperty = new SimpleObjectProperty<>(versionPolicy);
 		this.modifiedPipelineProperty = new ModifiedProperty();
 		this.modifiedPipelineProperty.addObservedProperty(this.name);
 		this.modifiedPipelineProperty.addObservedProperty(this.processors);
+		this.modifiedPipelineProperty.addObservedProperty(this.pipelineExecutorProperty);
+		this.modifiedPipelineProperty.addObservedProperty(this.layoutStrategyProperty);
+		this.modifiedPipelineProperty.addObservedProperty(this.versionPolicyProperty);
 	}
 
 	/**
@@ -138,6 +135,9 @@ public abstract class Pipeline<T extends PrototypeProcessor> implements Modifiab
 		// don't count the following initialization as modifications
 		this.modifiedPipelineProperty.removeObservedProperty(this.processors);
 
+		this.pipelineExecutorProperty.set(
+				PipelineExecutor.Type.get(pipeline.pipelineExecutor)
+		);
 		this.layoutStrategyProperty.set(
 				PipelineLayoutStrategy.get(pipeline.layoutStrategy)
 		);
@@ -235,6 +235,33 @@ public abstract class Pipeline<T extends PrototypeProcessor> implements Modifiab
 	}
 
 	/**
+	 * Returns the pipeline executor property.
+	 *
+	 * @return the pipeline executor property.
+	 */
+	public ObjectProperty<PipelineExecutor.Type> pipelineExecutorProperty() {
+		return this.pipelineExecutorProperty;
+	}
+
+	/**
+	 * Returns the pipeline executor.
+	 *
+	 * @return the pipeline executor.
+	 */
+	public PipelineExecutor.Type getPipelineExecutor() {
+		return this.pipelineExecutorProperty.get();
+	}
+
+	/**
+	 * Sets/updates the pipeline executor.
+	 *
+	 * @param executor the new pipeline executor.
+	 */
+	public void setPipelineExecutor(PipelineExecutor.Type executor) {
+		this.pipelineExecutorProperty.set(executor);
+	}
+
+	/**
 	 * Returns the layout strategy property.
 	 *
 	 * @return the layout strategy property.
@@ -315,23 +342,47 @@ public abstract class Pipeline<T extends PrototypeProcessor> implements Modifiab
 		return this.inputPortMap;
 	}
 
+	/**
+	 * Releases this object, making sure it can be garbage collected
+	 * immediately. Should be called upon closing a project page.
+	 */
+	protected void release() {
+		final ArrayList<T> copy = new ArrayList<>(this.processors);
+		for (T p : copy) {
+			removeProcessor(p);
+		}
+		repaintListeners.clear();
+	}
+
 	// processors might change ports later on (repaint), so we need to listen.
 	// Removed ports are left in the map (technically they're just hidden/
 	// deactivated anyways).
-	protected final Map<T, InvalidationListener> repaintListeners = new HashMap<>();
+	protected final Map<Integer, InvalidationListener> repaintListeners = new HashMap<>();
 
 	protected void addRepaintListener(T p) {
 		if (p.processor().hasRepaintProperty()) {
-			final InvalidationListener listener = (c) -> registerPorts(p);
-			this.repaintListeners.put(p, listener);
+			final int weakId = p.id;
+			final WeakReference<T> weakProcessor = new WeakReference<>(p);
+			final InvalidationListener listener = (c) -> {
+				final T wp = weakProcessor.get();
+				if (wp == null) {
+					repaintListeners.remove(weakId);
+					return;
+				}
+				registerPorts(wp);
+			};
+			this.repaintListeners.put(p.id, listener);
 			p.processor().repaintProperty().addListener(listener);
 		}
 	}
 
 	protected void removeRepaintListener(T p) {
 		if (p.processor().hasRepaintProperty()) {
-			final InvalidationListener listener = this.repaintListeners.get(p);
-			p.processor().repaintProperty().addListener(listener);
+			final InvalidationListener listener = this.repaintListeners.get(p.id);
+			if (listener != null) {
+				p.processor().repaintProperty().removeListener(listener);
+				this.repaintListeners.remove(p.id);
+			}
 		}
 	}
 
@@ -738,8 +789,9 @@ public abstract class Pipeline<T extends PrototypeProcessor> implements Modifiab
 		public Processor.State state() {
 			int max = -1;
 			for (PrototypeProcessor w : this.processors) {
-				if (w.getStateValue().weight > max) {
-					max = w.getStateValue().weight;
+				final int weight = w.getState().weight;
+				if (weight > max) {
+					max = weight;
 				}
 			}
 			return Processor.State.getState(max);

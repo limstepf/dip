@@ -216,7 +216,8 @@ public class ProjectData {
 				page.getName(),
 				page.file,
 				page.checksum,
-				page.getPipelineId()
+				page.getPipelineId(),
+				page.getState().name()
 		));
 	}
 
@@ -409,7 +410,7 @@ public class ProjectData {
 					// either the exact version, or an up-/downgraded one. If null, the service is
 					// unavailable (and needs to be manually replaced or something...)
 					final ServiceCollection<Processor> collection = handler.osgi.getProcessorCollection(processor.pid);
-					if (collection != null) {
+					if (collection != null && processor.version != null) {
 						final OSGiService<Processor> service = policy.getService(collection, new Version(processor.version));
 						if (service != null) {
 							final String versionByPolicy = service.version.toString();
@@ -547,6 +548,12 @@ public class ProjectData {
 		public int pipelineId = -1;
 
 		/**
+		 * The execution state (or state of the assigned pipeline).
+		 */
+		@XmlAttribute(name = "state")
+		public String pipelineState = PipelineState.getDefault().name();
+
+		/**
 		 * The name of the page. Get's initialized to the filename of the image
 		 * file, but can be changed to anything.
 		 */
@@ -575,6 +582,7 @@ public class ProjectData {
 					+ "{"
 					+ "id=" + id
 					+ ", pipeline=" + pipelineId
+					+ ", state=" + pipelineState
 					+ ", name=" + name
 					+ ", file=" + file
 					+ ", checksum=" + checksum
@@ -588,18 +596,20 @@ public class ProjectData {
 		}
 
 		/**
-		 * Creates a new page object.
+		 * Creates a new page object. Used to add a new page to a project
+		 * (without pipeline assigned).
 		 *
 		 * @param id the id of the page.
 		 * @param file the image of the page.
 		 * @throws IOException
 		 */
 		public Page(int id, Path file) throws IOException {
-			this(id, null, file, IOUtils.checksum(file), -1);
+			this(id, file, -1);
 		}
 
 		/**
-		 * Creates a new page object.
+		 * Creates a new page object. Used to add a new page to a project
+		 * (usually with the default pipeline assigned).
 		 *
 		 * @param id the id of the page.
 		 * @param file the image of the page.
@@ -607,19 +617,28 @@ public class ProjectData {
 		 * @throws IOException
 		 */
 		public Page(int id, Path file, int pipelineId) throws IOException {
-			this(id, null, file, IOUtils.checksum(file), pipelineId);
+			this(
+					id,
+					null,
+					file,
+					IOUtils.checksum(file),
+					pipelineId,
+					PipelineState.getDefault().name()
+			);
 		}
 
 		/**
-		 * Creates a new page object.
+		 * Creates a new page object. Used to marshal a page to XML.
 		 *
 		 * @param id the id of the page.
 		 * @param name the name of the page.
 		 * @param file the path to the image file of the page.
 		 * @param checksum the checksum of the image file.
 		 * @param pipelineId the id of the used/parent pipeline.
+		 * @param pipelineState the execution state (or state of the assigned
+		 * pipeline).
 		 */
-		public Page(int id, String name, Path file, String checksum, int pipelineId) {
+		public Page(int id, String name, Path file, String checksum, int pipelineId, String pipelineState) {
 			this.id = id;
 			if (name == null) {
 				this.name = getDefaultName(file);
@@ -629,6 +648,7 @@ public class ProjectData {
 			this.file = file;
 			this.checksum = checksum;
 			this.pipelineId = pipelineId;
+			this.pipelineState = pipelineState;
 		}
 
 		private String getDefaultName(Path file) {
@@ -639,6 +659,15 @@ public class ProjectData {
 				return defaultName.substring(0, i);
 			}
 			return defaultName;
+		}
+
+		/**
+		 * Returns the execution state (or state of the assigned pipeline).
+		 *
+		 * @return the execution state (or state of the assigned pipeline).
+		 */
+		public PipelineState getState() {
+			return PipelineState.get(pipelineState);
 		}
 
 		@Override

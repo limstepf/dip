@@ -84,7 +84,8 @@ Text, TextFlow {
 	-fx-font-weight: 900;
 }
 
-.dip-small {
+.dip-small,
+.dip-small-emphasis {
 	-fx-font-size: 0.75em;
 }
 .label.dip-small {
@@ -94,7 +95,17 @@ Text, TextFlow {
 	-fx-text-fill: white;
 }
 
+.dip-small-emphasis,
+.dip-emphasis {
+	-fx-fill: -fx-accent;
+	-fx-text-fill: -fx-accent;
+}
+
 .button.dip-small {
+    -fx-padding: 0.166667em 0.333333em 0.166667em 0.333333em;
+}
+
+.combo-box-base.dip-small > .list-cell {
     -fx-padding: 0.166667em 0.333333em 0.166667em 0.333333em;
 }
 
@@ -136,11 +147,6 @@ Text, TextFlow {
 .dip-menuitem:focused .dip-glyph {
 	-fx-fill: -dip-accent-inverted;
 	-fx-text-fill: -dip-accent-inverted;
-}
-
-.dip-form-grid-pane {
-	-fx-hgap: 1.25em;
-	-fx-vgap: 0.416em;
 }
 
 .dip-button-bar {
@@ -202,6 +208,14 @@ Text, TextFlow {
 
 .dip-status-bar ProgressBar {
 	-fx-padding: 0.166667em 0.0em 0.0em 0.0em;
+}
+
+.dip-cancelled-progress > .bar {
+    -fx-background-color: linear-gradient(to bottom, derive(-dip-proc-unavailable, -7%), derive(-dip-proc-unavailable, 0%), derive(-dip-proc-unavailable, -3%), derive(-dip-proc-unavailable, -9%) );
+}
+
+.dip-cancelled-progress:indeterminate > .bar {
+    -fx-background-color: linear-gradient(to left, transparent, -dip-proc-unavailable);
 }
 
 .dip-resize-handle {

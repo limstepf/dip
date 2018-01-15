@@ -71,6 +71,31 @@ public class DipThreadPool {
 	public DipThreadPool(int poolSize) {
 		this(
 				"dip-threadpool",
+				poolSize
+		);
+	}
+
+	/**
+	 * Creates a new thread pool.
+	 *
+	 * @param poolName prefix used to name the threads.
+	 */
+	public DipThreadPool(String poolName) {
+		this(
+				"dip-threadpool",
+				Runtime.getRuntime().availableProcessors()
+		);
+	}
+
+	/**
+	 * Creates a new thread pool.
+	 *
+	 * @param poolName prefix used to name the threads.
+	 * @param poolSize the number of threads in the pool.
+	 */
+	public DipThreadPool(String poolName, int poolSize) {
+		this(
+				poolName,
 				poolSize,
 				new LinkedBlockingQueue<>(),
 				null
@@ -129,7 +154,7 @@ public class DipThreadPool {
 		try {
 			this.executor.awaitTermination(5, TimeUnit.SECONDS);
 		} catch (InterruptedException ex) {
-			// interrupted
+			Thread.currentThread().interrupt();
 		} finally {
 			if (!this.executor.isTerminated()) {
 				this.executor.shutdownNow();

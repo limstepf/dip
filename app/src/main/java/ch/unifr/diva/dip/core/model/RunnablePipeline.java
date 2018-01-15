@@ -1,14 +1,20 @@
 package ch.unifr.diva.dip.core.model;
 
-import ch.unifr.diva.dip.api.services.Processor;
+import ch.unifr.diva.dip.core.execution.PipelineExecutor;
 import ch.unifr.diva.dip.api.utils.FxUtils;
 import ch.unifr.diva.dip.core.ApplicationHandler;
+import ch.unifr.diva.dip.core.execution.PipelineExecutionLogger;
+import ch.unifr.diva.dip.gui.pe.PipelineLayoutStrategy;
+import ch.unifr.diva.dip.osgi.OSGiVersionPolicy;
 import ch.unifr.diva.dip.utils.FileFinder;
+import ch.unifr.diva.dip.utils.IOUtils;
 import ch.unifr.diva.dip.utils.UniqueHashSet;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.ref.WeakReference;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -16,9 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javafx.beans.InvalidationListener;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javax.xml.bind.JAXBException;
 
 /**
@@ -31,7 +34,6 @@ public class RunnablePipeline extends Pipeline<RunnableProcessor> {
 	 */
 	public final ProjectPage page;
 
-	private final ObjectProperty<Pipeline.State> stateProperty;
 	private final List<Set<RunnableProcessor>> processorStateSets;
 	// set of processors in an error state (error, unavailable, unconnected)
 	private final Set<RunnableProcessor> errorProcessors;
@@ -40,6 +42,9 @@ public class RunnablePipeline extends Pipeline<RunnableProcessor> {
 	private final Set<RunnableProcessor> waitingProcessors;
 	// set of processors that can be (auto) processed next.
 	private final Set<RunnableProcessor> processingProcessors;
+	// don't update pipeline state during initialization (or this goes from ERROR
+	// to WARNING and to PROCESSING/READY eventually...)
+	private boolean doUpdateState;
 
 	// so far added and removed processors set the dirty bit to true, but that's
 	// not really enough: we'd also need to update the stages if connections change!
@@ -49,6 +54,11 @@ public class RunnablePipeline extends Pipeline<RunnableProcessor> {
 	protected boolean dirtyStages = true;
 	protected PipelineStages<RunnableProcessor> stages;
 
+	// two locks are needed, since resources need to be accessed by processors
+	// while the pipelineLock is being held.
+	private final Object pipelineLock = new Object();
+	private final Object resourceLock = new Object();
+
 	/**
 	 * Creates a new runnable pipeline from pipeline data.
 	 *
@@ -57,10 +67,16 @@ public class RunnablePipeline extends Pipeline<RunnableProcessor> {
 	 * @param pipeline the pipeline data/specification.
 	 */
 	public RunnablePipeline(ApplicationHandler handler, ProjectPage page, PipelineData.Pipeline pipeline) {
-		super(handler, pipeline.id, pipeline.name);
+		super(
+				handler,
+				pipeline.id,
+				pipeline.name,
+				PipelineExecutor.Type.get(pipeline.pipelineExecutor),
+				PipelineLayoutStrategy.get(pipeline.layoutStrategy),
+				OSGiVersionPolicy.get(pipeline.versionPolicy)
+		);
 		this.page = page;
 
-		this.stateProperty = new SimpleObjectProperty<>(Pipeline.State.WAITING);
 		this.errorProcessors = new UniqueHashSet<>();
 		this.waitingProcessors = new UniqueHashSet<>();
 		this.processingProcessors = new UniqueHashSet<>();
@@ -92,24 +108,9 @@ public class RunnablePipeline extends Pipeline<RunnableProcessor> {
 
 		// reattach listener we temp. removed (see above)
 		this.modifiedPipelineProperty.addObservedProperty(this.processors);
-	}
 
-	/**
-	 * Returns the state property of the pipeline.
-	 *
-	 * @return the state property of the pipeline.
-	 */
-	public ReadOnlyObjectProperty<Pipeline.State> stateProperty() {
-		return this.stateProperty;
-	}
-
-	/**
-	 * Returns the state of the pipeline.
-	 *
-	 * @return the state of the pipeline.
-	 */
-	public Pipeline.State getState() {
-		return stateProperty().get();
+		doUpdateState = true;
+		updateState();
 	}
 
 	/**
@@ -127,19 +128,34 @@ public class RunnablePipeline extends Pipeline<RunnableProcessor> {
 	 * (Re-)evaluates the state of the pipeline.
 	 */
 	private void updateState() {
-		if (!errorProcessors.isEmpty()) {
-			stateProperty.set(State.ERROR);
-		} else if (!waitingProcessors.isEmpty() && processingProcessors.isEmpty()) {
-			stateProperty.set(State.WAITING);
-		} else if (!processingProcessors.isEmpty()) {
-			stateProperty.set(State.PROCESSING);
-		} else {
-			stateProperty.set(State.READY);
+		// do not update the pipeline state if we're about to release this pipeline
+		if (releaseLock || !doUpdateState) {
+			return;
 		}
+
+		page.setState(getPipelineState());
+	}
+
+	/**
+	 * Returns the (execution) state of the pipeline.
+	 *
+	 * @return the (execution) state of the pipeline.
+	 */
+	protected PipelineState getPipelineState() {
+		if (!errorProcessors.isEmpty()) {
+			return PipelineState.ERROR;
+		}
+		if (!waitingProcessors.isEmpty() && processingProcessors.isEmpty()) {
+			return PipelineState.WAITING;
+		}
+		if (!processingProcessors.isEmpty()) {
+			return PipelineState.PROCESSING;
+		}
+		return PipelineState.READY;
 	}
 
 	private void registerProcessorState(RunnableProcessor p) {
-		switch (p.getStateValue()) {
+		switch (p.getState()) {
 			case WAITING:
 				registerProcessorState(p, null);
 				break;
@@ -174,16 +190,44 @@ public class RunnablePipeline extends Pipeline<RunnableProcessor> {
 		}
 	}
 
-	private final Map<RunnableProcessor, InvalidationListener> processorStateListeners = new HashMap<>();
+	/**
+	 * Release lock. Prevents updating the pipeline state while releasing the
+	 * pipeline. May be also checked by {@code RunnableProcessor}s.
+	 */
+	protected boolean releaseLock = false;
+
+	@Override
+	protected void release() {
+		releaseLock = true;
+		for (RunnableProcessor p : this.processors) {
+			p.release();
+		}
+		super.release();
+		this.stages = null;
+		this.errorProcessors.clear();
+		this.waitingProcessors.clear();
+		this.processingProcessors.clear();
+		this.processorStateListeners.clear();
+		releaseLock = false;
+	}
+
+	private final Map<Integer, InvalidationListener> processorStateListeners = new HashMap<>();
 
 	@Override
 	protected void registerProcessor(RunnableProcessor wrapper) {
 		super.registerProcessor(wrapper);
 		this.dirtyStages = true;
+		final WeakReference<RunnableProcessor> weakWrapper = new WeakReference<>(wrapper);
+		final int weakId = wrapper.id;
 		final InvalidationListener listener = (e) -> {
-			updateState(wrapper);
+			final RunnableProcessor p = weakWrapper.get();
+			if (p == null) {
+				processorStateListeners.remove(weakId);
+				return;
+			}
+			updateState(p);
 		};
-		processorStateListeners.put(wrapper, listener);
+		processorStateListeners.put(wrapper.id, listener);
 		wrapper.stateProperty().addListener(listener);
 		updateState(wrapper);
 	}
@@ -192,10 +236,11 @@ public class RunnablePipeline extends Pipeline<RunnableProcessor> {
 	protected void unregisterProcessor(RunnableProcessor wrapper) {
 		super.unregisterProcessor(wrapper);
 		this.dirtyStages = true;
-		final InvalidationListener listener = processorStateListeners.get(wrapper);
+		final InvalidationListener listener = processorStateListeners.get(wrapper.id);
 		if (listener != null) {
 			wrapper.stateProperty().removeListener(listener);
 		}
+		processorStateListeners.remove(wrapper.id);
 		registerProcessorState(wrapper, null);
 		updateState();
 	}
@@ -243,19 +288,23 @@ public class RunnablePipeline extends Pipeline<RunnableProcessor> {
 	 * {@code RunnableProcessor}s.
 	 */
 	public void save() {
-		for (RunnableProcessor p : processors) {
-			p.save();
+		synchronized (pipelineLock) {
+			for (RunnableProcessor p : processors) {
+				p.save();
+			}
+			savePipelinePatch();
+			FxUtils.run(() -> modifiedProperty().set(false));
 		}
-		savePipelinePatch();
-		FxUtils.run(() -> modifiedProperty().set(false));
 	}
 
 	/**
 	 * Switches/updates the context on all processors in the pipeline.
 	 */
 	public void contextSwitch() {
-		for (RunnableProcessor p : processors()) {
-			p.switchContext(false);
+		synchronized (pipelineLock) {
+			for (RunnableProcessor p : processors()) {
+				p.switchContext(false);
+			}
 		}
 	}
 
@@ -295,53 +344,32 @@ public class RunnablePipeline extends Pipeline<RunnableProcessor> {
 	}
 
 	/**
-	 * Processes the pipeline. Keeps processing all processable processors in
-	 * the pipeline until all processors are {@code READY} or can't be
-	 * automatically processed.
-	 *
-	 * Probably should be run on some background/worker thread, or something...
+	 * Processes the pipeline.
 	 */
-	public synchronized void process() {
-		final List<RunnableProcessor> processing = getProcessing();
-		for (RunnableProcessor p : processing) {
-			p.process();
-			processDependentProcessors(p);
+	public void process() {
+		process(handler.getPipelineExecutorLogger());
+	}
+
+	/**
+	 * Processes the pipeline.
+	 *
+	 * @param logger the pipeline execution logger.
+	 */
+	public void process(PipelineExecutionLogger logger) {
+		synchronized (pipelineLock) {
+			final PipelineExecutor executor = newPipelineExecutor(logger);
+			executor.processAndWaitForStop();
 		}
 	}
 
 	/**
-	 * Process dependent processors. Dependent processors are those immediately
-	 * following the given processor in the pipeline. The given processor has
-	 * been processed now, so we check if these dependent processor can be
-	 * processed now too, and do so, if that's the case. We repeat this
-	 * recursively for all processed processors.
+	 * Creates a new pipeline executor.
 	 *
-	 * @param p the processor that just has been processed.
+	 * @param logger the pipeline execution logger.
+	 * @return the pipeline executor.
 	 */
-	private void processDependentProcessors(RunnableProcessor p) {
-		p.applyToDependentProcessors((q) -> {
-			if (isProcessing(q)) {
-				q.process();
-				processDependentProcessors(q);
-			}
-			return null;
-		});
-	}
-
-	// can we process this now?
-	private boolean isProcessing(RunnableProcessor p) {
-		return Processor.State.PROCESSING.equals(p.getStateValue()) && p.processor().canProcess();
-	}
-
-	// inital set of processor that can be processed
-	private List<RunnableProcessor> getProcessing() {
-		final ArrayList<RunnableProcessor> processing = new ArrayList<>();
-		for (RunnableProcessor p : processors()) {
-			if (isProcessing(p)) {
-				processing.add(p);
-			}
-		}
-		return processing;
+	public PipelineExecutor newPipelineExecutor(PipelineExecutionLogger logger) {
+		return getPipelineExecutor().newInstance(this, logger);
 	}
 
 	/**
@@ -351,25 +379,43 @@ public class RunnablePipeline extends Pipeline<RunnableProcessor> {
 	 * @param unpatch if {@code true} resets all parameters/pipeline patches,
 	 * otherwise the persistent processor data only is deleted.
 	 */
-	public synchronized void reset(boolean unpatch) {
-		for (RunnableProcessor p : processors()) {
-			if (p.processor().canReset()) {
-				p.reset();
-				FxUtils.run(() -> p.updateState(true));
+	public void reset(boolean unpatch) {
+		synchronized (pipelineLock) {
+			for (RunnableProcessor p : processors()) {
+				if (p.processor().canReset()) {
+					p.reset();
+					FxUtils.runAndWait(() -> p.updateState(true));
+				}
+			}
+
+			try {
+				if (Files.exists(this.page.processorRootDirectory())) {
+					FileFinder.deleteDirectory(this.page.processorRootDirectory());
+				}
+			} catch (IOException ex) {
+				log.error("failed to clear the project page's processor data: {}", this, ex);
+				handler.uiStrategy.showError(ex);
+			}
+
+			if (unpatch) {
+				deletePipelinePatch();
 			}
 		}
+	}
 
-		try {
-			if (Files.exists(this.page.processorRootDirectory())) {
-				FileFinder.deleteDirectory(this.page.processorRootDirectory());
-			}
-		} catch (IOException ex) {
-			log.error("failed to clear the project page's processor data: {}", this, ex);
-			handler.uiStrategy.showError(ex);
-		}
-
-		if (unpatch) {
-			deletePipelinePatch();
+	/**
+	 * Returns the path to a processor's dedicated data directory. The directory
+	 * will be created if it doesn't exist yet.
+	 *
+	 * @param processorDataDirectory the processor's data directory.
+	 * @return path to the processor's data directory.
+	 * @throws IOException
+	 */
+	protected Path getProcessorDirectory(String processorDataDirectory) throws IOException {
+		final Path path = page.project().zipFileSystem().getPath(processorDataDirectory);
+		synchronized (resourceLock) {
+			final Path directory = IOUtils.getRealDirectories(path);
+			return directory;
 		}
 	}
 

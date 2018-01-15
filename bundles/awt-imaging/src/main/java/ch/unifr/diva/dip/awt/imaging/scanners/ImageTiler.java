@@ -76,6 +76,11 @@ public abstract class ImageTiler<T extends Rectangle> implements Iterator<T>, It
 			return null;
 		}
 
+		if (Thread.currentThread().isInterrupted()) {
+			Thread.currentThread().interrupt();
+			return null;
+		}
+
 		this.index++;
 		final int x = getX();
 		final int y = getY();
@@ -95,7 +100,7 @@ public abstract class ImageTiler<T extends Rectangle> implements Iterator<T>, It
 	/*
 	 * For thread safety with binary images we need to make sure to not produce
 	 * smaller rest-tiles at the border, but larger tiles an iteration earlier!
-	 * See notes in ProcessorBase.java, getOptimalTileSize() method.
+	 * See notes in dip/awt/imaging/Filter.java, getOptimalTileSize() method.
 	 */
 	protected int getWidth(int x) {
 		final int w = x + this.width;

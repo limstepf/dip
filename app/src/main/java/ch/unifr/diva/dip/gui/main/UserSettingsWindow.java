@@ -7,6 +7,7 @@ import ch.unifr.diva.dip.api.parameters.LabelParameter;
 import ch.unifr.diva.dip.api.parameters.PersistentParameter;
 import ch.unifr.diva.dip.api.utils.L10n;
 import ch.unifr.diva.dip.core.ApplicationHandler;
+import ch.unifr.diva.dip.core.execution.PipelineExecutor;
 import ch.unifr.diva.dip.core.ui.StylesheetManager;
 import ch.unifr.diva.dip.gui.pe.PipelineLayoutStrategy;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
@@ -197,6 +198,26 @@ public class UserSettingsWindow extends AbstractWindow implements Presenter {
 
 		/* pipeline editor settings */
 		final Category pe = new Category(localize("pipeline.editor"));
+
+		// default pipeline executor
+		pe.addItem(new Item<EnumParameter>() {
+			@Override
+			public EnumParameter parameter() {
+				if (this.parameter == null) {
+					this.parameter = new EnumParameter(
+							localize("pipeline.executor.default"),
+							PipelineExecutor.Type.class,
+							handler.settings.pipelineEditor.pipelineExecutor
+					);
+				}
+				return this.parameter;
+			}
+
+			@Override
+			public void save() {
+				handler.settings.pipelineEditor.pipelineExecutor = this.parameter.get();
+			}
+		});
 
 		// connection-view/wire type
 		pe.addItem(new Item<EnumParameter>() {

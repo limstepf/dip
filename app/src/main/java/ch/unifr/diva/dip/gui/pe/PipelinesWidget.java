@@ -7,6 +7,7 @@ import ch.unifr.diva.dip.api.ui.MouseEventHandler;
 import ch.unifr.diva.dip.api.ui.MouseEventHandler.ClickCount;
 import ch.unifr.diva.dip.api.utils.L10n;
 import ch.unifr.diva.dip.core.ApplicationHandler;
+import ch.unifr.diva.dip.core.execution.PipelineExecutor;
 import ch.unifr.diva.dip.core.model.ProjectPage;
 import ch.unifr.diva.dip.core.model.PrototypePipeline;
 import ch.unifr.diva.dip.core.ui.Localizable;
@@ -257,6 +258,7 @@ public class PipelinesWidget extends AbstractWidget {
 
 		private PrototypePipeline currentPipeline;
 		private Glyph currentGlyph;
+		private final Glyph expandGlyph;
 		private final PipelineEditor editor;
 		private final ToggleGroup group;
 		private final BorderPane pane = new BorderPane();
@@ -303,6 +305,12 @@ public class PipelinesWidget extends AbstractWidget {
 			label.setAlignment(Pos.CENTER_LEFT);
 			label.setMaxWidth(Double.MAX_VALUE);
 
+			this.expandGlyph = UIStrategyGUI.Glyphs.newGlyph(
+					MaterialDesignIcons.CHEVRON_DOWN,
+					Glyph.Size.NORMAL
+			);
+			expandGlyph.disabledHoverEffectProperty().set(true);
+
 			radioButton.setPadding(new Insets(0, UIStrategyGUI.Stage.insets, 0, 0));
 
 			usage.getStyleClass().add("dip-small");
@@ -345,7 +353,7 @@ public class PipelinesWidget extends AbstractWidget {
 				pane.setRight(getDefaultPipelineGlyph());
 				updateGlyphColor();
 			} else {
-				pane.setRight(null);
+				pane.setRight(expandGlyph);
 				currentGlyph = null;
 				this.selectedProperty().removeListener(glyphListener);
 			}
@@ -449,6 +457,11 @@ public class PipelinesWidget extends AbstractWidget {
 				currentPipeline.setName(tf);
 			}
 
+			final PipelineExecutor.Type pet = edit.getPipelineExecutor();
+			if (!currentPipeline.getPipelineExecutor().equals(pet)) {
+				currentPipeline.setPipelineExecutor(pet);
+			}
+
 			final PipelineLayoutStrategy pls = edit.getLayoutStrategy();
 			if (!currentPipeline.getLayoutStrategy().equals(pls)) {
 				currentPipeline.setLayoutStrategy(pls);
@@ -461,7 +474,7 @@ public class PipelinesWidget extends AbstractWidget {
 			}
 
 			pane.setCenter(vbox);
-			pane.setRight(currentGlyph);
+			pane.setRight((currentGlyph == null) ? expandGlyph : currentGlyph);
 
 			// this seems to be necessary since we ommit commitEdit and just
 			// use cancelEdit. Might also be a bug, who knows...
@@ -478,6 +491,7 @@ public class PipelinesWidget extends AbstractWidget {
 		private final FormGridPane grid;
 		private final TextField pipelineName;
 		private final Label usageLabel;
+		private final EnumParameter pipelineExecutor;
 		private final EnumParameter layoutStrategy;
 		private final EnumParameter versionPolicy;
 
@@ -494,6 +508,15 @@ public class PipelinesWidget extends AbstractWidget {
 			pipelineName.setOnKeyPressed(onEnterHandler);
 			this.usageLabel = new Label();
 			this.usageLabel.getStyleClass().add("dip-small");
+
+			this.pipelineExecutor = new EnumParameter(
+					L10n.getInstance().getString("pipeline.executor"),
+					PipelineExecutor.Type.class,
+					PipelineExecutor.Type.getDefault().name()
+			);
+			pipelineExecutor.view().node().setOnKeyPressed(onEnterHandler);
+			pipelineExecutor.view().node().getStyleClass().add("dip-small");
+			grid.addParameters(pipelineExecutor);
 
 			this.layoutStrategy = new EnumParameter(
 					L10n.getInstance().getString("pipeline.layout.strategy"),
@@ -525,6 +548,7 @@ public class PipelinesWidget extends AbstractWidget {
 		 * @param usage the usage message of the pipeline.
 		 */
 		public void init(PrototypePipeline pipeline, String name, String usage) {
+			pipelineExecutor.set(pipeline.getPipelineExecutor().name());
 			layoutStrategy.set(pipeline.getLayoutStrategy().name());
 			versionPolicy.set(pipeline.getVersionPolicy().name());
 			pipelineName.setText(name);
@@ -538,6 +562,15 @@ public class PipelinesWidget extends AbstractWidget {
 		 */
 		public String getPipelineName() {
 			return pipelineName.getText();
+		}
+
+		/**
+		 * Returns the (new) pipeline executor.
+		 *
+		 * @return the pipeline executor.
+		 */
+		public PipelineExecutor.Type getPipelineExecutor() {
+			return PipelineExecutor.Type.get(pipelineExecutor.get());
 		}
 
 		/**

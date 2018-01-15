@@ -18,7 +18,7 @@ import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
 import ch.unifr.diva.dip.osgi.OSGiService;
 import ch.unifr.diva.dip.utils.IOUtils;
-import ch.unifr.diva.dip.utils.SynchronizedObjectProperty;
+import ch.unifr.diva.dip.api.utils.SynchronizedObjectProperty;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -174,7 +174,6 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 		this.layoutXProperty.addListener(softEditListener);
 		this.layoutYProperty.addListener(softEditListener);
 		this.editingProperty.addListener(softEditListener);
-
 	}
 
 	/**
@@ -183,7 +182,7 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 	 * @return a read-only stateProperty.
 	 */
 	public ReadOnlyObjectProperty<Processor.State> stateProperty() {
-		return stateProperty.getReadOnlyProperty();
+		return stateProperty.getProperty();
 	}
 
 	/**
@@ -192,22 +191,7 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 	 * @return the state of the processor.
 	 */
 	public Processor.State getState() {
-		// returning the value from stateProperty itself is bound to end in
-		// confusion if we're listening to the stateProperty for changes, since
-		// that value might be already newer than the ReadOnlyProperty on the
-		// FX application thread.
-		return this.stateProperty.getReadOnlyProperty().get();
-	}
-
-	/**
-	 * Returns the state of the processor. This method shouldn't be called if
-	 * listening to the {@code stateProperty} since this value might already be
-	 * newer. However, this method might be prefered to initialize things.
-	 *
-	 * @return the state of the processor.
-	 */
-	public Processor.State getStateValue() {
-		return this.stateProperty.get();
+		return stateProperty.get();
 	}
 
 	/**
@@ -308,7 +292,7 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 	}
 
 	/**
-	 * Savely returns the processor's glyph, or the default one.
+	 * Safely returns the processor's glyph, or the default one.
 	 *
 	 * @return the glyph (factory) of the processor.
 	 */
@@ -317,7 +301,7 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 	}
 
 	/**
-	 * Savely returns a processor's glyph, or the default one.
+	 * Safely returns a processor's glyph, or the default one.
 	 *
 	 * @param processor a processor.
 	 * @return the glyph (factory) of the processor.
@@ -397,9 +381,7 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 		// ports have disappeared or something...
 		if (processor != null) {
 
-			if (processor.hasRepaintProperty()) {
-				processor.repaintProperty().removeListener(repaintListener);
-			}
+			removeRepaintListener();
 			saveParameters(processor);
 
 			// disconnecting the old processor might change its ports (repaint)
@@ -489,9 +471,11 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 		try {
 			if (isHostProcessor) {
 				final HostProcessor hp = (HostProcessor) processor;
-				hp.init(getHostProcessorContext());
+				final HostProcessorContext hpc = getHostProcessorContext();
+				hp.init(hpc);
 			} else {
-				processor.init(getProcessorContext());
+				final ProcessorContext pc = getProcessorContext();
+				processor.init(pc);
 			}
 		} catch (Exception ex) {
 			log.warn("failed to initialize the processor: {}", processor, ex);
@@ -522,6 +506,32 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 		this.parameters = PersistentParameter.getPreset(processor.parameters());
 	}
 
+	/**
+	 * Releases this object, making sure it can be garbage collected
+	 * immediately.
+	 */
+	protected void release() {
+		removePortListeners();
+		removeRepaintListener();
+	}
+
+	private void removeRepaintListener() {
+		if (processor.hasRepaintProperty()) {
+			processor.repaintProperty().removeListener(repaintListener);
+		}
+	}
+
+	private void removePortListeners() {
+		for (InputPort<?> p : currentInputPorts) {
+			p.portStateProperty().removeListener(inputPortListener);
+		}
+		currentInputPorts.clear();
+		for (OutputPort<?> p : currentOutputPorts) {
+			p.portStateProperty().removeListener(outputPortListener);
+		}
+		currentOutputPorts.clear();
+	}
+
 	private final InvalidationListener repaintListener = (e) -> onRepaint();
 	private final InvalidationListener inputPortListener = (e) -> onInputPortChanged();
 	private final InvalidationListener outputPortListener = (e) -> onOutputPortChanged();
@@ -545,15 +555,9 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 			this.modifiedProcessorProperty.removeObservedProperty(p.property());
 		}
 		currentParameters.clear();
+
 		// remove port listeners
-		for (InputPort<?> p : currentInputPorts) {
-			p.portStateProperty().removeListener(inputPortListener);
-		}
-		currentInputPorts.clear();
-		for (OutputPort<?> p : currentOutputPorts) {
-			p.portStateProperty().removeListener(outputPortListener);
-		}
-		currentOutputPorts.clear();
+		removePortListeners();
 
 		// add parameter listeners
 		for (Parameter<?> p : processor.parameters().values()) {
@@ -572,15 +576,6 @@ public class PrototypeProcessor implements Modifiable, Localizable {
 		}
 
 		updateState();
-	}
-
-	/**
-	 * Marks the wrapped processor as deprecated. This happens when the OSGi
-	 * service of the processor is removed from the OSGi framework, rendering
-	 * the wrapped processor unavailable until the service shows up again.
-	 */
-	public void deprecateProcessor() {
-		availableProperty.set(false);
 	}
 
 	/**

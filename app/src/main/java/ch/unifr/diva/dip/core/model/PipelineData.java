@@ -7,6 +7,7 @@ import ch.unifr.diva.dip.api.datatypes.DataType;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.api.utils.XmlUtils;
 import ch.unifr.diva.dip.core.UserSettings;
+import ch.unifr.diva.dip.core.execution.PipelineExecutor;
 import ch.unifr.diva.dip.core.services.api.HostService;
 import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.glyphs.mdi.MaterialDesignIcons;
@@ -321,6 +322,12 @@ public class PipelineData {
 		public String name;
 
 		/**
+		 * The pipeline executor.
+		 */
+		@XmlAttribute
+		public String pipelineExecutor;
+
+		/**
 		 * The layout strategy of the pipeline.
 		 */
 		@XmlAttribute
@@ -368,6 +375,7 @@ public class PipelineData {
 		public Pipeline(UserSettings settings, int id, String name) {
 			this.id = id;
 			this.name = name;
+			this.pipelineExecutor = PipelineExecutor.Type.getDefault().name();
 			this.layoutStrategy = PipelineLayoutStrategy.getDefault().name();
 			this.versionPolicy = (settings == null)
 					? OSGiVersionPolicy.getDefault().name()
@@ -383,6 +391,8 @@ public class PipelineData {
 		public <T extends PrototypeProcessor> Pipeline(ch.unifr.diva.dip.core.model.Pipeline<T> pipeline) {
 			this.id = pipeline.id;
 			this.name = pipeline.getName();
+
+			this.pipelineExecutor = pipeline.getPipelineExecutor().name();
 			this.layoutStrategy = pipeline.getLayoutStrategy().name();
 			this.versionPolicy = pipeline.getVersionPolicy().name();
 

@@ -406,6 +406,9 @@ public class LayerGroup extends LayerBase implements EditorLayerGroup {
 				return createLayerPane(name);
 			});
 		} catch (Exception ex) {
+			if (ex instanceof InterruptedException) {
+				return null;
+			}
 			log.error("failed to create a new LayerPane: {}", this, ex);
 			return null;
 		}

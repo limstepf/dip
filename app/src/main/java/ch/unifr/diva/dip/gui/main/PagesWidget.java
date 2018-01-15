@@ -1,10 +1,12 @@
 package ch.unifr.diva.dip.gui.main;
 
+import ch.unifr.diva.dip.api.ui.Glyph;
 import ch.unifr.diva.dip.api.ui.KeyEventHandler;
 import ch.unifr.diva.dip.api.ui.MouseEventHandler;
 import ch.unifr.diva.dip.api.ui.MouseEventHandler.ClickCount;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.model.PipelineManager;
+import ch.unifr.diva.dip.core.model.Project;
 import ch.unifr.diva.dip.eventbus.events.ProjectNotification;
 import ch.unifr.diva.dip.eventbus.events.ProjectRequest;
 import ch.unifr.diva.dip.gui.AbstractWidget;
@@ -12,6 +14,7 @@ import ch.unifr.diva.dip.gui.layout.DraggableListCell;
 import ch.unifr.diva.dip.core.model.ProjectPage;
 import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.core.ui.UIStrategyGUI;
+import ch.unifr.diva.dip.glyphs.mdi.MaterialDesignIcons;
 import ch.unifr.diva.dip.gui.layout.FormGridPane;
 import com.google.common.eventbus.Subscribe;
 import java.util.ArrayList;
@@ -22,9 +25,11 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
@@ -39,8 +44,10 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,6 +99,7 @@ public class PagesWidget extends AbstractWidget {
 				view.listView.setItems(handler.getProject().pages());
 				break;
 			case SELECTED:
+				view.selectItem(handler.getProject().getPage(event.page));
 				break;
 			case MODIFIED:
 				break;
@@ -186,6 +194,27 @@ public class PagesWidget extends AbstractWidget {
 			// back to listView (e.g. to delete those items) wont behave as expected...
 			return new ArrayList<>(listView.getSelectionModel().getSelectedItems());
 		}
+
+		/**
+		 * Marks the item/page as selected. Used as a callback in case a page got
+		 * selected over the eventbus (as opposed to the user clicking the radio button).
+		 * @param page the item/page to mark as select.
+		 */
+		public final void selectItem(ProjectPage page) {
+			if (page == null) {
+				return;
+			}
+			final ProjectPage selectedPage = listView.getSelectionModel().getSelectedItem();
+			if (selectedPage != null) {
+				if (page.id == selectedPage.id) {
+					return;
+				}
+			}
+
+			listView.scrollTo(page);
+			listView.getSelectionModel().select(page);
+		}
+
 	}
 
 	/**
@@ -193,34 +222,44 @@ public class PagesWidget extends AbstractWidget {
 	 */
 	public static class ProjectPageCell extends DraggableListCell<ProjectPage> implements Localizable {
 
+		private static final ColumnConstraints[] cc;
+		private static final RowConstraints rc;
+
+		static {
+			cc = new ColumnConstraints[]{
+				new ColumnConstraints(),
+				new ColumnConstraints()
+			};
+			cc[0].setMinWidth(40);
+			cc[0].setHgrow(Priority.SOMETIMES);
+			cc[1].setHgrow(Priority.ALWAYS);
+			rc = new RowConstraints();
+			rc.setValignment(VPos.TOP);
+		}
 		private final ApplicationHandler handler;
 		private final ToggleGroup group;
-		private final BorderPane pane = new BorderPane();
-		private final VBox vbox = new VBox();
-		private final RadioButton radioButton = new RadioButton();
-		private final Label label = new Label();
-		private final TextField textField = new TextField();
-		private final Label pipelineName = new Label();
-		private final Label pipelinesLabel = FormGridPane.newLabel(localize("pipeline") + ":");
-		private final FormGridPane grid = new FormGridPane();
+		private final EventHandler<KeyEvent> onEnterHandler;
+		private final EventHandler<MouseEvent> onDoubleClickHandler;
+		private final InvalidationListener selectionListener;
+		private final InvalidationListener pipelineListener;
+		private final BorderPane pane;
+		private final RadioButton radioButton;
+		private final FormGridPane grid;
+
+		private final Label pageName;
+		private final Label pageDescription;
+		private final Glyph expandGlyph;
+		private final BorderPane pagePane;
+
+		private final TextField pageNameField;
+		private final Label fileLabel;
+		private final Label fileDescription;
+		private final Label imageLabel;
+		private final Label imageDescription;
+		private final Label pipelineLabel;
+
+		private ComboBox<PipelineManager.PipelineItem> pipelineCombo;
 		private ProjectPage currentPage;
-		private ComboBox<PipelineManager.PipelineItem> pipelines;
-		private final EventHandler<KeyEvent> onEnterHandler = new KeyEventHandler(
-				KeyCode.ENTER,
-				(e) -> {
-					cancelEdit();
-					return true;
-				}
-		);
-		private final EventHandler<MouseEvent> onDoubleClickHandler = new MouseEventHandler(
-				ClickCount.DOUBLE_CLICK,
-				(e) -> {
-					cancelEdit();
-					return true;
-				}
-		);
-		// listen to (external) reassignment of the page's pipeline
-		private final InvalidationListener pipelineListener = (c) -> updatePipelineLabel();
 
 		/**
 		 * Creates a new project page cell.
@@ -232,32 +271,161 @@ public class PagesWidget extends AbstractWidget {
 		public ProjectPageCell(ApplicationHandler handler, ToggleGroup group) {
 			this.handler = handler;
 			this.group = group;
-
-			label.setAlignment(Pos.CENTER_LEFT);
-			label.setMaxWidth(Double.MAX_VALUE);
-			GridPane.setMargin(textField, new Insets(0, 0, 2, 0));
-			textField.setOnKeyPressed(onEnterHandler);
+			this.onEnterHandler = new KeyEventHandler(
+					KeyCode.ENTER,
+					(e) -> doCancelEdit(e)
+			);
+			this.onDoubleClickHandler = new MouseEventHandler(
+					ClickCount.DOUBLE_CLICK,
+					(e) -> doCancelEdit(e)
+			);
+			this.pipelineListener = (c) -> onUpdatePipeline();
+			this.selectionListener = (c) -> onUpdateSelection();
+			this.selectedProperty().addListener(selectionListener);
 
 			final int d = UIStrategyGUI.Stage.insets;
+			this.radioButton = new RadioButton();
 			radioButton.setPadding(new Insets(0, d, 0, 0));
-			pipelineName.getStyleClass().add("dip-small");
-			vbox.setSpacing(UIStrategyGUI.Stage.insets);
-			vbox.getChildren().setAll(label, pipelineName);
+			this.grid = new FormGridPane(0, 1);
+			grid.setMaxWidth(Double.MAX_VALUE);
+			grid.setHgap(d);
+			this.pane = new BorderPane();
+			pane.setMaxWidth(Double.MAX_VALUE);
 			pane.setLeft(radioButton);
-			pane.setCenter(vbox);
-			grid.setPadding(new Insets(0, 0, d * 2, 0));
+			pane.setCenter(grid);
+
+			this.pageName = newLabel("", false, true);
+			this.pageDescription = newLabel();
+			this.expandGlyph = UIStrategyGUI.Glyphs.newGlyph(
+					MaterialDesignIcons.CHEVRON_DOWN,
+					Glyph.Size.NORMAL
+			);
+			expandGlyph.setAlignment(Pos.CENTER_RIGHT);
+			expandGlyph.disabledHoverEffectProperty().set(true);
+			this.pagePane = new BorderPane();
+			GridPane.setFillWidth(pagePane, Boolean.TRUE);
+			GridPane.setHgrow(pagePane, Priority.ALWAYS);
+			BorderPane.setAlignment(pageName, Pos.CENTER_LEFT);
+			BorderPane.setAlignment(expandGlyph, Pos.CENTER_RIGHT);
+			pagePane.setCenter(pageName);
+			pagePane.setRight(expandGlyph);
+
+			this.pageNameField = new TextField();
+			this.fileLabel = newLabel(localize("file") + ":", true, false);
+			this.fileDescription = newLabel();
+			this.imageLabel = newLabel(localize("image") + ":", true, false);
+			this.imageDescription = newLabel();
+			this.pipelineLabel = newLabel(localize("pipeline") + ":", true, false);
+		}
+
+		private void onUpdateSelection() {
+			radioButton.setSelected(isPageSelected());
+		}
+
+		private void onUpdatePipeline() {
+			setPageDescription();
+		}
+
+		private void setPageDescription() {
+			pageDescription.setText(String.format(
+					"%d\u00D7%d\u00D7%d, %s (%s)",
+					currentPage.getWidth(),
+					currentPage.getHeight(),
+					currentPage.getNumBands(),
+					currentPage.getPipelineName(),
+					currentPage.getState().name()
+			));
+		}
+
+		private void initGrid() {
+			grid.clear();
+			grid.getColumnConstraints().setAll(cc);
+			grid.getRowConstraints().setAll(rc);
+		}
+
+		private void setDefaultGrid() {
+			pageName.setText(currentPage.getName());
+			setPageDescription();
+
+			initGrid();
+			grid.addSpanRow(pagePane, 2);
+			grid.addSpanRow(pageDescription, 2);
+		}
+
+		private void setEditGrid() {
+			pageNameField.setText(pageName.getText());
+			fileDescription.setText(currentPage.file.toString());
+			imageDescription.setText(String.format(
+					"%d\u00D7%d\u00D7%d",
+					currentPage.getWidth(),
+					currentPage.getHeight(),
+					currentPage.getNumBands()
+			));
+			pipelineCombo = handler.getProject().pipelineManager().getComboBox();
+			pipelineCombo.getStyleClass().add("dip-small");
+			// item's hashCode is the pipeline id!
+			final int id = currentPage.getPipelineId();
+			final PipelineManager.PipelineItem item = new PipelineManager.PipelineItem(id, "");
+			pipelineCombo.getSelectionModel().select(item);
+			pipelineCombo.setOnKeyPressed(onEnterHandler);
+
+			initGrid();
+			grid.addSpanRow(pageNameField, 2);
+			grid.addRow(fileLabel, fileDescription);
+			grid.addRow(imageLabel, imageDescription);
+			grid.addRow(pipelineLabel, pipelineCombo);
+		}
+
+		private void updateChangedValues() {
+			final String tf = pageNameField.getText();
+			if (!tf.equals(pageName.getText())) {
+				pageName.setText(pageNameField.getText());
+				currentPage.setName(pageNameField.getText());
+			}
+
+			if (pipelineCombo != null) {
+				final PipelineManager.PipelineItem selected = pipelineCombo.getSelectionModel().getSelectedItem();
+				if (selected != null) {
+					if (currentPage.getPipelineId() != selected.id) {
+						currentPage.setPipelineId(selected.id);
+						onUpdatePipeline();
+					}
+				}
+				pipelineCombo = null;
+			}
+		}
+
+		private static Label newLabel() {
+			return newLabel("", true, true);
+		}
+
+		private static Label newLabel(String text) {
+			return newLabel(text, true, true);
+		}
+
+		private static Label newLabel(String text, boolean small, boolean wrap) {
+			final Label label = new Label(text);
+			if (wrap) {
+				label.setWrapText(true);
+			}
+			if (small) {
+				label.getStyleClass().add("dip-small");
+			}
+			return label;
+		}
+
+		private <E extends Event> boolean doCancelEdit(E event) {
+			cancelEdit();
+			return true;
 		}
 
 		private boolean isPageSelected() {
-			return handler.getProject().getSelectedPageId() == this.getItem().id;
-		}
-
-		private void updatePipelineLabel() {
-			pipelineName.setText(String.format(
-					"%s: %s",
-					localize("pipeline"),
-					currentPage.pipelineNameProperty().get()
-			));
+			final Project project = handler.getProject();
+			final ProjectPage item = getItem();
+			if (project == null || item == null) {
+				return false;
+			}
+			return project.getSelectedPageId() == item.id;
 		}
 
 		@Override
@@ -268,6 +436,7 @@ public class PagesWidget extends AbstractWidget {
 			setGraphic(null);
 
 			if (currentPage != null) {
+				currentPage.stateProperty().removeListener(pipelineListener);
 				currentPage.pipelineIdProperty().removeListener(pipelineListener);
 				currentPage.pipelineNameProperty().removeListener(pipelineListener);
 			}
@@ -276,15 +445,17 @@ public class PagesWidget extends AbstractWidget {
 			if (!empty) {
 				currentPage.pipelineIdProperty().addListener(pipelineListener);
 				currentPage.pipelineNameProperty().addListener(pipelineListener);
-
+				currentPage.stateProperty().addListener(pipelineListener);
 				radioButton.setUserData(this.getItem().id);
 				radioButton.setToggleGroup(group);
 				radioButton.setSelected(isPageSelected());
-
-				label.setText(item.getName());
-				updatePipelineLabel();
-
+				setDefaultGrid();
 				setGraphic(pane);
+
+				// manage pane width to get wrapping text
+				pane.prefWidthProperty().bind(getListView().widthProperty().subtract(15));
+			} else {
+				pane.prefWidthProperty().unbind();
 			}
 		}
 
@@ -295,24 +466,7 @@ public class PagesWidget extends AbstractWidget {
 			getListView().addEventHandler(KeyEvent.KEY_PRESSED, onEnterHandler);
 			getListView().addEventHandler(MouseEvent.MOUSE_CLICKED, onDoubleClickHandler);
 
-			textField.setText(label.getText());
-			pipelines = handler.getProject().pipelineManager().getComboBox();
-
-			// item's hashCode is the pipeline id!
-			final int id = currentPage.getPipelineId();
-			final PipelineManager.PipelineItem item = new PipelineManager.PipelineItem(id, "");
-
-			pipelines.getSelectionModel().select(item);
-			pipelines.setOnKeyPressed(onEnterHandler);
-			grid.clear();
-			grid.addSpanRow(textField, 2);
-			grid.addRow(pipelinesLabel, pipelines);
-
-			pane.setCenter(grid);
-
-			// this seems to be necessary since we ommit commitEdit and just
-			// use cancelEdit. Might also be a bug, who knows...
-			getListView().layout();
+			setEditGrid();
 		}
 
 		@Override
@@ -322,28 +476,10 @@ public class PagesWidget extends AbstractWidget {
 			getListView().removeEventHandler(KeyEvent.KEY_PRESSED, onEnterHandler);
 			getListView().removeEventHandler(MouseEvent.MOUSE_CLICKED, onDoubleClickHandler);
 
-			final String tf = textField.getText();
-			if (!tf.equals(label.getText())) {
-				label.setText(textField.getText());
-				currentPage.setName(textField.getText());
-			}
-
-			if (pipelines != null) {
-				final PipelineManager.PipelineItem selected = pipelines.getSelectionModel().getSelectedItem();
-				if (selected != null) {
-					if (currentPage.getPipelineId() != selected.id) {
-						// TODO: ask for confirmation!
-						currentPage.setPipelineId(selected.id);
-						updatePipelineLabel();
-					}
-				}
-			}
-
-			pipelines = null;
-			pane.setCenter(vbox);
-
-			getListView().layout();
+			updateChangedValues();
+			setDefaultGrid();
 		}
+
 	}
 
 }

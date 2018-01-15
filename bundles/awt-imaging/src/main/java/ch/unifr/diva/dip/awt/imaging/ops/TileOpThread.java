@@ -4,6 +4,7 @@ import ch.unifr.diva.dip.awt.imaging.scanners.ImageTiler;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Image processing worker thread for {@code TileParallelizable}
@@ -14,6 +15,7 @@ import java.awt.image.BufferedImageOp;
  */
 public class TileOpThread<T extends BufferedImageOp & TileParallelizable<S>, S extends ImageTiler<? extends Rectangle>> extends Thread {
 
+	private final static AtomicInteger threadNumber = new AtomicInteger(1);
 	private final T op;
 	private final S tiler;
 	private final BufferedImage src;
@@ -32,6 +34,13 @@ public class TileOpThread<T extends BufferedImageOp & TileParallelizable<S>, S e
 		this.tiler = tiler;
 		this.src = src;
 		this.dst = dst;
+
+		this.setName(
+				"dip-tile-op-thread-"
+				+ threadNumber.getAndIncrement()
+		);
+		this.setPriority(Thread.NORM_PRIORITY);
+		this.setDaemon(false);
 	}
 
 	@Override

@@ -85,16 +85,21 @@ public class ConcurrentTileOp<T extends BufferedImageOp & TileParallelizable<S>,
 			dst = this.op.createCompatibleDestImage(src, src.getColorModel());
 		}
 
-		if (this.threadPool == null) {
-			runOnThreads(src, dst);
-		} else {
-			runOnThreadPool(src, dst);
+		try {
+			if (this.threadPool == null) {
+				runOnThreads(src, dst);
+			} else {
+				runOnThreadPool(src, dst);
+			}
+		} catch (InterruptedException ex) {
+			Thread.currentThread().interrupt();
+			return null;
 		}
 
 		return dst;
 	}
 
-	private void runOnThreads(BufferedImage src, BufferedImage dst) {
+	private void runOnThreads(BufferedImage src, BufferedImage dst) throws InterruptedException {
 		final S tiler = this.op.getImageTiler(src, dst, this.tileWidth, this.tileHeight);
 		final Thread[] threads = new Thread[this.threadCount];
 
@@ -107,12 +112,15 @@ public class ConcurrentTileOp<T extends BufferedImageOp & TileParallelizable<S>,
 			try {
 				t.join();
 			} catch (InterruptedException ex) {
-				// interrupted
+				for (int i = 0; i < this.threadCount; i++) {
+					threads[i].interrupt();
+				}
+				throw new InterruptedException();
 			}
 		}
 	}
 
-	private void runOnThreadPool(BufferedImage src, BufferedImage dst) {
+	private void runOnThreadPool(BufferedImage src, BufferedImage dst) throws InterruptedException {
 		final S tiler = this.op.getImageTiler(src, dst, this.tileWidth, this.tileHeight);
 		final List<Callable<Void>> callables = new ArrayList<>();
 
@@ -123,7 +131,7 @@ public class ConcurrentTileOp<T extends BufferedImageOp & TileParallelizable<S>,
 		try {
 			this.threadPool.getExecutorService().invokeAll(callables);
 		} catch (InterruptedException ex) {
-			// interrupted
+			throw new InterruptedException();
 		}
 	}
 

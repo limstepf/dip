@@ -10,6 +10,8 @@ import ch.unifr.diva.dip.eventbus.EventBusGuava;
 import ch.unifr.diva.dip.eventbus.events.StatusMessageEvent;
 import ch.unifr.diva.dip.eventbus.events.StatusWorkerEvent;
 import ch.unifr.diva.dip.api.utils.FxUtils;
+import ch.unifr.diva.dip.core.execution.PipelineExecutionLogger;
+import ch.unifr.diva.dip.core.execution.PrintingPipelineExecutionLogger;
 import ch.unifr.diva.dip.core.model.PipelineData;
 import ch.unifr.diva.dip.core.model.Project;
 import ch.unifr.diva.dip.core.model.ProjectData;
@@ -26,7 +28,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -126,7 +127,9 @@ public class MainCLI {
 			if (CommandLineOption.PROCESS.hasOption()) {
 				System.out.println();
 				System.out.println("processing project...");
-				joinThread(project.processAllPages().getThread());
+				// TODO: option to select a different logger; or simple "verbose" toggle?
+				final PipelineExecutionLogger logger = new PrintingPipelineExecutionLogger();
+				joinThread(project.processAllPages(logger).getThread());
 			}
 
 			// save project, unless asked to not do so...
@@ -568,7 +571,7 @@ public class MainCLI {
 			if (event.page < 0) {
 				System.out.println(String.format("%s%s", INDENT, event.type));
 			} else {
-				System.out.println(String.format("%s%s (%d)", INDENT, event.type, event.page));
+				System.out.println(String.format("%s%s: page %d", INDENT, event.type, event.page));
 			}
 		}
 

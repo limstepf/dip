@@ -1,5 +1,6 @@
 package ch.unifr.diva.dip.core.model;
 
+import ch.unifr.diva.dip.core.execution.PipelineExecutionController;
 import ch.unifr.diva.dip.core.ApplicationHandler;
 import ch.unifr.diva.dip.core.ui.Localizable;
 import ch.unifr.diva.dip.core.ui.UIStrategy.Answer;
@@ -8,6 +9,8 @@ import ch.unifr.diva.dip.utils.Modifiable;
 import ch.unifr.diva.dip.utils.ModifiedProperty;
 import ch.unifr.diva.dip.gui.pe.PipelineEditor;
 import ch.unifr.diva.dip.api.utils.FxUtils;
+import ch.unifr.diva.dip.core.execution.PipelineExecutionDialog;
+import ch.unifr.diva.dip.core.execution.PipelineExecutionLogger;
 import ch.unifr.diva.dip.eventbus.events.StatusMessageEvent;
 import ch.unifr.diva.dip.utils.BackgroundTask;
 import ch.unifr.diva.dip.utils.CursorLock;
@@ -24,6 +27,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -204,7 +208,7 @@ public class Project implements Modifiable, Localizable {
 	private void unbindSelectedPage() {
 		// might run on a background thread, so make sure we only touch props
 		// and bindings on the FX Application thread
-		FxUtils.run(() -> {
+		FxUtils.runAndWait(() -> {
 			selectedPageIdProperty.set(-1);
 			canProcessSelectedPageProperty.unbind();
 			canProcessSelectedPageProperty.set(false);
@@ -467,11 +471,13 @@ public class Project implements Modifiable, Localizable {
 	 * Selects a project page by id.
 	 *
 	 * @param id an id of a project page.
+	 * @return {@code true} if a new page has been selected, {@code false} if
+	 * not (e.g.\ if the page already was selected).
 	 */
-	public final void selectPage(int id) {
+	public final boolean selectPage(int id) {
 		final int selected = getSelectedPageId();
-		if (selected == id) {
-			return;
+		if (selected == id || id < 0) {
+			return false;
 		}
 
 		if (selected >= 0) {
@@ -483,11 +489,12 @@ public class Project implements Modifiable, Localizable {
 			page.open();
 			// might run on a background thread, so make sure we only touch props
 			// and bindings on the FX Application thread
-			FxUtils.run(() -> {
+			FxUtils.runAndWait(() -> {
 				selectedPageIdProperty.set(id);
 				canProcessSelectedPageProperty.bind(page.canProcessProperty());
 			});
 		}
+		return true;
 	}
 
 	/**
@@ -496,6 +503,15 @@ public class Project implements Modifiable, Localizable {
 	 * @return id of the selected project page.
 	 */
 	public int getSelectedPageId() {
+		if (!Platform.isFxApplicationThread()) {
+			try {
+				return FxUtils.runFutureTask(() -> {
+					return selectedPageIdProperty.get();
+				});
+			} catch (Exception ex) {
+				// return from property
+			}
+		}
 		return selectedPageIdProperty.get();
 	}
 
@@ -742,36 +758,51 @@ public class Project implements Modifiable, Localizable {
 	 * @return the started background task.
 	 */
 	public BackgroundTask<Void> processAllPages() {
-		return processPages(pages());
+		return processPages(pages(), null);
 	}
 
-	private BackgroundTask<Void> processPages(List<ProjectPage> pages) {
-		final CursorLock cursorLock = new CursorLock(handler, Cursor.WAIT);
-		final BackgroundTask<Void> task = new BackgroundTask<Void>(handler) {
+	/**
+	 * Processes all pages.
+	 *
+	 * @param logger the pipeline execution logger.
+	 * @return the started background task.
+	 */
+	public BackgroundTask<Void> processAllPages(PipelineExecutionLogger logger) {
+		return processPages(pages(), logger);
+	}
 
+	/**
+	 * Processes the given pages.
+	 *
+	 * @param pages the pages to process.
+	 * @return the started background task.
+	 */
+	public BackgroundTask<Void> processPages(List<ProjectPage> pages) {
+		return processPages(pages, null);
+	}
+
+	/**
+	 * Processes the given pages.
+	 *
+	 * @param pages the pages to process.
+	 * @param logger the pipeline execution logger.
+	 * @return the started background task.
+	 */
+	public BackgroundTask<Void> processPages(List<ProjectPage> pages, PipelineExecutionLogger logger) {
+		final CursorLock cursorLock = new CursorLock(handler, Cursor.WAIT);
+		final PipelineExecutionController controller;
+		if (logger == null) {
+			controller = new PipelineExecutionController(handler, pages);
+		} else {
+			controller = new PipelineExecutionController(handler, logger, pages);
+		}
+		final BackgroundTask<Void> task = new BackgroundTask<Void>(handler) {
 			@Override
 			protected Void call() throws Exception {
 				updateTitle(localize("processing.object", localize("pipelines")));
-				final int n = pages.size();
-				int i = 1;
-				for (ProjectPage page : pages) {
-					updateMessage(localize("processing.object", page.getName()));
-					if (i == n) {
-						updateProgress(-1, Double.NaN);
-					} else {
-						updateProgress(i++, n);
-					}
-
-					final boolean doOpen = !page.isOpened();
-					if (doOpen) {
-						page.open();
-					}
-					page.getPipeline().process();
-					runLater(() -> modifiedProperty().set(true));
-					if (doOpen) {
-						page.close();
-					}
-				}
+				updateMessage(localize("processing.object", localize("pipelines")));
+				updateProgress(-1, Double.NaN);
+				controller.process();
 				return null;
 			}
 
@@ -789,6 +820,10 @@ public class Project implements Modifiable, Localizable {
 			}
 		};
 		task.start();
+		if (handler.uiStrategy.hasStage()) {
+			final PipelineExecutionDialog dialog = controller.getDialog(handler.uiStrategy.getStage());
+			dialog.show();
+		}
 		return task;
 	}
 
@@ -836,7 +871,7 @@ public class Project implements Modifiable, Localizable {
 					if (doOpen) {
 						page.open();
 					}
-					page.getPipeline().reset(false);
+					page.reset();
 					runLater(() -> modifiedProperty().set(true));
 					if (doOpen) {
 						page.close(false);
