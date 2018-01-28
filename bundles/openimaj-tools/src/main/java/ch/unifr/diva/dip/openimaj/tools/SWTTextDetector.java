@@ -535,9 +535,9 @@ public class SWTTextDetector extends ProcessableBase {
 		}
 
 		return Arrays.asList(
-				linesLayer,
+				lettersLayer,
 				wordsLayer,
-				lettersLayer
+				linesLayer
 		);
 	}
 
