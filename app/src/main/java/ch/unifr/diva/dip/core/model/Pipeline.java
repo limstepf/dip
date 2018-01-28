@@ -636,6 +636,12 @@ public abstract class Pipeline<T extends PrototypeProcessor> implements Modifiab
 			return PrototypeProcessor.getOutputPortMap(pipeline.processors());
 		}
 
+		// The algorithm described in the thesis, and that has been written on paper(!)
+		// way after the following has been implemented (mea culpa!), is propably
+		// more clear and even might be more efficient than this mess here.
+		// Then again, I might have had my reasons to do it this way -- guess I just
+		// had a different idea in mind, and focused on doing one stage after the other
+		// -- so better double-check first before you get rid of it...
 		private void buildStages(Pipeline<T> pipeline, Map<OutputPort<?>, PrototypeProcessor.PortMapEntry> portMap) {
 			if (portMap == null) {
 				portMap = getPortMap(pipeline);
@@ -662,6 +668,7 @@ public abstract class Pipeline<T extends PrototypeProcessor> implements Modifiab
 								final PrototypeProcessor.PortMapEntry source = portMap.get(output);
 								if (!ready.contains(source.id)) {
 									isReady = false;
+									break;
 								}
 							}
 						}
