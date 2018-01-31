@@ -238,8 +238,8 @@ public class MatrixEditor extends ProcessorBase {
 
 		presets.add(new MatrixPreset(
 				"Gaussian blur 5x5",
-				3,
-				3,
+				5,
+				5,
 				"1/256",
 				new String[][]{
 					new String[]{"1", "4", "6", "4", "1"},
