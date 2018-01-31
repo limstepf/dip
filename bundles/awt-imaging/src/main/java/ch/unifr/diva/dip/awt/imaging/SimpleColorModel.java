@@ -585,10 +585,6 @@ public enum SimpleColorModel {
 	 * <dt>Z<dt>	<dd>Blue-stimulation, or S cone response.<br />
 	 * Range: [0.0, 1.0]</dd>
 	 * </dl>
-	 *
-	 * <br />
-	 * ...with values from 0 to 15 as "footroom", and values from 236 to 255 as
-	 * "headroom".
 	 */
 	XYZ(
 			ch.unifr.diva.dip.api.datatypes.BufferedImageXyz.class,
