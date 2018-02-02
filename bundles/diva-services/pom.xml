@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>ch.unifr.diva.dip</groupId>
+		<artifactId>dip-pom-osgi-bundle</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../../pom-osgi-bundle/pom.xml</relativePath>
+	</parent>
+
+	<artifactId>diva-services</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>bundle</packaging>
+
+	<name>DIVA Services OSGi Bundle</name>
+	<description>
+		DIVA Services.
+	</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>ch.unifr.diva.dip</groupId>
+			<artifactId>glyphs-materialdesignicons</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>ch.unifr.diva.dip.libs</groupId>
+			<artifactId>ch.unifr.diva.DivaServicesCommunicator</artifactId>
+			<version>[1.0,)</version>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

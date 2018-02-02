@@ -23,10 +23,11 @@
 		<module>ejml-tools</module>
 		<module>openimaj-utils</module>
 		<module>openimaj-tools</module>
+		<module>diva-services</module>
 
 		<!-- demo/experimental plugins -->
 		<!--<module>awt-demo</module>-->
 		<!--<module>ejml-demo</module>-->
-		
+
 	</modules>
 </project>
