@@ -31,10 +31,10 @@ public class RedPixler extends ProcessableBase {
 		this.nthParameter = new IntegerSliderParameter("band", 2, 1, 8);
 		this.parameters.put("nth pixel", this.nthParameter);
 
-		this.input = new InputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImage(), true);
+		this.input = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImage(), true);
 		this.inputs.put("buffered-image", this.input);
 
-		this.output = new OutputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImage());
+		this.output = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImage());
 		this.outputs.put("buffered-image", this.output);
 	}
 

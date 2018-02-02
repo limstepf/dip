@@ -57,10 +57,10 @@ public class ParameterDemo extends ProcessableBase {
 	public ParameterDemo() {
 		super("Parameter Demo");
 
-		this.input = new InputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImage(), true);
+		this.input = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImage(), true);
 		this.inputs.put("buffered-image", this.input);
 
-		this.output = new OutputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImage());
+		this.output = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImage());
 		this.outputs.put("buffered-image", this.output);
 
 		// If we'd do something useful here, we'd wanna have a class variable for

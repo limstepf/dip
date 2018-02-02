@@ -7,7 +7,9 @@ import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.components.ProcessorContext;
 import ch.unifr.diva.dip.api.datastructures.JaxbList;
 import ch.unifr.diva.dip.api.datastructures.Line2D;
+import ch.unifr.diva.dip.api.datastructures.Lines2D;
 import ch.unifr.diva.dip.api.datastructures.Point2D;
+import ch.unifr.diva.dip.api.datastructures.Points2D;
 import ch.unifr.diva.dip.api.services.ProcessableBase;
 import ch.unifr.diva.dip.api.services.Processor;
 import java.awt.image.BufferedImage;
@@ -25,19 +27,19 @@ import org.osgi.service.component.annotations.Component;
 public class LayerDemo extends ProcessableBase {
 
 	private final InputPort<BufferedImage> input;
-	private final OutputPort<List<Point2D>> points_out;
-	private final OutputPort<List<Line2D>> lines_out;
+	private final OutputPort<Points2D> points_out;
+	private final OutputPort<Lines2D> lines_out;
 
 	public LayerDemo() {
 		super("Layer Demo");
 
-		this.input = new InputPort(new ch.unifr.diva.dip.api.datatypes.BufferedImage(), true);
+		this.input = new InputPort<>(new ch.unifr.diva.dip.api.datatypes.BufferedImage(), true);
 		this.inputs.put("buffered-image", this.input);
 
-		this.points_out = new OutputPort(new ch.unifr.diva.dip.api.datatypes.Points2D());
+		this.points_out = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.Points2D());
 		this.outputs.put("points", this.points_out);
 
-		this.lines_out = new OutputPort(new ch.unifr.diva.dip.api.datatypes.Lines2D());
+		this.lines_out = new OutputPort<>(new ch.unifr.diva.dip.api.datatypes.Lines2D());
 		this.outputs.put("lines", this.lines_out);
 	}
 
@@ -47,6 +49,7 @@ public class LayerDemo extends ProcessableBase {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void init(ProcessorContext context) {
 		if (context != null) {
 			if (context.hasKeys("points", "lines", "width", "height")) {
@@ -87,10 +90,13 @@ public class LayerDemo extends ProcessableBase {
 	}
 
 	@Override
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public void process(ProcessorContext context) {
 		try {
-			final List<Point2D> pointSet = new ArrayList<>();
-			final List<Line2D> lineSet = new ArrayList<>();
+//			final List<Point2D> pointSet = new ArrayList<>();
+//			final List<Line2D> lineSet = new ArrayList<>();
+			final Points2D pointSet = new Points2D();
+			final Lines2D lineSet = new Lines2D();
 
 			final EditorLayerGroup root = context.getLayer();
 
