@@ -1,9 +1,12 @@
 
 BMAT File Format
 ================
-BMAT files are used to store instances of `BufferedMatrix` (located in the `ch.unifr.diva.dip.api.imaging` package), which are generalized `BufferedImage`s with any number of bands, variable sample precision/type (usually floats, but also double or int are supported), and no color model. 
+BMAT files are used to store instances of `BufferedMatrix` (located in the `ch.unifr.diva.dip.api.datastructures` package), which are generalized `BufferedImage`s with any number of bands, variable sample precision/type (usually floats, but also double or int are supported), and no color model. 
 
-While these files are often used to store images with samples in floating point precision (e.g. for images in Lab color space), it's an efficent file format for any kind of dense matrix, or raster data in general. And since `BufferedMatrix` is a/extends from `BufferedImage`, it comes with a nice API to use too (e.g. `WritableRaster`). In fact, you can just plug in a `BufferedMatrix` where a `BufferedImage` is expected (in most cases). They just can't be displayed directly, since the meaning of samples is not directly encoded, but (assumed to be) given by context. Images stored as BMAT files are typically interpreted by an associated color model defined in `SimpleColorModel` (located in the same package), but that is the business of the processor owning that file. 
+While these files are often used to store images with samples in single floating point precision (e.g. for images in Lab color space), it's an suitable file format for any kind of dense matrix, or raster data in general. 
+And since `BufferedMatrix` is a/extends from `BufferedImage`, it comes with a nice API to use too (e.g. `WritableRaster`). In fact, you can just plug in a `BufferedMatrix` where a `BufferedImage` is expected (in most cases). 
+They just can't be displayed directly, since the meaning of samples is not directly encoded, but (assumed to be) given by  context (or owner of the file). 
+Images stored as BMAT files are typically interpreted by an associated color model defined in `SimpleColorModel` (located in the ch.unifr.diva.dip.awt.imaging` package of the AWT imaging bundle), but that is the business of the processor owning that file. 
 
 A custom binary format (described in the following table) is used, since writing/reading huge matrices in a human readable format (e.g. csv, xml, or matrix market) is way too slow.
 
@@ -21,7 +24,7 @@ bytes | description
 width `x` height `x` bands `x` `b` | The samples (in BIP or BSQ) where `b` is the number of bytes per sample (e.g. 4 bytes for INT and FLOAT, 8 for DOUBLE)
 
 
-Reading and writing of BMAT (or `BufferedMatrix`) files is implemented in the `BufferedIO` utility class (also located in the `ch.unifr.diva.dip.api.imaging` package). Samples are stored either Band-Interleaved-by-Pixel (BIP), or Band-Sequential (BSQ), which affects both: the data buffer that backs the `BufferedMatrix`, as well as the way samples are written to/read from disk in the BMAT file format.
+Reading and writing of BMAT (or `BufferedMatrix`) files is implemented in the `BufferedIO` utility class (also located in the `ch.unifr.diva.dip.api.utils` package). Samples are stored either Band-Interleaved-by-Pixel (BIP), or Band-Sequential (BSQ), which affects both: the data buffer that backs the `BufferedMatrix`, as well as the way samples are written to/read from disk in the BMAT file format.
 
 
 Band-Interleaved-by-Pixel (BIP)
