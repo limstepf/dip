@@ -17,6 +17,9 @@ import java.text.DecimalFormatSymbols;
 import java.util.*;
 import java.util.List;
 
+/**
+ * DivaServices Communicator.
+ */
 public class DivaServicesCommunicator {
 
 	private String serverUrl;

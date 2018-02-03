@@ -25,7 +25,7 @@ import javafx.scene.shape.Shape;
 import org.osgi.service.component.annotations.Component;
 
 /**
- * DIVA Services line segmentation processor.
+ * DivaServices line segmentation processor.
  */
 @Component(service = Processor.class)
 public class DivaServicesLineSegmentation extends HybridProcessorBase {
@@ -36,7 +36,7 @@ public class DivaServicesLineSegmentation extends HybridProcessorBase {
 	 *
 	 * <p>
 	 * And just for the record: instead of this, we should rely on service
-	 * discovery at runtime (needs a better Diva Services Java API) and also
+	 * discovery at runtime (needs a better DivaServices Java API) and also
 	 * consider available parameters. A copy of the service definition should be
 	 * stored/managed locally for the case things go unavailable.
 	 */
@@ -118,10 +118,10 @@ public class DivaServicesLineSegmentation extends HybridProcessorBase {
 	private Shape currentSelection;
 
 	/**
-	 * Creates a new DIVA Services line segmentation processor.
+	 * Creates a new DivaServices line segmentation processor.
 	 */
 	public DivaServicesLineSegmentation() {
-		super("Diva Services Line Segmentation");
+		super("DivaServices Line Segmentation");
 
 		this.segMethod = new EnumParameter(
 				"Method",
@@ -210,7 +210,7 @@ public class DivaServicesLineSegmentation extends HybridProcessorBase {
 			final List<Rectangle> rectangles = response.getHighlighter().getData();
 			cancelIfInterrupted(rectangles);
 			log.info(
-					"DIVA Services {} detected {} line(s).",
+					"DivaServices {}: {} line(s) detected.",
 					method.getName(),
 					rectangles.size()
 			);

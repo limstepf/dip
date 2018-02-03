@@ -1,5 +1,5 @@
 /**
- * Diva Services Communicator API. Repackaged as an OSGi bundle.
+ * DivaServices Communicator API. Repackaged as an OSGi bundle.
  *
  * <p>
  * Note that this version is outdated and had to be fixed to use the new URL to
@@ -8,7 +8,7 @@
  * since the data directory is in an illegal location (should be moved to
  * resources...). And that deprecated Base64 decoder has been replaced with the
  * apache one. For a future version there should be service discovery, which
- * will require a mapping of Diva Services to DIP types to work.
+ * will require a mapping of DivaServices to DIP types to work.
  *
  * <p>
  * <ul>

@@ -11,6 +11,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
+ * DivaServices ImageEncoding.
+ *
  * Created by lunactic on 22.09.15.
  */
 public class ImageEncoding {
