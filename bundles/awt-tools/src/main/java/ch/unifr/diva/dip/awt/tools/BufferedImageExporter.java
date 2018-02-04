@@ -98,6 +98,11 @@ public class BufferedImageExporter extends ProcessableBase {
 		return this.nameParam.get().trim();
 	}
 
+	@Override
+	public boolean isConnected() {
+		return colorPortsUnit.isConnected();
+	}
+
 	// some filename is required
 	@Override
 	public boolean isWaitingOnInputParams() {

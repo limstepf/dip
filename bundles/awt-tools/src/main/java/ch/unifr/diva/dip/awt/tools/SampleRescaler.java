@@ -125,6 +125,11 @@ public class SampleRescaler extends ProcessableBase implements Previewable {
 		return this.input;
 	}
 
+	@Override
+	public boolean isConnected() {
+		return getConnectedInput().isConnected();
+	}
+
 	private void enableOutputs() {
 		this.outputs.clear();
 		this.outputs.putAll(this.rescaleUnit.getEnabledOutputPorts());
@@ -186,7 +191,7 @@ public class SampleRescaler extends ProcessableBase implements Previewable {
 				cancelIfInterrupted(src);
 				final BufferedImage rescaledImage = doProcess(context, src);
 				cancelIfInterrupted(rescaledImage);
-				
+
 				if (this.rescaleUnit.isBufferedMatrix()) {
 					writeBufferedMatrix(context, (BufferedMatrix) rescaledImage, STORAGE_MAT);
 				} else {

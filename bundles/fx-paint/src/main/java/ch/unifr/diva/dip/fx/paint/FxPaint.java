@@ -195,6 +195,11 @@ public class FxPaint extends HybridProcessorBase {
 	}
 
 	@Override
+	public boolean isConnected() {
+		return colorPortsUnit.isConnected();
+	}
+
+	@Override
 	public void reset(ProcessorContext context) {
 		this.colorPortsUnit.resetOutputs();
 		deleteFile(context, STORAGE_IMAGE);
