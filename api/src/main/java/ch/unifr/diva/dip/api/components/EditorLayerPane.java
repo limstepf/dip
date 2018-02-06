@@ -3,8 +3,10 @@ package ch.unifr.diva.dip.api.components;
 import javafx.scene.Node;
 
 /**
- * Grants safe access to a LayerPane. All methods are executed on the JavaFX
- * application thread.
+ * Grants safe access to a LayerPane. Unless stated otherwise all methods are
+ * executed on the JavaFX application thread (i.e. safe to be called from any
+ * other). Note, however, that layers attached to the JavaFX scene graph can
+ * only be modified on the JavaFX application thread.
  */
 public interface EditorLayerPane extends EditorLayer {
 

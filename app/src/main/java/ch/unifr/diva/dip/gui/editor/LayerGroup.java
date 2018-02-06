@@ -283,6 +283,21 @@ public class LayerGroup extends LayerBase implements EditorLayerGroup {
 	}
 
 	@Override
+	public int size() {
+		if (Platform.isFxApplicationThread()) {
+			return children.size();
+		}
+		try {
+			return FxUtils.runFutureTask(() -> {
+				return children.size();
+			});
+		} catch (Exception ex) {
+			log.error("failed to return the layer group's size: {}", this, ex);
+			return 0;
+		}
+	}
+
+	@Override
 	public boolean isEmpty() {
 		return this.emptyProperty().get();
 	}
