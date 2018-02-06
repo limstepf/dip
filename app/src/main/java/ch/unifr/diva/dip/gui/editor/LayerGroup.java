@@ -168,6 +168,16 @@ public class LayerGroup extends LayerBase implements EditorLayerGroup {
 
 		reevaluateEmpty();
 		fireEvent(MODIFIED_EVENT);
+
+		/* not really sure why, but this fixes a bug with groups of size 2, where
+		 the second item is displayed wrong in the tree (totally wrong indent/left
+		 margin). Calling setAll() twice fixed the problem, but is a bit costly,
+		 isn't it. So.. I've boiled it down to this here. Setting all items a
+		 second time fixes the problem. Feel free to try it out by yourself, out-
+		 comment the following line and check e.g. with a band splitter and only
+		 two outputs/layers...
+		 */
+		this.treeItem.getChildren().setAll(items);
 	}
 
 	private void addHiddenLayer(Layer layer, List<TreeItem<Layer>> items) {
