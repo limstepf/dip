@@ -245,8 +245,20 @@ public class PipelineEditor extends AbstractWindow implements Presenter {
 		repaint();
 	}
 
+	/**
+	 * Fires a repaint event.
+	 */
 	protected final void repaint() {
 		this.zoomPane.fireContentChange();
+	}
+
+	/**
+	 * Returns the zoom factor of the pipeline editor pane.
+	 *
+	 * @return the zoom factor ({@code 1.0} = 100%}).
+	 */
+	protected double getZoom() {
+		return this.zoomPane.getZoom();
 	}
 
 	/**

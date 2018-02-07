@@ -481,8 +481,9 @@ public abstract class ProcessorView extends BorderPane {
 	}
 
 	protected void moveNode(Node node, double dx, double dy) {
-		node.layoutXProperty().set(node.getLayoutX() + dx);
-		node.layoutYProperty().set(node.getLayoutY() + dy);
+		final double f = 1.0 / editor.getZoom();
+		node.layoutXProperty().set(node.getLayoutX() + dx * f);
+		node.layoutYProperty().set(node.getLayoutY() + dy * f);
 	}
 
 	protected void onMouseReleased(MouseEvent e) {
