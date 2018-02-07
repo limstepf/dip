@@ -320,6 +320,7 @@ public class ToolBarPresenter implements Presenter {
 	}
 
 	private void clearToolBar() {
+		this.currentProcessor = null;
 		final VisibilityMode mode = getVisibilityMode();
 		resetToolBar();
 		buildToolBar(mode);
