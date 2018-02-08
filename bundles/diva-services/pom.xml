@@ -25,7 +25,7 @@
 
 		<dependency>
 			<groupId>ch.unifr.diva.dip.libs</groupId>
-			<artifactId>ch.unifr.diva.DivaServicesCommunicator</artifactId>
+			<artifactId>ch.unifr.diva.services.DivaServicesCommunicator</artifactId>
 			<version>[1.0,)</version>
 		</dependency>
 
