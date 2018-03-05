@@ -1,6 +1,5 @@
 package ch.unifr.diva.dip.divaservices;
 
-import ch.unifr.diva.services.DivaServicesCommunicator;
 import ch.unifr.diva.dip.api.components.InputPort;
 import ch.unifr.diva.dip.api.components.OutputPort;
 import ch.unifr.diva.dip.api.components.ProcessorContext;
@@ -14,15 +13,15 @@ import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.services.ProcessorBase;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.glyphs.mdi.MaterialDesignIcons;
+import ch.unifr.diva.services.DivaServicesCommunicator;
 import ch.unifr.diva.services.returnTypes.DivaServicesResponse;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
-import java.util.List;
 import javafx.geometry.Bounds;
 import javafx.scene.shape.Shape;
 import org.osgi.service.component.annotations.Component;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.List;
 
 /**
  * DivaServices line segmentation processor.

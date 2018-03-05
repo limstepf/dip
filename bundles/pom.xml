@@ -1,33 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>ch.unifr.diva.dip</groupId>
-	<artifactId>dip-bundles</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
-	<name>DIVA DIP Bundles</name>
-	<description>
-		DIVA DIP Bundles is a multi-module (or aggregate) for in-house OSGi bundles.
-	</description>
-	<packaging>pom</packaging>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>ch.unifr.diva.dip</groupId>
+    <artifactId>dip-bundles</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <name>DIVA DIP Bundles</name>
+    <description>
+        DIVA DIP Bundles is a multi-module (or aggregate) for in-house OSGi bundles.
+    </description>
+    <packaging>pom</packaging>
 
-	<modules>
-		<!-- libraries (used by plugins below) -->
-		<module>imaging</module>
-		<module>awt-imaging</module>
-		<module>fx-imaging</module>
+    <modules>
+        <!-- libraries (used by plugins below) -->
+        <module>imaging</module>
+        <module>awt-imaging</module>
+        <module>fx-imaging</module>
 
-		<!-- plugins -->
-		<module>awt-tools</module>
-		<module>fx-tools</module>
-		<module>fx-paint</module>
-		<module>ejml-tools</module>
-		<module>openimaj-utils</module>
-		<module>openimaj-tools</module>
-		<module>diva-services</module>
+        <!-- plugins -->
+        <module>awt-tools</module>
+        <module>fx-tools</module>
+        <module>fx-paint</module>
+        <module>ejml-tools</module>
+        <module>openimaj-utils</module>
+        <module>openimaj-tools</module>
+        <module>diva-services</module>
+        <module>diva-services-binarization</module>
 
-		<!-- demo/experimental plugins -->
-		<!--<module>awt-demo</module>-->
-		<!--<module>ejml-demo</module>-->
-
-	</modules>
+        <!-- demo/experimental plugins -->
+        <!--<module>awt-demo</module>-->
+        <!--<module>ejml-demo</module>-->
+    </modules>
 </project>
