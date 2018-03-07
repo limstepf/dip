@@ -33,7 +33,6 @@
 
 		<!-- OSGi bundle archtypes -->
 		<module>bundle-archetype</module>
-
   </modules>
 
 	<build>

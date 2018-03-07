@@ -9,7 +9,7 @@
 	</parent>
 
 	<groupId>ch.unifr.diva.dip</groupId>
-	<artifactId>diva-services-binarization</artifactId>
+	<artifactId>diva-services-otsubinarization</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 
@@ -29,11 +29,6 @@
 			<artifactId>glyphs-materialdesignicons</artifactId>
 		</dependency>
 
-		<dependency>
-			<groupId>ch.unifr.diva.dip.libs</groupId>
-			<artifactId>ch.unifr.diva.services.DivaServicesCommunicator</artifactId>
-			<version>[1.0,)</version>
-		</dependency>
         <dependency>
             <groupId>ch.unifr.diva.dip.libs</groupId>
             <artifactId>ch.unifr.diva.services.DivaServicesCommunicator</artifactId>

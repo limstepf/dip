@@ -8,18 +8,29 @@ import ch.unifr.diva.dip.api.services.HybridProcessorBase;
 import ch.unifr.diva.dip.api.services.Processor;
 import ch.unifr.diva.dip.api.ui.NamedGlyph;
 import ch.unifr.diva.dip.glyphs.mdi.MaterialDesignIcons;
-import ch.unifr.diva.services.DivaServicesCommunicator;
-import ch.unifr.diva.services.returnTypes.DivaServicesResponse;
+import ch.unifr.diva.divaservices.communicator.DivaServicesAdmin;
+import ch.unifr.diva.divaservices.communicator.DivaServicesConnection;
+import ch.unifr.diva.divaservices.communicator.exceptions.*;
+import ch.unifr.diva.divaservices.communicator.request.DivaCollection;
+import javafx.util.Pair;
+import org.json.JSONObject;
 import org.osgi.service.component.annotations.Component;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A processor plugin.
  */
 @Component(service = Processor.class)
-public class DivaServicesBinarization extends HybridProcessorBase {
-    private final static String DIVA_SERVICES_API = "http://divaservices.unifr.ch/api/v1/";
+public class DivaServicesSauvolaBinarization extends HybridProcessorBase {
     private final static String STORAGE_IMAGE = "binary.png";
     private final static String STORAGE_IMAGE_FORMAT = "PNG";
 
@@ -33,8 +44,8 @@ public class DivaServicesBinarization extends HybridProcessorBase {
     /**
      * Creates a new processor plugin.
      */
-    public DivaServicesBinarization() {
-        super("DivaServices Binarization");
+    public DivaServicesSauvolaBinarization() {
+        super("DivaServices Sauvola Binarization");
 
         this.input = new InputPort<>(
                 new ch.unifr.diva.dip.api.datatypes.BufferedImage(),
@@ -71,7 +82,7 @@ public class DivaServicesBinarization extends HybridProcessorBase {
 
     @Override
     public Processor newInstance(ProcessorContext context) {
-        return new DivaServicesBinarization();
+        return new DivaServicesSauvolaBinarization();
     }
 
     @Override
@@ -96,23 +107,27 @@ public class DivaServicesBinarization extends HybridProcessorBase {
         // TODO: store result, and set output ports, layers, ...
         // TODO (optional): implement the Previewable interface if applicable
         try {
+
             final BufferedImage src = getSourceImage();
             cancelIfInterrupted(src);
-
-            final DivaServicesCommunicator communicator = new DivaServicesCommunicator(
-                    DIVA_SERVICES_API
-            );
+            DivaServicesConnection connection = new DivaServicesConnection("http://divaservices.unifr.ch/api/v2", 5);
+            List<Pair<String, BufferedImage>> images = new LinkedList<>();
+            images.add(new Pair<>("inputImage.jpg", src));
             Thread.sleep(2000);
-
-            final DivaServicesResponse response = communicator.runOtsuBinarization(src, true);
-            cancelIfInterrupted(response);
-            BufferedImage outputImage = response.getImage();
-            writeObject(context, outputImage, STORAGE_IMAGE);
+            Map<String, Object> parameters = new HashMap<>();
+            DivaCollection collection = DivaCollection.createCollectionWithImages(images, connection, log);
+            Thread.sleep(2000);
+            parameters.put("inputImage", collection.getName() + "/inputImage.jpg");
+            parameters.put("radius",15);
+            parameters.put("thres_tune",0.3);
+            List<JSONObject> binarizationResult = DivaServicesAdmin.runMethod("http://divaservices.unifr.ch/api/v2/binarization/sauvolabinarization/1", parameters);
+            log.info(binarizationResult.get(0).toString(1));
             cancelIfInterrupted();
 
-            setOutputs(context, outputImage);
+            setOutputs(context, parseResult(binarizationResult));
             cancelIfInterrupted();
-        } catch (InterruptedException ex) {
+        } catch (InterruptedException | FileTypeConfusionException | UserParametersOverloadException | IncompatibleValueException | UserValueRequiredException | ForgotKeyValueObjectException | IOException | MethodNotAvailableException ex) {
+            log.error(ex.getMessage());
             reset(context);
         }
     }
@@ -151,4 +166,20 @@ public class DivaServicesBinarization extends HybridProcessorBase {
             return input.getValue();
         }
     }
+
+    private BufferedImage parseResult(List<JSONObject> result) throws IOException {
+
+        for (int i = 0; i < result.get(0).getJSONArray("output").length(); i++) {
+            JSONObject resultFile = result.get(0).getJSONArray("output").getJSONObject(i);
+            if (resultFile.keySet().toArray()[0].equals("file")) {
+                JSONObject file = resultFile.getJSONObject("file");
+                if (file.getJSONObject("options").getBoolean("visualization")) {
+                    return ImageIO.read(new URL(file.getString("url")));
+
+                }
+            }
+        }
+        return null;
+    }
+
 }
