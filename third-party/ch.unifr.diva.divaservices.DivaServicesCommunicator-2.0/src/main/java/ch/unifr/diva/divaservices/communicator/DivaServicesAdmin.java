@@ -58,8 +58,8 @@ public class DivaServicesAdmin {
     //Test
     public static List<JSONObject> runMethod(String url, Map<String, Object> userParameters) throws MethodNotAvailableException, IOException, ForgotKeyValueObjectException, IncompatibleValueException, UserValueRequiredException, FileTypeConfusionException, UserParametersOverloadException {
         JSONObject postRequest1 = checkParams(runGetRequest(url), userParameters);
-        return runPostRequest(url, postRequest1);
         //return list of JSONObject
+        return runPostRequest(url, postRequest1);
     }
 
     private static List<JSONObject> runPostRequest(String url, JSONObject postRequest1) throws IOException, MethodNotAvailableException {
