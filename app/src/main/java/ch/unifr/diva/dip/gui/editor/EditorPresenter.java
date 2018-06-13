@@ -409,18 +409,6 @@ public class EditorPresenter implements Presenter {
 					new PolygonalSelectionTool(
 							"Polygonal lasso selection tool",
 							MaterialDesignIcons.VECTOR_POLYGON
-					),
-					new BrushSelectionTool(
-							"Brush selection tool",
-							IcoFont.MARKER_ALT_3,
-							new SquareShapeBrush(
-									"Square brush",
-									FontAwesome.SQUARE
-							),
-							new CircleShapeBrush(
-									"Circle brush",
-									FontAwesome.CIRCLE
-							)
 					)
 			);
 		}
